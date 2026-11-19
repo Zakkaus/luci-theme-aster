@@ -1,0 +1,312 @@
+/**
+ * Shared by checks/uniform.mjs and checks/contrast.mjs: the command line, the
+ * page list, the login, the page walk, and the helpers both gates run inside
+ * the page (visibility, a short element path, colour parsing, compositing).
+ *
+ * Nothing here writes to the device. The login is the ordinary form POST;
+ * light and dark are chosen through the theme's browser setting
+ * (localStorage "aster-theme"), as a reader chooses them; the only clicks
+ * are the Edit button that opens an interface dialog and the Close button of
+ * a dialog luci-app-attendedsysupgrade opens on its own. Nothing is saved.
+ *
+ * Playwright is not a dependency of this repository. PLAYWRIGHT points at its
+ * index.mjs (default: the bare specifier "playwright"); CHROME_PATH, when set,
+ * picks the browser binary.
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+
+export const CHECKS = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+export const VIEWPORTS = {desktop: {width: 1440, height: 900}, phone: {width: 390, height: 844}};
+
+/* Flags take one value each; repeatable flags collect into an array. */
+export function parseArgs(argv, {flags, repeat = [], usage}) {
+  const args = [...argv];
+  const out = {};
+  for (const f of repeat) out[f] = [];
+  const pos = [];
+  while (args.length) {
+    const a = args.shift();
+    if (!a.startsWith('--')) { pos.push(a); continue; }
+    const name = a.slice(2);
+    if (!(name in flags) && !repeat.includes(name)) die(`unknown option ${a}\n${usage}`);
+    if (!args.length) die(`${a} needs a value\n${usage}`);
+    const v = args.shift();
+    if (repeat.includes(name)) out[name].push(v); else out[name] = v;
+  }
+  for (const [k, v] of Object.entries(flags)) if (out[k] === undefined) out[k] = v;
+  if (pos.length !== 2) die(usage);
+  out.base = `${pos[0].replace(/\/+$/, '')}/cgi-bin/luci/`;
+  out.url = pos[0];
+  out.password = pos[1];
+  out.devices = out.viewports.split(',').map((s) => s.trim()).filter(Boolean);
+  out.modes = out.modes.split(',').map((s) => s.trim()).filter(Boolean);
+  for (const d of out.devices) if (!VIEWPORTS[d]) die(`--viewports: unknown ${d} (desktop, phone)`);
+  for (const m of out.modes) if (m !== 'light' && m !== 'dark') die(`--modes: unknown ${m} (light, dark)`);
+  return out;
+}
+
+export function die(msg) {
+  console.error(msg);
+  process.exit(1);
+}
+
+/* One entry a line:  <path> [modal=<name>] [require=<class>,<class>...]
+ * A class in require= must have at least one sample on that page at every
+ * viewport and mode; `<class>@desktop` asks for it on the desktop only. A
+ * class name matches itself and its dotted children ("button" matches
+ * "button.primary.md"). */
+export function readPages(files) {
+  const pages = [];
+  for (const file of files) {
+    const text = fs.readFileSync(file, 'utf8');
+    text.split('\n').forEach((raw, i) => {
+      const line = raw.replace(/#.*/, '').trim();
+      if (!line) return;
+      const [p, ...rest] = line.split(/\s+/);
+      const e = {path: p.replace(/^\/+/, ''), modal: null, require: [], src: `${path.basename(file)}:${i + 1}`};
+      for (const r of rest) {
+        const [k, v] = r.split('=');
+        if (k === 'modal') e.modal = v;
+        else if (k === 'require') e.require = v.split(',').filter(Boolean);
+        else die(`${e.src}: unknown field ${r}`);
+      }
+      if (e.modal && !MODALS[e.modal]) die(`${e.src}: unknown modal ${e.modal}`);
+      e.id = e.modal ? `${e.path} [${e.modal}]` : e.path;
+      pages.push(e);
+    });
+  }
+  if (!pages.length) die('the page list is empty');
+  return pages;
+}
+
+export const classMatches = (want, cls) => cls === want || cls.startsWith(`${want}.`);
+
+/* --debug-css <page id or path>=<css>: a stylesheet added to that page after
+ * it renders. For the negative tests only. */
+export function parseDebugCss(list) {
+  return list.map((s) => {
+    const i = s.indexOf('=');
+    if (i < 1) die(`--debug-css wants <page>=<css>, got ${s}`);
+    return {page: s.slice(0, i), css: s.slice(i + 1)};
+  });
+}
+
+/* Dialogs the page list can open. Each returns a description of what it
+ * opened, or throws. */
+export const MODALS = {
+  // Network > Interfaces: the first interface row's Edit button.
+  'interface-edit': async (page, timeout) => {
+    const btn = page.locator('.cbi-section-actions .cbi-button-edit, .cbi-section-actions button[title="Edit"]').first();
+    await btn.waitFor({state: 'visible', timeout});
+    const row = await btn.evaluate((b) => b.closest('[data-section-id]')?.getAttribute('data-section-id') ?? '?');
+    await btn.click();
+    await page.waitForSelector('#modal_overlay .modal :is(.cbi-section, .cbi-map, .cbi-value)', {state: 'visible', timeout});
+    return `edit dialog of interface ${row}`;
+  },
+};
+
+export async function launch() {
+  const {chromium} = await import(process.env.PLAYWRIGHT ?? 'playwright');
+  return chromium.launch(process.env.CHROME_PATH ? {executablePath: process.env.CHROME_PATH} : {});
+}
+
+/* A logged-in browser context for one viewport and mode. Throws on a failed
+ * login: LuCI answers a good one with 302 and a sysauth cookie. */
+export async function session(browser, opt, device, mode) {
+  const ctx = await browser.newContext({viewport: VIEWPORTS[device], deviceScaleFactor: 1, colorScheme: mode});
+  await ctx.addInitScript((m) => { try { localStorage.setItem('aster-theme', m); } catch (e) {} }, mode);
+  const r = await ctx.request.post(opt.base, {form: {luci_username: opt.user, luci_password: opt.password}, maxRedirects: 0});
+  const cookie = (await ctx.cookies()).some((c) => c.name.startsWith('sysauth'));
+  if (r.status() !== 302 || !cookie) {
+    await ctx.close();
+    throw new Error(`login returned ${r.status()}${cookie ? '' : ' and no sysauth cookie'}, want 302`);
+  }
+  return ctx;
+}
+
+/* Opens one page-list entry and leaves it ready to measure. Returns
+ * {page, note, errors} or {error}. A page that answers anything but 200,
+ * says it does not exist, shows a view error, never finishes rendering, or
+ * renders without the requested theme is an error. */
+export async function openPage(ctx, opt, entry, mode, debugCss) {
+  const page = await ctx.newPage();
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e.message).split('\n')[0].slice(0, 160)));
+  const fail = async (error) => { await page.close(); return {error}; };
+  let resp;
+  try {
+    resp = await page.goto(opt.base + entry.path, {waitUntil: 'load', timeout: opt.timeout});
+  } catch (e) {
+    return fail(`did not load: ${String(e.message).split('\n')[0]}`);
+  }
+  if (!resp || resp.status() !== 200) return fail(`HTTP ${resp?.status()}`);
+  // A view replaces its "Loading view…" spinner when it renders; the overview
+  // is a template whose #view fills with cards.
+  const rendered = await page.waitForFunction(() => {
+    const v = document.querySelector('#view');
+    if (!v) return !!document.querySelector('#maincontent');
+    return v.children.length > 0 && !v.querySelector(':scope > .spinning');
+  }, null, {timeout: opt.timeout}).then(() => true, () => false);
+  if (!rendered) return fail(`did not render within ${opt.timeout} ms`);
+  const missing = await page.evaluate(() => {
+    const main = document.querySelector('#maincontent') ?? document.body;
+    const head = main.innerText.slice(0, 3000);
+    if (/No page is registered at|Page not found/i.test(head)) return head.split('\n').find((l) => /registered|not found/i.test(l));
+    const err = document.querySelector('#view > .alert-message.error, #view > .alert-message.danger');
+    if (err && /Failed to execute|Unable to|TypeError|ReferenceError|error/i.test(err.innerText)) return err.innerText.split('\n').slice(0, 2).join(' ');
+    return null;
+  });
+  if (missing) return fail(`page error: ${missing.slice(0, 200)}`);
+  const theme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
+  if (theme !== mode) return fail(`data-theme is ${theme}, want ${mode} (theme not installed or not selected?)`);
+  await page.waitForTimeout(opt.settle);
+  // luci-app-attendedsysupgrade (25.12) asks on the overview whether to check
+  // for upgrades. Its Close button dismisses the dialog and saves nothing.
+  if (await page.locator('#modal_overlay .modal').isVisible().catch(() => false)) {
+    const close = page.locator('#modal_overlay .modal :is(button, .btn)', {hasText: /^\s*(Close|Dismiss)\s*$/});
+    await ((await close.count()) ? close.first() : page.locator('#modal_overlay .modal :is(button, .btn)').last()).click();
+    await page.waitForTimeout(500);
+  }
+  for (const d of debugCss) if (d.page === entry.id || d.page === entry.path) await page.addStyleTag({content: d.css});
+  let note = '';
+  if (entry.modal) {
+    try {
+      note = await MODALS[entry.modal](page, opt.timeout);
+    } catch (e) {
+      return fail(`modal ${entry.modal}: ${String(e.message).split('\n')[0]}`);
+    }
+    await page.waitForTimeout(opt.settle);
+  }
+  await page.evaluate(installHelpers);
+  return {page, note, errors};
+}
+
+/* Runs fn(ctx, device, mode) for every viewport and mode the run covers. A
+ * failed login is recorded and the run goes on to the next combination. */
+export async function eachCombo(opt, fn, onError) {
+  const browser = await launch();
+  try {
+    for (const device of opt.devices) {
+      for (const mode of opt.modes) {
+        const combo = `${device}-${mode}`;
+        let ctx;
+        try {
+          ctx = await session(browser, opt, device, mode);
+        } catch (e) {
+          onError(combo, '(login)', e.message);
+          continue;
+        }
+        try { await fn(ctx, device, mode, combo); } finally { await ctx.close(); }
+      }
+    }
+  } finally {
+    await browser.close();
+  }
+}
+
+/* Installed into the page as window.__ag before either gate collects. */
+export function installHelpers() {
+  if (window.__ag) return;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 1;
+  const cx = cv.getContext('2d', {willReadFrequently: true});
+  const cache = new Map();
+  const num = (s, pct = 1) => (s === 'none' ? 0 : s.endsWith('%') ? (parseFloat(s) / 100) * pct : parseFloat(s));
+  const enc = (c) => 255 * Math.min(1, Math.max(0, c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055));
+  const oklab = (L, a, b) => {
+    const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+    const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+    const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+    return [
+      enc(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s),
+      enc(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s),
+      enc(-0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s),
+    ];
+  };
+  /* Any computed colour as [r, g, b, a] with r, g, b in 0..255 (unrounded)
+   * and a in 0..1. rgb(), color(srgb), oklch() and oklab() are converted
+   * exactly; anything else goes through a canvas, which is 8-bit. */
+  const rgba = (str) => {
+    if (cache.has(str)) return cache.get(str);
+    let v;
+    const fn = /^([a-z-]+)\((.*)\)$/.exec(str.trim());
+    const parts = fn ? fn[2].replace(/[,/]/g, ' ').trim().split(/\s+/) : [];
+    const alpha = (i) => (parts[i] === undefined ? 1 : num(parts[i], 1));
+    if (str === 'transparent') v = [0, 0, 0, 0];
+    else if (fn && (fn[1] === 'rgb' || fn[1] === 'rgba')) v = [num(parts[0], 255), num(parts[1], 255), num(parts[2], 255), alpha(3)];
+    else if (fn && fn[1] === 'color' && parts[0] === 'srgb') v = [num(parts[1], 1) * 255, num(parts[2], 1) * 255, num(parts[3], 1) * 255, alpha(4)];
+    else if (fn && fn[1] === 'oklch') {
+      const L = num(parts[0], 1), C = num(parts[1], 0.4), h = (num(parts[2], 1) * Math.PI) / 180;
+      v = [...oklab(L, C * Math.cos(h), C * Math.sin(h)), alpha(3)];
+    } else if (fn && fn[1] === 'oklab') v = [...oklab(num(parts[0], 1), num(parts[1], 0.4), num(parts[2], 0.4)), alpha(3)];
+    else {
+      cx.clearRect(0, 0, 1, 1);
+      cx.fillStyle = '#000';
+      cx.fillStyle = str;
+      cx.fillRect(0, 0, 1, 1);
+      const d = cx.getImageData(0, 0, 1, 1).data;
+      v = [d[0], d[1], d[2], d[3] / 255];
+    }
+    cache.set(str, v);
+    return v;
+  };
+  const over = (top, under) => [0, 1, 2].map((i) => top[i] * top[3] + under[i] * (1 - top[3])).concat(1);
+  const lum = (c) => {
+    const f = (x) => { x /= 255; return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; };
+    return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+  };
+  const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+  const hex = (c) => `#${c.slice(0, 3).map((x) => Math.round(x).toString(16).padStart(2, '0')).join('')}`;
+  /* The opaque colour behind an element's content: every background colour
+   * from the root down to the element itself, composited over white, with
+   * each layer's alpha scaled by the opacity above it. Background images and
+   * content painted by siblings or pseudo-elements are not seen. Returns the
+   * colour and the opacity the element's own content is drawn with. */
+  const behind = (el, self = true) => {
+    const chain = [];
+    for (let e = self ? el : el.parentElement; e; e = e.parentElement) chain.unshift(e);
+    let bg = [255, 255, 255, 1];
+    let op = 1;
+    for (const e of chain) {
+      const s = getComputedStyle(e);
+      op *= parseFloat(s.opacity);
+      const c = rgba(s.backgroundColor);
+      if (c[3] > 0) bg = over([c[0], c[1], c[2], c[3] * op], bg);
+    }
+    return {bg, op};
+  };
+  const visible = (el) => {
+    const r = el.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1) return false;
+    if (r.right <= 0 || r.left >= innerWidth) return false;
+    if (el.checkVisibility && !el.checkVisibility({opacityProperty: true, visibilityProperty: true, contentVisibilityAuto: true})) return false;
+    return getComputedStyle(el).visibility !== 'hidden';
+  };
+  /* A short path for the report: up to four steps, stopping at an id. */
+  const where = (el) => {
+    const parts = [];
+    let e = el;
+    for (let i = 0; e && e !== document.body && i < 4; i++, e = e.parentElement) {
+      let p = e.tagName.toLowerCase();
+      if (e.id && !/^(?:widget|cbid)\./.test(e.id)) { parts.unshift(`${p}#${e.id}`); break; }
+      const c = [...e.classList].filter((k) => !/^(?:hidden|active)$/.test(k)).slice(0, 2);
+      if (c.length) p += `.${c.join('.')}`;
+      const n = e.getAttribute('data-name') ?? e.getAttribute('data-section-id') ?? (i === 0 ? e.getAttribute('name') : null);
+      if (n) p += `[${n.slice(0, 30)}]`;
+      parts.unshift(p);
+    }
+    return parts.join(' > ');
+  };
+  /* Elements with their own words: a non-blank text node as a child. */
+  const ownText = (el) => [...el.childNodes].filter((n) => n.nodeType === 3 && n.data.trim()).map((n) => n.data.trim()).join(' ');
+  window.__ag = {rgba, over, lum, ratio, hex, behind, visible, where, ownText};
+}
+
+/* "36px" for a number, the string itself otherwise; arrays joined. */
+export const show = (v) => (Array.isArray(v) ? v.map(show).join(' ') : typeof v === 'number' ? `${+v.toFixed(2)}px` : String(v));
+
+export function writeOut(file, text) {
+  if (file) fs.writeFileSync(file, text);
+}
