@@ -52,6 +52,13 @@
 .cbi-section-actions > * + * { margin-inline-start: var(--spacing-2); }
 /* In a table cell a control and its button have only whitespace between. */
 .td :is(input, select, .cbi-dropdown, .btn, .cbi-button) + :is(.btn, .cbi-button, button) { margin-inline-start: var(--spacing-2); }
+/* The package manager's <style> grows every control in its toolbar
+   (.controls > * > *); its pager arrows are IconButtons and keep their
+   square (layout). */
+#view .pager > :is(.btn, button) { flex: none; }
+/* A field's button written straight after it in a plain block (the
+   interface editor's CIDR switch) sits 8 after it, as in a control group. */
+.cbi-value-field div:not(.control-group, .cbi-value-field, .cbi-dropdown) > :is(input, select) + :is(.btn, .cbi-button, button) { margin-inline-start: var(--spacing-2); }
 /* luci-mod-statistics pairs a select with its button in a span. */
 .shell-content .nowrap:not(.td, .th) { display: inline-flex; align-items: center; gap: var(--spacing-2); }
 
@@ -156,10 +163,12 @@
 :is(.cbi-section, .cbi-section-node) > div:not(.cbi-section-node):has(> .table),
 .shell-inner > div:has(> .table),
 .cbi-section:has(> .table, > .cbi-section-node > .table) { overflow-x: auto; }
-/* A data table runs to the card's frame; its cells give the distance back,
-   so the rules span the card as in the reference's Table in a Card. */
-.cbi-section > .table:has(.th):not(.cbi-value *),
-.cbi-section > .cbi-section-node > .table:has(.th):not(.cbi-value *),
+/* A data table (a header row, or a form section's table: Interfaces
+   leaves the header out) runs to the card's frame; its cells give the
+   distance back, so the rules span the card as in the reference's Table in
+   a Card. */
+.cbi-section > .table:is(:has(.th), .cbi-section-table):not(.cbi-value *),
+.cbi-section > .cbi-section-node > .table:is(:has(.th), .cbi-section-table):not(.cbi-value *),
 :is(.cbi-section, .cbi-section-node) > div:not(.cbi-value, .cbi-section-node):has(> .table .th) > .table,
 .cbi-value > .table,
 .cbi-value > .cbi-section.cbi-tblsection > .table {
@@ -553,7 +562,17 @@
   /* Actions that wrap (here and in the Table fold) are spaced by the gap
      alone, not also by the button-after-button margin. */
   #view .tr:has(> .td > .ifacebox) > .td.cbi-section-actions > * > *,
-  #view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions:has(> * > :nth-child(2)) > * > * { margin-inline-start: 0; }
+  #view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions > div > * { margin-inline-start: 0; }
+  /* Under the stack the actions start where the stacked text does. */
+  #view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions { text-align: start; }
+  /* nftables: a rule's long badges wrap inside their cell (layout). */
+  #view .nft-rules .ifacebadge { flex-wrap: wrap; max-inline-size: 100%; }
+  #view .nft-rules .ifacebadge,
+  #view .nft-rules .ifacebadge > * { white-space: normal; }
+  /* Realtime graphs: a legend row holds three label and value pairs, six
+     cells too wide for a phone; the pairs stack, value beside label (layout). */
+  [data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr { display: grid; grid-template-columns: auto minmax(0, 1fr); }
+  [data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr > .td { display: block; }
   .cbi-page-actions { position: static; }
   /* A dialog fits the screen. */
   #modal_overlay { padding: var(--spacing-4); }
@@ -566,6 +585,7 @@
    shadow (1.1:1 on the white). Only !important beats an inline style, so
    each override below carries it; the series colours are the data and stay. */
 #view div[style*="border:1px solid #000"] {
+  box-sizing: border-box; /* its inline width:100% includes the frame, so it fits the card */
   border: var(--border-width) solid var(--color-border) !important; /* inline black frame */
   border-radius: var(--radius-element);
   background: var(--color-background-surface) !important; /* inline white fill */

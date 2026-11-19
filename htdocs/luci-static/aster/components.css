@@ -14,7 +14,9 @@
    Button        Button         button, input[type=button|submit|reset], .btn,
                                 .cbi-button, the overview's Hide/Show label,
                                 #indicators items (variant/size: --button-*);
-                                ComboButton: .cbi-dropdown.btn
+                                ComboButton: .cbi-dropdown.btn; IconButton:
+                                .pager arrows, .drag-handle, a dynlist's add,
+                                .cbi-button-neutral[aria-label] in a field
    Field         TextField      input (text-like), textarea (--field-*)
    Select        Select         select, .cbi-dropdown (not a ComboButton)
    Menu          Menu           .cbi-dropdown[open] > ul.dropdown
@@ -112,8 +114,10 @@ hr {
   line-height: var(--text-heading-2-leading);
 }
 /* Heading 3: a heading inside a card's content, under the card's title
-   (the overview's Active DHCPv4 Leases, Associated Stations). */
-:where(.cbi-section > div:not(.cbi-title) > h3) {
+   (the overview's Active DHCPv4 Leases, Associated Stations). Where the
+   card has no title of its own (24.10's leases), its first heading is the
+   title and only the ones after it are Heading 3. */
+:where(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div:not(.cbi-title) > h3, .cbi-section > div:not(.cbi-title) > h3 ~ h3) {
   font-size: var(--text-heading-3-size);
   font-weight: var(--text-heading-3-weight);
   line-height: var(--text-heading-3-leading);
@@ -173,6 +177,15 @@ hr {
 :where(button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button, .cbi-section .label[data-style], #indicators > :is(span, a)):is(:disabled, [disabled], [aria-disabled="true"]) {
   opacity: 0.5;
   cursor: default;
+}
+/* IconButton: a button that draws one glyph instead of words (a pager's
+   arrows, the drag handle, a dynlist's add, a field's reveal and CIDR
+   switch, which carry an aria-label) is square, as wide as it is high,
+   with no inline padding, and never stretched (Astryx Button isIconOnly). */
+:where(.pager > :is(.btn, button), .drag-handle, .add-item > .cbi-button-add, .cbi-value-field .cbi-button-neutral[aria-label]) {
+  --button-px: 0;
+  inline-size: var(--button-h, var(--size-element-md));
+  flex: none;
 }
 /* Busy (.spinning): unavailable, not moving. */
 :where(:is(.btn, .cbi-button, button).spinning) { opacity: 0.65; cursor: progress; }
@@ -509,6 +522,9 @@ hr {
   min-block-size: var(--size-element-md);
 }
 :where(.cbi-value > .cbi-value-field > *) { min-inline-size: 0; }
+/* A line break between a field and its buttons (System's Local Time) is
+   an empty flex item that doubles the gap; the row wraps on its own. */
+:where(.cbi-value > .cbi-value-field > br) { display: none; }
 :where(.cbi-value > .cbi-value-field > :is(.cbi-value-description, textarea, .cbi-section, .cbi-tblsection, output)) { flex-basis: 100%; }
 /* An option that holds a whole section or table has no label column. */
 :where(.cbi-value > :not(.cbi-value-title, .cbi-value-field)) { flex-basis: 100%; min-inline-size: 0; }
@@ -696,8 +712,7 @@ hr {
   :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr.placeholder) { display: block; }
   :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr:not(:has(> .th), .placeholder)) {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: var(--spacing-3);
+    grid-template-columns: minmax(0, 1fr);
     padding-block: var(--spacing-1);
     border-block-end: var(--border-width) solid var(--color-border);
   }
@@ -724,20 +739,13 @@ hr {
     font-weight: var(--font-weight-medium);
   }
   :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td:has(> :is(input:not([type="checkbox"]), select, .cbi-dropdown, .cbi-dynlist)))::before { display: block; }
+  /* The actions take a line of their own under the stack, so the data
+     keeps the row's full width (a column beside it left long values a
+     narrow one); several wrap, 8 apart. */
   :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions) {
-    padding-inline: 0 var(--spacing-4);
-    grid-column: 2;
-    grid-row: 1 / span 8;
-    align-self: center;
-  }
-  /* Two actions or more (Devices, Processes, Startup) take a line of their
-     own under the stack instead of the column beside it. */
-  :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions:has(> * > :nth-child(2))) {
-    grid-column: 1 / -1;
-    grid-row: auto;
     padding: var(--spacing-2) var(--spacing-4) 0;
   }
-  :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions:has(> * > :nth-child(2)) > *) { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
+  :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions > div) { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
 }
 
 /* ── MetadataList ────────────────────────────────────────────────
@@ -808,6 +816,23 @@ hr {
   font-variant-numeric: tabular-nums;
 }
 :where([data-tab-active="false"]) { display: none; }
+/* Narrow: one line that scrolls sideways, as Astryx Tabs do; the selected
+   tab is the list's initial scroll target where the browser has
+   scroll-initial-target. The list's rule is painted inside its padding so
+   the scroll box does not clip the indicator that sits on it. */
+@media (max-width: 48rem) {
+  :where(.tabs, .cbi-tabmenu) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    padding-block-end: calc(var(--spacing-1) + var(--border-width));
+    border-block-end: 0;
+    background: linear-gradient(var(--color-border), var(--color-border)) bottom / 100% var(--border-width) no-repeat;
+  }
+  :where(.tabs > li, .cbi-tabmenu > li) { flex: none; }
+  :where(.tab[data-active], .cbi-tabmenu > .cbi-tab) { scroll-initial-target: nearest; }
+}
 
 /* ── ProgressBar ─────────────────────────────────────────────────
    An 8 track in the muted fill, the value in the accent, both round; the
@@ -1060,14 +1085,19 @@ hr {
   font-weight: var(--text-body-weight);
   line-height: var(--text-body-leading);
   white-space: pre-line;
-  visibility: hidden;
+  /* Hidden, a tooltip takes no box: laid out at max-content it would widen
+     its card's scroll area (a phone could swipe the card sideways). */
+  display: none;
   opacity: 0;
   pointer-events: none;
-  transition: opacity var(--duration-fast) var(--ease-standard), visibility var(--duration-fast);
+  transition: opacity var(--duration-fast) var(--ease-standard), display var(--duration-fast) allow-discrete;
 }
-:where(.cbi-tooltip[style]) { visibility: visible; opacity: 1; }
+:where(.cbi-tooltip[style]) { display: block; opacity: 1; }
 @media (hover: hover) {
-  :where(.cbi-tooltip-container:hover > .cbi-tooltip:not(:empty)) { visibility: visible; opacity: 1; }
+  :where(.cbi-tooltip-container:hover > .cbi-tooltip:not(:empty)) { display: block; opacity: 1; }
+}
+@starting-style {
+  :where(.cbi-tooltip[style], .cbi-tooltip-container:hover > .cbi-tooltip) { opacity: 0; }
 }
 /* Chips inside take the tooltip's colours. */
 :where(.cbi-tooltip) :is(.ifacebadge, .zonebadge, .ifacebox, .ifacebox-head, .label) {
