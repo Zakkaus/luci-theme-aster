@@ -10,9 +10,9 @@
     "button.*.sm": {"_source": "spec Button secondary sm", "height": 32, "radius": 9999, "fontSize": 15, "paddingInline": 12},
     "button.icon.*": {"height": null, "radius": null, "fontSize": null, "paddingInline": null},
 
-    "field.*": {"height": null, "radius": null, "border": null, "fontSize": null, "formWidth": null, "textWidth": 0},
-    "checkbox": {"size": null},
-    "radio": {"size": null},
+    "field.*": {"_source": "Astryx 0.7.16 TextField and Select md, measured in M3 (STATE.md, M3 port): height --size-element-md, radius --radius-element, body size; formWidth is --aster-field-w (layout.css), desktop only. border stays the majority until the owner decides the field border (contrast rule field-border)", "height": 36, "radius": 12, "border": null, "fontSize": 15, "formWidth": {"desktop": 256, "phone": null}, "textWidth": 0},
+    "checkbox": {"_source": "Astryx 0.7.16 Checkbox, measured in M3 (STATE.md, M3 port): 24", "size": 24},
+    "radio": {"_source": "Astryx 0.7.16 Radio, measured in M3 (STATE.md, M3 port): 24", "size": 24},
 
     "table.header": {"_source": "spec Table header cell", "height": 31},
     "table.row.text": {"_source": "spec Table body row", "height": 33},
@@ -37,9 +37,9 @@
     "heading.sub": {"fontSize": null, "fontWeight": null},
     "heading.modal": {"fontSize": null, "fontWeight": null},
 
-    "tab": {"height": null, "indicator": null},
+    "tab": {"_source": "Astryx 0.7.16 Tabs md, measured in M3 (STATE.md, M3 port): 36 high, the selected tab marked by a 2 px accent pill", "height": 36, "indicator": {"light": "bar 2px rgb(34, 91, 255)", "dark": "bar 2px rgb(61, 135, 255)"}},
 
-    "form.label": {"width": null},
+    "form.label": {"_source": "Astryx Field layout, measured in M3 (STATE.md, M3 port): the label column --aster-form-label-w (layout.css) on desktop; on phone the label spans the row", "width": {"desktop": 200, "phone": null}},
     "form.row": {"gap": null},
 
     "font.body": {"_source": "spec --font-family-body", "fontFamily": "system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Noto Sans TC Variable, PingFang TC, Microsoft JhengHei, Arial, sans-serif"},
