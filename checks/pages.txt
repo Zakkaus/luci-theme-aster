@@ -9,6 +9,10 @@
 # Network > Wireless, Status > Realtime Graphs > Wireless and
 # Status > Channel Analysis (no radio), Network > Switch (no switch),
 # Status > Firewall (iptables; fw4 uses Status > nftables).
+#
+# LEDs, Static Routes, Port Forwards, NAT Rules and IP Sets have no rows in
+# the lab, and an empty table folds to its caption on a phone: their table
+# is required on the desktop only.
 
 # Status
 admin/status/overview                require=font.body,heading.page,heading.card,card,table.kv
@@ -31,19 +35,19 @@ admin/system/admin/repokeys          require=font.body,heading.page,card,button,
 admin/system/package-manager         require=font.body,heading.page,card,button,field.input,table,tab
 admin/system/startup                 require=font.body,heading.page,card,button,table,tab
 admin/system/crontab                 require=font.body,heading.page,button
-admin/system/leds                    require=font.body,heading.page,card,button,table
+admin/system/leds                    require=font.body,heading.page,card,button,table@desktop
 admin/system/flash                   require=font.body,heading.page,card,button,form.label,tab
 admin/system/reboot                  require=font.body,heading.page,button
 
 # Network
 admin/network/network                require=font.body,card,button,table
 admin/network/network modal=interface-edit  require=font.body,button,field,checkbox,form.label,tab
-admin/network/routes                 require=font.body,heading.page,card,button,table,tab
+admin/network/routes                 require=font.body,heading.page,card,button,table@desktop,tab
 admin/network/dhcp                   require=font.body,heading.page,card,button,field,checkbox,form.label,tab
 admin/network/diagnostics            require=font.body,heading.page,card,button,field.input
 admin/network/firewall/zones         require=font.body,heading.page,card,button,field,checkbox,form.label,table,tab
-admin/network/firewall/forwards      require=font.body,heading.page,card,button,table,tab
+admin/network/firewall/forwards      require=font.body,heading.page,card,button,table@desktop,tab
 admin/network/firewall/rules         require=font.body,heading.page,card,button,table,tab
-admin/network/firewall/snats         require=font.body,heading.page,card,button,table,tab
-admin/network/firewall/ipsets        require=font.body,heading.page,card,button,table,tab
+admin/network/firewall/snats         require=font.body,heading.page,card,button,table@desktop,tab
+admin/network/firewall/ipsets        require=font.body,heading.page,card,button,table@desktop,tab
 admin/network/firewall/custom        require=font.body,heading.page,card,button,tab

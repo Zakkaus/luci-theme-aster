@@ -10,7 +10,7 @@
     "button.*.sm": {"_source": "spec Button secondary sm", "height": 32, "radius": 9999, "fontSize": 15, "paddingInline": 12},
     "button.icon.*": {"height": null, "radius": null, "fontSize": null, "paddingInline": null},
 
-    "field.*": {"_source": "Astryx 0.7.16 TextField and Select md, measured in M3 (STATE.md, M3 port): height --size-element-md, radius --radius-element, body size; formWidth is --aster-field-w (layout.css), desktop only; border is Astryx's emphasized border (owner 2026-11-19: keep Astryx field border)", "height": 36, "radius": 12, "border": {"light": "1px solid rgb(204, 211, 219)", "dark": "1px solid rgb(73, 77, 83)"}, "fontSize": 15, "formWidth": {"desktop": 256, "phone": null}, "textWidth": 0},
+    "field.*": {"_source": "Astryx 0.7.16 TextField and Select md, measured in M3 (STATE.md, M3 port): height --size-element-md, radius --radius-element, body size; formWidth is --aster-field-w (layout.css), desktop only; on a phone the field fills its row (formFill 0); border is Astryx's emphasized border (owner 2026-11-19: keep Astryx field border)", "height": 36, "radius": 12, "border": {"light": "1px solid rgb(204, 211, 219)", "dark": "1px solid rgb(73, 77, 83)"}, "fontSize": 15, "formWidth": {"desktop": 256, "phone": null}, "formFill": 0, "textWidth": 0},
     "checkbox": {"_source": "Astryx 0.7.16 Checkbox, measured in M3 (STATE.md, M3 port): 24", "size": 24},
     "radio": {"_source": "Astryx 0.7.16 Radio, measured in M3 (STATE.md, M3 port): 24", "size": 24},
 
@@ -26,6 +26,7 @@
     "table.kv.row.text": {"_source": "M2 overview System card (spec has no key/value table)", "height": 33},
     "table.kv.row.*": {"height": null},
     "table.kv.td": {"_source": "M2 overview System card", "paddingBlock": 4, "paddingInlineStart": 16, "fontSize": 15},
+    "table.kv.td.key": {"_source": "M2 overview System card: the key column flush with the card (MetadataList)", "paddingBlock": 4, "paddingInlineStart": 0, "fontSize": 15},
     "table.progress.td": {"_source": "M2 overview Memory and Storage cards", "paddingBlock": 0, "paddingInlineStart": 0, "fontSize": null},
 
     "card": {
@@ -37,12 +38,13 @@
 
     "heading.page": {"_source": "spec Heading h1", "fontSize": 26, "fontWeight": "600"},
     "heading.card": {"_source": "spec Heading h2 (section)", "fontSize": 22, "fontWeight": "600"},
+    "heading.inner": {"_source": "spec Heading h3: a heading inside a card under its title (M2 overview leases and stations)", "fontSize": 18, "fontWeight": "600"},
     "heading.sub": {"fontSize": null, "fontWeight": null},
     "heading.modal": {"fontSize": null, "fontWeight": null},
 
     "tab": {"_source": "Astryx 0.7.16 Tabs md, measured in M3 (STATE.md, M3 port): 36 high, the selected tab marked by a 2 px accent pill", "height": 36, "indicator": {"light": "bar 2px rgb(34, 91, 255)", "dark": "bar 2px rgb(61, 135, 255)"}},
 
-    "form.label": {"_source": "Astryx Field layout, measured in M3 (STATE.md, M3 port): the label column --aster-form-label-w (layout.css) on desktop; on phone the label spans the row", "width": {"desktop": 200, "phone": null}},
+    "form.label": {"_source": "Astryx Field layout, measured in M3 (STATE.md, M3 port): the label column --aster-form-label-w (layout.css) on desktop; on phone the label spans the row", "width": {"desktop": 200, "phone": null}, "fill": 0},
     "form.row": {"gap": null},
 
     "font.body": {"_source": "spec --font-family-body", "fontFamily": "system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Noto Sans TC Variable, PingFang TC, Microsoft JhengHei, Arial, sans-serif"},

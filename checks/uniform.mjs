@@ -82,7 +82,14 @@ function collect(cfg) {
     return v > 0 && v >= Math.min(r.width, r.height) / 2 - 0.5 ? 9999 : v;
   };
   const box = (el) => el.getBoundingClientRect();
-  const CARD = '.cbi-section, .cbi-section-node';
+  // The width of a container's content box that el leaves empty.
+  const fill = (el, outer) => {
+    const s = getComputedStyle(outer);
+    return outer.clientWidth - parseFloat(s.paddingLeft) - parseFloat(s.paddingRight) - box(el).width;
+  };
+  // 24.10 writes the log view, a view's tab panes and an nftables chain
+  // without the .cbi-section 25.12 gives them; the theme frames them alike.
+  const CARD = '.cbi-section, .cbi-section-node, #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], .nft-chain';
   const BTN = 'button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button';
   // A .cbi-dropdown.btn is a split button (Diagnostics, page actions).
   const FIELD = 'input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"], [type="reset"], [type="file"], [type="hidden"], [type="image"]), select:not([multiple]), .cbi-dropdown:not(.btn)';
@@ -98,11 +105,17 @@ function collect(cfg) {
       : el.matches('.cbi-button-negative, .cbi-button-remove') ? 'danger'
       : el.matches('.cbi-button-positive, .cbi-button-apply, .cbi-button-save, .cbi-button-action, .btn.important') ? 'primary' : 'secondary';
     const size = el.closest('td, .td') ? 'sm' : 'md';
-    const cls = text ? `button.${variant}.${size}` : `button.icon.${size}`;
+    // A label of one or two glyphs and no letter or digit (a pager's « and
+    // ») draws an icon, so the button is an icon one.
+    const icon = !text || /^[^\p{L}\p{N}]{1,2}$/u.test(text);
+    const cls = icon ? `button.icon.${size}` : `button.${variant}.${size}`;
     add(cls, 'height', px(box(el).height), el);
     add(cls, 'radius', radius(el, s), el);
     add(cls, 'fontSize', px(s.fontSize), el);
-    add(cls, 'paddingInline', [px(s.paddingLeft), px(s.paddingRight)], el);
+    // A split button's label is its chosen item, which holds the inline
+    // padding; the button's own box has none, the chevron segment ends it.
+    const pad = el.matches('.cbi-dropdown') ? getComputedStyle(el.querySelector(':scope > ul > li[display]') ?? el) : s;
+    add(cls, 'paddingInline', el.matches('.cbi-dropdown') ? [px(pad.paddingLeft), px(pad.paddingRight)] : [px(s.paddingLeft), px(s.paddingRight)], el);
   }
 
   // Single-line fields: text inputs, selects and luci-base's dropdown widget.
@@ -114,7 +127,14 @@ function collect(cfg) {
     add(cls, 'radius', radius(el, s), el);
     add(cls, 'border', border(s), el);
     add(cls, 'fontSize', px(s.fontSize), el);
-    if (el.closest('.cbi-value-field') && !el.closest('td, .td')) add(cls, 'formWidth', px(box(el).width), el);
+    if (el.closest('.cbi-value-field') && !el.closest('td, .td')) {
+      // On a phone a field fills its row, whose width depends on the frame
+      // around it (a card, a dialog): read what it leaves of the row. A
+      // dynlist's add field shares its row with the add button, so its
+      // group is read.
+      if (cfg.device === 'phone') add(cls, 'formFill', px(fill(el.closest('.cbi-value-field .control-group') ?? el, el.closest('.cbi-value-field'))), el);
+      else add(cls, 'formWidth', px(box(el).width), el);
+    }
   }
 
   for (const el of all('input[type="checkbox"], input[type="radio"]')) {
@@ -162,20 +182,31 @@ function collect(cfg) {
       cells.forEach((c, i) => {
         const s = getComputedStyle(c);
         const cls = c.matches('.cbi-section-actions') ? 'table.fold.td.actions' : i === 0 ? 'table.fold.td.first' : 'table.fold.td.stacked';
+        // The actions cell's buttons are read as buttons; where it sits
+        // (beside the stack or under it) is layout.
+        if (cls === 'table.fold.td.actions') return;
         add(cls, 'paddingInlineStart', px(s.paddingInlineStart), c);
         add(cls, 'fontSize', px(s.fontSize), c);
       });
       continue;
     }
     const base = progress ? 'table.progress' : headerOf.get(table) ? 'table' : 'table.kv';
-    if (isHeader(row)) add(`${base}.header`, 'height', px(box(row).height), row);
+    // A row's height as the collapsed border model draws it: in the
+    // separate model (a table framed as a card) the row's box also holds
+    // its cells' bottom rule, which the collapsed model puts on the grid
+    // line between rows.
+    const rule = getComputedStyle(table).borderCollapse === 'separate' ? Math.max(0, ...cells.map((c) => parseFloat(getComputedStyle(c).borderBottomWidth) || 0)) : 0;
+    const rowH = () => px(box(row).height - rule);
+    if (isHeader(row)) add(`${base}.header`, 'height', rowH(), row);
     else if (!progress && cells.every((c) => lines(c) <= 1)) {
       const kind = row.querySelector('input:not([type="hidden"]), select, textarea, .cbi-dropdown') ? 'control' : row.querySelector(BTN) ? 'button' : 'text';
-      add(`${base}.row.${kind}`, 'height', px(box(row).height), row);
+      add(`${base}.row.${kind}`, 'height', rowH(), row);
     }
     for (const c of cells) {
       const s = getComputedStyle(c);
-      const cls = c.matches('th, .th') ? `${base}.th` : `${base}.td`;
+      // A key/value list's first cell is the key, flush with the card
+      // (MetadataList); the value cells are table cells.
+      const cls = c.matches('th, .th') ? `${base}.th` : base === 'table.kv' && c === cells[0] && cells.length > 1 ? 'table.kv.td.key' : `${base}.td`;
       add(cls, 'paddingBlock', [px(s.paddingTop), px(s.paddingBottom)], c);
       add(cls, 'paddingInlineStart', px(s.paddingInlineStart), c);
       add(cls, 'fontSize', px(s.fontSize), c);
@@ -219,7 +250,10 @@ function collect(cfg) {
   for (const el of all('h1, h2, h3, .cbi-section > legend')) {
     const s = getComputedStyle(el);
     const inCard = el.closest(CARD);
-    const cls = cfg.modal ? 'heading.modal' : !inCard && el.matches('h1, h2') ? 'heading.page' : inCard ? 'heading.card' : 'heading.sub';
+    // A heading inside a card's content under its title (Heading 3: the
+    // overview's leases and stations) is not the card's title.
+    const inner = el.matches('.cbi-section > div:not(.cbi-title) > h3');
+    const cls = cfg.modal ? 'heading.modal' : !inCard && el.matches('h1, h2') ? 'heading.page' : inner ? 'heading.inner' : inCard ? 'heading.card' : 'heading.sub';
     add(cls, 'fontSize', px(s.fontSize), el);
     add(cls, 'fontWeight', s.fontWeight, el);
   }
@@ -248,7 +282,10 @@ function collect(cfg) {
   for (const el of all('.cbi-value')) {
     if (el.closest('td, .td')) continue;
     const t = el.querySelector(':scope > .cbi-value-title');
-    if (t && visible(t)) add('form.label', 'width', px(box(t).width), t);
+    if (t && visible(t)) {
+      if (cfg.device === 'phone') add('form.label', 'fill', px(fill(t, el)), t);
+      else add('form.label', 'width', px(box(t).width), t);
+    }
     let n = el.nextElementSibling;
     while (n && !visible(n)) n = n.nextElementSibling;
     if (n && n.matches('.cbi-value')) add('form.row', 'gap', px(box(n).top - box(el).bottom), el);
@@ -259,7 +296,8 @@ function collect(cfg) {
   for (const el of scope.querySelectorAll('*')) {
     if (!el.matches('input, select, textarea, button') && !ownText(el)) continue;
     if (el.matches('option, script, style') || (!cfg.modal && el.closest('#modal_overlay')) || !visible(el)) continue;
-    add(el.closest('pre, code, kbd, samp, tt') ? 'font.code' : 'font.body', 'fontFamily', fam(getComputedStyle(el).fontFamily), el);
+    // A textarea is the Field's code variant (logs, keys, crontab, rc.local).
+    add(el.closest('pre, code, kbd, samp, tt, textarea') ? 'font.code' : 'font.body', 'fontFamily', fam(getComputedStyle(el).fontFamily), el);
   }
   return out;
 }
@@ -319,7 +357,7 @@ await eachCombo(opt, async (ctx, device, mode, combo) => {
       process.stderr.write(`${combo} ${entry.id}: ERROR ${r.error}\n`);
       continue;
     }
-    const samples = await r.page.evaluate(collect, {modal: !!entry.modal});
+    const samples = await r.page.evaluate(collect, {modal: !!entry.modal, device});
     samples.push(...await r.page.evaluate(widthTest, {modal: !!entry.modal, limit: +opt['width-test']}));
     await r.page.close();
     results.push({entry, device, mode, combo, samples, note: r.note, pageErrors: r.errors});
