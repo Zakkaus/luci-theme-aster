@@ -54,9 +54,14 @@ export function die(msg) {
 
 /* One entry a line:  <path> [modal=<name>] [require=<class>,<class>...]
  * A class in require= must have at least one sample on that page at every
- * viewport and mode; `<class>@desktop` asks for it on the desktop only. A
- * class name matches itself and its dotted children ("button" matches
- * "button.primary.md"). */
+ * viewport and mode. `<class>@desktop` asks for it on the desktop only;
+ * `<class>@rows` on the desktop, and at any other viewport whenever the
+ * page's tables hold a data row (an empty table folds to its caption on a
+ * phone). A class name matches itself and its dotted children ("button"
+ * matches "button.primary.md"). An entry a later file lists again (same
+ * path and modal) adds its require= classes to the first one: the 25.12
+ * list asks for what only 25.12 draws on a page both versions have. */
+const QUALIFIERS = ['desktop', 'rows'];
 export function readPages(files) {
   const pages = [];
   for (const file of files) {
@@ -73,8 +78,14 @@ export function readPages(files) {
         else die(`${e.src}: unknown field ${r}`);
       }
       if (e.modal && !MODALS[e.modal]) die(`${e.src}: unknown modal ${e.modal}`);
+      for (const req of e.require) {
+        const q = req.split('@')[1];
+        if (q !== undefined && !QUALIFIERS.includes(q)) die(`${e.src}: unknown qualifier @${q} (${QUALIFIERS.join(', ')})`);
+      }
       e.id = e.modal ? `${e.path} [${e.modal}]` : e.path;
-      pages.push(e);
+      const first = pages.find((x) => x.id === e.id);
+      if (first) first.require.push(...e.require.filter((r) => !first.require.includes(r)));
+      else pages.push(e);
     });
   }
   if (!pages.length) die('the page list is empty');

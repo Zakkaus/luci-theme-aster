@@ -18,8 +18,8 @@
  *              field: --text (4.5), or --large (3) at 24px, or 18.66px bold.
  *              Disabled controls and placeholders are exempt (WCAG 1.4.3).
  *   ui         the boundary of a checkbox or radio drawn by the theme
- *              (appearance: none): border or fill against what is around
- *              it, --ui (3).
+ *              (appearance: none), and of a split button (.cbi-dropdown.btn):
+ *              border or fill against what is around it, --ui (3).
  *   field-border  the same for a text field, textarea, select or dropdown,
  *              --ui (3), reported as its own rule. Waived by default (owner
  *              2026-11-19: keep Astryx field border, #ccd3db, 1.51:1): its
@@ -89,9 +89,14 @@ function collect(cfg) {
     push(large ? 'large' : 'text', fg, bg, el, words.trim(), {size});
   }
 
-  // Field boundaries: the border over the field's own fill, or the fill,
-  // against what surrounds the field; the stronger of the two counts.
-  for (const el of scope.querySelectorAll(`${FIELD}, input[type="checkbox"], input[type="radio"]`)) {
+  // Boundaries: the border over the control's own fill, or the fill,
+  // against what surrounds the control; the stronger of the two counts. A
+  // split button (.cbi-dropdown.btn, Save & Apply) is a ui control: its
+  // edge shows where to press and that its chevron is part of it, so its
+  // fill or border (a filled accent button passes on its fill) is held to
+  // --ui like a checkbox's.
+  const SPLIT = '.cbi-dropdown:is(.btn, .cbi-button)';
+  for (const el of scope.querySelectorAll(`${FIELD}, input[type="checkbox"], input[type="radio"], ${SPLIT}`)) {
     if (!inScope(el) || !visible(el) || disabled(el) || el.parentElement.closest('.cbi-dropdown')) continue;
     const s = getComputedStyle(el);
     if (el.matches('[type="checkbox"], [type="radio"]') && s.appearance !== 'none') continue;
@@ -102,7 +107,7 @@ function collect(cfg) {
     const b = rgba(s.borderTopColor);
     const edge = bw ? over([b[0], b[1], b[2], b[3] * op], fill) : fill;
     const use = ratio(edge, around) >= ratio(fill, around) ? edge : fill;
-    push(el.matches('[type="checkbox"], [type="radio"]') ? 'ui' : 'field-border', use, around, el, el.getAttribute('name') ?? el.tagName.toLowerCase());
+    push(el.matches(`[type="checkbox"], [type="radio"], ${SPLIT}`) ? 'ui' : 'field-border', use, around, el, el.getAttribute('name') ?? (el.matches(SPLIT) ? el.textContent.trim() : el.tagName.toLowerCase()));
   }
 
   // Separators: the line over the element's own surface.

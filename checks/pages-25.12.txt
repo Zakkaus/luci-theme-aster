@@ -1,3 +1,7 @@
 # Pages only 25.12 has (24.10 keeps DNS inside DHCP and DNS). Use with
 #   --pages checks/pages.txt --pages checks/pages-25.12.txt
+# A page pages.txt lists again here adds the classes only 25.12 draws there.
+
+# System: 25.12's first tab has a checkbox (Full TimeZone Name); 24.10's has none.
+admin/system/system                  require=checkbox
 admin/network/dns                    require=font.body,heading.page,card,button,field,checkbox,form.label,tab

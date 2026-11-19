@@ -32,7 +32,15 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
   `pages-25.12.txt` the ones only 25.12 has. A line is
   `<path> [modal=interface-edit] [require=<class>,...]`; a required class
   must have a sample on that page at every viewport and mode
-  (`<class>@desktop` for the desktop only).
+  (`<class>@desktop` for the desktop only; `<class>@rows` on the desktop,
+  and on a phone whenever the page's tables hold a data row). A page that
+  `pages-25.12.txt` lists again adds its classes to the `pages.txt` entry.
+- `uniform.mjs` also reads layout: a field fills its row (less the buttons
+  on its line), a form row fills its card or dialog, the phone fold's rows
+  are grids with their actions inside the card, and no card, table or
+  scroll box inside a card is wider than it (`overflow excess`). Components
+  that scroll by design (Field, the phone Tabs list) are named in
+  `SCROLLS` and skipped.
 - `uniform.json` holds one canonical value per component class and
   property. Values with a source in `lab/new-theme/astryx-ref/spec.json`
   are written out; `null` means "the majority of the run", and the report
@@ -43,6 +51,11 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
   emphasized #ccd3db at 1.51:1 on the surface): its findings are listed
   under WAIVED and do not fail the run. `--field-border enforce` applies it
   like every other rule, which stay enforced.
+- `contrast.mjs` holds a split button's (`.cbi-dropdown.btn`) fill or
+  border to `--ui`, as it does a checkbox's.
+- The negative tests assert the exit code and the exact set of failed rule
+  ids in the JSON report (`tests/gate-lib.sh`), so a case passes only when
+  the rule it breaks fails and no other does.
 - `contrast.mjs` takes `--text 4.5 --large 3 --ui 3 --focus 3` (WCAG AA)
   and `--separator-max 1.5 --separator-modes dark` (Argon's dark table rules,
   2026-07-25). The reference page's dark separators measure 1.32.

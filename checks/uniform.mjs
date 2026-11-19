@@ -15,15 +15,18 @@
  *
  * On each page and each viewport and mode it reads computed styles per
  * component class (buttons by variant and size, fields, checkboxes, table
- * rows and cells, cards, headings, tabs, form rows, font family) and compares
- * every sample with the canonical value: px values within --tolerance,
- * strings (colours, borders, font family, font weight) exactly. A canonical
- * null means "the majority of this run at that viewport and mode", and the
- * report prints the distribution so a value can be chosen.
+ * rows and cells, the phone fold, cards, headings, tabs, form rows, font
+ * family) and layout (a field filling its row, a row its card, content no
+ * wider than its card) and compares every sample with the canonical value:
+ * px values within --tolerance, strings (colours, borders, font family,
+ * font weight, display) exactly. A canonical null means "the majority of
+ * this run at that viewport and mode", and the report prints the
+ * distribution so a value can be chosen.
  *
  * Exit 1 on any outlier, a failed login, a page that is missing or does not
  * render, a page that yields no samples, or a class the page list requires
- * that has no sample. Nothing is written to the device.
+ * that has no sample. Nothing is written to the device. The JSON report
+ * names each failed rule: an outlier's class and property, a missing class.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -90,7 +93,37 @@ function collect(cfg) {
   // 24.10 writes the log view, a view's tab panes and an nftables chain
   // without the .cbi-section 25.12 gives them; the theme frames them alike.
   const CARD = '.cbi-section, .cbi-section-node, #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], .nft-chain';
+  const FRAME = `${CARD}, #view > :is(table, .table), #view > .cbi-map > :is(table, .table)`;
   const BTN = 'button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button';
+  // The Table component folds a table with a header row on a phone
+  // (components.css, Table: Collapsible).
+  const FOLD = '#view .table:has(> .tr > .th, > .thead > .tr > .th)';
+  // The card a node is drawn in: its outermost frame; in a dialog, the dialog.
+  const frameOf = (el) => {
+    if (cfg.modal) return scope;
+    let f = null;
+    for (let e = el; e && e !== scope; e = e.parentElement) if (e.matches(FRAME)) f = e;
+    return f;
+  };
+  // An element's content box, left and right edge.
+  const content = (el) => {
+    const s = getComputedStyle(el);
+    const l = box(el).left + el.clientLeft + parseFloat(s.paddingLeft);
+    return [l, l + el.clientWidth - parseFloat(s.paddingLeft) - parseFloat(s.paddingRight)];
+  };
+  // What a control leaves empty of its container's content box, left of it
+  // and right of its line; buttons on the same line after it (a dynlist's
+  // add, a password's reveal) take their share. 0: the line fills the box.
+  const after = (el, outer) => [...outer.querySelectorAll(BTN)].filter((b) => {
+    if (b === el || !visible(b)) return false;
+    const q = box(b), r = box(el);
+    return q.left >= r.right - 1 && q.top < r.bottom - 1 && q.bottom > r.top + 1;
+  }).sort((a, b) => box(a).left - box(b).left);
+  const lineFill = (el, outer) => {
+    const [l, r] = content(outer);
+    const end = Math.max(box(el).right, ...after(el, outer).map((b) => box(b).right));
+    return box(el).left - l + (r - end);
+  };
   // A .cbi-dropdown.btn is a split button (Diagnostics, page actions).
   const FIELD = 'input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"], [type="reset"], [type="file"], [type="hidden"], [type="image"]), select:not([multiple]), .cbi-dropdown:not(.btn)';
 
@@ -106,10 +139,12 @@ function collect(cfg) {
       : el.matches('.cbi-button-positive, .cbi-button-apply, .cbi-button-save, .cbi-button-action, .btn.important') ? 'primary' : 'secondary';
     const size = el.closest('td, .td') ? 'sm' : 'md';
     // A label of one or two glyphs and no letter or digit (a pager's « and
-    // ») draws an icon, so the button is an icon one.
+    // », the drag handle, a dynlist's +) draws an icon, so the button is an
+    // icon one: square, so its width is read too.
     const icon = !text || /^[^\p{L}\p{N}]{1,2}$/u.test(text);
     const cls = icon ? `button.icon.${size}` : `button.${variant}.${size}`;
     add(cls, 'height', px(box(el).height), el);
+    if (icon) add(cls, 'width', px(box(el).width), el);
     add(cls, 'radius', radius(el, s), el);
     add(cls, 'fontSize', px(s.fontSize), el);
     // A split button's label is its chosen item, which holds the inline
@@ -127,14 +162,18 @@ function collect(cfg) {
     add(cls, 'radius', radius(el, s), el);
     add(cls, 'border', border(s), el);
     add(cls, 'fontSize', px(s.fontSize), el);
-    if (el.closest('.cbi-value-field') && !el.closest('td, .td')) {
+    const field = el.closest('.cbi-value-field');
+    if (field && !el.closest('td, .td')) {
       // On a phone a field fills its row, whose width depends on the frame
-      // around it (a card, a dialog): read what it leaves of the row. A
-      // dynlist's add field shares its row with the add button, so its
-      // group is read.
-      if (cfg.device === 'phone') add(cls, 'formFill', px(fill(el.closest('.cbi-value-field .control-group') ?? el, el.closest('.cbi-value-field'))), el);
+      // around it (a card, a dialog): read what the field itself leaves of
+      // the row, less the buttons on its line (a dynlist's add, a
+      // password's reveal). That the row fills its frame is form.row fill.
+      if (cfg.device === 'phone') add(cls, 'formFill', px(lineFill(el, field)), el);
       else add(cls, 'formWidth', px(box(el).width), el);
     }
+    // The space between a field and the button on its line.
+    const next = after(el, field ?? el.parentElement)[0];
+    if (next) add(cls, 'buttonGap', px(box(next).left - box(el).right), el);
   }
 
   for (const el of all('input[type="checkbox"], input[type="radio"]')) {
@@ -165,28 +204,50 @@ function collect(cfg) {
   for (const row of all('tr, .tr')) {
     if (row.matches('.placeholder, .cbi-section-table-descr')) continue;
     const table = row.closest('table, .table');
+    if (!table) continue;
+    const cells = [...row.children].filter((c) => c.matches('th, td, .th, .td') && visible(c));
+    if (!cells.length) continue;
     // Diagnostics lays its three tools out as the cells of one row: layout,
-    // not data.
-    if (!table || table.querySelector('.diag-action')) continue;
+    // not data, so its row height is not read. Its cells keep the table
+    // cell's inset, and each tool's field fills its cell less the button on
+    // its line (luci.css puts the button under it).
+    if (table.querySelector('.diag-action')) {
+      for (const c of cells) {
+        const s = getComputedStyle(c);
+        add('table.layout.td', 'paddingBlock', [px(s.paddingTop), px(s.paddingBottom)], c);
+        add('table.layout.td', 'paddingInlineStart', px(s.paddingInlineStart), c);
+        for (const f of c.querySelectorAll(FIELD)) if (visible(f) && !f.parentElement.closest('.cbi-dropdown')) add(`field.${f.matches('select') ? 'select' : f.matches('.cbi-dropdown') ? 'dropdown' : 'input'}`, 'cellFill', px(lineFill(f, c)), f);
+      }
+      continue;
+    }
     if (!headerOf.has(table)) headerOf.set(table, [...table.querySelectorAll('tr, .tr')].some((r) => r.closest('table, .table') === table && isHeader(r)));
     // A row holding a progress bar is the progress component (name and
     // value over a track), not a table row: its cells are read, its height
     // is not.
     const progress = !!row.querySelector('.cbi-progressbar');
-    const cells = [...row.children].filter((c) => c.matches('th, td, .th, .td') && visible(c));
-    if (!cells.length) continue;
-    // A header table folded on a phone (a row is a grid, not a table row):
-    // the reference's collapsible table, the first cell in body text and
-    // the dropped columns stacked under it as supporting text (spec.md,
-    // Phone layout). Its cells are their own classes; row heights vary
-    // with the number of columns and are not read.
-    if (!progress && headerOf.get(table) && getComputedStyle(row).display === 'grid') {
+    // A header table on a phone folds (the Table component's collapsible
+    // table, spec.md Phone layout): each row a grid, the first cell in body
+    // text, the dropped columns stacked under it as supporting text, the
+    // actions on a line of their own. Which tables fold is the viewport and
+    // the component's selector, not how the row happens to be drawn, so a
+    // fold that breaks is read as one. Row heights vary with the number of
+    // columns and are not read.
+    if (!progress && cfg.device === 'phone' && table.matches(FOLD)) {
+      add('table.fold.row', 'display', getComputedStyle(row).display, row);
       cells.forEach((c, i) => {
         const s = getComputedStyle(c);
-        const cls = c.matches('.cbi-section-actions') ? 'table.fold.td.actions' : i === 0 ? 'table.fold.td.first' : 'table.fold.td.stacked';
-        // The actions cell's buttons are read as buttons; where it sits
-        // (beside the stack or under it) is layout.
-        if (cls === 'table.fold.td.actions') return;
+        if (c.matches('.cbi-section-actions')) {
+          // Inset like the cells, and every button inside the card.
+          add('table.fold.td.actions', 'paddingInline', [px(s.paddingInlineStart), px(s.paddingInlineEnd)], c);
+          const f = frameOf(c);
+          if (!f) return;
+          const fb = box(f);
+          const [l, r] = [fb.left + f.clientLeft, fb.left + f.clientLeft + f.clientWidth];
+          const out = Math.max(0, ...[...c.querySelectorAll(BTN)].filter(visible).map((b) => Math.max(l - box(b).left, box(b).right - r)));
+          add('table.fold.td.actions', 'overflow', px(out), c);
+          return;
+        }
+        const cls = i === 0 ? 'table.fold.td.first' : 'table.fold.td.stacked';
         add(cls, 'paddingInlineStart', px(s.paddingInlineStart), c);
         add(cls, 'fontSize', px(s.fontSize), c);
       });
@@ -199,11 +260,17 @@ function collect(cfg) {
     // A row's height as the collapsed border model draws it: in the
     // separate model (a table framed as a card) the row's box also holds
     // its cells' bottom rule, which the collapsed model puts on the grid
-    // line between rows.
-    const rule = getComputedStyle(table).borderCollapse === 'separate' ? Math.max(0, ...cells.map((c) => parseFloat(getComputedStyle(c).borderBottomWidth) || 0)) : 0;
+    // line between rows. At most the Table's rule (1px) is taken off, so a
+    // thicker border still shows in the height.
+    const rule = getComputedStyle(table).borderCollapse === 'separate' ? Math.min(1, Math.max(0, ...cells.map((c) => parseFloat(getComputedStyle(c).borderBottomWidth) || 0))) : 0;
     const rowH = () => px(box(row).height - rule);
+    // A key/value row a phone layout stacks (luci.css: the realtime
+    // legends) is not a table row: its cells are read, its height is not,
+    // and it may be stacked only as the layout says (never on the desktop).
+    const wrapped = base === 'table.kv' && getComputedStyle(row).display !== 'table-row';
+    if (wrapped) add('table.kv.row.wrap', 'display', getComputedStyle(row).display, row);
     if (isHeader(row)) add(`${base}.header`, 'height', rowH(), row);
-    else if (!progress && cells.every((c) => lines(c) <= 1)) {
+    else if (!progress && !wrapped && cells.every((c) => lines(c) <= 1)) {
       const kind = row.querySelector('input:not([type="hidden"]), select, textarea, .cbi-dropdown') ? 'control' : row.querySelector(BTN) ? 'button' : 'text';
       add(`${base}.row.${kind}`, 'height', rowH(), row);
     }
@@ -224,9 +291,9 @@ function collect(cfg) {
   // One with neither a border nor a fill is not a card: a frameless band
   // (the overview's port status) or a table not framed yet. Dialog sections
   // are the dialog's, not cards.
+  const framed = new Set();
   if (!cfg.modal) {
-    const cards = all(`${CARD}, #view > :is(table, .table), #view > .cbi-map > :is(table, .table)`).filter((el) => !el.parentElement.closest(CARD));
-    const framed = new Set();
+    const cards = all(FRAME).filter((el) => !el.parentElement.closest(CARD));
     for (const el of cards) {
       const s = getComputedStyle(el);
       if (border(s) === 'none' && rgba(s.backgroundColor)[3] === 0) continue;
@@ -251,13 +318,37 @@ function collect(cfg) {
     }
   }
 
+  // Content wider than its card: a card, a table, or anything that scrolls
+  // inside a card (or a dialog) whose content does not fit it. The 26d0959
+  // regression: a 15,200 px interfaces table scrolled inside its card while
+  // the page itself did not overflow. Components designed to scroll are
+  // named here and skipped; each frame reports its widest excess (0: fits).
+  const SCROLLS = [
+    'input, select, textarea', // Field: scrolls its own text
+    '.tabs, .cbi-tabmenu', // Tabs: one line that scrolls sideways on a phone
+  ].join(', ');
+  // Text cut short with an ellipsis (nftables' set list) is truncated, not
+  // scrolled: what it hides is marked.
+  const excess = (e) => (e.matches(SCROLLS) || getComputedStyle(e).textOverflow === 'ellipsis' ? 0 : Math.max(0, e.scrollWidth - e.clientWidth));
+  for (const f of cfg.modal ? [scope] : [...framed]) {
+    const wide = [f, ...f.querySelectorAll('*')].filter((e) => e === f || e.matches('table, .table') || !['visible', 'clip'].includes(getComputedStyle(e).overflowX));
+    let worst = f, most = -1;
+    for (const e of wide) {
+      if (e.closest(SCROLLS) || !visible(e)) continue;
+      const x = excess(e);
+      if (x > most) { most = x; worst = e; }
+    }
+    add('overflow', 'excess', px(Math.max(0, most)), worst);
+  }
+
   // Headings by role: the page title, a card's title, anything else.
   for (const el of all('h1, h2, h3, .cbi-section > legend')) {
     const s = getComputedStyle(el);
     const inCard = el.closest(CARD);
     // A heading inside a card's content under its title (Heading 3: the
-    // overview's leases and stations) is not the card's title.
-    const inner = el.matches('.cbi-section > div:not(.cbi-title) > h3');
+    // overview's leases and stations) is not the card's title: not its
+    // first heading.
+    const inner = el.matches('.cbi-section > div:not(.cbi-title) > h3') && el.closest('.cbi-section').querySelector('h1, h2, h3, h4, h5, h6, legend') !== el;
     const cls = cfg.modal ? 'heading.modal' : !inCard && el.matches('h1, h2') ? 'heading.page' : inner ? 'heading.inner' : inCard ? 'heading.card' : 'heading.sub';
     add(cls, 'fontSize', px(s.fontSize), el);
     add(cls, 'fontWeight', s.fontWeight, el);
@@ -291,6 +382,10 @@ function collect(cfg) {
       if (cfg.device === 'phone') add('form.label', 'fill', px(fill(t, el)), t);
       else add('form.label', 'width', px(box(t).width), t);
     }
+    // The row fills its card's (or the dialog's) content box, so a field
+    // that fills its row is as wide as the frame allows.
+    const f = frameOf(el);
+    if (f) add('form.row', 'fill', px(lineFill(el, f)), el);
     let n = el.nextElementSibling;
     while (n && !visible(n)) n = n.nextElementSibling;
     if (n && n.matches('.cbi-value')) add('form.row', 'gap', px(box(n).top - box(el).bottom), el);
@@ -350,6 +445,19 @@ function widthTest(cfg) {
   return out;
 }
 
+/* How many data rows the page's tables hold, drawn or not: a row with a
+ * data cell that is not the empty message or a description. The DOM is the
+ * same at every viewport, so a phone that folds a table away still counts
+ * its rows (table@rows in the page list). */
+function dataRows(cfg) {
+  const scope = cfg.modal ? document.querySelector('#modal_overlay .modal') : document.querySelector('#maincontent');
+  if (!scope) return 0;
+  return [...scope.querySelectorAll('tr, .tr')].filter((row) => (cfg.modal || !row.closest('#modal_overlay'))
+    && !row.matches('.placeholder, .cbi-section-table-descr') && row.closest('table, .table')
+    && !row.closest('table, .table').querySelector('.diag-action')
+    && [...row.children].some((c) => c.matches('td, .td'))).length;
+}
+
 /* ── Run ─────────────────────────────────────────────────────── */
 
 const errors = [];
@@ -364,8 +472,9 @@ await eachCombo(opt, async (ctx, device, mode, combo) => {
     }
     const samples = await r.page.evaluate(collect, {modal: !!entry.modal, device});
     samples.push(...await r.page.evaluate(widthTest, {modal: !!entry.modal, limit: +opt['width-test']}));
+    const rows = await r.page.evaluate(dataRows, {modal: !!entry.modal});
     await r.page.close();
-    results.push({entry, device, mode, combo, samples, note: r.note, pageErrors: r.errors});
+    results.push({entry, device, mode, combo, samples, rows, note: r.note, pageErrors: r.errors});
     process.stderr.write(`${combo} ${entry.id}: ${samples.length} samples\n`);
   }
 }, (combo, page, error) => errors.push({page, combo, error}));
@@ -420,8 +529,9 @@ for (const r of results) {
   if (!r.samples.length) errors.push({page: r.entry.id, combo: r.combo, error: 'measured nothing'});
   for (const req of r.entry.require) {
     const [cls, only] = req.split('@');
-    if (only && only !== r.device) continue;
-    if (!r.samples.some(([c]) => classMatches(cls, c))) missing.push({page: r.entry.id, combo: r.combo, cls});
+    if (only === 'desktop' && r.device !== 'desktop') continue;
+    if (only === 'rows' && r.device !== 'desktop' && !r.rows) continue;
+    if (!r.samples.some(([c]) => classMatches(cls, c))) missing.push({page: r.entry.id, combo: r.combo, cls, ...(only === 'rows' ? {rows: r.rows} : {})});
   }
   for (const [cls, prop, v, where] of r.samples) {
     let want = lookup(cls, prop, r.device, r.mode);
@@ -444,7 +554,7 @@ L.push(`uniform  ${opt.url}  ${pages.length} pages  ${combos.join(' ')}  canonic
 L.push('', `ERRORS (${errors.length})`);
 for (const e of errors) L.push(`  ${e.combo}  ${e.page}: ${e.error}`);
 L.push('', `MISSING REQUIRED CLASSES (${missing.length})`);
-for (const m of missing) L.push(`  ${m.combo}  ${m.page}: no ${m.cls}`);
+for (const m of missing) L.push(`  ${m.combo}  ${m.page}: no ${m.cls}${m.rows ? ` (the page's tables hold ${m.rows} data rows)` : ''}`);
 const outList = [...outliers.values()];
 L.push('', `OUTLIERS (${outList.reduce((a, o) => a + o.count, 0)} samples in ${outList.length} groups), page by page`);
 for (const p of pages) {
