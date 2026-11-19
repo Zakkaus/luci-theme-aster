@@ -33,8 +33,9 @@
 /* Small: the overview's Hide/Show. */
 .cbi-section .label[data-style] { --button-h: var(--size-element-sm); }
 
-/* A row of buttons: 8 apart, wrapping; LuCI's own margins go. */
-.right,
+/* A row of buttons: 8 apart, wrapping; LuCI's own margins go. On a table
+   cell .right only aligns the cell's text: the cell stays a cell. */
+.right:not(td, th, .td, .th),
 .cbi-page-actions,
 .btn-group,
 .cbi-section-create {
@@ -43,8 +44,9 @@
   align-items: center;
   gap: var(--spacing-2);
 }
-.right { justify-content: flex-end; }
-:is(.right, .cbi-page-actions, .btn-group, .cbi-section-create) > * { margin-inline: 0; }
+.right:not(td, th, .td, .th) { justify-content: flex-end; }
+:is(.right:not(td, th, .td, .th), .cbi-page-actions, .btn-group, .cbi-section-create) > * { margin-inline: 0; }
+:is(td, th, .td, .th).right { text-align: end; }
 /* An actions cell stays a table cell; its buttons sit 8 apart. */
 :is(.td, .th).cbi-section-actions { text-align: end; white-space: nowrap; }
 .cbi-section-actions > * + * { margin-inline-start: var(--spacing-2); }

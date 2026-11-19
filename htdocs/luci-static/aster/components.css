@@ -651,9 +651,6 @@ hr {
 }
 :where(th, td, .th, .td):last-child { padding-inline-end: var(--spacing-4); }
 :where(td, .td) { line-height: var(--text-body-leading); font-variant-numeric: tabular-nums; }
-/* An actions column's header holds only &nbsp;, whose fallback glyph sits
-   lower and stretches the header row; it shows nothing, so it takes no line. */
-:where(:is(th, .th).cbi-section-actions) { line-height: 0; }
 /* luci-mod-status's nftables view sets its cells to .25em with !important
    in a <style> it adds after the theme; only !important, one id heavier,
    gives the cell padding back. */
