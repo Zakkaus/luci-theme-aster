@@ -271,14 +271,6 @@
   margin-block-start: calc(var(--text-body-size) * var(--text-body-leading) * -1);
 }
 
-/* A heading inside a card's content (Active DHCPv4 Leases, Associated
-   Stations) is the reference's Heading 3 over a table, as 已連接站點 is. */
-[data-page="admin-status-overview"] #view > .cbi-section > div:not(.cbi-title) > h3 {
-  font-size: var(--text-heading-3-size);
-  font-weight: var(--text-heading-3-weight);
-  line-height: var(--text-heading-3-leading);
-}
-
 /* Interface boxes. luci-mod-status draws three kinds with one class: the
    port boxes (29_ports.js), the upstream boxes of the Network card
    (30_network.js) and one box per radio (60_wifi.js). Each becomes one of
@@ -288,44 +280,8 @@
    that. The images are hidden and the reference's icons take their place as
    masks coloured by tokens: Heroicons 2.2.0 outline (MIT,
    LICENSES/heroicons-MIT.txt), path data verbatim, ServerStack for a port or
-   a wired device, Wifi for a radio or a wireless device.
-
-   Overflow stays visible: the port and statistics tooltips hang inside. */
-[data-page="admin-status-overview"] .shell-content .ifacebox {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2);
-  margin: 0;
-  padding: calc(var(--spacing-4) - var(--border-width));
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-container);
-  background: var(--color-background-surface);
-  color: var(--color-text-primary);
-}
-[data-page="admin-status-overview"] .shell-content .ifacebox-head {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  filter: none;
-  color: var(--color-text-primary);
-  font-size: var(--text-heading-3-size);
-  font-weight: var(--text-heading-3-weight);
-  line-height: var(--text-heading-3-leading);
-  text-align: start;
-}
-[data-page="admin-status-overview"] .shell-content .ifacebox-head > strong { font-weight: inherit; }
-[data-page="admin-status-overview"] .shell-content .ifacebox-body {
-  padding: 0;
-  border-radius: 0;
-  color: var(--color-text-secondary);
-  font-size: var(--text-supporting-size);
-  line-height: var(--text-supporting-leading);
-  text-align: start;
-}
+   a wired device, Wifi for a radio or a wireless device. The box itself is
+   the Card variant of the interface box (components.css). */
 /* The Network and Wireless cards put their boxes in a .network-status-table:
    the reference's Grid of radio cards, at most two a row, each at least 320. */
 [data-page="admin-status-overview"] #view .network-status-table {
@@ -382,10 +338,10 @@
 /* Port tiles, the reference's port band. The Port status card is the reference's section: its title over a grid of
    port tiles with no card around them. */
 [data-page="admin-status-overview"] #view > .cbi-section:has(img[src*="/port_"]) {
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: none;
+  --card-pad: 0;
+  --card-border-width: 0;
+  --card-radius: 0;
+  --card-bg: transparent;
 }
 [data-page="admin-status-overview"] #view > .cbi-section:has(img[src*="/port_"]) > :is(.cbi-title, h3) { margin-block-end: var(--spacing-6); }
 /* 29_ports.js writes the grid inline: repeat(auto-fit, minmax(70px, 1fr))
@@ -408,8 +364,8 @@
 /* A port with no carrier is the reference's muted Card: the sunken fill, no
    edge, muted text. LuCI says so only in the image: port_down, port_pse_down. */
 [data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="_down."]) {
-  border-color: transparent;
-  background: var(--color-background-muted);
+  --card-border: transparent;
+  --card-bg: var(--color-background-muted);
 }
 /* The name row: the icon, green with a link, then the name. Its bold is
    inline; the heading weight is 600. The end stays free for the zone dots. */
@@ -423,15 +379,15 @@
 /* The speed ("10 GbE", "no link"): body text on one line, muted without a
    link. The <br> after the hidden image would leave an empty line. */
 [data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-body:nth-child(2) {
+  --ifacebox-body-fg: var(--color-text-primary);
+  --ifacebox-body-size: var(--text-body-size);
+  --ifacebox-body-leading: var(--text-body-leading);
   overflow: hidden;
-  color: var(--color-text-primary);
-  font-size: var(--text-body-size);
-  line-height: var(--text-body-leading);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 [data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-body:nth-child(2) > br { display: none; }
-[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="_down."]) > .ifacebox-body:nth-child(2) { color: var(--color-text-secondary); }
+[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="_down."]) > .ifacebox-body:nth-child(2) { --ifacebox-body-fg: var(--color-text-secondary); }
 /* The zone row: one 3-pixel bar per firewall zone, full width, in the zone's
    colour (flex: 1 and height inline). The reference ends the name row with
    the port's role; the zones go there, as 8 dots in the colours LuCI wrote,
@@ -471,9 +427,9 @@
    MetadataList: the 112 label column, secondary, 500, then the value; the
    text after the <strong> is the grid's second item. */
 [data-page="admin-status-overview"] #view .network-status-table > .ifacebox:not(:has(img[src*="/signal-"])) > .ifacebox-body {
-  color: var(--color-text-primary);
-  font-size: var(--text-body-size);
-  line-height: var(--text-body-leading);
+  --ifacebox-body-fg: var(--color-text-primary);
+  --ifacebox-body-size: var(--text-body-size);
+  --ifacebox-body-leading: var(--text-body-leading);
 }
 [data-page="admin-status-overview"] #view .network-status-table > .ifacebox > .ifacebox-body > span:first-child > br,
 [data-page="admin-status-overview"] #view .ifacebox-body > div > .ifacebadge > span > br { display: none; }
@@ -490,27 +446,19 @@
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-medium);
 }
-/* A chip in a box (the upstream's device, a radio's SSID) is a group under
-   the box's own lines, apart by a divider: no frame, no monospace. */
+/* A chip in a box (the upstream's device, a radio's SSID) is the plain
+   Badge as a group under the box's own lines, apart by a divider. */
 [data-page="admin-status-overview"] #view .ifacebox-body > div > .ifacebadge {
   align-items: flex-start;
   gap: var(--spacing-3);
   margin-block-start: var(--spacing-2);
-  padding: var(--spacing-3) 0 0;
-  border: 0;
+  padding-block-start: var(--spacing-3);
   border-block-start: var(--border-width) solid var(--color-border);
-  border-radius: 0;
-  background: none;
-  font-family: inherit;
-  font-size: inherit;
 }
 [data-page="admin-status-overview"] #view .ifacebox-body > div > .ifacebadge::before {
   margin-block-start: calc(var(--text-body-size) * var(--text-body-leading) / 2 + var(--spacing-1) - var(--aster-icon-md) / 2);
 }
 [data-page="admin-status-overview"] #view .ifacebox-body > div > .ifacebadge > span { flex: 1; min-inline-size: 0; }
-/* luci-base's chip sets its labels and values in monospace; these are a
-   list's labels, set in the body face. */
-[data-page="admin-status-overview"] #view :is(.ifacebox-body > div, .td) > .ifacebadge :is(var, strong, a) { font-family: inherit; }
 
 /* A radio box is the reference's radio card: the Wifi icon in the accent,
    the radio's name, and at the end a dot, green while the radio is up (LuCI
@@ -546,17 +494,6 @@
 }
 [data-page="admin-status-overview"] #view .ifacebox:has(img[src*="/signal-"]) .ifacebadge { gap: var(--spacing-2); }
 
-/* A chip in a table (the station's network, its signal) is an icon and its
-   text, as the reference's signal cell is a StatusDot and the value. */
-[data-page="admin-status-overview"] #view .td > .ifacebadge {
-  gap: var(--spacing-2);
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  font-family: inherit;
-  font-size: inherit;
-}
 [data-page="admin-status-overview"] #view .td > .ifacebadge small { color: var(--color-text-secondary); }
 
 /* ── Indicators [ported] ────────────────────────────────────── */

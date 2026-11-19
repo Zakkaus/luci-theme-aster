@@ -61,7 +61,11 @@ const FIELDS = [
   {name: 'side nav item height (drawer)', from: ['drawer', 'item', 'height'], devices: ['phone'], drawer: true, sel: '#mainmenu .nav-group:not([data-collapsed]) > .nav-item:not([data-active])', prop: 'height'},
   {name: 'side nav item radius', from: ['components', 'SideNavItem child row (路由)', 'radius'], devices: ['desktop'], sel: '#mainmenu .nav-item', prop: 'radius'},
   {name: 'side nav selected background', from: ['components', 'SideNavItem selected (概覽)', 'background'], devices: ['desktop'], sel: '#mainmenu .nav-item[data-active]', prop: 'background', exact: true},
-  {name: 'side nav selected colour', from: ['components', 'SideNavItem selected (概覽)', 'color'], devices: ['desktop'], sel: '#mainmenu .nav-item[data-active]', prop: 'color', exact: true},
+  // Not the reference's accent: the accent is 4.2:1 on the accent-muted fill,
+  // so the theme pulls it 20 % toward the text colour (shell.css
+  // --nav-selected-fg, 2026-11-19 contrast decision). Per mode.
+  {name: 'side nav selected colour', from: ['components', 'SideNavItem selected (概覽)', 'color'], devices: ['desktop'], sel: '#mainmenu .nav-item[data-active]', prop: 'color', exact: true,
+    want: {light: 'color(srgb 0.123137 0.298824 0.809412)', dark: 'color(srgb 0.366275 0.600784 0.979608)'}},
   // Top bar and page frame.
   {name: 'top bar height', from: ['frame', 'Top bar (AppShell header)', 'height'], sel: '.shell-header', prop: 'height'},
   {name: 'top bar padding', from: ['frame', 'TopNav', 'padding'], sel: '.shell-header', prop: 'padding'},
@@ -246,7 +250,7 @@ for (const [device, viewport] of Object.entries({desktop: {width: 1440, height: 
 
     for (const f of [...plain, ...drawerFields]) {
       const [section, k, prop] = f.from;
-      const want = f.want ?? ref[section]?.[k]?.[prop];
+      const want = (typeof f.want === 'object' ? f.want[key.split('-')[1]] : f.want) ?? ref[section]?.[k]?.[prop];
       const m = got[f.name];
       if (want == null) { fail(`${key} ${f.name}: spec has no ${f.from.join(' > ')}`); continue; }
       const pass = m.count > 0 && compare(m.value, want, f.exact);

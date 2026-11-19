@@ -24,13 +24,15 @@
                                 .cbi-value-error, .control-group
    Card          Card           .cbi-section, .cbi-section-node, .ifacebox
                                 (+ .ifacebox-head/-body), .cbi-page-actions
-                                (--card-*)
+                                (--card-*); Card variant of .ifacebox: the
+                                overview's boxes (--ifacebox-body-*)
    MetadataList  MetadataList   .cbi-section .table without a header row
    Table         Table          table, .table, .tr, .th, .td
    Tabs          Tabs           .tabs > li > .tab, .cbi-tabmenu > li > a
    ProgressBar   ProgressBar    .cbi-progressbar, .spinning (indeterminate)
    Badge         Badge          .label, .badge, .zonebadge, .ifacebadge, tab
-                                error count (--badge-*)
+                                error count (--badge-*); plain variant: the
+                                overview's chips in a box or a table cell
    Banner        Banner/Toast   .alert-message (.success .info .notice
                                 .warning .error .danger), notifications
                                 (--banner-*)
@@ -105,6 +107,13 @@ hr {
   font-size: var(--text-heading-2-size);
   font-weight: var(--text-heading-2-weight);
   line-height: var(--text-heading-2-leading);
+}
+/* Heading 3: a heading inside a card's content, under the card's title
+   (the overview's Active DHCPv4 Leases, Associated Stations). */
+:where(.cbi-section > div:not(.cbi-title) > h3) {
+  font-size: var(--text-heading-3-size);
+  font-weight: var(--text-heading-3-weight);
+  line-height: var(--text-heading-3-leading);
 }
 /* Heading 1: the page title, which LuCI writes as an <h2>. */
 :where(h1, .shell-content h2:not(.cbi-section *)) {
@@ -513,6 +522,15 @@ hr {
    edge to the content. --card-pad is the inner padding, which tables
    bleed back over. */
 
+/* The frame parameters belong to the card they are set on: a card inside a
+   framed or bare card draws its own frame. --card-pad inherits, because
+   the tables inside read it. */
+@property --card-bg { syntax: "*"; inherits: false; }
+@property --card-border { syntax: "*"; inherits: false; }
+@property --card-border-width { syntax: "*"; inherits: false; }
+@property --card-radius { syntax: "*"; inherits: false; }
+@property --card-shadow { syntax: "*"; inherits: false; }
+
 :where(.cbi-section, .cbi-section-node, .ifacebox, .cbi-page-actions) {
   --card-pad: calc(var(--spacing-4) - var(--border-width));
   box-sizing: border-box;
@@ -559,6 +577,41 @@ hr {
   font-size: var(--text-supporting-size);
   line-height: var(--text-supporting-leading);
   text-align: center;
+}
+
+/* Card variant: the box as a full Card (16 in, the container radius, 8
+   between its rows), the head a Heading 3 row with a leading icon slot, the
+   body supporting text in secondary, both start-aligned. Overflow stays
+   visible: the port and statistics tooltips hang inside. The overview's
+   port, upstream and radio boxes; --ifacebox-body-* switch a body to body
+   text. */
+:where([data-page="admin-status-overview"] .shell-content .ifacebox) {
+  --card-pad: calc(var(--spacing-4) - var(--border-width));
+  --card-radius: var(--radius-container);
+  display: flex;
+  gap: var(--spacing-2);
+  margin: 0;
+  overflow: visible;
+}
+:where([data-page="admin-status-overview"] .shell-content .ifacebox-head) {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: var(--text-heading-3-size);
+  font-weight: var(--text-heading-3-weight);
+  line-height: var(--text-heading-3-leading);
+  text-align: start;
+}
+:where([data-page="admin-status-overview"] .shell-content .ifacebox-head > strong) { font-weight: inherit; }
+:where([data-page="admin-status-overview"] .shell-content .ifacebox-body) {
+  padding: 0;
+  color: var(--ifacebox-body-fg, var(--color-text-secondary));
+  font-size: var(--ifacebox-body-size, var(--text-supporting-size));
+  line-height: var(--ifacebox-body-leading, var(--text-supporting-leading));
+  text-align: start;
 }
 
 /* ── Table ───────────────────────────────────────────────────────
@@ -799,6 +852,20 @@ hr {
 :where(.ifacebadge img) { inline-size: var(--aster-icon-sm); block-size: var(--aster-icon-sm); }
 :where(.ifacebadge) :is(var, strong, a) { font-style: normal; }
 :where(.ifacebadge var) { color: var(--color-text-secondary); }
+/* Plain variant: a chip in a card's list or a table cell is an icon and its
+   text, as the reference's signal cell is a StatusDot and the value: no
+   fill, no pill, the surrounding text's size and face (luci-base sets the
+   chip's labels in monospace). The overview's device, SSID and station
+   chips. */
+:where([data-page="admin-status-overview"] #view :is(.ifacebox-body > div, .td) > .ifacebadge) {
+  --badge-bg: transparent;
+  gap: var(--spacing-2);
+  padding: 0;
+  border-radius: 0;
+  font-family: inherit;
+  font-size: inherit;
+}
+:where([data-page="admin-status-overview"] #view :is(.ifacebox-body > div, .td) > .ifacebadge :is(var, strong, a)) { font-family: inherit; }
 
 /* ── Banner ──────────────────────────────────────────────────────
    The status-muted fill and the matching on-muted text, container
