@@ -212,14 +212,16 @@ function collect(cfg) {
 
   // Tabs: the theme's page tabs and luci-base's section tabs are one
   // component. The active one's indicator: a bottom border, else a box
-  // shadow, else an ::after bar, on the tab or its link.
+  // shadow, else a ::before or ::after bar, on the tab or its link.
   const indicator = (el) => {
     for (const e of [el, el.querySelector(':scope > a')].filter(Boolean)) {
       const s = getComputedStyle(e);
       if (parseFloat(s.borderBottomWidth) && s.borderBottomStyle !== 'none' && rgba(s.borderBottomColor)[3] > 0) return `border ${px(s.borderBottomWidth)}px ${col(s.borderBottomColor)}`;
       if (s.boxShadow !== 'none') return `shadow ${s.boxShadow}`;
-      const a = getComputedStyle(e, '::after');
-      if (a.content !== 'none' && rgba(a.backgroundColor)[3] > 0) return `after ${px(a.height)}px ${col(a.backgroundColor)}`;
+      for (const pseudo of ['::before', '::after']) {
+        const a = getComputedStyle(e, pseudo);
+        if (a.content !== 'none' && rgba(a.backgroundColor)[3] > 0) return `bar ${px(a.height)}px ${col(a.backgroundColor)}`;
+      }
     }
     return 'none';
   };
