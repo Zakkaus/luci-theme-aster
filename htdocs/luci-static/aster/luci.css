@@ -607,3 +607,50 @@
   font-family: var(--font-family-body) !important; /* inline font-family:sans-serif */
 }
 
+
+/* ── Third-party apps [ported] ──────────────────────────────── */
+/* Lua apps colour hints inline (PassWall, OpenClash): the named reds and
+   greens become the theme's text tones, readable in both modes. */
+#maincontent :is([style*="color:red" i], [style*="color: red" i], [style*="color:#f00" i], [style*="color: #f00" i], [style*="color:#ff0000" i], font[color="red" i]):not([style*="background" i]) {
+  color: var(--color-text-error) !important; /* inline color:red */
+}
+#maincontent :is([style*="color:green" i], [style*="color: green" i], font[color="green" i]):not([style*="background" i]) {
+  color: var(--color-text-success) !important; /* inline color:green */
+}
+
+/* OpenClash (body[data-page^="admin-services-openclash"]) styles its own
+   markup inside .oc from ~135 custom properties (oc-common.css, loaded
+   after the theme; html[data-darkmode=true] .oc for dark). Its surfaces,
+   inks, accent and radii take the theme's tokens; one more element of
+   weight than its dark block. */
+html body[data-page^="admin-services-openclash"] .oc {
+  --bg-white: var(--color-background-card);
+  --bg-light: var(--color-background-muted);
+  --bg-gray: var(--color-background-muted);
+  --card-bg-start: var(--color-background-card);
+  --editor-bg: var(--color-background-muted);
+  --text-primary: var(--color-text-primary);
+  --text-title: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --primary-color: var(--color-accent);
+  --info-color: var(--color-accent);
+  --btn-primary-hover: var(--color-accent);
+  --card-btn-bg: var(--color-accent);
+  --text-on-primary: var(--color-on-accent);
+  --primary-a5: color-mix(in srgb, var(--color-accent) 5%, transparent);
+  --primary-a10: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  --primary-a20: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  --primary-a30: color-mix(in srgb, var(--color-accent) 30%, transparent);
+  --success-color: var(--color-text-success);
+  --error-color: var(--color-text-error);
+  --tip-color: var(--color-text-warning);
+  --border-color: var(--color-border-emphasized);
+  --border-light: var(--color-border);
+  --divider: var(--color-border);
+  --hover-bg: var(--color-overlay-hover);
+  --switch-off-bg: var(--color-border-emphasized);
+  --radius-sm: var(--radius-element);
+  --radius-md: var(--radius-element);
+  --radius-lg: var(--radius-container);
+  font-family: var(--font-family-body);
+}
