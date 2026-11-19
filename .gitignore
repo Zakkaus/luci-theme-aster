@@ -1,2 +1,5 @@
 # 构建时由 po/ 生成，不入库
 *.lmo
+
+# 开发用的 Node 依赖，不入库
+node_modules/
