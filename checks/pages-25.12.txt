@@ -1,0 +1,3 @@
+# Pages only 25.12 has (24.10 keeps DNS inside DHCP and DNS). Use with
+#   --pages checks/pages.txt --pages checks/pages-25.12.txt
+admin/network/dns                    require=font.body,heading.page,card,button,field,checkbox,form.label,tab

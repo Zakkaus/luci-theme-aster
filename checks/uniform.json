@@ -1,0 +1,48 @@
+{
+  "_comment": [
+    "Canonical values for checks/uniform.mjs. A number is px (within the gate's --tolerance), a string is compared exactly,",
+    "null means the majority of the run at each viewport and mode (the report prints the distribution: pick a value and write it here).",
+    "A value can be split by {\"light\", \"dark\"}, {\"desktop\", \"phone\"} or \"desktop-light\" and so on. * stands for one dotted segment.",
+    "Values with a source: lab/new-theme/astryx-ref/spec.json (components), as measured on the approved M2 overview by scripts/measure.mjs."
+  ],
+  "classes": {
+    "button.*.md": {"_source": "spec Button secondary md", "height": 36, "radius": 9999, "fontSize": 15, "paddingInline": 12},
+    "button.*.sm": {"_source": "spec Button secondary sm", "height": 32, "radius": 9999, "fontSize": 15, "paddingInline": 12},
+    "button.icon.*": {"height": null, "radius": null, "fontSize": null, "paddingInline": null},
+
+    "field.*": {"height": null, "radius": null, "border": null, "fontSize": null, "formWidth": null, "textWidth": 0},
+    "checkbox": {"size": null},
+    "radio": {"size": null},
+
+    "table.header": {"_source": "spec Table header cell", "height": 31},
+    "table.row.text": {"_source": "spec Table body row", "height": 33},
+    "table.row.button": {"_source": "spec Table body row with sm Button", "height": 41},
+    "table.row.control": {"height": null},
+    "table.th": {"_source": "spec Table header cell", "paddingBlock": 4, "paddingInlineStart": 16, "fontSize": 15, "fontWeight": "600"},
+    "table.td": {"_source": "spec Table body cell", "paddingBlock": 4, "paddingInlineStart": 16, "fontSize": 15},
+    "table.kv.row.text": {"_source": "M2 overview System card (spec has no key/value table)", "height": 33},
+    "table.kv.row.*": {"height": null},
+    "table.kv.td": {"_source": "M2 overview System card", "paddingBlock": 4, "paddingInlineStart": 16, "fontSize": 15},
+    "table.progress.td": {"_source": "M2 overview Memory and Storage cards", "paddingBlock": 0, "paddingInlineStart": 0, "fontSize": null},
+
+    "card": {
+      "_source": "spec Card (default); gap is the overview grid gap",
+      "radius": 16, "padding": 15, "gap": 16,
+      "background": {"light": "rgb(255, 255, 255)", "dark": "rgb(31, 31, 34)"},
+      "border": {"light": "1px solid rgba(5, 54, 89, 0.098)", "dark": "1px solid rgba(242, 244, 246, 0.098)"}
+    },
+
+    "heading.page": {"_source": "spec Heading h1", "fontSize": 26, "fontWeight": "600"},
+    "heading.card": {"_source": "spec Heading h2 (section)", "fontSize": 22, "fontWeight": "600"},
+    "heading.sub": {"fontSize": null, "fontWeight": null},
+    "heading.modal": {"fontSize": null, "fontWeight": null},
+
+    "tab": {"height": null, "indicator": null},
+
+    "form.label": {"width": null},
+    "form.row": {"gap": null},
+
+    "font.body": {"_source": "spec --font-family-body", "fontFamily": "system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Noto Sans TC Variable, PingFang TC, Microsoft JhengHei, Arial, sans-serif"},
+    "font.code": {"_source": "spec --font-family-code", "fontFamily": "ui-monospace, SF Mono, Menlo, Consolas, DejaVu Sans Mono, Liberation Mono, monospace"}
+  }
+}
