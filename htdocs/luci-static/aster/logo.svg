@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- Placeholder: the mark is carried over unchanged from luci-theme-graphite
+       until the Aster mark replaces it.
+
+       A favicon inherits no colour, so the fill is stated here and restated
+       for a dark browser chrome. Everywhere the mark is inlined instead, the
+       path takes currentColor from the square it sits in. -->
+  <style>
+    path { fill: #111111; }
+    @media (prefers-color-scheme: dark) { path { fill: #eeeeee; } }
+  </style>
+  <path d="M10.9 1.9 18.8 6.46v4.04H3v-4.04L10.9 1.9Zm-5.7 11.6h15.8v4.04L13.1 22.1l-7.9-4.56V13.5Z"/>
+</svg>
