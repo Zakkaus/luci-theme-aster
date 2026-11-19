@@ -4,8 +4,9 @@
  * the page (visibility, a short element path, colour parsing, compositing).
  *
  * Nothing here writes to the device. The login is the ordinary form POST;
- * light and dark are chosen through the theme's browser setting
- * (localStorage "aster-theme"), as a reader chooses them; the only clicks
+ * light and dark, and the palette (--palette, default aster), are chosen
+ * through the theme's browser settings (localStorage "aster-theme" and
+ * "aster-palette"), as a reader chooses them; the only clicks
  * are the Edit button that opens an interface dialog and the Close button of
  * a dialog luci-app-attendedsysupgrade opens on its own. Nothing is saved.
  *
@@ -44,6 +45,7 @@ export function parseArgs(argv, {flags, repeat = [], usage}) {
   out.modes = out.modes.split(',').map((s) => s.trim()).filter(Boolean);
   for (const d of out.devices) if (!VIEWPORTS[d]) die(`--viewports: unknown ${d} (desktop, phone)`);
   for (const m of out.modes) if (m !== 'light' && m !== 'dark') die(`--modes: unknown ${m} (light, dark)`);
+  if (out.palette !== undefined && !/^[a-z][a-z-]*$/.test(out.palette)) die(`--palette: not a palette slug: ${out.palette}`);
   return out;
 }
 
@@ -127,7 +129,9 @@ export async function launch() {
  * login: LuCI answers a good one with 302 and a sysauth cookie. */
 export async function session(browser, opt, device, mode) {
   const ctx = await browser.newContext({viewport: VIEWPORTS[device], deviceScaleFactor: 1, colorScheme: mode});
-  await ctx.addInitScript((m) => { try { localStorage.setItem('aster-theme', m); } catch (e) {} }, mode);
+  await ctx.addInitScript(([m, p]) => {
+    try { localStorage.setItem('aster-theme', m); localStorage.setItem('aster-palette', p); } catch (e) {}
+  }, [mode, opt.palette ?? 'aster']);
   const r = await ctx.request.post(opt.base, {form: {luci_username: opt.user, luci_password: opt.password}, maxRedirects: 0});
   const cookie = (await ctx.cookies()).some((c) => c.name.startsWith('sysauth'));
   if (r.status() !== 302 || !cookie) {
@@ -172,6 +176,9 @@ export async function openPage(ctx, opt, entry, mode, debugCss) {
   if (missing) return fail(`page error: ${missing.slice(0, 200)}`);
   const theme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
   if (theme !== mode) return fail(`data-theme is ${theme}, want ${mode} (theme not installed or not selected?)`);
+  // Aster, the default palette, is the absence of the attribute.
+  const palette = await page.evaluate(() => document.documentElement.getAttribute('data-palette') ?? 'aster');
+  if (palette !== (opt.palette ?? 'aster')) return fail(`data-palette is ${palette}, want ${opt.palette} (unknown palette, or a theme without palettes?)`);
   await page.waitForTimeout(opt.settle);
   // luci-app-attendedsysupgrade (25.12) asks on the overview whether to check
   // for upgrades. Its Close button dismisses the dialog and saves nothing.

@@ -51,6 +51,14 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
   emphasized #ccd3db at 1.51:1 on the surface): its findings are listed
   under WAIVED and do not fail the run. `--field-border enforce` applies it
   like every other rule, which stay enforced.
+- Both take `--palette <slug>` (`aster`, `relay`, `teal`, `plum`,
+  `rose-pine`; default `aster`), set like the mode through the theme's
+  browser setting (`aster-palette`); a page whose `data-palette` is not the
+  one asked for is an error. Run contrast once per palette: the field
+  border (Astryx's #ccd3db, or a palette's own emphasized border) is waived
+  under every palette. Uniform checks only the default palette: its colour
+  canonicals in `uniform.json` are Aster's colours, and the palettes change
+  colour tokens only, so their sizes and spacing are the default's.
 - `contrast.mjs` holds a split button's (`.cbi-dropdown.btn`) fill or
   border to `--ui`, as it does a checkbox's.
 - The negative tests assert the exit code and the exact set of failed rule

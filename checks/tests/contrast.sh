@@ -60,6 +60,14 @@ expect contrast 1 focus,waived:field-border "no focus ring" "no focus ring" -- "
 expect contrast 1 separator,waived:field-border "bright separator in dark mode" -- "$url" "$password" --pages "$tmp/base.txt" --modes dark \
 	--debug-css 'admin/status/overview=#view .td { border-block-end: 1px solid #fff !important }'
 
+# Palettes: the run picks one as a reader does (localStorage), a slug that
+# is not a palette is an error, and a palette block whose ink is pale fails
+# the text rule under that palette.
+expect contrast 1 error "unknown palette" "data-palette is aster, want nosuch" -- "$url" "$password" --pages "$tmp/base.txt" --palette nosuch
+expect contrast 0 waived:field-border "baseline: Relay Blue" -- "$url" "$password" --pages "$tmp/base.txt" --palette relay
+expect contrast 1 text,waived:field-border "palette block with a pale ink" "#dddddd on #ffffff" -- "$url" "$password" --pages "$tmp/base.txt" --palette relay \
+	--debug-css 'admin/status/overview=:root[data-palette="relay"], :root[data-palette="relay"]:has(> body > .shell) { --color-text-primary: light-dark(#ddd, #ddd) !important }'
+
 # Field border alone: waived by default (exit 0, listed as waived), and a
 # failure when enforced.
 expect contrast 0 waived:field-border "near-white field border, rule waived by default" "WAIVED (field-border" -- "$url" "$password" --pages "$tmp/form.txt" --debug-css "$pale"

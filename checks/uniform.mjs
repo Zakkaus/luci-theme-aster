@@ -4,7 +4,7 @@
  *
  *   node checks/uniform.mjs <base url> <password>
  *        [--user root] [--pages <file>]... [--canonical <json>]
- *        [--viewports desktop,phone] [--modes light,dark] [--tolerance 1]
+ *        [--viewports desktop,phone] [--modes light,dark] [--palette aster] [--tolerance 1]
  *        [--json <file>] [--out <file>] [--timeout 60000] [--settle 1500]
  *        [--width-test 12] [--debug-css <page>=<css>]...
  *
@@ -32,9 +32,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {CHECKS, parseArgs, readPages, parseDebugCss, classMatches, openPage, eachCombo, show, writeOut, die} from './lib/gate.mjs';
 
-const usage = 'usage: node checks/uniform.mjs <base url> <password> [--user root] [--pages <file>]... [--canonical <json>] [--viewports desktop,phone] [--modes light,dark] [--tolerance 1] [--json <file>] [--out <file>] [--timeout ms] [--settle ms] [--width-test n] [--debug-css <page>=<css>]...';
+const usage = 'usage: node checks/uniform.mjs <base url> <password> [--user root] [--pages <file>]... [--canonical <json>] [--viewports desktop,phone] [--modes light,dark] [--palette aster] [--tolerance 1] [--json <file>] [--out <file>] [--timeout ms] [--settle ms] [--width-test n] [--debug-css <page>=<css>]...';
 const opt = parseArgs(process.argv.slice(2), {
-  flags: {user: 'root', canonical: path.join(CHECKS, 'uniform.json'), viewports: 'desktop,phone', modes: 'light,dark', tolerance: '1', json: undefined, out: undefined, timeout: '60000', settle: '1500', 'width-test': '12'},
+  flags: {user: 'root', canonical: path.join(CHECKS, 'uniform.json'), viewports: 'desktop,phone', modes: 'light,dark', palette: 'aster', tolerance: '1', json: undefined, out: undefined, timeout: '60000', settle: '1500', 'width-test': '12'},
   repeat: ['pages', 'debug-css'],
   usage,
 });
@@ -593,12 +593,12 @@ const notes = results.filter((r) => r.note).map((r) => `${r.combo} ${r.entry.id}
 if (notes.length) L.push('', 'NOTES', ...notes.map((n) => `  ${n}`));
 const total = results.reduce((a, r) => a + r.samples.length, 0);
 const failed = errors.length || missing.length || outList.length;
-L.push('', `RESULT ${failed ? 'FAIL' : 'OK'}  errors ${errors.length}  missing ${missing.length}  outlier samples ${outList.reduce((a, o) => a + o.count, 0)}  samples ${total}`);
+L.push('', `RESULT ${failed ? 'FAIL' : 'OK'}  palette ${opt.palette}  errors ${errors.length}  missing ${missing.length}  outlier samples ${outList.reduce((a, o) => a + o.count, 0)}  samples ${total}`);
 const text = `${L.join('\n')}\n`;
 process.stdout.write(text);
 writeOut(opt.out, text);
 writeOut(opt.json, JSON.stringify({
-  gate: 'uniform', base: opt.url, combos, tolerance: tol, canonicalFile: opt.canonical,
+  gate: 'uniform', base: opt.url, palette: opt.palette, combos, tolerance: tol, canonicalFile: opt.canonical,
   pages: pages.map((p) => ({id: p.id, require: p.require})),
   errors, missing, outliers: outList,
   perPageClass: Object.fromEntries(ranked),

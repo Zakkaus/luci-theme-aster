@@ -5,7 +5,7 @@
  *
  *   node checks/contrast.mjs <base url> <password>
  *        [--user root] [--pages <file>]... [--viewports desktop,phone]
- *        [--modes light,dark] [--text 4.5] [--large 3] [--ui 3] [--focus 3]
+ *        [--modes light,dark] [--palette aster] [--text 4.5] [--large 3] [--ui 3] [--focus 3]
  *        [--separator-max 1.5] [--separator-modes dark] [--focus-limit 3]
  *        [--field-border enforce|waive]
  *        [--json <file>] [--out <file>] [--timeout 60000] [--settle 1500]
@@ -44,9 +44,9 @@
 import path from 'node:path';
 import {CHECKS, die, parseArgs, readPages, parseDebugCss, openPage, eachCombo, writeOut} from './lib/gate.mjs';
 
-const usage = 'usage: node checks/contrast.mjs <base url> <password> [--user root] [--pages <file>]... [--viewports desktop,phone] [--modes light,dark] [--text 4.5] [--large 3] [--ui 3] [--focus 3] [--separator-max 1.5] [--separator-modes dark] [--focus-limit 3] [--field-border enforce|waive] [--json <file>] [--out <file>] [--timeout ms] [--settle ms] [--debug-css <page>=<css>]...';
+const usage = 'usage: node checks/contrast.mjs <base url> <password> [--user root] [--pages <file>]... [--viewports desktop,phone] [--modes light,dark] [--palette aster] [--text 4.5] [--large 3] [--ui 3] [--focus 3] [--separator-max 1.5] [--separator-modes dark] [--focus-limit 3] [--field-border enforce|waive] [--json <file>] [--out <file>] [--timeout ms] [--settle ms] [--debug-css <page>=<css>]...';
 const opt = parseArgs(process.argv.slice(2), {
-  flags: {user: 'root', viewports: 'desktop,phone', modes: 'light,dark', text: '4.5', large: '3', ui: '3', focus: '3', 'separator-max': '1.5', 'separator-modes': 'dark', 'field-border': 'waive', 'focus-limit': '3', json: undefined, out: undefined, timeout: '60000', settle: '1500'},
+  flags: {user: 'root', viewports: 'desktop,phone', modes: 'light,dark', palette: 'aster', text: '4.5', large: '3', ui: '3', focus: '3', 'separator-max': '1.5', 'separator-modes': 'dark', 'field-border': 'waive', 'focus-limit': '3', json: undefined, out: undefined, timeout: '60000', settle: '1500'},
   repeat: ['pages', 'debug-css'],
   usage,
 });
@@ -274,12 +274,12 @@ L.push('', 'LOWEST RATIO PER VIEWPORT-MODE AND KIND (separator: highest)');
 for (const [k, v] of Object.entries(minRatio).sort()) L.push(`  ${k.padEnd(24)} ${v.toFixed(2)}`);
 const failed = errors.length || fails.length;
 const total = results.reduce((a, r) => a + r.found.length, 0);
-L.push('', `RESULT ${failed ? 'FAIL' : 'OK'}  errors ${errors.length}  failed samples ${fails.reduce((a, g) => a + g.count, 0)}  samples ${total}`);
+L.push('', `RESULT ${failed ? 'FAIL' : 'OK'}  palette ${opt.palette}  errors ${errors.length}  failed samples ${fails.reduce((a, g) => a + g.count, 0)}  samples ${total}`);
 const text = `${L.join('\n')}\n`;
 process.stdout.write(text);
 writeOut(opt.out, text);
 writeOut(opt.json, JSON.stringify({
-  gate: 'contrast', base: opt.url, combos, thresholds: {...min, separatorMax: sepMax, separatorModes: sepModes},
+  gate: 'contrast', base: opt.url, palette: opt.palette, combos, thresholds: {...min, separatorMax: sepMax, separatorModes: sepModes},
   pages: pages.map((p) => p.id),
   fieldBorder: opt['field-border'],
   errors, failures: fails.map((g) => ({...g, pages: [...g.pages]})),
