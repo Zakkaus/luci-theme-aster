@@ -7,6 +7,7 @@
  *        [--user root] [--pages <file>]... [--viewports desktop,phone]
  *        [--modes light,dark] [--text 4.5] [--large 3] [--ui 3] [--focus 3]
  *        [--separator-max 1.5] [--separator-modes dark] [--focus-limit 3]
+ *        [--field-border enforce|waive]
  *        [--json <file>] [--out <file>] [--timeout 60000] [--settle 1500]
  *        [--debug-css <page>=<css>]...
  *
@@ -16,9 +17,14 @@
  *   text       every element with its own words, and the value of every
  *              field: --text (4.5), or --large (3) at 24px, or 18.66px bold.
  *              Disabled controls and placeholders are exempt (WCAG 1.4.3).
- *   ui         the boundary of a text field, select or dropdown, or of a
- *              checkbox or radio drawn by the theme (appearance: none):
- *              border or fill against what is around it, --ui (3).
+ *   ui         the boundary of a checkbox or radio drawn by the theme
+ *              (appearance: none): border or fill against what is around
+ *              it, --ui (3).
+ *   field-border  the same for a text field, textarea, select or dropdown,
+ *              --ui (3), reported as its own rule: --field-border enforce
+ *              (default) fails the run on it, --field-border waive lists
+ *              its findings under WAIVED and passes (WCAG 1.4.11; the owner
+ *              decides whether the Astryx field border is kept).
  *              Buttons with words are identified by their words (1.4.11).
  *   focus      up to --focus-limit buttons, fields, checkboxes, links and
  *              tabs a page, focused from the keyboard: the ring (outline,
@@ -36,17 +42,19 @@
  * is written to the device.
  */
 import path from 'node:path';
-import {CHECKS, parseArgs, readPages, parseDebugCss, openPage, eachCombo, writeOut} from './lib/gate.mjs';
+import {CHECKS, die, parseArgs, readPages, parseDebugCss, openPage, eachCombo, writeOut} from './lib/gate.mjs';
 
-const usage = 'usage: node checks/contrast.mjs <base url> <password> [--user root] [--pages <file>]... [--viewports desktop,phone] [--modes light,dark] [--text 4.5] [--large 3] [--ui 3] [--focus 3] [--separator-max 1.5] [--separator-modes dark] [--focus-limit 3] [--json <file>] [--out <file>] [--timeout ms] [--settle ms] [--debug-css <page>=<css>]...';
+const usage = 'usage: node checks/contrast.mjs <base url> <password> [--user root] [--pages <file>]... [--viewports desktop,phone] [--modes light,dark] [--text 4.5] [--large 3] [--ui 3] [--focus 3] [--separator-max 1.5] [--separator-modes dark] [--focus-limit 3] [--field-border enforce|waive] [--json <file>] [--out <file>] [--timeout ms] [--settle ms] [--debug-css <page>=<css>]...';
 const opt = parseArgs(process.argv.slice(2), {
-  flags: {user: 'root', viewports: 'desktop,phone', modes: 'light,dark', text: '4.5', large: '3', ui: '3', focus: '3', 'separator-max': '1.5', 'separator-modes': 'dark', 'focus-limit': '3', json: undefined, out: undefined, timeout: '60000', settle: '1500'},
+  flags: {user: 'root', viewports: 'desktop,phone', modes: 'light,dark', text: '4.5', large: '3', ui: '3', focus: '3', 'separator-max': '1.5', 'separator-modes': 'dark', 'field-border': 'enforce', 'focus-limit': '3', json: undefined, out: undefined, timeout: '60000', settle: '1500'},
   repeat: ['pages', 'debug-css'],
   usage,
 });
 opt.timeout = +opt.timeout;
 opt.settle = +opt.settle;
-const min = {text: +opt.text, large: +opt.large, ui: +opt.ui, focus: +opt.focus};
+const min = {text: +opt.text, large: +opt.large, ui: +opt.ui, focus: +opt.focus, 'field-border': +opt.ui};
+if (!['enforce', 'waive'].includes(opt['field-border'])) die(`--field-border must be enforce or waive\n${usage}`);
+const waived = opt['field-border'] === 'waive' ? ['field-border'] : [];
 const sepMax = +opt['separator-max'];
 const sepModes = opt['separator-modes'].split(',');
 const pages = readPages(opt.pages.length ? opt.pages : [path.join(CHECKS, 'pages.txt')]);
@@ -94,7 +102,7 @@ function collect(cfg) {
     const b = rgba(s.borderTopColor);
     const edge = bw ? over([b[0], b[1], b[2], b[3] * op], fill) : fill;
     const use = ratio(edge, around) >= ratio(fill, around) ? edge : fill;
-    push('ui', use, around, el, el.getAttribute('name') ?? el.tagName.toLowerCase());
+    push(el.matches('[type="checkbox"], [type="radio"]') ? 'ui' : 'field-border', use, around, el, el.getAttribute('name') ?? el.tagName.toLowerCase());
   }
 
   // Separators: the line over the element's own surface.
@@ -218,16 +226,18 @@ const combos = opt.devices.flatMap((d) => opt.modes.map((m) => `${d}-${m}`));
 for (const combo of combos) {
   const mine = results.filter((r) => r.combo === combo);
   if (!mine.length) continue;
-  for (const kind of ['ui', 'focus', 'separator']) {
+  for (const kind of ['field-border', 'focus', 'separator']) {
     if (!mine.some((r) => r.found.some((f) => f.kind === kind))) errors.push({page: '(all pages)', combo, error: `no ${kind} samples`});
   }
 }
 
 /* ── Report ──────────────────────────────────────────────────── */
 
-const fails = [...groups.values()];
+const allFails = [...groups.values()];
+const fails = allFails.filter((g) => !waived.includes(g.kind));
+const waivedFails = allFails.filter((g) => waived.includes(g.kind));
 const L = [];
-L.push(`contrast  ${opt.url}  ${pages.length} pages  ${combos.join(' ')}  text ${min.text}  large ${min.large}  ui ${min.ui}  focus ${min.focus}  separator <= ${sepMax} in ${sepModes.join(',')}`);
+L.push(`contrast  ${opt.url}  ${pages.length} pages  ${combos.join(' ')}  text ${min.text}  large ${min.large}  ui ${min.ui}  focus ${min.focus}  field-border ${min['field-border']} (${opt['field-border']})  separator <= ${sepMax} in ${sepModes.join(',')}`);
 L.push('', `ERRORS (${errors.length})`);
 for (const e of errors) L.push(`  ${e.combo}  ${e.page}: ${e.error}`);
 L.push('', `FAILURES (${fails.reduce((a, g) => a + g.count, 0)} samples in ${fails.length} groups), page by page`);
@@ -238,8 +248,14 @@ for (const page of ['[shell]', ...pages.map((p) => p.id)]) {
   mine.sort((a, b) => a.kind.localeCompare(b.kind) || a.ratio - b.ratio);
   for (const g of mine) {
     const e = g.examples[0];
-    L.push(`  ${g.combo.padEnd(13)} ${g.kind.padEnd(9)} ${g.ratio.toFixed(2)} (want ${g.rule})  ${g.fg} on ${g.bg}  x${g.count}${g.page === '[shell]' ? ` on ${g.pages.size} pages` : ''}  ${e.where}${e.text ? ` "${e.text}"` : ''}${e.note ? ` (${e.note})` : ''}`);
+    L.push(`  ${g.combo.padEnd(13)} ${g.kind.padEnd(12)} ${g.ratio.toFixed(2)} (want ${g.rule})  ${g.fg} on ${g.bg}  x${g.count}${g.page === '[shell]' ? ` on ${g.pages.size} pages` : ''}  ${e.where}${e.text ? ` "${e.text}"` : ''}${e.note ? ` (${e.note})` : ''}`);
   }
+}
+if (waivedFails.length) {
+  const n = waivedFails.reduce((a, g) => a + g.count, 0);
+  const worst = Math.min(...waivedFails.map((g) => g.ratio));
+  L.push('', `WAIVED (${waived.join(', ')}: ${n} samples in ${waivedFails.length} groups, lowest ${worst.toFixed(2)}; not counted in RESULT)`);
+  for (const g of waivedFails.sort((a, b) => a.ratio - b.ratio).slice(0, 20)) L.push(`  ${g.combo.padEnd(13)} ${g.page}  ${g.ratio.toFixed(2)} (want ${g.rule})  ${g.fg} on ${g.bg}  x${g.count}  ${g.examples[0].where}`);
 }
 const byPageKind = new Map();
 for (const g of fails) {
@@ -260,7 +276,9 @@ writeOut(opt.out, text);
 writeOut(opt.json, JSON.stringify({
   gate: 'contrast', base: opt.url, combos, thresholds: {...min, separatorMax: sepMax, separatorModes: sepModes},
   pages: pages.map((p) => p.id),
+  fieldBorder: opt['field-border'],
   errors, failures: fails.map((g) => ({...g, pages: [...g.pages]})),
+  waived: waivedFails.map((g) => ({...g, pages: [...g.pages]})),
   perPageKind: Object.fromEntries(ranked), extremes: minRatio, counts,
   result: failed ? 'FAIL' : 'OK',
 }, null, 1));

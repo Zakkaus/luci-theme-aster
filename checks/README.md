@@ -37,6 +37,11 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
   property. Values with a source in `lab/new-theme/astryx-ref/spec.json`
   are written out; `null` means "the majority of the run", and the report
   prints each distribution so a value can be chosen and written in.
+- `contrast.mjs` reports a text field's, textarea's, select's or dropdown's
+  boundary as its own rule, `field-border` (3:1, WCAG 1.4.11):
+  `--field-border enforce` (default) fails the run on it, `--field-border
+  waive` lists it under WAIVED and passes. Astryx's emphasized border is
+  1.51:1 against the surface; the owner decides which way it goes.
 - `contrast.mjs` takes `--text 4.5 --large 3 --ui 3 --focus 3` (WCAG AA)
   and `--separator-max 1.5 --separator-modes dark` (Argon's dark table rules,
   2026-07-25). The reference page's dark separators measure 1.32.
