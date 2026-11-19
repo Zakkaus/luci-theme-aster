@@ -159,10 +159,12 @@
    in the view; the table is the Card. A collapsed table takes no padding or
    radius, so it keeps its borders separate. */
 #view > :is(table, .table), #view > .cbi-map > :is(table, .table) { border-collapse: separate; }
-/* A table that does not fit scrolls inside its card, not the page. */
+/* A table that does not fit scrolls inside its card, not the page; in a
+   Lua CBI map (form > .cbi-map) also when an app wraps it deeper. */
 :is(.cbi-section, .cbi-section-node) > div:not(.cbi-section-node):has(> .table),
 .shell-inner > div:has(> .table),
-.cbi-section:has(> .table, > .cbi-section-node > .table) { overflow-x: auto; }
+.cbi-section:has(> .table, > .cbi-section-node > .table),
+form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: auto; }
 /* A data table (a header row, or a form section's table: Interfaces
    leaves the header out) runs to the card's frame; its cells give the
    distance back, so the rules span the card as in the reference's Table in
@@ -654,3 +656,8 @@ html body[data-page^="admin-services-openclash"] .oc {
   --radius-lg: var(--radius-container);
   font-family: var(--font-family-body);
 }
+/* OpenClash's script adds .oc to its action buttons (Commit, Apply, the
+   file lists' Refresh/Create/Delete); they join the Button rule, and the
+   fill its sheet forces (!important, from --primary-color) follows the
+   Button variant. */
+html body[data-page^="admin-services-openclash"] .oc.cbi-button { --primary-color: var(--button-bg, var(--color-neutral)); }
