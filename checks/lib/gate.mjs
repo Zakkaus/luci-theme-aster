@@ -54,7 +54,7 @@ export function die(msg) {
   process.exit(1);
 }
 
-/* One entry a line:  <path> [modal=<name>] [require=<class>,<class>...]
+/* One entry a line:  <path> [modal=<name>] [tab=<name>] [require=<class>,<class>...]
  * A class in require= must have at least one sample on that page at every
  * viewport and mode. `<class>@desktop` asks for it on the desktop only;
  * `<class>@rows` on the desktop, and at any other viewport whenever the
@@ -62,7 +62,10 @@ export function die(msg) {
  * phone). A class name matches itself and its dotted children ("button"
  * matches "button.primary.md"). An entry a later file lists again (same
  * path and modal) adds its require= classes to the first one: the 25.12
- * list asks for what only 25.12 draws on a page both versions have. */
+ * list asks for what only 25.12 draws on a page both versions have.
+ * tab= selects a tab of the page's first tab group with that data-tab name
+ * (a Lua CBI page's tabs, a JS view's tabs) before measuring; the entry is
+ * its own page ("<path> #<tab>"). */
 const QUALIFIERS = ['desktop', 'rows'];
 export function readPages(files) {
   const pages = [];
@@ -72,10 +75,11 @@ export function readPages(files) {
       const line = raw.replace(/#.*/, '').trim();
       if (!line) return;
       const [p, ...rest] = line.split(/\s+/);
-      const e = {path: p.replace(/^\/+/, ''), modal: null, require: [], src: `${path.basename(file)}:${i + 1}`};
+      const e = {path: p.replace(/^\/+/, ''), modal: null, tab: null, require: [], src: `${path.basename(file)}:${i + 1}`};
       for (const r of rest) {
         const [k, v] = r.split('=');
         if (k === 'modal') e.modal = v;
+        else if (k === 'tab') e.tab = v;
         else if (k === 'require') e.require = v.split(',').filter(Boolean);
         else die(`${e.src}: unknown field ${r}`);
       }
@@ -84,7 +88,7 @@ export function readPages(files) {
         const q = req.split('@')[1];
         if (q !== undefined && !QUALIFIERS.includes(q)) die(`${e.src}: unknown qualifier @${q} (${QUALIFIERS.join(', ')})`);
       }
-      e.id = e.modal ? `${e.path} [${e.modal}]` : e.path;
+      e.id = (e.modal ? `${e.path} [${e.modal}]` : e.path) + (e.tab ? ` #${e.tab}` : '');
       const first = pages.find((x) => x.id === e.id);
       if (first) first.require.push(...e.require.filter((r) => !first.require.includes(r)));
       else pages.push(e);
@@ -198,6 +202,18 @@ export async function openPage(ctx, opt, entry, mode, debugCss) {
     } catch (e) {
       return fail(`modal ${entry.modal}: ${String(e.message).split('\n')[0]}`);
     }
+    await page.waitForTimeout(opt.settle);
+  }
+  if (entry.tab) {
+    const tab = page.locator(`.cbi-tabmenu > li[data-tab="${entry.tab}"]`).first();
+    try {
+      await tab.waitFor({state: 'visible', timeout: opt.timeout});
+      await tab.locator('a').first().click();
+      await page.waitForFunction((t) => document.querySelector(`.cbi-tabmenu > li[data-tab="${t}"]`)?.classList.contains('cbi-tab'), entry.tab, {timeout: opt.timeout});
+    } catch (e) {
+      return fail(`tab ${entry.tab}: ${String(e.message).split('\n')[0]}`);
+    }
+    note = note ? `${note}, tab ${entry.tab}` : `tab ${entry.tab}`;
     await page.waitForTimeout(opt.settle);
   }
   await page.evaluate(installHelpers);

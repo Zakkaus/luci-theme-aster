@@ -1,0 +1,69 @@
+# Third-party app pages (M3c): OpenClash 0.48.002 and PassWall 26.11.11-r1,
+# installed by lab/new-theme/hostscripts/apps-install.sh on OpenWrt 25.12.
+# Same format as pages.txt; tab=<name> selects a tab of the page's first
+# tab group (the entry without tab= is the page's first tab). Use alone:
+#   --pages checks/pages-apps-25.12.txt
+#
+# The services are installed but stopped, as the lab runs them; no page
+# below needs a running service to render. Pages that show more while the
+# service runs are marked "(runs: ...)".
+#
+# Not listed: menu entries that answer with another page (OpenClash
+# servers -> config, custom-dns-edit -> config-overwrite; PassWall haproxy
+# -> settings while haproxy is not installed), pages that need a section id
+# from a configured node or subscription (OpenClash other-file-edit,
+# config-subscribe-edit, proxies-config, proxy-groups-config,
+# proxy-providers-config; PassWall node_config, node_subscribe_config,
+# shunt_rules, socks_config, acl_config, server_config, server_user_config),
+# and OpenClash's Rules Update tab, which hides itself.
+
+# OpenClash
+admin/services/openclash/client                            require=font.body
+admin/services/openclash/settings                          require=font.body,tab
+admin/services/openclash/settings tab=traffic_control      require=font.body,tab
+admin/services/openclash/settings tab=dns                  require=font.body,tab
+admin/services/openclash/settings tab=stream_enhance       require=font.body,tab
+admin/services/openclash/settings tab=lan_ac               require=font.body,tab
+admin/services/openclash/settings tab=dashboard            require=font.body,tab
+admin/services/openclash/settings tab=ipv6                 require=font.body,tab
+admin/services/openclash/settings tab=geo_update           require=font.body,tab
+admin/services/openclash/settings tab=chnr_update          require=font.body,tab
+admin/services/openclash/settings tab=auto_restart         require=font.body,tab
+admin/services/openclash/settings tab=debug                require=font.body,tab
+admin/services/openclash/settings tab=developer            require=font.body,tab
+admin/services/openclash/settings tab=version_update       require=font.body,tab
+admin/services/openclash/settings tab=oixcloud             require=font.body,tab
+admin/services/openclash/config-overwrite                  require=font.body,tab
+admin/services/openclash/config-overwrite tab=dns          require=font.body,tab
+admin/services/openclash/config-overwrite tab=meta         require=font.body,tab
+admin/services/openclash/config-overwrite tab=smart        require=font.body,tab
+admin/services/openclash/config-overwrite tab=rules        require=font.body,tab
+admin/services/openclash/config-subscribe                  require=font.body
+admin/services/openclash/config                            require=font.body
+admin/services/openclash/log                               require=font.body
+admin/services/openclash/proxy-providers-file-manage       require=font.body
+admin/services/openclash/rule-providers-file-manage        require=font.body
+
+# PassWall
+admin/services/passwall/settings                           require=font.body,tab
+admin/services/passwall/settings tab=DNS                   require=font.body,tab
+admin/services/passwall/settings tab=Proxy                 require=font.body,tab
+admin/services/passwall/settings tab=log                   require=font.body,tab
+admin/services/passwall/settings tab=faq                   require=font.body,tab
+admin/services/passwall/settings tab=maintain              require=font.body,tab
+admin/services/passwall/node_list                          require=font.body
+admin/services/passwall/node_subscribe                     require=font.body
+admin/services/passwall/other                              require=font.body
+admin/services/passwall/app_update                         require=font.body
+admin/services/passwall/rule                               require=font.body
+admin/services/passwall/rule_list                          require=font.body,tab
+admin/services/passwall/rule_list tab=proxy_list           require=font.body,tab
+admin/services/passwall/rule_list tab=block_list           require=font.body,tab
+admin/services/passwall/rule_list tab=lan_ip_list          require=font.body,tab
+admin/services/passwall/rule_list tab=route_hosts          require=font.body,tab
+admin/services/passwall/rule_list tab=gfw_list             require=font.body,tab
+admin/services/passwall/rule_list tab=chn_list             require=font.body,tab
+admin/services/passwall/rule_list tab=chnroute_list        require=font.body,tab
+admin/services/passwall/acl                                require=font.body
+admin/services/passwall/log                                require=font.body
+admin/services/passwall/server                             require=font.body

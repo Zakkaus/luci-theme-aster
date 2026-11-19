@@ -30,11 +30,15 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
 
 - `pages.txt` lists the core pages both 24.10 and 25.12 have;
   `pages-25.12.txt` the ones only 25.12 has. A line is
-  `<path> [modal=interface-edit] [require=<class>,...]`; a required class
+  `<path> [modal=interface-edit] [tab=<name>] [require=<class>,...]`
+  (`tab=` selects that tab of the page's first tab group); a required class
   must have a sample on that page at every viewport and mode
   (`<class>@desktop` for the desktop only; `<class>@rows` on the desktop,
   and on a phone whenever the page's tables hold a data row). A page that
   `pages-25.12.txt` lists again adds its classes to the `pages.txt` entry.
+- `pages-apps-24.10.txt` and `pages-apps-25.12.txt` list third-party app
+  pages (OpenClash, PassWall), every menu entry and tab; run each alone
+  on a box the lab's apps-install.sh prepared.
 - `uniform.mjs` also reads layout: a field fills its row (less the buttons
   on its line), a form row fills its card or dialog, the phone fold's rows
   are grids with their actions inside the card, and no card, table or
