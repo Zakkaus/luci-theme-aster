@@ -179,6 +179,179 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-background-body: light-dark(#F4F4F5, #18181B);
 }
 
+/* Palettes (design/palettes.mjs), chosen per browser: header.ut sets
+   data-palette from localStorage "aster-palette". Colour tokens only. */
+:root[data-palette="relay"],
+:root[data-palette="relay"]:has(> body > .shell) {
+  --color-accent: light-dark(#315FD3, #87A9FA);
+  --color-accent-muted: light-dark(#315FD316, #87A9FA26);
+  --color-background-body: light-dark(#F3F4F7, #181A20);
+  --color-background-card: light-dark(#FFFFFF, #20232A);
+  --color-background-muted: light-dark(#E9ECF2, #15171D);
+  --color-background-popover: light-dark(#FFFFFF, #2C2F36);
+  --color-background-surface: light-dark(#FFFFFF, #20232A);
+  --color-border: light-dark(#DCE1E9, #31353E);
+  --color-border-emphasized: light-dark(#CCD3DB, #494D53);
+  --color-border-error: light-dark(#9D303D, #F2ACB3);
+  --color-error: light-dark(#BD4C56, #D97782);
+  --color-error-muted: light-dark(#BD4C5633, #D977823F);
+  --color-icon-accent: light-dark(#315FD3, #87A9FA);
+  --color-icon-primary: light-dark(#19202C, #E4E8EF);
+  --color-icon-secondary: light-dark(#515F74, #AFBACB);
+  --color-icon-success: light-dark(#246445, #99D2AF);
+  --color-icon-warning: light-dark(#80500E, #EDC588);
+  --color-info-muted: light-dark(#477FA133, #75ABCA3F);
+  --color-neutral: light-dark(#19202C1A, #E4E8EF33);
+  --color-on-accent: light-dark(#FFFFFF, #101D37);
+  --color-on-error: light-dark(#FFFFFF, #19202C);
+  --color-on-error-muted: light-dark(#9D303D, #F2ACB3);
+  --color-on-info-muted: light-dark(#31617F, #A0CBE3);
+  --color-on-light: light-dark(#000000, #000000);
+  --color-on-success-muted: light-dark(#246445, #99D2AF);
+  --color-on-warning-muted: light-dark(#80500E, #EDC588);
+  --color-overlay: light-dark(#19202C66, #181A2099);
+  --color-overlay-hover: light-dark(#19202C0C, #FFFFFF0C);
+  --color-overlay-pressed: light-dark(#19202C19, #FFFFFF19);
+  --color-success-muted: light-dark(#35856133, #65B5913F);
+  --color-text-accent: light-dark(#274EAD, #A9C2FF);
+  --color-text-error: light-dark(#9D303D, #F2ACB3);
+  --color-text-primary: light-dark(#19202C, #E4E8EF);
+  --color-text-secondary: light-dark(#515F74, #AFBACB);
+  --color-warning: light-dark(#BE852E, #D3A258);
+  --color-warning-muted: light-dark(#BE852E33, #D3A2583F);
+  --focus-outline-color: light-dark(#315FD3, #87A9FA);
+}
+
+:root[data-palette="teal"],
+:root[data-palette="teal"]:has(> body > .shell) {
+  --color-accent: light-dark(#246B69, #7DC8BC);
+  --color-accent-muted: light-dark(#246B6919, #7DC8BC24);
+  --color-background-body: light-dark(#F1F5F3, #161D1C);
+  --color-background-card: light-dark(#FCFEFD, #1D2826);
+  --color-background-muted: light-dark(#E4ECE8, #131A19);
+  --color-background-popover: light-dark(#FCFEFD, #293432);
+  --color-background-surface: light-dark(#FCFEFD, #1D2826);
+  --color-border: light-dark(#D6E1DC, #2E3935);
+  --color-border-emphasized: light-dark(#CCD3DB, #494D53);
+  --color-border-error: light-dark(#933B37, #EFAEA9);
+  --color-error: light-dark(#B95853, #D9817B);
+  --color-error-muted: light-dark(#B9585333, #D9817B3F);
+  --color-icon-accent: light-dark(#246B69, #7DC8BC);
+  --color-icon-primary: light-dark(#172824, #E0EAE6);
+  --color-icon-secondary: light-dark(#50645F, #A9BDB5);
+  --color-icon-success: light-dark(#44622E, #BDDA9E);
+  --color-icon-warning: light-dark(#785017, #E7C697);
+  --color-info-muted: light-dark(#5984AA33, #84AACC3F);
+  --color-neutral: light-dark(#1728241A, #E0EAE633);
+  --color-on-accent: light-dark(#FFFFFF, #112D2A);
+  --color-on-error: light-dark(#FFFFFF, #172824);
+  --color-on-error-muted: light-dark(#933B37, #EFAEA9);
+  --color-on-info-muted: light-dark(#355E84, #ACCCE6);
+  --color-on-light: light-dark(#000000, #000000);
+  --color-on-success-muted: light-dark(#44622E, #BDDA9E);
+  --color-on-warning-muted: light-dark(#785017, #E7C697);
+  --color-overlay: light-dark(#17282466, #161D1C99);
+  --color-overlay-hover: light-dark(#1728240C, #FFFFFF0C);
+  --color-overlay-pressed: light-dark(#17282419, #FFFFFF19);
+  --color-success-muted: light-dark(#65824533, #9BB97B3F);
+  --color-text-accent: light-dark(#175A59, #9ADACE);
+  --color-text-error: light-dark(#933B37, #EFAEA9);
+  --color-text-primary: light-dark(#172824, #E0EAE6);
+  --color-text-secondary: light-dark(#50645F, #A9BDB5);
+  --color-warning: light-dark(#BA863E, #CEA468);
+  --color-warning-muted: light-dark(#BA863E33, #CEA4683F);
+  --focus-outline-color: light-dark(#246B69, #7DC8BC);
+}
+
+:root[data-palette="plum"],
+:root[data-palette="plum"]:has(> body > .shell) {
+  --color-accent: light-dark(#785378, #C9A2C5);
+  --color-accent-muted: light-dark(#78537819, #C9A2C526);
+  --color-background-body: light-dark(#F6F3F0, #201C20);
+  --color-background-card: light-dark(#FFFDFA, #292529);
+  --color-background-muted: light-dark(#ECE7E3, #1C181C);
+  --color-background-popover: light-dark(#FFFDFA, #353134);
+  --color-background-surface: light-dark(#FFFDFA, #292529);
+  --color-border: light-dark(#E2DBD7, #3D353C);
+  --color-border-emphasized: light-dark(#CCD3DB, #494D53);
+  --color-border-error: light-dark(#943F30, #EFAE9C);
+  --color-error: light-dark(#BB5A46, #D78472);
+  --color-error-muted: light-dark(#BB5A4633, #D784723F);
+  --color-icon-accent: light-dark(#785378, #C9A2C5);
+  --color-icon-primary: light-dark(#292329, #ECE5E5);
+  --color-icon-secondary: light-dark(#695E66, #C3B6BD);
+  --color-icon-success: light-dark(#4C6134, #C5D4A0);
+  --color-icon-warning: light-dark(#805017, #EBC492);
+  --color-info-muted: light-dark(#547D9C33, #7EA9C53F);
+  --color-neutral: light-dark(#2923291A, #ECE5E533);
+  --color-on-accent: light-dark(#FFFFFF, #302033);
+  --color-on-error: light-dark(#FFFFFF, #292329);
+  --color-on-error-muted: light-dark(#943F30, #EFAE9C);
+  --color-on-info-muted: light-dark(#3B627F, #ABCCE0);
+  --color-on-light: light-dark(#000000, #000000);
+  --color-on-success-muted: light-dark(#4C6134, #C5D4A0);
+  --color-on-warning-muted: light-dark(#805017, #EBC492);
+  --color-overlay: light-dark(#29232966, #201C2099);
+  --color-overlay-hover: light-dark(#2923290C, #FFFFFF0C);
+  --color-overlay-pressed: light-dark(#29232919, #FFFFFF19);
+  --color-success-muted: light-dark(#75834F33, #A6B77E3F);
+  --color-text-accent: light-dark(#69456B, #DEC0DB);
+  --color-text-error: light-dark(#943F30, #EFAE9C);
+  --color-text-primary: light-dark(#292329, #ECE5E5);
+  --color-text-secondary: light-dark(#695E66, #C3B6BD);
+  --color-warning: light-dark(#BF873D, #CFA163);
+  --color-warning-muted: light-dark(#BF873D33, #CFA1633F);
+  --focus-outline-color: light-dark(#785378, #C9A2C5);
+}
+
+:root[data-palette="rose-pine"],
+:root[data-palette="rose-pine"]:has(> body > .shell) {
+  --color-accent: light-dark(#286983, #9CCFD8);
+  --color-accent-muted: light-dark(#28698319, #9CCFD826);
+  --color-background-body: light-dark(#FAF4ED, #191724);
+  --color-background-card: light-dark(#FFFAF3, #1F1D2E);
+  --color-background-muted: light-dark(#F2E9E1, #191724);
+  --color-background-popover: light-dark(#FFFAF3, #2B293A);
+  --color-background-surface: light-dark(#FFFAF3, #1F1D2E);
+  --color-border: light-dark(#DFDAD9, #373447);
+  --color-border-emphasized: light-dark(#CECACD, #524F67);
+  --color-border-error: light-dark(#8F4F61, #EF88A5);
+  --color-error: light-dark(#AA5E73, #EB6F92);
+  --color-error-muted: light-dark(#AA5E7333, #EB6F923F);
+  --color-icon-accent: light-dark(#286983, #9CCFD8);
+  --color-icon-primary: light-dark(#575279, #E0DEF4);
+  --color-icon-secondary: light-dark(#69657F, #908CAA);
+  --color-icon-success: light-dark(#3E6B73, #74A1B3);
+  --color-icon-warning: light-dark(#8C5E1F, #F6C177);
+  --color-info-muted: light-dark(#907AA933, #C4A7E73F);
+  --color-neutral: light-dark(#5752791A, #E0DEF433);
+  --color-on-accent: light-dark(#FFFAF3, #191724);
+  --color-on-error: light-dark(#FFFFFF, #FFFFFF);
+  --color-on-error-muted: light-dark(#8F4F61, #EF88A5);
+  --color-on-info-muted: light-dark(#6D5D80, #C4A7E7);
+  --color-on-light: light-dark(#000000, #000000);
+  --color-on-success-muted: light-dark(#3E6B73, #74A1B3);
+  --color-on-warning-muted: light-dark(#8C5E1F, #F6C177);
+  --color-overlay: light-dark(#57527966, #19172499);
+  --color-overlay-hover: light-dark(#5752790C, #FFFFFF0C);
+  --color-overlay-pressed: light-dark(#57527919, #FFFFFF19);
+  --color-success-muted: light-dark(#56949F33, #31748F3F);
+  --color-text-accent: light-dark(#286983, #9CCFD8);
+  --color-text-error: light-dark(#8F4F61, #EF88A5);
+  --color-text-primary: light-dark(#575279, #E0DEF4);
+  --color-text-secondary: light-dark(#69657F, #908CAA);
+  --color-warning: light-dark(#EA9D34, #F6C177);
+  --color-warning-muted: light-dark(#EA9D3433, #F6C1773F);
+  --focus-outline-color: light-dark(#286983, #9CCFD8);
+}
+
+/* The palette menu's swatch of each palette: its accent on its shell. */
+[data-swatch="aster"] { --aster-swatch-accent: light-dark(#225BFF, #3D87FF); --aster-swatch-shell: light-dark(#F4F4F5, #18181B); }
+[data-swatch="relay"] { --aster-swatch-accent: light-dark(#315FD3, #87A9FA); --aster-swatch-shell: light-dark(#F3F4F7, #181A20); }
+[data-swatch="teal"] { --aster-swatch-accent: light-dark(#246B69, #7DC8BC); --aster-swatch-shell: light-dark(#F1F5F3, #161D1C); }
+[data-swatch="plum"] { --aster-swatch-accent: light-dark(#785378, #C9A2C5); --aster-swatch-shell: light-dark(#F6F3F0, #201C20); }
+[data-swatch="rose-pine"] { --aster-swatch-accent: light-dark(#286983, #9CCFD8); --aster-swatch-shell: light-dark(#FAF4ED, #191724); }
+
 /* Layout: the sizes the shell and the component layer need that the Astryx
    theme has no token for. Values are the reference page's measurements
    (lab/new-theme/astryx-ref/spec.json); scripts/tokens.mjs appends this

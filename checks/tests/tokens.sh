@@ -36,6 +36,10 @@ copy nosuch
 printf '\n.tokens-test { color: var(--no-such); }\n' >>"$tmp/nosuch/luci.css"
 expect 1 "undefined: --no-such (read in luci.css)" "var(--no-such) in luci.css" -- --check --styles "$tmp/nosuch"
 
+copy palettegap
+printf '\n.tokens-test { color: var(--color-text-blue); }\n' >>"$tmp/palettegap/luci.css"
+expect 1 "palette relay lacks colour tokens the stylesheets read: --color-text-blue" "a colour token no palette defines" -- --styles "$tmp/palettegap"
+
 copy nofill
 expect 1 "undefined: --font-weight-semibold" "core fill disabled" -- --skip-core-fill --styles "$tmp/nofill"
 
