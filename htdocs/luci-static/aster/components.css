@@ -651,10 +651,14 @@ hr {
 }
 :where(th, td, .th, .td):last-child { padding-inline-end: var(--spacing-4); }
 :where(td, .td) { line-height: var(--text-body-leading); font-variant-numeric: tabular-nums; }
+/* An actions column's header holds only &nbsp;, whose fallback glyph sits
+   lower and stretches the header row; it shows nothing, so it takes no line. */
+:where(:is(th, .th).cbi-section-actions) { line-height: 0; }
 /* luci-mod-status's nftables view sets its cells to .25em with !important
-   in a <style> of its own; only !important gives the cell padding back. */
-.nft-rules tr > td { padding: var(--spacing-1) var(--spacing-2) var(--spacing-1) var(--spacing-4) !important; }
-.nft-rules tr > td:last-child { padding-inline-end: var(--spacing-4) !important; }
+   in a <style> it adds after the theme; only !important, one id heavier,
+   gives the cell padding back. */
+#view .nft-rules tr > td { padding: var(--spacing-1) var(--spacing-2) var(--spacing-1) var(--spacing-4) !important; }
+#view .nft-rules tr > td:last-child { padding-inline-end: var(--spacing-4) !important; }
 :where(th, .th) {
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-semibold);
@@ -711,7 +715,7 @@ hr {
     overflow-wrap: anywhere;
     text-align: start;
   }
-  .nft-rules tr > td { padding-block: 0 !important; } /* nftables' <style>, as above */
+  #view .nft-rules tr > td { padding-block: 0 !important; } /* nftables' <style>, as above */
   :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td:first-child) {
     color: var(--color-text-primary);
     font-size: var(--text-body-size);

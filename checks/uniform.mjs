@@ -165,7 +165,9 @@ function collect(cfg) {
   for (const row of all('tr, .tr')) {
     if (row.matches('.placeholder, .cbi-section-table-descr')) continue;
     const table = row.closest('table, .table');
-    if (!table) continue;
+    // Diagnostics lays its three tools out as the cells of one row: layout,
+    // not data.
+    if (!table || table.querySelector('.diag-action')) continue;
     if (!headerOf.has(table)) headerOf.set(table, [...table.querySelectorAll('tr, .tr')].some((r) => r.closest('table, .table') === table && isHeader(r)));
     // A row holding a progress bar is the progress component (name and
     // value over a track), not a table row: its cells are read, its height
@@ -190,7 +192,10 @@ function collect(cfg) {
       });
       continue;
     }
-    const base = progress ? 'table.progress' : headerOf.get(table) ? 'table' : 'table.kv';
+    // A form section's table (.cbi-section-table) is a data table even with
+    // its header row left out (Interfaces); only a plain headerless table is
+    // a key/value list.
+    const base = progress ? 'table.progress' : headerOf.get(table) || table.matches('.cbi-section-table') ? 'table' : 'table.kv';
     // A row's height as the collapsed border model draws it: in the
     // separate model (a table framed as a card) the row's box also holds
     // its cells' bottom rule, which the collapsed model puts on the grid
