@@ -48,9 +48,10 @@ const {chromium} = await import(process.env.PLAYWRIGHT ?? 'playwright');
 /* Each field names where the reference value lives in spec.json and what the
  * theme's counterpart is. `from` is [section, key, property]; `take` turns a
  * measured element (or two) into the same string form spec.json uses.
- * `devices` limits a field to where the reference measured it; `want`
- * replaces a spec value with a constant where the property is a relation,
- * not a size. */
+ * `devices` limits a field to where the reference measured it; `pseudo` reads
+ * a ::before box (the theme's mask icons); `want` replaces a spec value with
+ * a constant where the property is a relation, not a size. */
+const PORT_UP = '#view .ifacebox:has(> .ifacebox-body > img[src*="/port_"]):not(:has(> .ifacebox-body > img[src*="_down."]))';
 const FIELDS = [
   // Side nav: the panel and its rows. On the phone they are the drawer's.
   {name: 'side nav width', from: ['frame', 'Side nav panel (AppShell sidenav)', 'width'], devices: ['desktop'], sel: '#sidebar', prop: 'width'},
@@ -87,8 +88,21 @@ const FIELDS = [
   // A data row of a table with a header row; where the overview has none (no
   // DHCP leases, no wireless stations), a row of a key/value table, which the
   // reference draws as a MetadataList row (24 + 8, within the 33's tolerance).
-  {name: 'table row height', from: ['components', 'Table body row', 'height'], devices: ['desktop'], sel: '#view .table:has(.th) > .tr:has(> .td):not(.placeholder)', fallback: '#view .table:not(:has(.th)) > .tr:not(:has(.cbi-progressbar))', prop: 'height'},
+  {name: 'table row height', from: ['components', 'Table body row', 'height'], devices: ['desktop'], sel: '#view .table:has(.th) > .tr:has(> .td):not(.placeholder, :has(button, .btn))', fallback: '#view .table:not(:has(.th)) > .tr:not(:has(.cbi-progressbar))', prop: 'height'},
+  // A data row holding a button (DHCP's Reserve IP, a station's Disconnect).
+  {name: 'table row height (button)', from: ['components', 'Table body row with sm Button', 'height'], devices: ['desktop'], sel: '#view .table:has(.th) > .tr:has(> .td > :is(button, .btn))', prop: 'height'},
   {name: 'icon size', from: ['components', 'Icon sm', 'width'], sel: '.shell-header .icon-btn:not([hidden]) svg, .brand .mark svg', prop: 'width', visible: true},
+  // Port tiles (Port status): the first tile with a link.
+  {name: 'port grid gap', from: ['frame', 'Grid: port tiles', 'gap'], sel: '#view div[style*="grid-template-columns"]:has(> .ifacebox)', prop: 'gap'},
+  {name: 'port tile radius', from: ['components', 'Port tile (Card)', 'radius'], sel: PORT_UP, prop: 'radius'},
+  {name: 'port tile padding', from: ['components', 'Port tile (Card)', 'padding'], sel: PORT_UP, prop: 'padding'},
+  {name: 'port tile border', from: ['components', 'Port tile (Card)', 'border'], sel: PORT_UP, prop: 'border', exact: true},
+  {name: 'port tile background', from: ['components', 'Port tile (Card)', 'background'], sel: PORT_UP, prop: 'background', exact: true},
+  {name: 'port name size', from: ['components', 'Heading h3 (port name, radio SSID)', 'fontSize'], sel: `${PORT_UP} > .ifacebox-head:first-child`, prop: 'fontSize'},
+  {name: 'port icon size', from: ['components', 'Port tile: port icon', 'width'], sel: `${PORT_UP} > .ifacebox-head:first-child`, pseudo: '::before', prop: 'width'},
+  {name: 'port icon colour', from: ['components', 'Port tile: port icon', 'color'], sel: `${PORT_UP} > .ifacebox-head:first-child`, pseudo: '::before', prop: 'background', exact: true},
+  {name: 'port speed size', from: ['components', 'Port tile: speed text', 'fontSize'], sel: `${PORT_UP} > .ifacebox-body:nth-child(2)`, prop: 'fontSize'},
+  {name: 'port traffic size', from: ['components', 'Port tile: TX/RX text', 'fontSize'], sel: `${PORT_UP} > .ifacebox-body > .cbi-tooltip-container`, prop: 'fontSize'},
   // Main colours.
   {name: 'shell background', from: ['frame', 'AppShell root', 'background'], sel: '.shell', prop: 'background', exact: true},
   {name: 'text', from: ['frame', 'AppShell root', 'color'], sel: '.shell', prop: 'color', exact: true},
@@ -113,12 +127,12 @@ function readAll(fields) {
     return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden';
   };
   const px = (n) => `${Math.round(n * 100) / 100}px`;
-  const read = (el, prop) => {
-    const s = getComputedStyle(el);
+  const read = (el, prop, pseudo) => {
+    const s = getComputedStyle(el, pseudo ?? null);
     const r = el.getBoundingClientRect();
     switch (prop) {
-      case 'width': return px(r.width);
-      case 'height': return px(r.height);
+      case 'width': return pseudo ? s.width : px(r.width);
+      case 'height': return pseudo ? s.height : px(r.height);
       case 'padding': return four(s, 'padding');
       case 'gap': return `${s.rowGap} / ${s.columnGap}`;
       case 'radius': return s.borderRadius;
@@ -164,7 +178,7 @@ function readAll(fields) {
       els = [...document.querySelectorAll(f.fallback)].filter(shown);
       via = f.fallback;
     }
-    out[f.name] = {value: els.length ? read(els[0], f.prop) : null, count: els.length, via};
+    out[f.name] = {value: els.length ? read(els[0], f.prop, f.pseudo) : null, count: els.length, via};
   }
   return out;
 }
