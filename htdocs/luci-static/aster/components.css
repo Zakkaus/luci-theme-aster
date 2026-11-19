@@ -1,22 +1,48 @@
-/* Component layer: Astryx's Button, Field, Select, Badge, Table, Tabs and
-   the text roles, applied to HTML elements and to the generic class names
-   luci-base shares with them (.btn, .table/.tr/.th/.td, .label). Values are
-   the reference page's (lab/new-theme/astryx-ref/spec.md, section 2).
+/* Component layer: Astryx components written as CSS for LuCI's markup.
+   Values come from the reference page (lab/new-theme/astryx-ref/spec.md)
+   and @astryxdesign/core 0.7.16. Each component is defined here once; its
+   sizes, radius, padding, states and colours come only from its own
+   --<component>-* properties, which default to Astryx tokens. luci.css maps
+   LuCI's markup onto these, by setting those properties or by layout; it
+   does not restate a component's box or colours.
 
-   Every value is a token. Selectors sit in :where() so that luci.css, which
-   maps luci-base's own .cbi-* names onto these components, wins at equal or
-   lower weight without restating them. A component that has sizes or
-   variants reads them from parameters with a default:
+   Component     Astryx         LuCI selectors
+   ------------  -------------  ----------------------------------------------
+   Text roles    Heading/Text   page title (.shell-content h2), card title
+                                (.cbi-section legend/h2/h3), .cbi-map-descr,
+                                .cbi-section-descr, .cbi-value-description
+   Button        Button         button, input[type=button|submit|reset], .btn,
+                                .cbi-button, the overview's Hide/Show label,
+                                #indicators items (variant/size: --button-*);
+                                ComboButton: .cbi-dropdown.btn
+   Field         TextField      input (text-like), textarea (--field-*)
+   Select        Select         select, .cbi-dropdown (not a ComboButton)
+   Menu          Menu           .cbi-dropdown[open] > ul.dropdown
+   Checkbox      Checkbox/Radio input[type=checkbox|radio], .cbi-checkbox
+   Dynlist       TextField list .cbi-dynlist (.item, .add-item)
+   Form row      Field layout   .cbi-value, .cbi-value-title, .cbi-value-field,
+                                .cbi-value-error, .control-group
+   Card          Card           .cbi-section, .cbi-section-node, .ifacebox
+                                (+ .ifacebox-head/-body), .cbi-page-actions
+                                (--card-*)
+   MetadataList  MetadataList   .cbi-section .table without a header row
+   Table         Table          table, .table, .tr, .th, .td
+   Tabs          Tabs           .tabs > li > .tab, .cbi-tabmenu > li > a
+   ProgressBar   ProgressBar    .cbi-progressbar, .spinning (indeterminate)
+   Badge         Badge          .label, .badge, .zonebadge, .ifacebadge, tab
+                                error count (--badge-*)
+   Banner        Banner/Toast   .alert-message (.success .info .notice
+                                .warning .error .danger), notifications
+                                (--banner-*)
+   Dialog        Dialog         #modal_overlay and the node inside it
+   Tooltip       Tooltip        .cbi-tooltip, a cell's [data-tooltip] mark
+   Change list   (diff rows)    .uci-change-list ins/del (changes dialog)
 
-     --button-h, --button-px, --button-bg, --button-fg   Button
-     --badge-bg, --badge-fg                              Badge
-
-   so a mapping says "this is the small button" or "this is the primary
-   button" by setting a parameter, not by copying the rule. */
+   Selectors sit in :where( so a mapping in luci.css wins at any weight. */
 
 /* ── Base ────────────────────────────────────────────────────── */
 
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html) { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
 body {
   margin: 0;
@@ -31,10 +57,9 @@ body {
 }
 
 /* A rule of ours with display outranks the UA sheet's [hidden]. */
-[hidden] { display: none !important; }
+[hidden], .hidden { display: none !important; }
 
-/* The browser's fieldset draws a frame and cuts the legend into it; LuCI's
-   cards are often fieldsets, and the card is the frame. */
+/* LuCI's cards are often fieldsets; the card is the frame. */
 fieldset { margin-inline: 0; padding: 0; border: 0; min-inline-size: 0; }
 fieldset > legend { float: inline-start; inline-size: 100%; padding-inline: 0; }
 fieldset > legend + * { clear: both; }
@@ -50,9 +75,12 @@ input[type="checkbox"], input[type="radio"] { -webkit-tap-highlight-color: trans
 
 ::selection { background: var(--color-accent-muted); }
 
-/* The checkbox tick, the radio dot and the range track. */
-input[type="checkbox"], input[type="radio"], input[type="range"], progress {
-  accent-color: var(--color-accent);
+input[type="range"], progress { accent-color: var(--color-accent); }
+
+hr {
+  margin-block: var(--spacing-4);
+  border: 0;
+  border-block-start: var(--border-width) solid var(--color-border);
 }
 
 /* ── Text roles ──────────────────────────────────────────────── */
@@ -61,16 +89,6 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress {
   margin: 0;
   font-family: var(--font-family-heading);
   color: var(--color-text-primary);
-}
-:where(h1) {
-  font-size: var(--text-heading-1-size);
-  font-weight: var(--text-heading-1-weight);
-  line-height: var(--text-heading-1-leading);
-}
-:where(h2) {
-  font-size: var(--text-heading-2-size);
-  font-weight: var(--text-heading-2-weight);
-  line-height: var(--text-heading-2-leading);
 }
 :where(h3) {
   font-size: var(--text-heading-3-size);
@@ -82,14 +100,33 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress {
   font-weight: var(--text-heading-4-weight);
   line-height: var(--text-heading-4-leading);
 }
+/* Heading 2: a card's title. */
+:where(h2, .cbi-section :is(h2, h3), .cbi-section > legend) {
+  font-size: var(--text-heading-2-size);
+  font-weight: var(--text-heading-2-weight);
+  line-height: var(--text-heading-2-leading);
+}
+/* Heading 1: the page title, which LuCI writes as an <h2>. */
+:where(h1, .shell-content h2:not(.cbi-section *)) {
+  font-size: var(--text-heading-1-size);
+  font-weight: var(--text-heading-1-weight);
+  line-height: var(--text-heading-1-leading);
+}
+/* Supporting text: descriptions and help. */
+:where(.cbi-map-descr, .cbi-section-descr, .cbi-value-description) {
+  color: var(--color-text-secondary);
+  font-size: var(--text-supporting-size);
+  line-height: var(--text-supporting-leading);
+}
 :where(code, kbd, pre, samp) { font-family: var(--font-family-code); }
 
 /* ── Button ──────────────────────────────────────────────────────
-   Secondary md by default: 36 high, pill, 12 inline padding, label weight,
-   the neutral fill. Hover and press lay the overlay over whatever fill the
-   variant has, so no variant needs its own hover colour. */
+   Secondary md by default: 36 high, pill, 12 inline, label weight, the
+   neutral fill. Hover and press lay the overlay over whatever fill the
+   variant has (press also scales to 98 %), so a variant only sets
+   --button-bg and --button-fg. Disabled is half opaque. */
 
-:where(button, input[type="button"], input[type="submit"], input[type="reset"], .btn) {
+:where(button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button, .cbi-section .label[data-style], #indicators > :is(span, a)) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -97,6 +134,7 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress {
   flex: none;
   box-sizing: border-box;
   min-block-size: var(--button-h, var(--size-element-md));
+  margin: 0;
   padding: 0 var(--button-px, var(--spacing-3));
   border: 0;
   border-radius: var(--radius-full);
@@ -106,74 +144,427 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress {
   font-size: var(--text-label-size);
   font-weight: var(--text-label-weight);
   line-height: var(--text-label-leading);
-  text-decoration: none;
+  text-decoration: var(--button-decoration, none);
   white-space: nowrap;
   cursor: pointer;
   transition: background-color var(--duration-fast) var(--ease-standard);
 }
 @media (hover: hover) {
-  :where(button, input[type="button"], input[type="submit"], input[type="reset"], .btn):hover:not(:disabled):not([aria-disabled="true"]) {
+  :where(button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button, .cbi-section .label[data-style], #indicators > :is(span, a)):hover:not(:disabled, [disabled], [aria-disabled="true"]) {
     background-image: linear-gradient(var(--color-overlay-hover), var(--color-overlay-hover));
   }
 }
-:where(button, input[type="button"], input[type="submit"], input[type="reset"], .btn):active:not(:disabled):not([aria-disabled="true"]) {
+:where(button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button, .cbi-section .label[data-style], #indicators > :is(span, a)):active:not(:disabled, [disabled], [aria-disabled="true"]) {
   background-image: linear-gradient(var(--color-overlay-pressed), var(--color-overlay-pressed));
+  transform: scale(0.98);
 }
-:where(button, input[type="button"], input[type="submit"], input[type="reset"], .btn):is(:disabled, [aria-disabled="true"]) {
-  color: var(--color-text-disabled);
+:where(button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button, .cbi-section .label[data-style], #indicators > :is(span, a)):is(:disabled, [disabled], [aria-disabled="true"]) {
+  opacity: 0.5;
   cursor: default;
 }
+/* Busy (.spinning): unavailable, not moving. */
+:where(:is(.btn, .cbi-button, button).spinning) { opacity: 0.65; cursor: progress; }
+/* ComboButton (.cbi-dropdown.btn, Save & Apply): the Button whose label is
+   the dropdown's chosen item and whose chevron segment is divided off. */
+:where(.cbi-dropdown:is(.btn, .cbi-button)) { --button-px: 0; position: relative; align-items: stretch; }
+:where(:is(.cbi-dropdown:is(.btn, .cbi-button)) > ul:not(.dropdown) > li[display]) { padding-inline: var(--spacing-3); }
+:where(:is(.cbi-dropdown:is(.btn, .cbi-button)) > .open) {
+  inline-size: var(--size-element-md);
+  border-inline-start: var(--border-width) solid color-mix(in srgb, currentColor 30%, transparent);
+  color: inherit;
+}
 
-/* ── Field and Select ────────────────────────────────────────────
-   md height, the element radius, an emphasized border on the surface. */
+/* ── Field ───────────────────────────────────────────────────────
+   TextField: md 36 high, 8 inline, element radius, an emphasized border
+   on the surface. One height for every control in a row: a field, a
+   select and the button beside it are all 36. Hover adds a 2 inset ring
+   in the border colour at 30 %; focus turns the border accent with a 2
+   inset ring in the accent's muted tint (no outline); disabled is half
+   opaque; read-only looks the same as editable; invalid has the error
+   border, also on hover and focus. --field-w sets the width. */
 
-:where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"], [type="reset"], [type="file"], [type="hidden"], [type="image"]), textarea, select) {
+:where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"], [type="reset"], [type="file"], [type="hidden"], [type="image"]), textarea, select, .cbi-dropdown:not(.btn, .cbi-button)) {
+  --field-ring: transparent;
   box-sizing: border-box;
-  min-block-size: var(--size-element-md);
-  padding: 0 var(--spacing-3);
-  border: var(--border-width) solid var(--color-border-emphasized);
+  inline-size: var(--field-w, auto);
+  max-inline-size: 100%;
+  block-size: var(--field-h, var(--size-element-md));
+  margin: 0;
+  padding: 0 var(--spacing-2);
+  border: var(--border-width) solid var(--field-border, var(--color-border-emphasized));
   border-radius: var(--radius-element);
-  background-color: var(--color-background-surface);
+  background-color: var(--field-bg, var(--color-background-surface));
+  box-shadow: inset 0 0 0 calc(var(--border-width) * 2) var(--field-ring);
   color: var(--color-text-primary);
   font: inherit;
   font-size: var(--text-body-size);
   line-height: var(--text-body-leading);
-  transition: border-color var(--duration-fast) var(--ease-standard);
+  text-overflow: ellipsis;
+  transition: border-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
 }
-:where(textarea) { padding-block: var(--spacing-2); }
-:where(select[multiple]) { padding-block: var(--spacing-1); }
-@media (hover: hover) {
-  :where(input, textarea, select):hover:not(:disabled):not(:focus) { border-color: var(--color-text-secondary); }
-}
-:where(input, textarea, select):focus { border-color: var(--color-accent); }
-:where(input, textarea, select):disabled {
-  background-color: var(--color-background-muted);
-  color: var(--color-text-disabled);
-}
-:where(input, textarea)::placeholder { color: var(--color-text-disabled); }
-
-/* ── Badge ───────────────────────────────────────────────────────
-   20 high, pill, 8 inline padding, supporting size at label weight. */
-
-:where(.label, .badge) {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--spacing-1);
-  min-block-size: var(--spacing-5);
-  padding: 0 var(--spacing-2);
-  border-radius: var(--radius-full);
-  background-color: var(--badge-bg, var(--color-neutral));
-  color: var(--badge-fg, var(--color-text-primary));
+:where(textarea) {
+  block-size: auto;
+  inline-size: var(--field-w, 100%);
+  padding-block: var(--spacing-1);
+  font-family: var(--font-family-code);
   font-size: var(--text-supporting-size);
-  font-weight: var(--font-weight-medium);
-  line-height: var(--text-supporting-leading);
+  resize: vertical;
+}
+:where(select[multiple]) { block-size: auto; padding-block: var(--spacing-1); }
+:where(select > option) { background: var(--color-background-popover); color: var(--color-text-primary); }
+@media (hover: hover) {
+  :where(:is(input, textarea, select, .cbi-dropdown:not(.btn, .cbi-button)):hover:not(:disabled, [disabled], :focus, [open])) {
+    --field-ring: color-mix(in srgb, var(--color-border-emphasized) 30%, transparent);
+  }
+}
+:where(:is(input, textarea, select):focus, .cbi-dropdown:not(.btn, .cbi-button):is([open], :focus-visible)) {
+  --field-border: var(--color-accent);
+  --field-ring: var(--color-accent-muted);
+  outline: none;
+}
+:where(input, textarea)::placeholder { color: var(--color-text-secondary); }
+:where(:is(input, textarea, select):disabled, .cbi-dropdown[disabled], .cbi-dynlist[disabled]) {
+  opacity: 0.5;
+  cursor: default;
+}
+:where(.cbi-dropdown[disabled], .cbi-dynlist[disabled]) { pointer-events: none; }
+:where(.cbi-input-invalid, .cbi-input-invalid:is(:hover, :focus, [open]), [aria-invalid="true"]) {
+  --field-border: var(--color-border-error);
+}
+
+/* ── Select ──────────────────────────────────────────────────────
+   A native <select> is the Field with the browser's arrow. LuCI's
+   .cbi-dropdown is a <div> list that opens a Menu: the Field box (above),
+   the chosen item 12 in, the 16 chevron in the secondary icon colour 13
+   from the end. */
+
+:where(.cbi-dropdown:not(.btn, .cbi-button)) {
+  display: inline-flex;
+  align-items: stretch;
+  position: relative;
+  padding: 0;
+  cursor: pointer;
+}
+:where(.cbi-dropdown[multiple]) { block-size: auto; min-block-size: var(--field-h, var(--size-element-md)); }
+:where(.cbi-dropdown > ul) {
+  display: flex;
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+}
+:where(.cbi-dropdown > ul.preview),
+:where(.cbi-dropdown > ul > li),
+:where(.cbi-dropdown > ul > li > form),
+:where(.cbi-dropdown > ul > li .hide-close),
+:where(.cbi-dropdown > .more) { display: none; }
+:where(.cbi-dropdown > ul > li) {
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--spacing-2);
+  min-inline-size: 0;
+  padding: 0 var(--spacing-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+:where(.cbi-dropdown > ul > li[display]),
+:where(.cbi-dropdown[multiple] > ul > li > label),
+:where(:is(.cbi-dropdown[multiple][more], .cbi-dropdown[multiple][empty]) > .more) { display: flex; }
+:where(.cbi-dropdown[empty] > ul > li) { display: block; }
+:where(:is(.cbi-dropdown:not(.btn, .cbi-button)) > ul > li[placeholder]) { color: var(--color-text-secondary); }
+:where(.cbi-dropdown > ul > li[display]:not([display="0"])) { border-inline-start: var(--border-width) solid var(--color-border); }
+:where(.cbi-dropdown > ul > li img) { block-size: var(--aster-icon-sm); inline-size: auto; }
+/* The chevron segment: square, the control's height. */
+:where(.cbi-dropdown > :is(.open, .more)) {
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--size-element-sm);
+  color: var(--color-icon-secondary);
+}
+:where(.cbi-dropdown > .open) { display: flex; }
+
+/* ── Menu ────────────────────────────────────────────────────────
+   The list a .cbi-dropdown opens: a popover over the control, container
+   radius, the low shadow, 4 inside; rows 36 high, 8 inline, element
+   radius; the overlay under the pointer and on the chosen row, which is
+   medium weight and ends with a 16 accent check (Heroicons 2.2.0 Check,
+   MIT). ui.js writes the direction and height inline. */
+
+:where(.cbi-dropdown[open] > ul.dropdown) {
+  display: block;
+  position: absolute;
+  z-index: 110;
+  inset-inline-start: calc(var(--border-width) * -1);
+  min-inline-size: calc(100% + 2 * var(--border-width));
+  inline-size: max-content;
+  max-inline-size: min(var(--aster-menu-max-w), calc(100vw - var(--spacing-8)));
+  box-sizing: border-box;
+  padding: var(--spacing-1);
+  overflow-y: auto;
+  border-radius: var(--radius-container);
+  background: var(--color-background-popover);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-normal);
+  box-shadow: var(--shadow-low);
+  transform: translateY(var(--spacing-1));
+}
+:where(.cbi-dropdown[open] > ul.dropdown[style*="bottom"]) { transform: translateY(calc(var(--spacing-1) * -1)); }
+:where(.cbi-dropdown[open] > ul.dropdown > li) {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  min-block-size: var(--size-element-md);
+  padding: 0 var(--spacing-2);
+  border-radius: var(--radius-element);
+  color: var(--color-text-primary);
+  white-space: normal;
+}
+:where(.cbi-dropdown[optional][open] > ul.dropdown > li[placeholder]) { display: flex; }
+:where(.cbi-dropdown[open] > ul.dropdown > li .hide-open) { display: none; }
+:where(.cbi-dropdown[open] > ul.dropdown > li .hide-close) { display: initial; }
+:where(.cbi-dropdown[multiple][open] > ul.dropdown > li > form) { display: flex; pointer-events: none; }
+:where(.cbi-dropdown[open] > ul.dropdown > li:is(.focus, [selected])) { background: var(--color-overlay-hover); }
+@media (hover: hover) {
+  :where(.cbi-dropdown[open] > ul.dropdown > li:hover) { background: var(--color-overlay-hover); }
+}
+:where(.cbi-dropdown[open] > ul.dropdown > li[selected]) { font-weight: var(--font-weight-medium); }
+:where(.cbi-dropdown[open]:not([multiple]) > ul.dropdown > li[selected])::after {
+  content: "";
+  flex: none;
+  margin-inline-start: auto;
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
+  background-color: var(--color-icon-accent);
+  mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='m4.5%2012.75%206%206%209-13.5'/></svg>") center / contain no-repeat;
+}
+:where(.cbi-dropdown[open] > ul.dropdown > li[unselectable]) { opacity: 0.5; }
+:where(.cbi-dropdown[open] > ul.dropdown > li > input.create-item-input) { --field-h: var(--size-element-sm); inline-size: 100%; }
+@media (pointer: coarse) {
+  :where(.cbi-dropdown[open] > ul.dropdown > li) { min-block-size: var(--spacing-11); }
+}
+
+/* ── Checkbox and Radio ──────────────────────────────────────────
+   md: a 24 box (inner radius) or circle, 1 emphasized border on the
+   surface; checked fills with the accent and draws a 14 tick or a 10 dot
+   in the on-accent colour. Hover lays the overlay over the box; disabled
+   is half opaque. */
+
+:where(input[type="checkbox"], input[type="radio"]) {
+  appearance: none;
+  display: inline-grid;
+  place-content: center;
+  flex: none;
+  box-sizing: border-box;
+  inline-size: var(--spacing-6);
+  block-size: var(--spacing-6);
+  margin: 0;
+  vertical-align: middle;
+  border: var(--border-width) solid var(--color-border-emphasized);
+  border-radius: var(--radius-inner);
+  background-color: var(--color-background-surface);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard), border-color var(--duration-fast) var(--ease-standard);
+}
+:where(input[type="radio"]) { border-radius: var(--radius-full); }
+:where(input[type="checkbox"], input[type="radio"])::before {
+  content: "";
+  inline-size: calc(var(--spacing-3) + var(--spacing-0-5));
+  block-size: calc(var(--spacing-3) + var(--spacing-0-5));
+  background: var(--color-on-accent);
+  transform: scale(0);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+:where(input[type="checkbox"])::before { clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
+:where(input[type="radio"])::before { inline-size: calc(var(--spacing-2) + var(--spacing-0-5)); block-size: calc(var(--spacing-2) + var(--spacing-0-5)); border-radius: var(--radius-full); }
+:where(:is(input[type="checkbox"], input[type="radio"]):checked) {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+}
+:where(input[type="checkbox"], input[type="radio"]):checked::before { transform: scale(1); }
+@media (hover: hover) {
+  :where(:is(input[type="checkbox"], input[type="radio"]):hover:not(:disabled)) {
+    background-image: linear-gradient(var(--color-overlay-hover), var(--color-overlay-hover));
+  }
+}
+:where(:is(input[type="checkbox"], input[type="radio"]):disabled) { opacity: 0.5; cursor: default; }
+:where(input[type="checkbox"].cbi-input-invalid) { border-color: var(--color-border-error); }
+/* The tap target grows around the box on a touch screen. */
+@media (pointer: coarse) {
+  :where(input[type="checkbox"], input[type="radio"]) { outline: var(--spacing-2) solid transparent; outline-offset: 0; }
+}
+/* LuCI's checkbox widget: the box and an empty label for it. */
+:where(.cbi-checkbox) { display: inline-flex; align-items: center; gap: var(--spacing-2); min-block-size: var(--size-element-md); }
+:where(.cbi-checkbox > label:empty) { display: none; }
+
+/* ── Dynlist ─────────────────────────────────────────────────────
+   Values over an add row: each value a row on the muted fill with the
+   inner radius and the remove mark at its end; the add row is a Field
+   with its button. ui.js finds the remove target by the ::after strip's
+   width, so the strip is the full height of the row. */
+
+:where(.cbi-dynlist) {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  inline-size: var(--field-w, auto);
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+:where(.cbi-dynlist > .item) {
+  position: relative;
+  box-sizing: border-box;
+  min-block-size: var(--size-element-sm);
+  padding: var(--spacing-1) calc(var(--size-element-sm) + var(--spacing-1)) var(--spacing-1) var(--spacing-3);
+  border-radius: var(--radius-inner);
+  background: var(--color-background-muted);
+  color: var(--color-text-primary);
+  line-height: var(--text-body-leading);
+  overflow-wrap: anywhere;
+  cursor: move;
+}
+:where(.cbi-dynlist) > .item::after {
+  content: "×";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  display: grid;
+  place-items: center;
+  inline-size: var(--size-element-sm);
+  color: var(--color-icon-secondary);
+  font-size: var(--text-heading-3-size);
+  cursor: pointer;
+}
+@media (hover: hover) {
+  :where(.cbi-dynlist) > .item:hover::after { color: var(--color-text-error); }
+}
+:where(.cbi-dynlist > .item > span) { pointer-events: none; }
+:where(.cbi-dynlist > .item code) { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--color-text-secondary); }
+:where(.cbi-dynlist > .item.dragging) { opacity: 0.5; }
+:where(.cbi-dynlist) > :is(.item, .add-item > *).drag-over { box-shadow: inset 0 calc(var(--border-width) * 2) 0 var(--color-accent); }
+:where(.cbi-dynlist > .add-item) { display: flex; gap: var(--spacing-2); min-inline-size: 0; }
+:where(.cbi-dynlist > .add-item > :is(input, .cbi-dropdown)) { --field-w: auto; flex: 1 1 auto; min-inline-size: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  :where(.cbi-dynlist > .item.flash) { animation: aster-flash var(--duration-medium-min) var(--ease-standard); }
+}
+@keyframes aster-flash { 50% { opacity: 0.5; } }
+
+/* ── Form row ────────────────────────────────────────────────────
+   The Field label (15 / 24, medium, secondary) in a fixed column, centred
+   on the first control line, 16 to the control; the description (13 / 20,
+   secondary) 4 under the control; 16 between rows. */
+
+:where(.cbi-value) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: var(--spacing-4);
+  padding-block: var(--spacing-2);
+}
+:where(.cbi-value > .cbi-value-title) {
+  flex: 0 0 var(--form-label-w, var(--aster-form-label-w));
+  display: flex;
+  align-items: center;
+  min-block-size: var(--size-element-md);
+  color: var(--color-text-secondary);
+  font-size: var(--text-label-size);
+  font-weight: var(--text-label-weight);
+  line-height: var(--text-label-leading);
+  overflow-wrap: anywhere;
+}
+:where(.cbi-value > .cbi-value-field) {
+  --field-w: var(--aster-field-w);
+  flex: 1 1 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-1) var(--spacing-2);
+  min-inline-size: 0;
+  min-block-size: var(--size-element-md);
+}
+:where(.cbi-value > .cbi-value-field > *) { min-inline-size: 0; }
+:where(.cbi-value > .cbi-value-field > :is(.cbi-value-description, textarea, .cbi-section, .cbi-tblsection, output)) { flex-basis: 100%; }
+/* An option that holds a whole section or table has no label column. */
+:where(.cbi-value > :not(.cbi-value-title, .cbi-value-field)) { flex-basis: 100%; min-inline-size: 0; }
+:where(.cbi-value-error) {
+  color: var(--color-text-error);
+  font-size: var(--text-supporting-size);
+  line-height: var(--text-supporting-leading);
+}
+/* A changed, unsaved value: an accent StatusDot after its label (ui.js
+   marks the widget data-changed). */
+:where(.cbi-value:has([data-changed="true"]) > .cbi-value-title)::after {
+  content: "";
+  flex: none;
+  inline-size: var(--spacing-2);
+  block-size: var(--spacing-2);
+  margin-inline-start: var(--spacing-2);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
+/* A field with its own affordance (password reveal, add button). */
+:where(.control-group) { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); }
+
+/* ── Card ────────────────────────────────────────────────────────
+   The surface, a 1 border, the container radius and 16 from the outer
+   edge to the content. --card-pad is the inner padding, which tables
+   bleed back over. */
+
+:where(.cbi-section, .cbi-section-node, .ifacebox, .cbi-page-actions) {
+  --card-pad: calc(var(--spacing-4) - var(--border-width));
+  box-sizing: border-box;
+  padding: var(--card-pad);
+  border: var(--card-border-width, var(--border-width)) solid var(--card-border, var(--color-border));
+  border-radius: var(--card-radius, var(--radius-container));
+  background: var(--card-bg, var(--color-background-surface));
+  color: var(--color-text-primary);
+  box-shadow: var(--card-shadow, none);
+}
+/* A card inside a card is a group of it: no frame. Two groups in a row
+   are divided by a rule with 24 on either side. */
+:where(.cbi-section, .cbi-section-node) :where(.cbi-section, .cbi-section-node) {
+  --card-pad: 0;
+  --card-border-width: 0;
+  --card-radius: 0;
+  --card-bg: transparent;
+}
+:where(.cbi-section, .cbi-section-node) :where(.cbi-section + .cbi-section, .cbi-section-node + .cbi-section-node) {
+  margin-block-start: var(--spacing-6);
+  padding-block-start: var(--spacing-6);
+  border-block-start: var(--border-width) solid var(--color-border);
+}
+/* The interface box is a small Card: element radius, a header strip (the
+   muted fill, or the zone colour LuCI writes inline) over its body. */
+:where(.ifacebox) {
+  --card-pad: 0;
+  --card-radius: var(--radius-element);
+  display: inline-flex;
+  flex-direction: column;
+  overflow: clip;
+}
+:where(.ifacebox-head) {
+  padding: var(--spacing-1) var(--spacing-3);
+  border-block-end: var(--border-width) solid var(--color-border);
+  background: var(--color-background-muted);
+  font-size: var(--text-supporting-size);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--text-supporting-leading);
+  text-align: center;
+}
+:where(.ifacebox-body) {
+  padding: var(--spacing-2) var(--spacing-3);
+  font-size: var(--text-supporting-size);
+  line-height: var(--text-supporting-leading);
+  text-align: center;
 }
 
 /* ── Table ───────────────────────────────────────────────────────
-   luci-base builds most tables from divs with these classes. Cells carry
-   4 / 8 / 4 / 16 padding and a bottom rule; a body row is 33 high, a header
-   row 31. border-collapse keeps display:table from boxing every cell. */
+   Cells 4 / 8 / 4 / 16 with a bottom rule; a body row 33, a header row
+   31; header cells secondary, semibold; the hovered row takes the
+   overlay. The empty message is the caption, so it spans the table. */
 
 :where(table, .table) {
   display: table;
@@ -191,46 +582,430 @@ input[type="checkbox"], input[type="radio"], input[type="range"], progress {
   vertical-align: middle;
 }
 :where(th, td, .th, .td):last-child { padding-inline-end: var(--spacing-4); }
-:where(td, .td) {
-  line-height: var(--text-body-leading);
-  font-variant-numeric: tabular-nums;
-}
+:where(td, .td) { line-height: var(--text-body-leading); font-variant-numeric: tabular-nums; }
 :where(th, .th) {
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-semibold);
   line-height: var(--text-heading-5-leading);
   white-space: nowrap;
 }
+@media (hover: hover) {
+  :where(.table > .tr:has(> .td):not(.placeholder)):hover { background-color: var(--color-overlay-hover); }
+}
+:where(.tr.placeholder) { display: table-caption; caption-side: bottom; }
+:where(.tr.placeholder > .td) {
+  display: block;
+  padding-block: var(--spacing-6);
+  border-block-end: 0;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+/* Inside a row a button is the small one (Button sm, 32). */
+:where(td, .td) :where(.btn, .cbi-button, button) { --button-h: var(--size-element-sm); }
+/* Sorting by drag: the moved row fades, the drop line is the accent. */
+:where(.dragging) { opacity: 0.5; }
+:where(.drag-over-above) { box-shadow: inset 0 calc(var(--border-width) * 2) 0 var(--color-accent); }
+:where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -2) 0 var(--color-accent); }
+/* Collapsible: below 768 a table with a header row folds each row into a
+   stack, as the reference's lease table does. The first cell in primary
+   text; the others under it in supporting text, each with its column name
+   (LuCI's data-title); the action cell at the end. */
+@media (max-width: 48rem) {
+  :where(#view .table:has(> .tr > .th)) { display: block; overflow: visible; }
+  :where(#view .table:has(> .tr > .th) > .tr:has(> .th)) { display: none; }
+  :where(#view .table:has(> .tr > .th) > .tr.placeholder) { display: block; }
+  :where(#view .table:has(> .tr > .th) > .tr:not(:has(> .th), .placeholder)) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--spacing-3);
+    padding: var(--spacing-2) var(--card-pad, var(--spacing-0));
+    border-block-end: var(--border-width) solid var(--color-border);
+  }
+  :where(#view .table:has(> .tr > .th) > .tr > .td) {
+    display: block;
+    grid-column: 1;
+    padding: 0;
+    border: 0;
+    color: var(--color-text-secondary);
+    font-size: var(--text-supporting-size);
+    line-height: var(--text-supporting-leading);
+    overflow-wrap: anywhere;
+    text-align: start;
+  }
+  :where(#view .table:has(> .tr > .th) > .tr > .td:first-child) {
+    color: var(--color-text-primary);
+    font-size: var(--text-body-size);
+    line-height: var(--text-body-leading);
+  }
+  :where(#view .table:has(> .tr > .th) > .tr > .td[data-title]:not(:first-child, .cbi-section-actions))::before {
+    content: attr(data-title);
+    margin-inline-end: var(--spacing-2);
+    font-weight: var(--font-weight-medium);
+  }
+  :where(#view .table:has(> .tr > .th) > .tr > .td:has(> :is(input:not([type="checkbox"]), select, .cbi-dropdown, .cbi-dynlist)))::before { display: block; }
+  :where(#view .table:has(> .tr > .th) > .tr > .td.cbi-section-actions) {
+    grid-column: 2;
+    grid-row: 1 / span 8;
+    align-self: center;
+  }
+}
+
+/* ── MetadataList ────────────────────────────────────────────────
+   A table with no header row: key in a 112 column, secondary at label
+   weight, value in primary, no rules, 8 between rows. */
+
+:where(.cbi-section .table:not(:has(.th)) > .tr > .td) { padding-block: var(--spacing-1); border-block-end: 0; }
+:where(.cbi-section .table:not(:has(.th)) > .tr > .td:first-child) {
+  inline-size: var(--aster-label-w);
+  padding-inline-start: 0;
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
 
 /* ── Tabs ────────────────────────────────────────────────────────
-   The row the theme's menu writes under the page title (.tabs > li > .tab):
-   label weight, a rule under the row, the current tab underlined in the
-   accent. */
+   md tabs 36 high, 12 inline, 2 apart, element radius; unselected
+   secondary at regular weight, selected primary at semibold. The list
+   has 4 under the tabs and a 1 rule; the indicator is a 2 accent pill
+   under the label (12 in from each end) whose bottom edge sits on the
+   list's. Hover and press lay the overlay over the tab. */
 
-:where(.tabs) {
+:where(.tabs, .cbi-tabmenu) {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-1);
+  gap: var(--spacing-0-5);
   margin: 0;
-  padding: 0;
+  padding: 0 0 var(--spacing-1);
   list-style: none;
-  box-shadow: inset 0 calc(var(--border-width) * -1) 0 var(--color-border);
+  border-block-end: var(--border-width) solid var(--color-border);
 }
-:where(.tab) {
+:where(.tabs > li, .cbi-tabmenu > li) { display: inline-flex; align-items: center; }
+:where(.tab, .cbi-tabmenu > li > a) {
+  position: relative;
   display: inline-flex;
   align-items: center;
   min-block-size: var(--size-element-md);
   padding: 0 var(--spacing-3);
+  border-radius: var(--radius-element);
   color: var(--color-text-secondary);
   font-size: var(--text-label-size);
-  font-weight: var(--text-label-weight);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--text-label-leading);
   text-decoration: none;
-  border-block-end: calc(var(--border-width) * 2) solid transparent;
 }
 @media (hover: hover) {
-  :where(.tab):hover { color: var(--color-text-primary); }
+  :where(.tab, .cbi-tabmenu > li > a):hover { background-color: var(--color-overlay-hover); }
 }
-:where(.tab)[data-active] {
+:where(.tab, .cbi-tabmenu > li > a):active { background-color: var(--color-overlay-pressed); }
+:where(.tab[data-active], .cbi-tabmenu > .cbi-tab > a) {
   color: var(--color-text-primary);
-  border-block-end-color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
 }
+:where(.tab[data-active], .cbi-tabmenu > .cbi-tab > a)::before {
+  content: "";
+  position: absolute;
+  inset-inline: var(--spacing-3);
+  inset-block-end: calc((var(--spacing-1) + var(--border-width)) * -1);
+  block-size: calc(var(--border-width) * 2);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
+:where(.tab[data-errors], .cbi-tabmenu > li[data-errors] > a) { color: var(--color-text-error); }
+:where(.tab[data-errors], .cbi-tabmenu > li[data-errors])::after {
+  --badge-bg: var(--color-error-muted);
+  --badge-fg: var(--color-on-error-muted);
+  content: attr(data-errors);
+  margin-inline-start: var(--spacing-1);
+  font-variant-numeric: tabular-nums;
+}
+:where([data-tab-active="false"]) { display: none; }
+
+/* ── ProgressBar ─────────────────────────────────────────────────
+   An 8 track in the muted fill, the value in the accent, both round; the
+   value text (luci-base's title) over the track's end in supporting text,
+   on a 24 line so it shares a baseline with a label beside it. */
+
+:where(.cbi-progressbar) {
+  position: relative;
+  min-inline-size: var(--aster-label-w);
+  block-size: var(--aster-progress-h);
+  margin-block-start: calc(var(--text-body-size) * var(--text-body-leading) + var(--spacing-1));
+  border-radius: var(--radius-full);
+  background: var(--color-background-muted);
+}
+:where(.cbi-progressbar > div) {
+  block-size: 100%;
+  max-inline-size: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  transition: width var(--duration-fast-max) var(--ease-standard);
+}
+:where(.cbi-progressbar)::before {
+  content: attr(title);
+  position: absolute;
+  inset-inline-end: 0;
+  inset-block-end: calc(100% + var(--spacing-1));
+  color: var(--color-text-secondary);
+  font-size: var(--text-supporting-size);
+  line-height: calc(var(--text-body-size) * var(--text-body-leading));
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+:where(.cbi-progressbar .bar-ink) { display: none; }
+/* Indeterminate: a status line (.spinning) leads with a short track whose
+   accent segment slides. */
+:where(.spinning:not(.btn, .cbi-button, .cbi-dropdown, button)) {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  color: var(--color-text-secondary);
+  font-size: var(--text-supporting-size);
+}
+:where(.spinning:not(.btn, .cbi-button, .cbi-dropdown, button))::before {
+  content: "";
+  flex: none;
+  inline-size: var(--spacing-10);
+  block-size: var(--spacing-1);
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--color-background-muted) 35%, var(--color-accent) 35% 65%, var(--color-background-muted) 65%) 100% 0 / 300% 100%;
+  animation: aster-progress 1.2s var(--ease-standard) infinite;
+}
+@keyframes aster-progress { to { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) {
+  :where(.spinning)::before, :where(#modal_overlay > .alert-message.spinning)::after { animation: none; }
+}
+
+/* ── Badge ───────────────────────────────────────────────────────
+   20 high, pill, 8 inline, supporting size at medium weight. */
+
+:where(.label:not(.cbi-section .label[data-style]), .badge, .zonebadge, .ifacebadge, .tab[data-errors]::after, .cbi-tabmenu > li[data-errors]::after) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-1);
+  box-sizing: border-box;
+  min-inline-size: var(--spacing-5);
+  min-block-size: var(--spacing-5);
+  padding: 0 var(--spacing-2);
+  border-radius: var(--radius-full);
+  background-color: var(--badge-bg, var(--color-neutral));
+  color: var(--badge-fg, var(--color-text-primary));
+  font-size: var(--text-supporting-size);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--text-supporting-leading);
+  white-space: nowrap;
+}
+/* A device chip or a firewall clause: the muted fill, its icon 16. */
+:where(.ifacebadge) { --badge-bg: var(--color-background-muted); border-radius: var(--radius-inner); }
+:where(.ifacebadge img) { inline-size: var(--aster-icon-sm); block-size: var(--aster-icon-sm); }
+:where(.ifacebadge) :is(var, strong, a) { font-style: normal; }
+:where(.ifacebadge var) { color: var(--color-text-secondary); }
+
+/* ── Banner ──────────────────────────────────────────────────────
+   The status-muted fill and the matching on-muted text, container
+   radius, no border, 12 / 16 inside, a 20 status icon 16 / 12 in and 8
+   before the text
+   (Heroicons 2.2.0 outline, MIT, path data verbatim: InformationCircle,
+   ExclamationTriangle, ExclamationCircle, CheckCircle) as a mask, so it
+   takes the text colour. A notification is a Banner with a Dismiss button;
+   ui.js removes it when the .fade-out transition ends, so that transition
+   always runs. */
+
+:where(.alert-message) {
+  --banner-bg: var(--color-info-muted);
+  --banner-fg: var(--color-on-info-muted);
+  --banner-mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='m11.25%2011.25.041-.02a.75.75%200%200%201%201.063.852l-.708%202.836a.75.75%200%200%200%201.063.853l.041-.021M21%2012a9%209%200%201%201-18%200%209%209%200%200%201%2018%200Zm-9-3.75h.008v.008H12V8.25Z'/></svg>");
+  position: relative;
+  box-sizing: border-box;
+  margin-block-end: var(--spacing-4);
+  padding: var(--spacing-3) var(--spacing-4) var(--spacing-3) calc(var(--spacing-4) + var(--aster-icon-md) + var(--spacing-2));
+  border-radius: var(--radius-container);
+  background: var(--banner-bg);
+  color: var(--banner-fg);
+  overflow-wrap: anywhere;
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+:where(.alert-message)::before {
+  content: "";
+  position: absolute;
+  inset-block-start: var(--spacing-3);
+  inset-inline-start: var(--spacing-4);
+  inline-size: var(--aster-icon-md);
+  block-size: var(--aster-icon-md);
+  background-color: currentColor;
+  mask: var(--banner-mask) center / contain no-repeat;
+}
+:where(.alert-message.success) {
+  --banner-bg: var(--color-success-muted);
+  --banner-fg: var(--color-on-success-muted);
+  --banner-mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M9%2012.75%2011.25%2015%2015%209.75M21%2012a9%209%200%201%201-18%200%209%209%200%200%201%2018%200Z'/></svg>");
+}
+:where(.alert-message.warning) {
+  --banner-bg: var(--color-warning-muted);
+  --banner-fg: var(--color-on-warning-muted);
+  --banner-mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M12%209v3.75m-9.303%203.376c-.866%201.5.217%203.374%201.948%203.374h14.71c1.73%200%202.813-1.874%201.948-3.374L13.949%203.378c-.866-1.5-3.032-1.5-3.898%200L2.697%2016.126ZM12%2015.75h.007v.008H12v-.008Z'/></svg>");
+}
+:where(.alert-message:is(.error, .danger)) {
+  --banner-bg: var(--color-error-muted);
+  --banner-fg: var(--color-on-error-muted);
+  --banner-mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M12%209v3.75m9-.75a9%209%200%201%201-18%200%209%209%200%200%201%2018%200Zm-9%203.75h.008v.008H12v-.008Z'/></svg>");
+}
+:where(.alert-message) > :first-child { margin-block-start: 0; }
+:where(.alert-message) > :last-child { margin-block-end: 0; }
+:where(.alert-message h4) {
+  margin-block-end: var(--spacing-1);
+  font-size: var(--text-body-size);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--text-body-leading);
+}
+:where(.alert-message pre) { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--text-supporting-size); }
+:where(.alert-message :is(.btn, .cbi-button, button)) { --button-h: var(--size-element-sm); }
+:where(.alert-message.fade-out) { opacity: 0; }
+
+/* ── Dialog ──────────────────────────────────────────────────────
+   The overlay dims the page; the dialog is the surface with the container
+   radius, the high shadow and no border, 16 inside. The title is Heading
+   2; the footer (.right / .button-row) is ruled off, its buttons at the
+   end 8 apart, the primary last, as luci-base writes them. On a phone it
+   keeps 16 to each screen edge. luci-base opens it by putting
+   .modal-overlay-active on the body. */
+
+:where(#modal_overlay) {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: var(--spacing-12) var(--spacing-4) var(--spacing-6);
+  overflow-y: auto;
+  background: var(--color-overlay);
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity var(--duration-fast-max) var(--ease-standard), visibility var(--duration-fast-max);
+}
+:where(body.modal-overlay-active #modal_overlay) { visibility: visible; opacity: 1; }
+:where(#modal_overlay > *) {
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: var(--dialog-w, var(--aster-dialog-w));
+  margin: 0;
+  padding: var(--spacing-4);
+  border: 0;
+  border-radius: var(--radius-container);
+  background: var(--color-background-surface);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-high);
+}
+:where(#modal_overlay > * > h4:first-child) {
+  margin-block-end: var(--spacing-4);
+  font-size: var(--text-heading-2-size);
+  font-weight: var(--text-heading-2-weight);
+  line-height: var(--text-heading-2-leading);
+}
+:where(#modal_overlay > * > h4:empty) { display: none; }
+:where(#modal_overlay > * > :is(.right, .button-row):last-child) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--spacing-2);
+  margin: var(--spacing-4) calc(var(--spacing-4) * -1) 0;
+  padding: var(--spacing-4) var(--spacing-4) 0;
+  border-block-start: var(--border-width) solid var(--color-border);
+}
+/* A Banner inside a dialog drops its fill: the dialog is the surface. */
+:where(#modal_overlay > * > .alert-message) { --banner-bg: transparent; padding-inline-end: 0; }
+/* A dialog that is itself a status (ui.js displayStatus: the apply
+   countdown) is the sm dialog, its progress full width under the text. */
+:where(#modal_overlay > .alert-message) {
+  --banner-bg: var(--color-background-surface);
+  --banner-fg: var(--color-text-primary);
+  max-inline-size: var(--aster-dialog-sm-w);
+}
+:where(#modal_overlay > .alert-message.spinning) { display: block; }
+:where(#modal_overlay > .alert-message.spinning)::after {
+  content: "";
+  display: block;
+  block-size: var(--spacing-1);
+  margin-block-start: var(--spacing-3);
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--color-background-muted) 35%, var(--color-accent) 35% 65%, var(--color-background-muted) 65%) 100% 0 / 300% 100%;
+  animation: aster-progress 1.2s var(--ease-standard) infinite;
+}
+
+/* ── Tooltip ─────────────────────────────────────────────────────
+   The inverted fill (text colour behind, surface colour in front), 4 / 8 inside, container radius, body text. Two kinds:
+   markup in a .cbi-tooltip-container shown on hover, and one node ui.js
+   moves around and shows by writing an inline style. */
+
+:where(.cbi-tooltip-container) { position: relative; cursor: help; }
+:where(.cbi-tooltip-container:is(:hover, :focus-within)) { z-index: 120; }
+:where(.cbi-tooltip) {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: 110;
+  box-sizing: border-box;
+  inline-size: max-content;
+  max-inline-size: min(var(--aster-menu-max-w), calc(100vw - var(--spacing-8)));
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-container);
+  background: var(--color-text-primary);
+  color: var(--color-background-surface);
+  font-size: var(--text-body-size);
+  font-weight: var(--text-body-weight);
+  line-height: var(--text-body-leading);
+  white-space: pre-line;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-fast) var(--ease-standard), visibility var(--duration-fast);
+}
+:where(.cbi-tooltip[style]) { visibility: visible; opacity: 1; }
+@media (hover: hover) {
+  :where(.cbi-tooltip-container:hover > .cbi-tooltip:not(:empty)) { visibility: visible; opacity: 1; }
+}
+/* Chips inside take the tooltip's colours. */
+:where(.cbi-tooltip) :is(.ifacebadge, .zonebadge, .ifacebox, .ifacebox-head, .label) {
+  --badge-bg: color-mix(in srgb, currentColor 16%, transparent);
+  --badge-fg: inherit;
+  --card-bg: transparent;
+  --card-border: color-mix(in srgb, currentColor 24%, transparent);
+  color: inherit;
+}
+/* A cell's "#" with a data-tooltip (more detail behind a row) is an info
+   mark: a 20 ring with an "i"; the character stays for screen readers. */
+:where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button)) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--spacing-5);
+  block-size: var(--spacing-5);
+  border: var(--border-width) solid var(--color-border-emphasized);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-size: 0;
+  cursor: help;
+}
+:where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button))::after {
+  content: "i";
+  font: var(--font-weight-semibold) var(--text-supporting-size) / 1 var(--font-family-code);
+}
+
+/* ── Change list ─────────────────────────────────────────────────
+   The pending changes dialog: one line per change in the code face, added
+   lines on the success muted fill, removed ones on the error muted fill. */
+
+:where(.uci-change-list) { font-family: var(--font-family-code); font-size: var(--text-supporting-size); }
+:where(.uci-change-list) :is(ins, del) {
+  display: block;
+  margin-block-end: var(--spacing-1);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-inner);
+  overflow-wrap: anywhere;
+}
+:where(.uci-change-list, .uci-change-legend-label) :is(ins, del) { text-decoration: none; }
+:where(:is(.uci-change-list, .uci-change-legend-label) ins) { background: var(--color-success-muted); }
+:where(:is(.uci-change-list, .uci-change-legend-label) del) { background: var(--color-error-muted); }
+:where(.uci-change-legend-label) :is(ins, del) { display: inline-block; margin: 0; padding: 0 var(--spacing-1); }
+:where(.uci-change-list var) { font-style: normal; color: var(--color-text-secondary); }

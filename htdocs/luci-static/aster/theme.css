@@ -1,125 +1,87 @@
 /* Project layer. Loads after tokens.css, components.css and shell.css and
    holds what is neither a component nor the shell: the status classes, the
    login screen (M4 restyles it), prose links and a few LuCI leftovers.
-   The names it reads that are not Astryx tokens come from the temporary
-   bridge in tokens.css. */
+   Every value is a token. */
 
-/* The status classes read tokens that flip with the colour scheme, so these
-   four rules need no dark branch. */
-.status-ok      { background: var(--status-ok-bg);   color: var(--status-ok-fg); }
-.status-info    { background: var(--status-info-bg); color: var(--status-info-fg); }
-.status-pending { background: var(--status-warn-bg); color: var(--status-warn-fg); }
-.status-error   { background: var(--status-bad-bg);  color: var(--status-bad-fg); }
+/* The status classes: Badge's muted status pairs. */
+.status-ok      { background: var(--color-success-muted); color: var(--color-on-success-muted); }
+.status-info    { background: var(--color-info-muted);    color: var(--color-on-info-muted); }
+.status-pending { background: var(--color-warning-muted); color: var(--color-on-warning-muted); }
+.status-error   { background: var(--color-error-muted);   color: var(--color-on-error-muted); }
 
-/* The login screen. */
-.login { min-block-size: 100vh; display: grid; place-items: center; padding: var(--sp-5) var(--sp-4); background: var(--background); }
+/* The login screen. M4 restyles it; M3 only moved it onto the tokens. */
+.login { min-block-size: 100vh; display: grid; place-items: center; padding: var(--spacing-6) var(--spacing-4); background: var(--color-background-body); }
 @supports (min-block-size: 100dvh) { .login { min-block-size: 100dvh; } }
-/* 一个值同时管两个方向。面板的左右内缩、头部到表单、按钮到铭牌，
-   全部读 --login-inset —— 它们是同一条边界的四个面，分开写就会各自漂。 */
 .login-panel {
   inline-size: 100%;
   max-inline-size: 24rem;
-  padding: var(--login-inset);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  background: var(--card);
-  box-shadow: var(--elev-2);
+  padding: var(--spacing-8);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-container);
+  background: var(--color-background-card);
+  box-shadow: var(--shadow-med);
 }
-.login-head { display: grid; justify-items: center; gap: var(--sp-2); margin-block-end: var(--login-inset); text-align: center; }
-.login-head h1 { margin: 0; font-size: var(--text-lg); line-height: var(--lh-title); }
-.login-head p { margin: 0; color: var(--muted-foreground); font-size: var(--text-sm); }
+.login-head { display: grid; justify-items: center; gap: var(--spacing-2); margin-block-end: var(--spacing-8); text-align: center; }
+.login-head h1 { margin: 0; font-size: var(--text-heading-3-size); line-height: var(--text-heading-3-leading); }
+.login-head p { margin: 0; color: var(--color-text-secondary); font-size: var(--text-supporting-size); }
 
-/* The sidebar's square, one step up. */
+/* The brand mark. */
 .login-head .mark {
-  inline-size: 2.75rem;
-  block-size: 2.75rem;
-  border-radius: var(--radius-lg);
+  inline-size: var(--spacing-11);
+  block-size: var(--spacing-11);
+  border-radius: var(--radius-element);
   display: grid;
   place-items: center;
-  background: var(--foreground);
-  color: var(--background);
+  background: var(--color-text-primary);
+  color: var(--color-background-body);
 }
-.login-head .mark > .ico { inline-size: 28px; block-size: 28px; }
+.login-head .mark > .ico { inline-size: var(--spacing-7); block-size: var(--spacing-7); }
 
-/* The nameplate under the form: there to be checked, not read. */
+/* The host details under the form. */
 .login-foot {
-  margin: var(--login-inset) 0 0;
-  padding-block-start: var(--sp-4);
-  border-block-start: 1px solid var(--border);
+  margin: var(--spacing-8) 0 0;
+  padding-block-start: var(--spacing-4);
+  border-block-start: var(--border-width) solid var(--color-border);
   display: grid;
-  gap: var(--sp-1);
-  color: var(--muted-foreground);
-  font-size: var(--text-xs);
-  line-height: var(--lh-cjk);
+  gap: var(--spacing-1);
+  color: var(--color-text-secondary);
+  font-size: var(--text-supporting-size);
+  line-height: var(--text-supporting-leading);
 }
-.login-foot > div { display: flex; gap: var(--sp-2); min-inline-size: 0; }
+.login-foot > div { display: flex; gap: var(--spacing-2); min-inline-size: 0; }
 .login-foot dt { flex: none; }
-.login-foot dd { margin: 0; min-inline-size: 0; color: var(--foreground); overflow-wrap: anywhere; }
+.login-foot dd { margin: 0; min-inline-size: 0; color: var(--color-text-primary); overflow-wrap: anywhere; }
 
-/* Texture from the grey ramp, since an achromatic palette has no colour to
-   spend on it: a faint dot grid and a lift behind the card. Both come from
-   --foreground at percentages low enough not to survive a screenshot. */
+/* A faint dot grid and a lift behind the card, from the text colour at
+   percentages low enough not to survive a screenshot. */
 .login {
   background-image:
-    radial-gradient(circle at 50% 0%, oklch(from var(--foreground) l c h / 5%), transparent 60%),
-    radial-gradient(oklch(from var(--foreground) l c h / 7%) 1px, transparent 1px);
-  background-size: 100% 32rem, 22px 22px;
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--color-text-primary) 5%, transparent), transparent 60%),
+    radial-gradient(color-mix(in srgb, var(--color-text-primary) 7%, transparent) var(--border-width), transparent var(--border-width));
+  background-size: 100% 32rem, 1.375rem 1.375rem;
   background-position: center top, center top;
   background-repeat: no-repeat, repeat;
 }
 
-/* Links take the surrounding ink and are marked by an underline, not a hue:
-   where colour means status, a blue link is a false signal. */
+/* Links: the surrounding text colour, marked by an underline where they
+   sit in prose (descriptions, table cells, the footer); a link wearing a
+   control's box is that control. */
 a { color: inherit; }
-
-/* A whitelist of the places prose appears, not a blacklist of everything
-   that is not prose — the blacklist version underlined the tab row, and every
-   new component would have had to be added to it. */
-.shell-content p a,
-.shell-content .td a,
-.shell-content .cbi-value-description a,
-.shell-content .cbi-section-descr a,
-.shell-content .cbi-map-descr a,
+.shell-content :is(p, .td, .cbi-value-description, .cbi-section-descr, .cbi-map-descr) a,
 .shell-footer a,
 .login-panel p a {
   text-decoration: underline;
   text-underline-offset: 0.2em;
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: var(--border-width);
 }
-.shell-content p a:hover,
-.shell-content .td a:hover { text-decoration-thickness: 2px; }
-/* Anything wearing a control's box is not prose, wherever it sits. */
-.shell-content a.btn,
-.shell-content a.cbi-button,
-.shell-content a.nav-item,
-.shell-content a.tab { text-decoration: none; }
-.brand, .shell-footer a { color: inherit; }
+@media (hover: hover) {
+  .shell-content :is(p, .td) a:hover { text-decoration-thickness: calc(var(--border-width) * 2); }
+}
+.shell-content a:is(.btn, .cbi-button, .nav-item, .tab) { text-decoration: none; }
 
 /* The login page has no top bar, so its switch floats in the corner. */
 .login .theme-switch {
   position: fixed;
-  inset-block-start: var(--sp-4);
-  inset-inline-end: var(--sp-4);
+  inset-block-start: var(--spacing-4);
+  inset-inline-end: var(--spacing-4);
 }
-
-/* LuCI puts an <hr> between a map's description and its actions. The
-   browser's default groove reads as a section boundary; this is a
-   separator. */
-hr {
-  border: 0;
-  border-block-start: 1px solid var(--outline-variant);
-  margin-block: var(--sp-4);
-}
-
-/* The distance belongs to the row, not to the button inside it: the button's
-   class varies by page — .cbi-button-add on the interfaces list, a plain .btn
-   elsewhere. */
-.cbi-section-create,
-.cbi-section > .btn,
-.cbi-section > .cbi-button { margin-block-start: var(--sp-4); }
-
-/* Carried over from the accent layer this theme does not ship. The progress
-   bar module adds a second copy of the label (.bar-ink) inside the fill only
-   when an accent is set, and only that layer positioned it; this keeps any
-   copy that still reaches the DOM out of sight. */
-.cbi-progressbar .bar-ink { display: none; }

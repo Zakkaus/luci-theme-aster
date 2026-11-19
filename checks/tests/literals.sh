@@ -45,7 +45,7 @@ sed -i 's|^\(/\* ── Tables \[ported\].*\)$|\1\n.literals-test { background: 
 expect 1 "FAIL luci.css Tables [ported]: 1 literal(s): background: rgb(" "rgb() in a ported luci.css section" "$tmp/rgb"
 
 copy todo
-sed -i 's|^\(/\* ── Modal .*\)$|\1\n.literals-test { margin: 5px; }|' "$tmp/todo/luci.css"
+printf '\n/* ── Literals test ─── */\n.literals-test { margin: 5px; }\n' >> "$tmp/todo/luci.css"
 expect 0 "remaining literals outside ported sections: $((base + 1))" "px in a section not yet ported is counted" "$tmp/todo"
 
 copy comment

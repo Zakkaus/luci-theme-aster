@@ -28,4 +28,18 @@
 
   /* Progress bar track height. */
   --aster-progress-h: 8px;
+
+  /* Form row: the label column and the width of a single-line field (a
+     select does not follow its placeholder; every field in a column lines
+     up). */
+  --aster-form-label-w: 200px;
+  --aster-field-w: 256px;
+
+  /* Menu and tooltip: the widest they open. */
+  --aster-menu-max-w: 384px;
+
+  /* Dialog widths: sm (a status), md (default), lg (a form). */
+  --aster-dialog-sm-w: 400px;
+  --aster-dialog-w: 560px;
+  --aster-dialog-lg-w: 800px;
 }
