@@ -172,7 +172,6 @@
 }
 /* A table with no card around it makes up the card's border only. */
 .shell-inner .table:not(.cbi-section *) { margin-inline: var(--border-width); }
-.table:has([style*="min-width"]) { min-inline-size: max-content; }
 /* An interface box column is as narrow as the box. */
 .tr:has(> .td > .ifacebox) > .td:first-child { inline-size: 1%; white-space: nowrap; }
 
@@ -539,6 +538,22 @@
   .table:has(.diag-action) > .tr > .td { display: block; padding-inline: 0; border: 0; }
   /* A wide table without a header row scrolls inside its card. */
   .table:not(:has(> .tr > .th, > .thead > .tr > .th)) { display: block; overflow-x: auto; }
+  /* form.js writes the widest row's measured width inline on every actions
+     cell; on a phone the cell takes the width its row gives it. */
+  #view .cbi-section-actions[style*="width"] {
+    min-inline-size: 0 !important; /* inline min-width */
+    inline-size: auto !important; /* inline width */
+  }
+  /* Network > Interfaces has no header row, so the Table fold skips it: the
+     box, its status and the actions stack, the actions wrap (layout). */
+  #view .tr:has(> .td > .ifacebox) { display: flex; flex-direction: column; }
+  #view .tr:has(> .td > .ifacebox) > .td { display: block; inline-size: auto; white-space: normal; }
+  #view .tr:has(> .td > .ifacebox) > .td:not(:last-child) { border: 0; }
+  #view .tr:has(> .td > .ifacebox) > .td.cbi-section-actions > * { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
+  /* Actions that wrap (here and in the Table fold) are spaced by the gap
+     alone, not also by the button-after-button margin. */
+  #view .tr:has(> .td > .ifacebox) > .td.cbi-section-actions > * > *,
+  #view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions:has(> * > :nth-child(2)) > * > * { margin-inline-start: 0; }
   .cbi-page-actions { position: static; }
   /* A dialog fits the screen. */
   #modal_overlay { padding: var(--spacing-4); }
