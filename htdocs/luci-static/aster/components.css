@@ -24,8 +24,9 @@
                                 .cbi-value-error, .control-group
    Card          Card           .cbi-section, .cbi-section-node, .ifacebox
                                 (+ .ifacebox-head/-body), .cbi-page-actions,
-                                a table straight in the view (24.10 status
-                                pages)
+                                a table straight in the view, #content_syslog,
+                                a tab pane straight in a view, .nft-chain
+                                (24.10 writes these without .cbi-section)
                                 (--card-*); Card variant of .ifacebox: the
                                 overview's boxes (--ifacebox-body-*)
    MetadataList  MetadataList   .cbi-section .table without a header row
@@ -222,6 +223,10 @@ hr {
   font-size: var(--text-supporting-size);
   resize: vertical;
 }
+/* ui.Textarea writes font-family:monospace inline for a key or command
+   output; the code face replaces it (an inline style yields only to
+   !important). */
+:where(textarea[style*="monospace"]) { font-family: var(--font-family-code) !important; }
 :where(select[multiple]) { block-size: auto; padding-block: var(--spacing-1); }
 :where(select > option) { background: var(--color-background-popover); color: var(--color-text-primary); }
 @media (hover: hover) {
@@ -364,8 +369,9 @@ hr {
 }
 
 /* ── Checkbox and Radio ──────────────────────────────────────────
-   md: a 24 box (inner radius) or circle, 1 emphasized border on the
-   surface; checked fills with the accent and draws a 14 tick or a 10 dot
+   md: a 24 box (inner radius) or circle, 1 border on the surface in the
+   secondary icon colour (Astryx's emphasized border is 1.5:1, under the
+   3:1 a control's boundary needs; the field border keeps it, see Field); checked fills with the accent and draws a 14 tick or a 10 dot
    in the on-accent colour. Hover lays the overlay over the box; disabled
    is half opaque. */
 
@@ -379,9 +385,10 @@ hr {
   block-size: var(--spacing-6);
   margin: 0;
   vertical-align: middle;
-  border: var(--border-width) solid var(--color-border-emphasized);
+  border: var(--border-width) solid var(--checkbox-border, var(--color-icon-secondary));
   border-radius: var(--radius-inner);
   background-color: var(--color-background-surface);
+  font: inherit;
   cursor: pointer;
   transition: background-color var(--duration-fast) var(--ease-standard), border-color var(--duration-fast) var(--ease-standard);
 }
@@ -538,7 +545,7 @@ hr {
 @property --card-radius { syntax: "*"; inherits: false; }
 @property --card-shadow { syntax: "*"; inherits: false; }
 
-:where(.cbi-section, .cbi-section-node, .ifacebox, .cbi-page-actions, #view > :is(table, .table), #view > .cbi-map > :is(table, .table)) {
+:where(.cbi-section, .cbi-section-node, .ifacebox, .cbi-page-actions, #view > :is(table, .table), #view > .cbi-map > :is(table, .table), #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], .nft-chain) {
   --card-pad: calc(var(--spacing-4) - var(--border-width));
   box-sizing: border-box;
   min-inline-size: 0;
@@ -644,6 +651,10 @@ hr {
 }
 :where(th, td, .th, .td):last-child { padding-inline-end: var(--spacing-4); }
 :where(td, .td) { line-height: var(--text-body-leading); font-variant-numeric: tabular-nums; }
+/* luci-mod-status's nftables view sets its cells to .25em with !important
+   in a <style> of its own; only !important gives the cell padding back. */
+.nft-rules tr > td { padding: var(--spacing-1) var(--spacing-2) var(--spacing-1) var(--spacing-4) !important; }
+.nft-rules tr > td:last-child { padding-inline-end: var(--spacing-4) !important; }
 :where(th, .th) {
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-semibold);
@@ -700,6 +711,7 @@ hr {
     overflow-wrap: anywhere;
     text-align: start;
   }
+  .nft-rules tr > td { padding-block: 0 !important; } /* nftables' <style>, as above */
   :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td:first-child) {
     color: var(--color-text-primary);
     font-size: var(--text-body-size);

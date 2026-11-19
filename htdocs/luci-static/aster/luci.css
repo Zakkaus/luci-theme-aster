@@ -79,7 +79,7 @@
 /* ── Cards [ported] ──────────────────────────────────────────── */
 
 /* Cards 16 apart; a map's last block 24 above what follows. */
-.cbi-section, .cbi-section-node { margin-block-end: var(--spacing-4); }
+.cbi-section, .cbi-section-node, #view > :is(table, .table), #view > .cbi-map > :is(table, .table), #content_syslog, .nft-chain { margin-block-end: var(--spacing-4); }
 .cbi-section > :is(.cbi-section, .cbi-section-node):last-child { margin-block-end: 0; }
 .cbi-map { margin-block-end: var(--spacing-6); }
 :not(.cbi-map) + .cbi-map { margin-block-start: var(--spacing-4); }
@@ -189,13 +189,21 @@
    administrator's data: kept, toned down, with dark text on it. */
 .ifacebox-head[style*="background"],
 .zonebadge[style*="background"] { --badge-fg: var(--color-on-light); color: var(--color-on-light); filter: saturate(0.5); }
+/* A device that is down: LuCI fades its name to half opacity inline
+   (2.2:1 on the badge); the secondary text colour says the same at 4.5:1. */
+.ifacebadge > span[style*="opacity"] {
+  opacity: 1 !important; /* inline opacity:.5 */
+  color: var(--color-text-secondary);
+}
 .ifacebox-body > div > .ifacebadge { display: flex; }
 .ifacebox-body > div > .ifacebadge + .ifacebadge { margin-block-start: var(--spacing-2); }
 .network-status-table { display: flex; flex-wrap: wrap; gap: var(--spacing-3); }
 .network-status-table + .table { margin-block-start: var(--spacing-4); }
 /* Firewall rules: a two-line action aligns its row to the top. */
 .nft-rules .td { vertical-align: top; }
-.nft-rules .td > .ifacebadge { margin-block-end: var(--spacing-1); }
+/* A rule's badges fill the body line box (20 + 2 + 2), so a row of them
+   is a text row's height; LuCI's own .125em margins are replaced. */
+.nft-rules .td > .ifacebadge { margin: var(--spacing-0-5) var(--spacing-1) var(--spacing-0-5) 0; }
 .nft-comment { --badge-bg: transparent; cursor: help; }
 
 /* ── The login form [ported] ────────────────────────────────── */
@@ -519,8 +527,9 @@
 /* ── Phone [ported] ─────────────────────────────────────────── */
 
 @media (max-width: 48rem) {
-  /* A form row stacks: the label over the control, which fills the row. */
-  .cbi-value { flex-direction: column; align-items: stretch; }
+  /* A form row stacks: the label over the control, which fills the row.
+     One line, so a long value cannot widen the column past the row. */
+  .cbi-value { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
   .cbi-value > .cbi-value-title { flex-basis: auto; min-block-size: 0; margin-block-end: var(--spacing-1); }
   .cbi-value-field { --field-w: 100%; flex-basis: auto; }
   /* CBI wraps a widget in a bare div, which must span the row too. */
@@ -556,5 +565,6 @@
 #view svg text {
   fill: var(--color-text-secondary) !important; /* inline fill:#eee */
   text-shadow: none !important; /* inline dark shadow */
+  font-family: var(--font-family-body) !important; /* inline font-family:sans-serif */
 }
 
