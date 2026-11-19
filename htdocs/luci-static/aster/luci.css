@@ -2185,6 +2185,7 @@ input:disabled, select:disabled, textarea:disabled {
 [data-page="admin-status-overview"] #view .network-status-table > .ifacebox:not(:has(img[src*="/signal-"])) .nowrap {
   display: grid;
   grid-template-columns: var(--aster-label-w) minmax(0, 1fr);
+  align-items: baseline;
   column-gap: var(--spacing-4);
   padding-block: var(--spacing-1);
   overflow-wrap: anywhere;
