@@ -210,8 +210,9 @@
 /* Firewall rules: a two-line action aligns its row to the top. */
 .nft-rules .td { vertical-align: top; }
 /* A rule's badges fill the body line box (20 + 2 + 2), so a row of them
-   is a text row's height; LuCI's own .125em margins are replaced. */
-.nft-rules .td > .ifacebadge { margin: var(--spacing-0-5) var(--spacing-1) var(--spacing-0-5) 0; }
+   is a text row's height; LuCI's own .125em margins are replaced, and they
+   sit at the line's top (on the baseline they pushed it down 1-5 px). */
+.nft-rules .td > .ifacebadge { margin: var(--spacing-0-5) var(--spacing-1) var(--spacing-0-5) 0; vertical-align: top; }
 .nft-comment { --badge-bg: transparent; cursor: help; }
 
 /* ── The login form [ported] ────────────────────────────────── */
