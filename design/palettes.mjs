@@ -96,18 +96,21 @@ const PLUM = {
 
    Official colours moved toward black (Dawn) or white (Main), each by the
    smallest step that passes; ratios against the worst background the text
-   sits on (the surface, the muted well, or its own muted fill):
+   sits on (the surface, the muted well, its own muted fill, the neutral
+   button fill, or the hover overlay):
      text-secondary  Dawn subtle #797593 -> #69657F   3.7 -> 4.6 on overlay
+                     Main subtle #908CAA -> #938FAC   4.5 -> 4.6 under hover
      text-success    Dawn foam   #56949F -> #3E6B73   2.7 -> 4.6 on its fill
                      Main pine   #31748F -> #74A1B3   2.5 -> 4.6 on its fill
      text-warning    Dawn gold   #EA9D34 -> #8C5E1F   1.9 -> 4.7 on its fill
      text-error      Dawn love   #B4637A -> #8F4F61   3.2 -> 4.6 on its fill
-                     Main love   #EB6F92 -> #EF88A5   3.8 -> 4.6 on its fill
+                     Main love   #EB6F92 -> #F19DB5   3.3 -> 4.6 on the
+                                                      neutral button (Delete)
      text-info       Dawn iris   #907AA9 -> #6D5D80   2.9 -> 4.6 on its fill
      error (fill)    Dawn love   #B4637A -> #AA5E73   white on it 4.2 -> 4.6
      border          Main highlightMed #403D52 -> #373447: the dark
                      separator cap is 1.5:1; 1.69 -> 1.47 on base
-   Main's subtle, iris, gold and foam pass as they are. */
+   Main's iris, gold and foam pass as they are. */
 const ROSE_PINE = {
   '--color-accent': ['#286983', '#9CCFD8'],
   '--color-accent-muted': ['#28698319', '#9CCFD826'],
@@ -117,7 +120,7 @@ const ROSE_PINE = {
   '--color-background-surface': ['#FFFAF3', '#1F1D2E'],
   '--color-background-muted': ['#F2E9E1', '#191724'],
   '--color-text-primary': ['#575279', '#E0DEF4'],
-  '--color-text-secondary': ['#69657F', '#908CAA'],
+  '--color-text-secondary': ['#69657F', '#938FAC'],
   '--color-border': ['#DFDAD9', '#373447'],
   '--color-border-emphasized': ['#CECACD', '#524F67'],
   '--color-success': ['#56949F', '#31748F'],
@@ -125,7 +128,7 @@ const ROSE_PINE = {
   '--color-warning': ['#EA9D34', '#F6C177'],
   '--color-text-warning': ['#8C5E1F', '#F6C177'],
   '--color-error': ['#AA5E73', '#EB6F92'],
-  '--color-text-error': ['#8F4F61', '#EF88A5'],
+  '--color-text-error': ['#8F4F61', '#F19DB5'],
   '--color-info': ['#907AA9', '#C4A7E7'],
   '--color-text-info': ['#6D5D80', '#C4A7E7'],
   '--focus-outline-color': ['#286983', '#9CCFD8'],

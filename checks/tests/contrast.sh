@@ -62,11 +62,12 @@ expect contrast 1 separator,waived:field-border "bright separator in dark mode" 
 
 # Palettes: the run picks one as a reader does (localStorage), a slug that
 # is not a palette is an error, and a palette block whose ink is pale fails
-# the text rule under that palette.
+# the text rule under that palette (the secondary ink: body-size labels
+# only, where the primary would fail the large page title too).
 expect contrast 1 error "unknown palette" "data-palette is aster, want nosuch" -- "$url" "$password" --pages "$tmp/base.txt" --palette nosuch
 expect contrast 0 waived:field-border "baseline: Relay Blue" -- "$url" "$password" --pages "$tmp/base.txt" --palette relay
 expect contrast 1 text,waived:field-border "palette block with a pale ink" "#dddddd on #ffffff" -- "$url" "$password" --pages "$tmp/base.txt" --palette relay \
-	--debug-css 'admin/status/overview=:root[data-palette="relay"], :root[data-palette="relay"]:has(> body > .shell) { --color-text-primary: light-dark(#ddd, #ddd) !important }'
+	--debug-css 'admin/status/overview=:root[data-palette="relay"], :root[data-palette="relay"]:has(> body > .shell) { --color-text-secondary: light-dark(#ddd, #ddd) !important }'
 
 # Field border alone: waived by default (exit 0, listed as waived), and a
 # failure when enforced.
