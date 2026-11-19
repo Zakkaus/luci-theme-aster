@@ -48,7 +48,9 @@ const {chromium} = await import(process.env.PLAYWRIGHT ?? 'playwright');
 /* Each field names where the reference value lives in spec.json and what the
  * theme's counterpart is. `from` is [section, key, property]; `take` turns a
  * measured element (or two) into the same string form spec.json uses.
- * `devices` limits a field to where the reference measured it. */
+ * `devices` limits a field to where the reference measured it; `want`
+ * replaces a spec value with a constant where the property is a relation,
+ * not a size. */
 const FIELDS = [
   // Side nav: the panel and its rows. On the phone they are the drawer's.
   {name: 'side nav width', from: ['frame', 'Side nav panel (AppShell sidenav)', 'width'], devices: ['desktop'], sel: '#sidebar', prop: 'width'},
@@ -65,6 +67,11 @@ const FIELDS = [
   {name: 'frame padding', from: ['frame', 'Main content (LayoutContent)', 'padding'], sel: '.shell-content', prop: 'padding'},
   {name: 'section gap', from: ['frame', 'Page VStack (band gap)', 'gap'], measure: 'sectionGap'},
   {name: 'card gap', from: ['frame', 'Grid: 系統 + 記憶體 cards', 'gap'], sel: '#view', prop: 'gap'},
+  // Cards sharing a grid row end on one line (系統 and 記憶體與儲存): the
+  // largest spread of bottom edges within a row. Phones stack the cards.
+  {name: 'same-row card bottoms', from: ['frame', 'Grid: 系統 + 記憶體 cards', 'height'], want: '0px', devices: ['desktop'], measure: 'rowSpread', edge: 'bottom'},
+  // ... and start their first line of content level (型號 and 可用記憶體).
+  {name: 'same-row first line', from: ['frame', 'Grid: 系統 + 記憶體 cards', 'height'], want: '0px', devices: ['desktop'], measure: 'rowSpread', edge: 'firstLine'},
   // Cards.
   {name: 'card radius', from: ['components', 'Card (default)', 'radius'], sel: '#view > .cbi-section', prop: 'radius'},
   {name: 'card padding', from: ['components', 'Card (default)', 'padding'], sel: '#view > .cbi-section', prop: 'padding'},
@@ -130,6 +137,25 @@ function readAll(fields) {
       const title = document.querySelector('.shell-inner > h2, #view > h2');
       const card = [...document.querySelectorAll('#view > .cbi-section')].find(shown);
       out[f.name] = title && card ? {value: `${px(card.getBoundingClientRect().top - title.getBoundingClientRect().bottom)}`, count: 1} : {value: null, count: 0};
+      continue;
+    }
+    if (f.measure === 'rowSpread') {
+      // Group the cards by their top edge; count only rows of two or more.
+      // An edge is the card's bottom, or the content top of its first cell.
+      const edge = (c) => {
+        if (f.edge === 'bottom') return c.getBoundingClientRect().bottom;
+        const td = c.querySelector('.table .tr > .td');
+        return td ? td.getBoundingClientRect().top + parseFloat(getComputedStyle(td).paddingTop) : NaN;
+      };
+      const rowsByTop = new Map();
+      for (const c of [...document.querySelectorAll('#view > .cbi-section')].filter(shown)) {
+        const r = c.getBoundingClientRect();
+        const top = [...rowsByTop.keys()].find((t) => Math.abs(t - r.top) <= 1) ?? r.top;
+        rowsByTop.set(top, [...(rowsByTop.get(top) ?? []), edge(c)]);
+      }
+      const shared = [...rowsByTop.values()].filter((b) => b.length > 1);
+      const spread = Math.max(0, ...shared.map((b) => Math.max(...b) - Math.min(...b)));
+      out[f.name] = {value: shared.length ? px(spread) : null, count: shared.length};
       continue;
     }
     let els = [...document.querySelectorAll(f.sel)].filter(shown);
@@ -206,7 +232,7 @@ for (const [device, viewport] of Object.entries({desktop: {width: 1440, height: 
 
     for (const f of [...plain, ...drawerFields]) {
       const [section, k, prop] = f.from;
-      const want = ref[section]?.[k]?.[prop];
+      const want = f.want ?? ref[section]?.[k]?.[prop];
       const m = got[f.name];
       if (want == null) { fail(`${key} ${f.name}: spec has no ${f.from.join(' > ')}`); continue; }
       const pass = m.count > 0 && compare(m.value, want, f.exact);

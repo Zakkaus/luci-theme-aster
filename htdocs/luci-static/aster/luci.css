@@ -1928,13 +1928,18 @@ input:disabled, select:disabled, textarea:disabled {
    the cards in a grid of at most two tracks (each at least 320, 16 apart),
    and anything holding a wide table, a row of interface boxes or a long list
    across the full width. Every include is its own .cbi-section, a direct
-   child of #view. */
+   child of #view. Two cards in one row stretch to the row, as the
+   reference's Grid does: System and Memory end on the same line. */
 [data-page="admin-status-overview"] #view:has(> .cbi-section) {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(max(min(100%, var(--aster-card-min)), calc((100% - var(--spacing-4)) / 2)), 1fr));
   gap: var(--spacing-4);
-  align-items: start;
+  align-items: stretch;
 }
+/* A card collapsed with Hide keeps only its title row; stretched, it would
+   be an empty box as tall as its neighbour. luci-mod-status hides the
+   content by writing display: none on its container. */
+[data-page="admin-status-overview"] #view > .cbi-section:has(> div[style*="display: none"]) { align-self: start; }
 [data-page="admin-status-overview"] #view > :not(.cbi-section) { grid-column: 1 / -1; }
 [data-page="admin-status-overview"] #view > .cbi-section { margin: 0; min-inline-size: 0; }
 [data-page="admin-status-overview"] #view > .cbi-section:has(.tr > .td:nth-child(3), .th, .ifacebox, .network-status-table, .tr:nth-child(7) > .td > .cbi-progressbar) {
@@ -1947,6 +1952,9 @@ input:disabled, select:disabled, textarea:disabled {
   display: block;
   padding-block: var(--spacing-2);
 }
+/* The first one starts its text where a key/value row does (4 in), so the
+   first lines of Memory and System sit level, as the reference's do. */
+[data-page="admin-status-overview"] .table .tr:first-child:has(> .td > .cbi-progressbar) { padding-block-start: var(--spacing-1); }
 [data-page="admin-status-overview"] .table .tr:has(> .td > .cbi-progressbar) > .td {
   display: block;
   inline-size: auto;
