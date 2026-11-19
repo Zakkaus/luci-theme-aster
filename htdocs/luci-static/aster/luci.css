@@ -557,6 +557,9 @@
   /* Network > Interfaces has no header row, so the Table fold skips it: the
      box, its status and the actions stack, the actions wrap (layout). */
   #view .tr:has(> .td > .ifacebox) { display: flex; flex-direction: column; }
+  /* The table is a block here; a row group left as a table shrinks to its
+     content and the rules stop short of the card edge (layout). */
+  #view .tbody:has(> .tr > .td > .ifacebox) { display: block; }
   #view .tr:has(> .td > .ifacebox) > .td { display: block; inline-size: auto; white-space: normal; }
   #view .tr:has(> .td > .ifacebox) > .td:not(:last-child) { border: 0; }
   #view .tr:has(> .td > .ifacebox) > .td.cbi-section-actions > * { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
