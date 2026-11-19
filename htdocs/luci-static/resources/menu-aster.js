@@ -476,7 +476,7 @@ return baseclass.extend({
 			root.toggleAttribute('data-rail', on);
 			set(!on);
 
-			try { localStorage.setItem('graphite-rail', on ? '1' : '0'); }
+			try { localStorage.setItem('aster-rail', on ? '1' : '0'); }
 			catch (e) { /* private window: the choice lasts this page only */ }
 		};
 

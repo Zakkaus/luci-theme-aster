@@ -40,7 +40,7 @@ return baseclass.extend({
 		let override = null;
 
 		try {
-			const v = localStorage.getItem('graphite-theme');
+			const v = localStorage.getItem('aster-theme');
 
 			if (v === 'auto' || v === 'light' || v === 'dark')
 				override = v;
@@ -81,7 +81,7 @@ return baseclass.extend({
 			o.addEventListener('click', () => {
 				override = o.value;
 
-				try { localStorage.setItem('graphite-theme', o.value); }
+				try { localStorage.setItem('aster-theme', o.value); }
 				catch (e) { /* private window: the choice lasts this page only */ }
 
 				if (o.value === 'auto') {
