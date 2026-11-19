@@ -1,22 +1,62 @@
-# Sourced by checks/tests/{uniform,contrast}.sh. expect runs one gate with
-# the given arguments and passes when it exits 1 and its output contains the
-# given text; anything else is a failed test.
+# Sourced by checks/tests/{uniform,contrast}.sh. expect runs one gate and
+# passes when its exit code is the one wanted and the JSON report's failed
+# rules are exactly the ones named: the named rule failed and no other did.
 root=$(cd "$(dirname "$0")/../.." && pwd)
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 failures=0
 
-# expect <gate> <text the output must contain> <label> -- <gate args...>
+# The failed rule ids in a gate's JSON report, one a line:
+#   uniform   "<class> <property>" per outlier, "missing <class>" per
+#             required class with no sample, "error" for any error;
+#   contrast  the failure's kind (text, large, ui, field-border, focus,
+#             separator), "waived:<kind>" for a waived one, "error".
+rules() {
+	node -e '
+		const r = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
+		const ids = new Set();
+		if (r.errors.length) ids.add("error");
+		if (r.gate === "uniform") {
+			for (const o of r.outliers) ids.add(`${o.cls} ${o.prop}`);
+			for (const m of r.missing) ids.add(`missing ${m.cls}`);
+		} else {
+			for (const f of r.failures) ids.add(f.kind);
+			for (const f of r.waived) ids.add(`waived:${f.kind}`);
+		}
+		console.log([...ids].sort().join("\n"));
+	' "$1"
+}
+
+# expect <gate> <exit> <rules> <label> [<text>] -- <gate args...>
+#   <rules>  the failed rule ids, comma-separated, "" for none; * in one
+#            stands for one dotted segment ("button.*.md height").
+#   <text>   optional: the text report must also contain it.
+# Desktop and light unless the arguments say otherwise.
 expect() {
-	local gate=$1 text=$2 label=$3 got=0
+	local gate=$1 want=$2 rules_want=$3 label=$4 text='' got=0
 	shift 4
-	node "$root/checks/$gate.mjs" "$@" --viewports desktop --modes light >"$tmp/out" 2>"$tmp/err" || got=$?
-	if [[ $got -ne 1 ]] || ! grep -qF -- "$text" "$tmp/out"; then
-		echo "FAIL $label: exit $got (want 1), output:"
+	if [[ $1 != -- ]]; then text=$1; shift; fi
+	shift
+	rm -f "$tmp/json"
+	node "$root/checks/$gate.mjs" --viewports desktop --modes light "$@" --json "$tmp/json" >"$tmp/out" 2>"$tmp/err" || got=$?
+	local have='(no JSON report)'
+	[[ -s $tmp/json ]] && have=$(rules "$tmp/json" | paste -sd, -)
+	local ok=1
+	[[ $got -eq $want ]] || ok=0
+	[[ -z $text ]] || grep -qF -- "$text" "$tmp/out" || ok=0
+	node -e '
+		const [want, have] = process.argv.slice(1).map((s) => (s ? s.split(",") : []));
+		const re = (p) => new RegExp(`^${p.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, "[^. ]+")}$`);
+		const pats = want.map(re);
+		const ok = have.every((h) => pats.some((p) => p.test(h))) && pats.every((p) => have.some((h) => p.test(h)));
+		process.exit(ok ? 0 : 1);
+	' "$rules_want" "$have" || ok=0
+	if [[ $ok -eq 1 ]]; then
+		echo "ok   $label: exit $got, failed rules {$have}${text:+, says \"$text\"}"
+	else
+		echo "FAIL $label: exit $got (want $want), failed rules {$have} (want {$rules_want})${text:+, want \"$text\"}"
 		tail -20 "$tmp/out" "$tmp/err" | sed 's/^/    /'
 		failures=$((failures + 1))
-	else
-		echo "ok   $label: exit 1, says \"$text\""
 	fi
 }
 

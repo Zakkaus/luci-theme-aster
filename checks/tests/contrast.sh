@@ -4,12 +4,10 @@
 #
 #   checks/tests/contrast.sh <base url> <password>
 #
-# Each case must exit 1 and say why: card titles injected in a pale grey
-# (#dddddd on the white card, 1.36:1), a separator injected too bright in
-# dark mode, a field border injected near-white (field-border rule: fails
-# when enforced, listed under WAIVED when waived; --text 99 keeps that run
-# failing so the case can be checked), a page-list entry that does not exist, and a wrong password.
-# Desktop only. Needs Playwright, as the gate does.
+# Each case names the exit code and the exact set of rules that must fail
+# (checks/tests/gate-lib.sh): one rule broken by one injected colour, and
+# no other rule failing. Desktop and light unless a case says otherwise.
+# Needs Playwright, as the gate does.
 set -euo pipefail
 source "$(dirname "$0")/gate-lib.sh"
 url=$1 password=$2
@@ -17,16 +15,46 @@ url=$1 password=$2
 printf 'admin/status/overview\n' >"$tmp/overview.txt"
 printf 'admin/status/overview\nadmin/no/such/page\n' >"$tmp/missing.txt"
 printf 'admin/system/system\n' >"$tmp/form.txt"
-pale='admin/system/system=#view :is(input, select, textarea, .cbi-dropdown) { border-color: #f8f8f8 !important }'
+printf 'admin/system/admin/dropbear\n' >"$tmp/dropbear.txt"
+printf 'admin/system/admin/uhttpd\n' >"$tmp/uhttpd.txt"
+# Text fields, selects and dropdowns only: a near-white border on a
+# checkbox would break the ui rule as well.
+pale='admin/system/system=#view :is(input:not([type="checkbox"], [type="radio"]), select, textarea, .cbi-dropdown:not(.btn)) { border-color: #f8f8f8 !important }'
 
-expect contrast "#dddddd on #ffffff" "low-contrast card titles" -- "$url" "$password" --pages "$tmp/overview.txt" \
+# Errors.
+expect contrast 1 error "page-list entry that 404s" "admin/no/such/page: HTTP 404" -- "$url" "$password" --pages "$tmp/missing.txt"
+expect contrast 1 error "wrong password" "(login): login returned 403" -- "$url" "$password-wrong" --pages "$tmp/overview.txt"
+
+# Text: body text in table cells, and card titles (22px semibold is body
+# size for WCAG), each #dddddd on the white card (1.36:1).
+expect contrast 1 text "low-contrast body text" "#dddddd on #ffffff" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=#view .td { color: #ddd !important }'
+expect contrast 1 text "low-contrast card titles" "#dddddd on #ffffff" -- "$url" "$password" --pages "$tmp/overview.txt" \
 	--debug-css 'admin/status/overview=#view .cbi-section :is(h2, h3) { color: #ddd !important }'
-expect contrast "separator" "bright separator with the bound applied in light mode" -- "$url" "$password" --pages "$tmp/overview.txt" \
-	--separator-modes light --debug-css 'admin/status/overview=#view .td { border-block-end: 1px solid #000 !important }'
-expect contrast "field-border" "near-white field border, rule enforced" -- "$url" "$password" --pages "$tmp/form.txt" --debug-css "$pale" \
+
+# Large text, on a phone: the 26px page title at #cccccc (1.61:1, under 3).
+expect contrast 1 large "low-contrast page title on a phone" -- "$url" "$password" --pages "$tmp/overview.txt" --viewports phone \
+	--debug-css 'admin/status/overview=#maincontent h2[name="content"] { color: #ccc !important }'
+
+# UI boundary: an unchecked checkbox with a near-white border on white, and
+# a split button (Save & Apply) turned white with a near-white border but
+# dark words.
+expect contrast 1 ui "checkbox boundary" -- "$url" "$password" --pages "$tmp/dropbear.txt" \
+	--debug-css 'admin/system/admin/dropbear=#view input[type="checkbox"]:not(:checked) { border-color: #f4f4f4 !important; background-color: #fff !important }'
+expect contrast 1 ui "split button boundary" -- "$url" "$password" --pages "$tmp/uhttpd.txt" \
+	--debug-css 'admin/system/admin/uhttpd=#maincontent .cbi-dropdown:is(.btn, .cbi-button) { background-color: #fff !important; border: 1px solid #fafafa !important } #maincontent .cbi-dropdown:is(.btn, .cbi-button), #maincontent .cbi-dropdown:is(.btn, .cbi-button) * { color: #222 !important }'
+
+# Focus: no ring at all on the page's controls.
+expect contrast 1 focus "no focus ring" "no focus ring" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=#maincontent :is(:focus, :focus-visible) { outline: none !important; box-shadow: none !important }'
+
+# Separator, in dark mode as the rule applies by default: white cell rules.
+expect contrast 1 separator "bright separator in dark mode" -- "$url" "$password" --pages "$tmp/overview.txt" --modes dark \
+	--debug-css 'admin/status/overview=#view .td { border-block-end: 1px solid #fff !important }'
+
+# Field border alone: waived by default (exit 0, listed as waived), and a
+# failure when enforced.
+expect contrast 0 waived:field-border "near-white field border, rule waived by default" "WAIVED (field-border" -- "$url" "$password" --pages "$tmp/form.txt" --debug-css "$pale"
+expect contrast 1 field-border "near-white field border, rule enforced" -- "$url" "$password" --pages "$tmp/form.txt" --debug-css "$pale" \
 	--field-border enforce
-expect contrast "WAIVED (field-border" "near-white field border, rule waived by default" -- "$url" "$password" --pages "$tmp/form.txt" --debug-css "$pale" \
-	--text 99
-expect contrast "admin/no/such/page: HTTP 404" "page-list entry that 404s" -- "$url" "$password" --pages "$tmp/missing.txt"
-expect contrast "(login): login returned 403" "wrong password" -- "$url" "$password-wrong" --pages "$tmp/overview.txt"
 finish
