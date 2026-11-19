@@ -23,6 +23,22 @@ make package/luci-theme-aster/compile V=s
 The packages land in `bin/packages/<arch>/luci/`: an `.ipk` from the 24.10 SDK
 and an `.apk` from the 25.12 SDK.
 
+## Palettes
+
+Five colour palettes, chosen per browser from the palette menu in the top
+bar (in the drawer on a phone): Aster (the default), Relay Blue, Sounding
+Teal, Herbarium Plum and Rosé Pine (Dawn in light mode, Main in dark). Each
+works in light, dark and auto mode. The choice is kept in the browser's
+`localStorage` (`aster-palette`), not on the router. Only colours change
+between palettes; components and spacing stay the same.
+
+## Credits
+
+The logo (Ray Floret) and the Relay, Teal and Plum palettes were designed
+for this project. The Rosé Pine palette is Rosé Pine's
+(https://rosepinetheme.com), MIT, see `LICENSES/rose-pine-MIT.txt`; the few
+colours moved for contrast are listed in `design/palettes.mjs`.
+
 ## Licence
 
 Apache-2.0, see `LICENSE`. The icons are Heroicons 2.2.0 outline

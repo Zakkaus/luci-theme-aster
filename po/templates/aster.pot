@@ -33,6 +33,10 @@ msgstr ""
 msgid "Dark"
 msgstr ""
 
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:233 luci-theme-aster/ucode/template/themes/aster/header.ut:268
+msgid "Palette"
+msgstr ""
+
 #: luci-theme-aster/ucode/template/themes/aster/header.ut:223
 msgid "No password set!"
 msgstr ""

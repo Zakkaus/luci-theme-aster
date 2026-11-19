@@ -124,6 +124,16 @@
   color: var(--color-icon-primary);
 }
 
+/* The palette menu (components.css Menu) drops from its button, its end
+   edge on the button's, so it stays on screen at the top bar's end; in the
+   drawer's foot it opens upward. */
+.palette-menu { position: relative; display: flex; }
+.palette-menu > [role="menu"] { inset-block-start: 100%; inset-inline: auto 0; }
+.drawer-foot .palette-menu > [role="menu"] {
+  inset-block: auto 100%;
+  transform: translateY(calc(var(--spacing-1) * -1));
+}
+
 /* The drawer toggle and the drawer's own head exist only on a phone. */
 #sidebar-toggle,
 .drawer-head,
@@ -301,6 +311,7 @@
   }
   .brand .sub,
   .shell-header .theme-switch,
+  .shell-header .palette-menu,
   .rail-toggle { display: none; }
   #sidebar-toggle,
   .drawer-head,
@@ -353,6 +364,8 @@
   }
   .drawer-foot {
     justify-content: center;
+    align-items: center;
+    gap: var(--spacing-2);
     padding: var(--spacing-2);
     border-block-start: var(--border-width) solid var(--color-border);
   }

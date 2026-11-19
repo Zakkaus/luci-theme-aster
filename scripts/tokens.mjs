@@ -29,6 +29,8 @@
  *     tokens (--color-*, *-color) the stylesheets read, directly or through
  *     a non-colour token of tokens.css. A gap would leave that token at the
  *     default's colour under the palette.
+ *     header.ut's `palettes` list (the picker and the head script) must
+ *     name the same palettes, default first, in the same order.
  *  7. Closure check over tokens.css and the other four stylesheets: every
  *     var(--x) without a fallback must be declared in tokens.css, or be a
  *     component parameter declared in one of the stylesheets. A var()
@@ -357,6 +359,11 @@ function main() {
   const target = path.join(opts.styles, 'tokens.css');
 
   problems.push(...closure(out, sheets, read(opts.layout)));
+  const header = read(path.join(ROOT, 'ucode/template/themes/aster/header.ut'));
+  const listed = [...(header.match(/const palettes = \[([\s\S]*?)\];/)?.[1] ?? '').matchAll(/\[\s*'([^']+)',\s*'([^']+)'\s*\]/g)]
+    .map((m) => `${m[1]}=${m[2]}`).join(' ');
+  const want = [DEFAULT, ...PALETTES].map((p) => `${p.slug}=${p.name}`).join(' ');
+  if (listed !== want) problems.push(`header.ut palettes list is "${listed}", want "${want}"`);
   if (opts.check) {
     let current = null;
     try {

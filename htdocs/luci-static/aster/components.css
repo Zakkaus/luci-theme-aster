@@ -19,7 +19,9 @@
                                 .cbi-button-neutral[aria-label] in a field
    Field         TextField      input (text-like), textarea (--field-*)
    Select        Select         select, .cbi-dropdown (not a ComboButton)
-   Menu          Menu           .cbi-dropdown[open] > ul.dropdown
+   Menu          Menu           .cbi-dropdown[open] > ul.dropdown, the
+                                palette menu (.palette-menu, rows with a
+                                .palette-swatch)
    Checkbox      Checkbox/Radio input[type=checkbox|radio], .cbi-checkbox
    Dynlist       TextField list .cbi-dynlist (.item, .add-item)
    Form row      Field layout   .cbi-value, .cbi-value-title, .cbi-value-field,
@@ -326,9 +328,11 @@ hr {
    radius, the low shadow, 4 inside; rows 36 high, 8 inline, element
    radius; the overlay under the pointer and on the chosen row, which is
    medium weight and ends with a 16 accent check (Heroicons 2.2.0 Check,
-   MIT). ui.js writes the direction and height inline. */
+   MIT). ui.js writes the direction and height inline. The palette menu
+   (header.ut) is the same list with menuitemradio rows, each led by its
+   swatch: the palette's accent dot on its shell, a hairline round it. */
 
-:where(.cbi-dropdown[open] > ul.dropdown) {
+:where(.cbi-dropdown[open] > ul.dropdown, .palette-menu[open] > [role="menu"]) {
   display: block;
   position: absolute;
   z-index: 110;
@@ -347,7 +351,7 @@ hr {
   transform: translateY(var(--spacing-1));
 }
 :where(.cbi-dropdown[open] > ul.dropdown[style*="bottom"]) { transform: translateY(calc(var(--spacing-1) * -1)); }
-:where(.cbi-dropdown[open] > ul.dropdown > li) {
+:where(.cbi-dropdown[open] > ul.dropdown > li, .palette-menu[open] > [role="menu"] > li) {
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
@@ -361,12 +365,12 @@ hr {
 :where(.cbi-dropdown[open] > ul.dropdown > li .hide-open) { display: none; }
 :where(.cbi-dropdown[open] > ul.dropdown > li .hide-close) { display: initial; }
 :where(.cbi-dropdown[multiple][open] > ul.dropdown > li > form) { display: flex; pointer-events: none; }
-:where(.cbi-dropdown[open] > ul.dropdown > li:is(.focus, [selected])) { background: var(--color-overlay-hover); }
+:where(.cbi-dropdown[open] > ul.dropdown > li:is(.focus, [selected]), .palette-menu[open] > [role="menu"] > li:is(:focus-visible, [aria-checked="true"])) { background: var(--color-overlay-hover); }
 @media (hover: hover) {
-  :where(.cbi-dropdown[open] > ul.dropdown > li:hover) { background: var(--color-overlay-hover); }
+  :where(.cbi-dropdown[open] > ul.dropdown > li:hover, .palette-menu[open] > [role="menu"] > li:hover) { background: var(--color-overlay-hover); }
 }
-:where(.cbi-dropdown[open] > ul.dropdown > li[selected]) { font-weight: var(--font-weight-medium); }
-:where(.cbi-dropdown[open]:not([multiple]) > ul.dropdown > li[selected])::after {
+:where(.cbi-dropdown[open] > ul.dropdown > li[selected], .palette-menu[open] > [role="menu"] > li[aria-checked="true"]) { font-weight: var(--font-weight-medium); }
+:where(.cbi-dropdown[open]:not([multiple]) > ul.dropdown > li[selected], .palette-menu[open] > [role="menu"] > li[aria-checked="true"])::after {
   content: "";
   flex: none;
   margin-inline-start: auto;
@@ -376,9 +380,18 @@ hr {
   mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='m4.5%2012.75%206%206%209-13.5'/></svg>") center / contain no-repeat;
 }
 :where(.cbi-dropdown[open] > ul.dropdown > li[unselectable]) { opacity: 0.5; }
+:where(.palette-menu[open] > [role="menu"] > li) { cursor: pointer; }
+:where(.palette-swatch) {
+  flex: none;
+  inline-size: var(--aster-icon-md);
+  block-size: var(--aster-icon-md);
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle, var(--aster-swatch-accent) 0 40%, var(--aster-swatch-shell) 42%);
+  box-shadow: inset 0 0 0 var(--border-width) var(--color-border-emphasized);
+}
 :where(.cbi-dropdown[open] > ul.dropdown > li > input.create-item-input) { --field-h: var(--size-element-sm); inline-size: 100%; }
 @media (pointer: coarse) {
-  :where(.cbi-dropdown[open] > ul.dropdown > li) { min-block-size: var(--spacing-11); }
+  :where(.cbi-dropdown[open] > ul.dropdown > li, .palette-menu[open] > [role="menu"] > li) { min-block-size: var(--spacing-11); }
 }
 
 /* ── Checkbox and Radio ──────────────────────────────────────────
