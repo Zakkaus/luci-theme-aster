@@ -14,4 +14,13 @@
 
   /* Icon size sm: the side nav, the top bar and the indicators. */
   --aster-icon-sm: 16px;
+
+  /* Grid tracks: cards wrap below 320 wide, as Grid minmax(320px, 1fr). */
+  --aster-card-min: 320px;
+
+  /* A label column in a key/value list (MetadataList dt). */
+  --aster-label-w: 112px;
+
+  /* Progress bar track height. */
+  --aster-progress-h: 8px;
 }

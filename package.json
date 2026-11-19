@@ -9,7 +9,9 @@
     "check:theme": "astryx theme build design/aster.ts --out design/built/aster.css --icons-specifier ../icons --check",
     "tokens": "node scripts/tokens.mjs",
     "check:tokens": "node scripts/tokens.mjs --check",
-    "test:tokens": "bash checks/tests/tokens.sh"
+    "test:tokens": "bash checks/tests/tokens.sh",
+    "check:literals": "bash checks/literals.sh",
+    "test:literals": "bash checks/tests/literals.sh"
   },
   "devDependencies": {
     "@astryxdesign/cli": "0.7.16",

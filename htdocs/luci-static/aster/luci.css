@@ -5,347 +5,207 @@
 
    Two rules:
 
-   - no colour literals. A rule that needs one means theme.css is missing
-     a token.
+   - no colour literals and no px: tokens.css is the only file that may hold
+     them. A section whose header carries [ported] has been moved onto the
+     Astryx tokens and is held to that by checks/literals.sh; the others are
+     graphite's and still read the temporary bridge names (M3 ports them).
    - no !important. Bootstrap carries 44, argon 291, liquid 147.
 
    And one thing that is easy to miss: LuCI's buttons are frequently
    <div class="btn"> and <a class="btn">, not <button>. */
 
-/* ── Buttons ─────────────────────────────────────────────────── */
+/* ── Buttons [ported] ────────────────────────────────────────── */
 
-.btn,
-.cbi-button,
-button:not(.icon-btn):not([role="radio"]),
-input[type="button"],
-input[type="submit"],
-input[type="reset"] {
-  font: inherit;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-2);
-  min-block-size: var(--control-h);
-  padding: var(--sp-2) var(--sp-4);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--secondary);
-  color: var(--secondary-foreground);
-  text-decoration: none;
-  cursor: pointer;
-  white-space: nowrap;
-  /* A button in a flex row stretches unless told not to: the package pager's
-     « and » came out a third of the page wide. */
-  flex: none;
-  transition:
-    transform var(--dur-press) ease,
-    box-shadow var(--dur-hover) ease,
-    border-color var(--dur-hover) ease,
-    background-color var(--dur-press) ease;
-}
-
-.btn:hover:not([aria-disabled="true"]):not(:disabled),
-.cbi-button:hover:not(:disabled):not([aria-disabled="true"]),
-button:not(.icon-btn):not([role="radio"]):hover:not(:disabled):not([aria-disabled="true"]) {
-  transform: translateY(-1px);
-  box-shadow: var(--elev-press);
-}
-.btn:not([aria-disabled="true"]):not(:disabled):active,
-.cbi-button:not([aria-disabled="true"]):not(:disabled):active,
-button:not(.icon-btn):not([aria-disabled="true"]):not(:disabled):active { transform: scale(0.97); }
+/* components.css draws every <button>, button-type <input> and .btn as the
+   secondary md button; LuCI's .cbi-button sits on one of those. This section
+   only picks the variant and the size, through the button's parameters.
+   LuCI's buttons are frequently <div class="btn"> and <a class="btn">. */
 
 .cbi-button-positive,
 .cbi-button-apply,
 .cbi-button-save,
 .cbi-button-action,
 .btn.important {
-  background: var(--primary);
-  color: var(--primary-foreground);
-  border-color: var(--primary);
+  --button-bg: var(--color-accent);
+  --button-fg: var(--color-on-accent);
 }
-
-/* Destructive is an action, not a state, so the default form is outlined.
-   The solid fill is reserved for the confirm inside a dialog, where it is the
-   only red on screen. A device list with five solid red buttons trains a
-   reader to ignore red, and red is the one colour that must stay unignorable. */
+/* Destructive is an action, not a state: red text on the neutral fill. The
+   solid fill is kept for the confirm inside a dialog, where it is the only
+   red on screen. */
 .cbi-button-negative,
-.cbi-button-remove {
-  background: none;
-  border-color: var(--destructive);
-  color: var(--destructive);
+.cbi-button-remove { --button-fg: var(--color-text-error); }
+#modal_overlay :is(.cbi-button-negative, .cbi-button-remove) {
+  --button-bg: var(--color-error);
+  --button-fg: var(--color-on-error);
 }
-/* Reset discards unsaved edits; nothing on the device changes, so it is not
-   destructive. */
-.cbi-button-reset { background: var(--secondary); color: var(--secondary-foreground); }
-#modal_overlay .cbi-button-negative,
-#modal_overlay .cbi-button-remove {
-  background: var(--destructive);
-  border-color: var(--destructive);
-  color: var(--destructive-foreground);
+.cbi-button-link {
+  --button-bg: transparent;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
-.cbi-button-link { background: none; border-color: transparent; text-decoration: underline; text-underline-offset: 0.2em; }
+/* Inside a table row a button is the small one (Button sm, 32 high). */
+:is(.td, td) :is(.btn, .cbi-button, button) { --button-h: var(--size-element-sm); }
 
-/* The login form disables its button with aria-disabled, not the property. */
-button:disabled, .cbi-button:disabled,
-.btn[aria-disabled="true"], button[aria-disabled="true"], .cbi-button[aria-disabled="true"] {
-  opacity: 0.55;
-  cursor: default;
-  transform: none;
-  box-shadow: none;
-}
-
-/* Buttons come out of luci-base separated by a single whitespace text node,
-   which collapses to nothing between two inline-flex elements. Every place
-   holding a row of them needs a real gap, or Restart / Stop / Edit / Delete
-   arrive as one four-word slab. */
+/* luci-base separates buttons by one collapsible whitespace node, so a row
+   of them needs a real gap; its own 8px left margin goes, or a wrapped row
+   gets a ragged edge. */
 .right,
 .cbi-page-actions,
 .btn-group {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--sp-2);
+  gap: var(--spacing-2);
 }
-/* And luci-base's own 8px left margin has to go with it. Beside the gap it
-   doubled the spacing on a desktop; stacked on a phone it became an 8px
-   indent on the second and third buttons only, so the three actions in one
-   bar had two different left edges. Spacing is the gap's job here. */
 .right > *,
 .cbi-page-actions > *,
 .btn-group > * { margin-inline: 0; }
 .right { justify-content: flex-end; }
 
-/* An actions cell is a table cell: `display: flex` takes it out of the row's
-   layout and every Install button straddled two rows. Spacing comes from a
-   sibling margin rather than a gap that would need flex. */
+/* An actions cell stays a table cell: flex would take it out of the row. */
 .cbi-section-actions,
-.td.cbi-section-actions {
-  text-align: right;
+.td.cbi-section-actions,
+.th.cbi-section-actions {
+  text-align: end;
   white-space: nowrap;
 }
-/* The heading over that cell carries the same class, and .th's own alignment
-   was beating it: the DHCP lease table put "Static lease" at the column's left
-   edge and the buttons under it at the right, thirty-four pixels apart. A
-   column heading stands over its column. */
-.th.cbi-section-actions { text-align: right; }
 .cbi-section-actions > * + *,
-.td.cbi-section-actions > * + * { margin-inline-start: var(--sp-2); }
+.td.cbi-section-actions > * + * { margin-inline-start: var(--spacing-2); }
 
-/* Full control height. The small step these once used was for a column that
-   squeezed; the table scrolls instead now, and what the small step left was a
-   32px button marooned in a 170px row, reading as disabled. */
-.td.cbi-section-actions .cbi-button,
-.td.cbi-section-actions .btn,
-.cbi-section-actions .cbi-button,
-.cbi-section-actions .btn {
-  min-block-size: var(--control-h);
-  padding: var(--sp-2) var(--sp-4);
-}
-/* The rule that used to sit here pulled the vertical padding of a row holding
-   full-height buttons down to --sp-2, back when every cell carried --sp-3.
-   The base is --sp-2 now, so it asked for what it already had. */
-
-/* luci-base writes `<input><button>` with only a collapsible whitespace node
-   between them. A margin rather than a gap, because the containers are table
-   cells and inline wrappers whose display must not change. */
+/* `<input><button>` with only whitespace between them. A margin, because the
+   containers are table cells and inline wrappers. */
 .shell-content input + *,
 .shell-content select + *,
 .shell-content textarea + *,
 .shell-content .cbi-dropdown + *,
 .shell-content .btn + .btn,
-.shell-content .cbi-button + .cbi-button { margin-inline-start: var(--sp-2); }
+.shell-content .cbi-button + .cbi-button { margin-inline-start: var(--spacing-2); }
 
-/* A pager arrow is an icon, not a word: square, and the same size as the
-   icon buttons in the top bar. */
-.shell-content .pager > button,
-.shell-content .pager > .btn,
-.pager > button.btn {
-  inline-size: var(--control-h-sm);
-  min-inline-size: var(--control-h-sm);
-  block-size: var(--control-h-sm);
-  min-block-size: var(--control-h-sm);
-  padding: 0;
-  border-radius: var(--radius-md);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+/* A pager arrow is an icon button: square, small. */
+.shell-content .pager > :is(button, .btn) {
+  --button-h: var(--size-element-sm);
+  --button-px: 0;
+  inline-size: var(--size-element-sm);
 }
+.shell-content :is(.btn, .cbi-button) + .text,
+.shell-content .text + :is(.btn, .cbi-button) { margin-inline-start: var(--spacing-3); }
 
-/* Nothing but a whitespace node between the arrow and the count. */
-.shell-content .btn + .text,
-.shell-content .cbi-button + .text,
-.shell-content .text + .btn,
-.shell-content .text + .cbi-button { margin-inline-start: var(--sp-3); }
-
-/* luci-mod-statistics pairs each select with its button inside an inline
-   <span class="nowrap">, so two of them wrapping land with no space between
-   the rows. */
+/* luci-mod-statistics pairs each select with its button in an inline
+   <span class="nowrap">. */
 .shell-content .nowrap:not(.td):not(.th) {
   display: inline-flex;
   align-items: center;
-  gap: var(--sp-2);
-  margin-block-end: var(--sp-2);
+  gap: var(--spacing-2);
+  margin-block-end: var(--spacing-2);
 }
 
-/* ── Headings ───────────────────────────────────────────────── */
+/* ── Headings [ported] ───────────────────────────────────────── */
 
-/* LuCI emits bare h2/h3/h4 and this file never claimed them, so every page
-   title and card heading was sized and spaced by the browser's own sheet:
-   1.5em and 1.17em against a 14px body give 21px and 16.4px, and the margins
-   come out at 17.4px and 16.4px. None of those four numbers is on this
-   system's type ladder or its spacing ladder, and because they are em-based
-   they drift again wherever the inherited size differs. That is what "the
-   spacing is wrong" looks like when nobody wrote a rule.
-
-   Placed here, before the sections that follow, so the specific rules further
-   down — the card heading's own bottom margin, the alert's h4 — keep winning
-   at equal specificity. */
-.shell-content :is(h1, h2, h3, h4, h5) {
-  margin-block: 0 var(--sp-3);
-  line-height: var(--lh-title);
-  font-weight: 650;
+/* LuCI writes the page title as an <h2> and a card's title as an <h3>. They
+   take the reference's page and section roles: Heading 1 (26 / 600) for the
+   page, Heading 2 (22 / 600) for a card. The page title sits on the frame's
+   edge, like the cards under it. */
+.shell-content h2:not(.cbi-section *) {
+  font-size: var(--text-heading-1-size);
+  font-weight: var(--text-heading-1-weight);
+  line-height: var(--text-heading-1-leading);
+  margin-block-end: var(--spacing-6);
 }
-.shell-content h1,
-.shell-content h2 { font-size: var(--text-xl); }
-/* The page title names the page rather than sitting in it, so it starts on
-   the card's own edge instead of on the column the card's contents keep.
-   Only the title: the description under it, the tab row and everything below
-   stay where they are.
-
-   The two :not() arms carry no exclusion of their own — they are there to
-   match the weight of the inset rule further down, which has them, and which
-   otherwise wins the tie and leaves the title where it was. */
-.shell-content .shell-inner h2:not(.cbi-section *):not(.cbi-page-actions *) {
-  padding-inline: 0;
+.shell-content .cbi-section :is(h2, h3),
+.shell-content .cbi-section > legend {
+  font-size: var(--text-heading-2-size);
+  font-weight: var(--text-heading-2-weight);
+  line-height: var(--text-heading-2-leading);
 }
-.shell-content h3 { font-size: var(--text-lg); }
-.shell-content h4,
-.shell-content h5 { font-size: var(--text-base); }
-
-/* A heading that follows content needs the space above it that the browser's
-   own margin used to provide. */
-.shell-content * + :is(h2, h3) { margin-block-start: var(--sp-5); }
-.shell-content .cbi-section :is(h2, h3):first-child,
-.shell-content .cbi-map > :is(h2, h3):first-child { margin-block-start: 0; }
-
-/* The page's own text sits on the card's text, not on the card's edge.
-
-   There are two vertical lines on every page: the content column at the card's
-   outer edge, and the card's content one padding step inside it. The page
-   title used to sit on the first and the card's heading on the second, so two
-   bold headings stacked 17px apart read as crooked — and under a light palette
-   the card's border is close enough to its fill that the outer line has
-   nothing on it but the title itself.
-
-   The cards keep the outer line; everything that is page-level text moves in
-   to join the inner one. The tab row goes with them because it is a row of
-   labels, not a surface. */
-/* Stated as "text that is not inside a card", not as a list of the shapes LuCI
-   happens to emit. The shapes were enumerated first — bare under .shell-inner,
-   one <div> down, inside a .cbi-map — and the startup and DNS-proxy pages put
-   their title two <div>s down, so they kept their old indent while everything
-   below them moved. A card's own headings are excluded because the card
-   already supplies this inset as padding. */
-.shell-content :is(h1, h2, h3, .cbi-map-descr, .cbi-section-descr, .cbi-value, .tabs, .cbi-tabmenu):not(.cbi-section *):not(.cbi-page-actions *) {
-  padding-inline: calc(var(--sp-4) + var(--hairline));
+.shell-content .cbi-section h4 {
+  font-size: var(--text-heading-4-size);
+  font-weight: var(--text-heading-4-weight);
+  line-height: var(--text-heading-4-leading);
 }
-/* The routes page writes its description as a bare <p> under the view node
-   rather than as a .cbi-map-descr, so the list above does not reach it.
+/* A title below other content needs the band gap above it. */
+.shell-content * + :is(h2, h3):not(.cbi-section > :first-child) { margin-block-start: var(--spacing-6); }
+/* The page title opens the frame; the dispatcher writes it after the hidden
+   tab row, which is not content above it. */
+.shell-content .shell-inner > h2:first-of-type { margin-block-start: 0; }
+.shell-content .cbi-section :is(h2, h3, h4) { margin-block-end: var(--spacing-4); }
+.shell-content .cbi-title > :is(h2, h3) { margin-block-end: 0; }
 
-   It gets its own rule instead of joining that list: :is() takes the weight
-   of its heaviest argument, and #view carries an id, so putting it in there
-   raised the whole selector to id specificity and silently outranked every
-   override written against it — the tab row's, among others. */
-.shell-content #view > p {
-  padding-inline: calc(var(--sp-4) + var(--hairline));
+/* A page or map description: supporting text under the title. */
+.cbi-map-descr,
+.cbi-section-descr {
+  color: var(--color-text-secondary);
+  font-size: var(--text-supporting-size);
+  line-height: var(--text-supporting-leading);
 }
-/* The log views are the exception the list above cannot cover. They render a
-   filter row, the log itself and a jump button as bare <div>s under a
-   container that carries an id and no class, so the only things the list
-   reached were the heading and the description — every control sat one card
-   inset to the left of the heading naming it, which a reader sees as the
-   negation label having escaped its row.
+.shell-content h2:not(.cbi-section *):has(+ .cbi-map-descr) { margin-block-end: var(--spacing-1); }
+.cbi-map-descr { margin-block-end: var(--spacing-6); }
+.cbi-section-descr { margin-block-end: var(--spacing-4); }
 
-   Scoped to that container by id, not to "an unclassed div under the view".
-   The general form was written first and moved cards: a card that happens to
-   sit in such a div takes the inset on its own box, and everything inside it
-   — section titles, labels, table headers — shifts with it. The routes, nlbw
-   and startup pages are where that showed. Both log pages use this same id.
+/* ── Cards [ported] ──────────────────────────────────────────── */
 
-   The description is the one child the list already reached, so it gives its
-   own inset back rather than taking it twice. */
-#content_syslog {
-  padding-inline: calc(var(--sp-4) + var(--hairline));
+/* A .cbi-section is the reference's Card: the surface, a 1 border, the
+   container radius and 16 from the outer edge to the content (15 inside the
+   border). --card-pad is that inner padding, for the tables that bleed to
+   the frame. */
+.cbi-section,
+.cbi-section-node {
+  --card-pad: calc(var(--spacing-4) - var(--border-width));
+  padding: calc(var(--spacing-4) - var(--border-width));
+  margin-block-end: var(--spacing-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-container);
+  background: var(--color-background-surface);
+  color: var(--color-text-primary);
 }
-#content_syslog > .cbi-section-descr {
-  padding-inline: 0;
-}
-/* The dispatcher's own placeholder, from luci-base's view.ut: a bare <div>
-   that is a direct child of the view node, so the list above misses it the
-   same way. It is the first thing on every page and the last thing a reader
-   sees before the content arrives, so it starting one inset left of the title
-   it appears under is the misalignment most people meet first. */
-#view > .spinning {
-  padding-inline: calc(var(--sp-4) + var(--hairline));
-}
-/* A title row with actions beside it — the channel analysis page puts its
-   refresh button here. The list above reaches the heading inside it and
-   nothing else, so the heading took the page inset and the button next to it
-   did not, leaving the button one inset further out than the title it belongs
-   to. The row takes the inset and the heading gives its own back. */
-.shell-content .cbi-title-section:not(.cbi-section *) {
-  padding-inline: calc(var(--sp-4) + var(--hairline));
-}
-/* The two :not() arms are not decoration. The page-inset rule near the top of
-   this file carries them, which puts it at a higher specificity than a plain
-   descendant selector, so a shorter form here lost and the heading took the
-   inset twice — once from that rule and once from the row around it. */
-.shell-content .cbi-title-section :is(h1, h2, h3):not(.cbi-section *):not(.cbi-page-actions *) {
-  padding-inline: 0;
-}
-
-/* The graph frame, written into the markup by the realtime and channel views:
-   a black border on a white fill, from before LuCI had a theme to ask. On a
-   dark ground it is a white slab with a hard edge, and at full width with no
-   card around it there is nothing holding it to the page.
-
-   This is the one place the theme overrides an inline style. The zone colours
-   and the legend rules stay because they carry meaning the graph needs; a
-   border colour and a page-coloured fill carry none. Matched on the declared
-   border so the rule finds the frame in both the old views and the current
-   ones, which still write the same string. */
-#view div[style*="border:1px solid #000"] {
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-lg);
-  background: var(--card) !important;
-  overflow: hidden;
-}
-/* Where a card already frames the graph — the current views put it in one —
-   the frame would be a second border a few pixels inside the first. It keeps
-   the fill and gives up the edge; the card is the boundary. The older views
-   this rule exists for emit no card, and there the frame is the only thing
-   holding the graph to the page. */
-#view .cbi-section div[style*="border:1px solid #000"] {
-  border-color: transparent !important;
+/* One card, the outermost one: CBI nests sections and nodes freely, and a
+   frame at every level puts a field four frames deep. */
+.cbi-section .cbi-section,
+.cbi-section .cbi-section-node,
+.cbi-section-node .cbi-section,
+.cbi-section-node .cbi-section-node {
+  padding: 0;
+  border: 0;
   border-radius: 0;
+  background: none;
 }
-/* With no card around it the frame is the only thing on the page that has not
-   been given the content inset, so it ran wider than the title, the tabs and
-   the table beneath it by one inset at each end. The width is declared inline
-   as 100%, which would then overflow by both margins; auto fills what is left
-   after them instead. */
-#view div[style*="border:1px solid #000"]:not(.cbi-section *) {
-  margin-inline: calc(var(--sp-4) + var(--hairline));
-  inline-size: auto !important;
+/* Two groups in a row inside one card are told apart by a divider. */
+.cbi-section .cbi-section + .cbi-section,
+.cbi-section .cbi-section-node + .cbi-section-node,
+.cbi-section-node .cbi-section-node + .cbi-section-node {
+  margin-block-start: var(--spacing-6);
+  padding-block-start: var(--spacing-6);
+  border-block-start: var(--border-width) solid var(--color-border);
 }
+.cbi-section > .cbi-section-node:last-child,
+.cbi-section > .cbi-section:last-child { margin-block-end: 0; }
+.cbi-section > legend { color: var(--color-text-primary); }
 
-/* shell.css gives the content area a 24px gutter on all four sides. The
-   vertical value is right; the horizontal one puts the card frame 24px off
-   the sidebar and the text inside it 41px, which reads as the page having
-   been pushed away from its own navigation. Only the inline half changes. */
-.shell-content { padding-inline: var(--sp-4); }
+/* The card's title row: the title and, on the overview, the Hide / Show
+   control at the end. luci-base writes these as span.label with a
+   data-style; they are buttons (Button sm), not badges. */
+.cbi-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-2);
+  margin-block-end: var(--spacing-4);
+}
+.cbi-title > :is(h2, h3) { flex: 1; align-items: center; gap: var(--spacing-2); }
+.cbi-section .label[data-style] {
+  min-block-size: var(--size-element-sm);
+  padding: 0 var(--spacing-3);
+  background: var(--color-neutral);
+  color: var(--color-text-primary);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-leading);
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .cbi-section .label[data-style]:hover {
+    background-image: linear-gradient(var(--color-overlay-hover), var(--color-overlay-hover));
+  }
+}
 
 /* ── Feedback ───────────────────────────────────────────────── */
 
@@ -695,58 +555,6 @@ body.modal-overlay-active #modal_overlay { visibility: visible; opacity: 1; }
    preceding map is excluded because it already carries that bottom margin. */
 :not(.cbi-map) + .cbi-map { margin-block-start: var(--sp-4); }
 .cbi-map-descr { color: var(--muted-foreground); font-size: var(--text-sm); margin-block-end: var(--sp-4); }
-
-.cbi-section,
-.cbi-section-node {
-  background: var(--card);
-  color: var(--card-foreground);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--elev-1);
-  padding: var(--sp-4);
-  margin-block-end: var(--sp-4);
-}
-/* One card, the outermost one; everything inside it is grouping, not surface.
-   CBI nests these freely — a map holds a section, the section a node, the node
-   another node — and a fill and a border at every level put the actual field
-   four frames deep. A frame says "this is the surface the page sits on", and
-   there is one of those per card. */
-.cbi-section .cbi-section,
-.cbi-section .cbi-section-node,
-.cbi-section-node .cbi-section,
-.cbi-section-node .cbi-section-node {
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  box-shadow: none;
-}
-
-/* Two of them in a row need to be told apart, and a line does it. */
-.cbi-section .cbi-section + .cbi-section,
-.cbi-section .cbi-section-node + .cbi-section-node,
-.cbi-section-node .cbi-section-node + .cbi-section-node {
-  margin-block-start: var(--sp-5);
-  padding-block-start: var(--sp-5);
-  border-block-start: 1px solid var(--border);
-}
-/* Otherwise the card's own padding and the node's bottom margin stack, and
-   the frame reads as tighter at the top than at the bottom. */
-.cbi-section > .cbi-section-node:last-child,
-.cbi-section > .cbi-section:last-child { margin-block-end: 0; }
-
-.cbi-section > h3:first-child, .cbi-section > legend { margin-block-end: var(--sp-3); }
-
-/* components.css now drops the legend out of its notch and zeroes the
-   fieldset's own margin, border and padding, so only the type is left here —
-   a legend heads a card the same way an h3 does. */
-.cbi-section > legend {
-  font-size: var(--text-lg);
-  font-weight: 650;
-  line-height: var(--lh-title);
-  color: var(--card-foreground);
-}
-.cbi-section-descr { color: var(--muted-foreground); font-size: var(--text-sm); margin-block-end: var(--sp-3); }
 
 /* One row of a form: label, control, and the sentence explaining it.
 
@@ -1642,302 +1450,150 @@ input:disabled, select:disabled, textarea:disabled {
   inline-size: 100%;
 }
 
-/* ── Progress bar ────────────────────────────────────────────
-   The label sits on the bar, so it crosses the edge between a near-black
-   fill and a near-white track and no single colour is readable on both.
-   Difference blending answers that without a second copy of the text: white
-   resolves light over the fill and dark over the track, and a glyph the edge
-   runs through inverts at exactly that point. It holds in both schemes
-   because it inverts whatever is behind it rather than naming a colour.
-
-   isolation keeps the blend inside the bar. Without it the label would blend
-   with the card, and on the pages that put a bar inside a coloured row, with
-   that row's tint.
-
-   The bar clips, so the fill states no radius of its own — a fill that
-   inherited one would round its leading edge in the middle of the track. The
-   old top margin is gone with the label that needed it; the cell's own
-   padding is what separates one row from the next. */
+/* ── Progress bar [ported] ───────────────────────────────────
+   Astryx's ProgressBar: an 8 track in the muted fill, the value in the
+   accent, both fully round, and the value text (luci-base's title, "x / y
+   (z%)") above the track's end in supporting text. The text sits in a
+   24 line, the body line, so it shares a baseline with a label beside it.
+   --card-pad is declared by the card (Cards section). */
 .cbi-progressbar {
   position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--muted);
-  block-size: 1.375rem;
-  min-inline-size: 10rem;
+  min-inline-size: var(--aster-label-w);
+  block-size: var(--aster-progress-h);
+  margin-block-start: calc(var(--text-body-size) * var(--text-body-leading) + var(--spacing-1));
+  border-radius: var(--radius-full);
+  background: var(--color-background-muted);
 }
 .cbi-progressbar > div {
   block-size: 100%;
-  background: var(--bar-fill);
-  transition: width var(--dur-surface) var(--ease-out);
+  max-inline-size: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  transition: width var(--duration-fast-max) var(--ease-standard);
 }
-/* On a phone the value column is half the row and the bar is left with 160px
-   for a label that needs 170. Centred, that clips five pixels off each end,
-   which takes the leading digit as well as the percentage. The label column
-   holds three or four characters, so it shrinks to what it holds and the bar
-   takes the rest — 286px at 430, 216px at 360, both past what the longest
-   label needs. Alignment moves to the start as well: if a label ever does
-   overrun, losing the tail is recoverable and losing the first digit is not. */
-@media (max-width: 30rem) {
-  .cbi-section .table:has(.cbi-progressbar) .td:first-child { inline-size: 1%; }
-  .cbi-progressbar::after { place-items: center start; padding-inline: var(--sp-2); }
-}
-.cbi-progressbar::after {
+.cbi-progressbar::before {
   content: attr(title);
   position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  mix-blend-mode: difference;
-  color: oklch(1 0 0);
-  font-size: var(--text-xs);
+  inset-inline-end: 0;
+  inset-block-end: calc(100% + var(--spacing-1));
+  color: var(--color-text-secondary);
+  font-size: var(--text-supporting-size);
+  line-height: calc(var(--text-body-size) * var(--text-body-leading));
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-/* ── Tables ─────────────────────────────────────────────────── */
+/* ── Tables [ported] ────────────────────────────────────────── */
 
-/* The diagnostics page lays three tools out as three cells of one row, and
-   automatic layout sizes each column to its own button label, so the three
-   inputs start at different places. Scoped with :has(): the package list's
-   description column has to keep taking the space it needs. */
+/* components.css draws the cells. This section fits LuCI's tables into its
+   cards and pages. */
+
+/* The diagnostics page lays three tools out as three cells of one row;
+   fixed layout lines their inputs up. */
 .table:has(.diag-action) { table-layout: fixed; }
-/* The field is full width, so this pair stacks and the horizontal gap given
-   near the top of this file became an indent under it. */
 .td > input + .diag-action {
   display: block;
   margin-inline-start: 0;
-  margin-block-start: var(--sp-2);
+  margin-block-start: var(--spacing-2);
 }
-
-/* A text input is 222px wide by the browser's default `size`, which with a
-   button beside it overflows the column. */
+/* A text input's default size overflows a column with a button beside it. */
 .td > input[type="text"],
 .td > input[type="password"] { inline-size: 100%; }
 
-/* LuCI builds most tables out of divs carrying .table/.tr/.th/.td.
-   border-collapse is not optional here: display:table defaults to `separate`,
-   which gives every cell its own border and puts border-spacing between them,
-   so a process list renders as a grid of little boxes instead of a table. */
-.table {
-  display: table;
-  inline-size: 100%;
-  border-collapse: collapse;
-  /* Body size: these tables are the page, and a notch smaller than the prose
-     around them made every status page read as shrunken. Density comes from
-     the row padding instead. */
-  font-size: var(--text-base);
-}
-.tr { display: table-row; }
-/* 横向大于纵向：一行文字的行盒自带行距，等值的内边距看上去就是两边紧、上下松。
-   横向取的是卡片自己的内边距，因为下面那条规则让表格整块出血到卡片边框，
-   单元格要把这一步还回来 —— 文字于是仍然落在卡片内容的那条线上。 */
-.th, .td {
-  display: table-cell;
-  padding: var(--sp-2) var(--sp-4);
-  vertical-align: middle;
-}
-
-/* On the cells, not the row: on the row it could be inset independently of
-   the fill, and the two disagreed. */
-.th, .td { border-block-end: 1px solid var(--border); }
-.th {
-  /* Some of these are div.th and some a real <th>, which the browser
-     centres — a heading takes the alignment of what it names. */
-  text-align: start;
-  font-weight: 600;
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--muted-foreground);
-  vertical-align: bottom;
-  /* A wrapped heading stops lining up with the data under it. The table
-     already scrolls in its own container, so the width is paid there. */
-  white-space: nowrap;
-}
-.td { font-variant-numeric: tabular-nums; }
-
-/* LuCI marks a row with more detail behind it by putting a literal "#" in the
-   first cell and hanging data-tooltip off it, which reads as leftover markup.
-   The character stays — CSS cannot replace a text node, and it is what a
-   screen reader gets — but on screen it becomes a mark that says so.
-
-   Only where the attribute sits on a bare marker. LuCI also hangs it off real
-   controls — the DHCP lease table gives its reserve-address button one — and
-   this rule turned that button into an 18px circle with its label spilling out
-   of it, because the button's own font-size overrode the size:0 that hides the
-   marker's character. A control explains itself; it does not need the mark. */
-.td > [data-tooltip]:not(button):not(a):not(input):not(select):not(.btn):not(.cbi-button) {
+/* LuCI marks a row with more detail behind it by a literal "#" with a
+   data-tooltip; it becomes an info mark. The character stays for screen
+   readers. Controls that carry the attribute are left alone. */
+.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  inline-size: 1.15rem;
-  block-size: 1.15rem;
-  border: 1px solid var(--outline-variant);
+  inline-size: var(--spacing-5);
+  block-size: var(--spacing-5);
+  border: var(--border-width) solid var(--color-border-emphasized);
   border-radius: var(--radius-full);
-  /* Hidden, not removed: the character stays in the accessibility tree. */
   font-size: 0;
-  color: var(--muted-foreground);
+  color: var(--color-text-secondary);
   cursor: help;
-  transition: color var(--dur-hover) var(--ease-out), border-color var(--dur-hover) var(--ease-out);
 }
-.td > [data-tooltip]:not(button):not(a):not(input):not(select):not(.btn):not(.cbi-button)::after {
+.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button)::after {
   content: "i";
-  font: 600 0.6875rem/1 var(--font-mono);
+  font: var(--font-weight-semibold) var(--text-supporting-size) / 1 var(--font-family-code);
 }
-@media (hover: hover) {
-  .td > [data-tooltip]:not(button):not(a):not(input):not(select):not(.btn):not(.cbi-button):hover { color: var(--foreground); border-color: var(--foreground); }
-}
-/* The row fill and the rule between rows are the same band and the text sits
-   inside it. Three things have to hold at once: the rule lines up with
-   something, the fill does not run past the rule, and the text does not touch
-   the edge of the fill. Nothing bleeds to the card edge — the fill and the
-   rule both come off the same cells, and the heading above the table is inset
-   to match the text rather than the band. */
-/* The empty-table message is a real <tr> holding one <td>, so it lands in the
-   first column — and Chinese breaks between any two characters, which made it
-   six lines one character wide. colspan is what this wants and CSS cannot set
-   it; nowrap works instead by widening the column, which costs nothing in a
-   table that is empty. */
+
+/* The empty-table message is one cell in the first column; nowrap widens
+   that column instead of breaking Chinese one character per line. */
 .tr.placeholder > .td {
-  color: var(--muted-foreground);
+  color: var(--color-text-secondary);
   text-align: center;
   white-space: nowrap;
-  padding: var(--sp-5) var(--sp-3);
+  padding-block: var(--spacing-6);
 }
-/* No zebra striping: the interface badge fill and the striped row fill are
-   the same token, so a device chip vanished on every other row. Rows are
-   separated by a hairline, and the hover band below tracks the row the reader
-   is actually on. */
-.cbi-rowstyle-2, .tr.cbi-rowstyle-2 { background-color: transparent; }
+.cbi-rowstyle-2 { background-color: transparent; }
 
-/* Keyed on what the row contains, not what it is called: a header row has .th
-   and no .td. Excluding .table-titles by name missed the package manager's
-   cbi-section-table-titles. */
 @media (hover: hover) {
   .table > .tr:has(> .td):not(.placeholder):hover,
   .cbi-section-table > .tr:has(> .td):not(.placeholder):hover {
-    background-color: var(--surface-raised);
+    background-color: var(--color-overlay-hover);
   }
 }
-/* A table that does not fit scrolls inside its own box. LuCI pins its action
-   column with an inline width, and the remaining columns were squeezed until
-   a four-character Chinese status broke into four lines — Chinese wraps
-   between any two characters, so there is no width at which it gives up and
-   overflows instead. */
+
+/* A key/value list (a table with no header row, such as the overview's
+   System card) is the reference's MetadataList: the key in a 112 column in
+   secondary text at label weight, the value in primary text, no rules
+   between rows, 8 between them. */
+.cbi-section .table:not(:has(.th)) > .tr > .td {
+  padding-block: var(--spacing-1);
+  border-block-end: 0;
+}
+.cbi-section .table:not(:has(.th)) > .tr > .td:first-child {
+  inline-size: var(--aster-label-w);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* A table that does not fit scrolls inside its own box rather than pushing
+   the page sideways; Chinese wraps between any two characters, so a squeezed
+   column never gives up and overflows on its own. */
 .cbi-section > div:not(.cbi-section-node):has(> .table),
 .cbi-section-node > div:not(.cbi-section-node):has(> .table),
 .shell-inner > div:has(> .table) { overflow-x: auto; }
-
-/* CBI's TableSection writes the table straight into the section, so there is
-   no wrapper for the rules above to use. The section can be the scroller
-   itself — unlike .shell-main, where the same move kills the sticky bar. */
 .cbi-section:has(> .table),
-.cbi-section:has(> .cbi-section-node > .table) {
-  overflow-x: auto;
-  /* A horizontal scrollbar is laid inside this box, under everything in it,
-     and the card's own bottom padding is all it has to sit in. On the firewall
-     page that put the bar hard against the Add button below the table. The
-     extra band is the scrollbar's own; it costs the same on a card that never
-     scrolls, and CSS cannot ask whether this one will. */
-  padding-block-end: var(--sp-6);
-}
+.cbi-section:has(> .cbi-section-node > .table) { overflow-x: auto; }
 
-/* The table bleeds to the card's frame and its cells give the distance back as
-   their own padding, so the text still lands on the card's content line — where
-   the page title, the card heading and every form label already sit — while the
-   row fill runs the full width of the card.
-
-   Three things had to be got right, and each was wrong once:
-
-   All the way, not part of it. Pulling the table out by the cell padding alone
-   left the fill stopping 5px short of the frame, and a hovered row read as
-   crashing into the card. A fill that touches the frame is a full-bleed table;
-   a fill that stops 5px short is a mistake.
-
-   On whatever clips, not on the content inside it. Where CBI wraps the table in
-   a scroller, bleeding the table past that wrapper's box bleeds into the part
-   the wrapper clips — the cell's leading padding was cut away with it and the
-   text came out flush against the fill.
-
-   One level only. The selector list below mirrors the overflow rules above: the
-   section is the scroller when the table is its own child, and in every other
-   shape a <div> is. Naming both the node and the table matched twice on the LXC
-   page and bled 32px, putting the table outside the card.
-
-   The node is not one of those wrapper <div>s. Treating it as one is what the
-   mounts page caught: it is a plain div holding a table, so it matched, and the
-   bleed pulled the whole group out — its own heading and every form label with
-   it, one inset left of the card heading above them. The table inside it is
-   named instead.
-
-   The card's own padding cannot be dropped instead — passwall, dhcp and dns put
-   form rows and a table inside one card and those rows need it. Nor does any of
-   this apply to a table inside a form row: dhcp nests a whole .cbi-tblsection in
-   a .cbi-value's field, and that one is already indented by the row it sits in. */
-.cbi-section > .table:not(.cbi-value *),
-.cbi-section > div:not(.cbi-section-node):has(> .table:not(.cbi-value *)),
-.cbi-section-node > div:not(.cbi-section-node):has(> .table:not(.cbi-value *)),
-.cbi-section > .cbi-section-node > .table:not(.cbi-value *) {
-  margin-inline: calc(var(--sp-4) * -1);
-}
-
-/* Everything that shares the bled wrapper with its table. The overview page
-   puts a panel's heading, its interface boxes and its table in one <div>, and
-   that div is the scroller, so the bleed lands on it and carries all three
-   out — the heading sixteen pixels left of every other card heading, the
-   interface box flush against the card's inner edge with nothing between them.
-
-   Only the table wants the bleed, so the wrapper takes its inset back and the
-   table alone gives it up again. Done on the wrapper rather than on each
-   child: a rule per child would put a left margin on every interface box in a
-   row of them, and the ports panel is a row of them. */
-.cbi-section > div:not(.cbi-value):not(.cbi-section-node):has(> .table),
-.cbi-section-node > div:not(.cbi-value):not(.cbi-section-node):has(> .table) {
-  padding-inline: var(--sp-4);
-}
-.cbi-section > div:not(.cbi-value):not(.cbi-section-node):has(> .table) > .table,
-.cbi-section-node > div:not(.cbi-value):not(.cbi-section-node):has(> .table) > .table {
-  margin-inline: calc(var(--sp-4) * -1);
-}
-/* A form row and a section node are not wrappers of that kind. Treating them
-   as such gave each a padding and the table inside it a matching bleed, and
-   the two cancelled: the header text stayed one cell padding inside the
-   column — on the DHCP page, which puts a table in a row, and on lxccm, which
-   puts one under a node. Both keep their own geometry; the table gives up the
-   cell padding on its own. */
-.cbi-value > .table {
-  margin-inline: calc(var(--sp-4) * -1);
-}
-
-/* A whole table section nested inside a form row — the DHCP page puts static
-   leases there, lxccm does the same. The bleed above excludes anything under
-   .cbi-value, which is right for a table belonging to one field and wrong for
-   this: it is a section that happens to sit in a row, and without the bleed
-   its header text lands one cell padding inside the description above it in
-   the same card. */
+/* A data table runs to the card's frame and its cells give the distance
+   back as padding, so the text stays on the card's content line while the
+   row rules run the card's width — the reference's Table in a Card. The
+   bleed lands on whatever clips: the section when the table is its own
+   child, otherwise the wrapper <div>. A key/value list does not bleed. */
+.cbi-section > .table:has(.th):not(.cbi-value *),
+.cbi-section > .cbi-section-node > .table:has(.th):not(.cbi-value *),
+.cbi-section > div:not(.cbi-value, .cbi-section-node):has(> .table .th) > .table,
+.cbi-section-node > div:not(.cbi-value, .cbi-section-node):has(> .table .th) > .table,
+.cbi-value > .table,
 .cbi-value > .cbi-section.cbi-tblsection > .table {
-  margin-inline: calc(var(--sp-4) * -1);
+  inline-size: calc(100% + 2 * var(--card-pad, var(--spacing-0)));
+  margin-inline: calc(var(--card-pad, var(--spacing-0)) * -1);
+}
+/* A wrapper that scrolls clips whatever bleeds past its padding box, so it
+   bleeds itself and gives the distance back as padding: the heading beside
+   the table stays on the content line and the table's bleed lands inside the
+   wrapper's own padding. */
+.cbi-section > div:not(.cbi-value, .cbi-section-node):has(> .table .th),
+.cbi-section-node > div:not(.cbi-value, .cbi-section-node):has(> .table .th) {
+  margin-inline: calc(var(--card-pad, var(--spacing-0)) * -1);
+  padding-inline: var(--card-pad, var(--spacing-0));
 }
 
-/* A table with no card around it — the package list, the process list — has no
-   card frame to bleed to, so it only makes up the border a card would have
-   drawn. Its text then lands in the same column as everything else. */
-.shell-inner .table:not(.cbi-section *) {
-  margin-inline: var(--hairline);
-}
-/* A whole table section nested inside a form row — the DHCP page puts static
-   leases there. The bleed above excludes anything under .cbi-value, which is
-   right for a table belonging to one field and wrong for this: it is a
-   section that happens to sit in a row, and without the bleed its header text
-   landed one cell padding inside the description above it in the same card.
-   Injected across all 58 pages before it was written here: it moves that
-   table and nothing else. */
-.cbi-value > .cbi-section.cbi-tblsection > .table {
-  margin-inline: calc(var(--sp-4) * -1);
-}
+/* The empty-table message is one cell; as the table's caption it spans the
+   table instead of sitting in the first column. */
+.tr.placeholder { display: table-caption; caption-side: bottom; }
+.tr.placeholder > .td { display: block; border-block-end: 0; }
+
+/* The table cell already supplies the first column's 16; the key/value
+   list sits on the content line. */
+.cbi-section .table:not(:has(.th)) > .tr > .td:first-child { padding-inline-start: 0; }
+/* A table with no card around it makes up the card's border only. */
+.shell-inner .table:not(.cbi-section *) { margin-inline: var(--border-width); }
 .table:has([style*="min-width"]) { min-inline-size: max-content; }
 
 /* ── Tabs written by luci-base ──────────────────────────────── */
@@ -2266,6 +1922,85 @@ input:disabled, select:disabled, textarea:disabled {
 .login-panel .cbi-value-field input { inline-size: 100%; }
 .login-panel form > button { inline-size: 100%; min-block-size: var(--control-h); margin-block-start: var(--sp-5); }
 
+/* ── Status overview [ported] ───────────────────────────────── */
+
+/* The reference lays the overview out as bands of cards: the title, then
+   the cards in a grid of at most two tracks (each at least 320, 16 apart),
+   and anything holding a wide table, a row of interface boxes or a long list
+   across the full width. Every include is its own .cbi-section, a direct
+   child of #view. */
+[data-page="admin-status-overview"] #view:has(> .cbi-section) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(max(min(100%, var(--aster-card-min)), calc((100% - var(--spacing-4)) / 2)), 1fr));
+  gap: var(--spacing-4);
+  align-items: start;
+}
+[data-page="admin-status-overview"] #view > :not(.cbi-section) { grid-column: 1 / -1; }
+[data-page="admin-status-overview"] #view > .cbi-section { margin: 0; min-inline-size: 0; }
+[data-page="admin-status-overview"] #view > .cbi-section:has(.tr > .td:nth-child(3), .th, .ifacebox, .network-status-table, .tr:nth-child(7) > .td > .cbi-progressbar) {
+  grid-column: 1 / -1;
+}
+
+/* A row holding a progress bar is the reference's ProgressBar with its
+   label: the name and the value text on one line, the track under both. */
+[data-page="admin-status-overview"] .table .tr:has(> .td > .cbi-progressbar) {
+  display: block;
+  padding-block: var(--spacing-2);
+}
+[data-page="admin-status-overview"] .table .tr:has(> .td > .cbi-progressbar) > .td {
+  display: block;
+  inline-size: auto;
+  padding: 0;
+  border: 0;
+}
+/* The name and the value text share a line. The value ("218.81 GiB /
+   648.51 GiB (33%)", at most about fourteen supporting-size em) keeps its
+   room; a longer name ends in an ellipsis instead of running into it. */
+[data-page="admin-status-overview"] .table .tr:has(> .td > .cbi-progressbar) > .td:first-child {
+  max-inline-size: calc(100% - 14 * var(--text-supporting-size));
+  overflow: hidden;
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-normal);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-page="admin-status-overview"] .table .tr:has(> .td > .cbi-progressbar) > .td:has(> .cbi-progressbar) {
+  margin-block-start: calc(var(--text-body-size) * var(--text-body-leading) * -1);
+}
+
+/* Port and interface boxes: the reference's port tiles, Cards inside the
+   card. The head is the tile's title (label weight, start-aligned, no fill
+   unless a zone colour was written), the body its supporting text. */
+[data-page="admin-status-overview"] .shell-content .ifacebox {
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-container);
+  background: var(--color-background-surface);
+  overflow: hidden;
+}
+[data-page="admin-status-overview"] .shell-content .ifacebox-head {
+  padding: var(--spacing-3) var(--spacing-4) 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--color-text-primary);
+  font-size: var(--text-label-size);
+  font-weight: var(--font-weight-semibold);
+  text-align: start;
+}
+[data-page="admin-status-overview"] .shell-content .ifacebox-head[style*="background"] {
+  padding-block-end: var(--spacing-2);
+  color: var(--color-on-light);
+}
+[data-page="admin-status-overview"] .shell-content .ifacebox-body {
+  padding: var(--spacing-2) var(--spacing-4) var(--spacing-3);
+  border-radius: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-supporting-size);
+  line-height: var(--text-supporting-leading);
+  text-align: start;
+}
+[data-page="admin-status-overview"] .shell-content .ifacebox-body strong { color: var(--color-text-primary); font-weight: var(--font-weight-medium); }
+
 /* ── Phone ──────────────────────────────────────────────────── */
 
 @media (max-width: 48rem) {
@@ -2290,37 +2025,42 @@ input:disabled, select:disabled, textarea:disabled {
   .cbi-page-actions > .cbi-button:not(.cbi-dropdown) { padding-inline: var(--sp-2); }
 }
 
-/* ── Indicators ─────────────────────────────────────────────── */
+/* ── Indicators [ported] ────────────────────────────────────── */
 
-/* luci-base drops these into #indicators as bare spans with nothing between
-   them, so "Refreshing" and "Unsaved Changes: 7" arrive as one word. */
-#indicators {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--sp-2);
-}
-#indicators > span, #indicators > a {
+/* luci-base drops these into the top bar's #indicators as bare spans:
+   "Refreshing", "Unsaved Changes: 7". They are the top bar's secondary md
+   buttons. Unsaved changes is the one asking for an action, so it leads
+   with the warning icon (Heroicons ExclamationTriangle). */
+#indicators > :is(span, a) {
   display: inline-flex;
   align-items: center;
-  gap: var(--sp-1);
-  /* Operations, not footnotes: the same target as everything else in the
-     bar. */
-  min-block-size: var(--control-h-sm);
-  padding: var(--sp-1) var(--sp-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--secondary);
-  color: var(--secondary-foreground);
-  font-size: var(--text-sm);
-  line-height: 1;
+  gap: var(--spacing-2);
+  min-block-size: var(--size-element-md);
+  padding: 0 var(--spacing-3);
+  border-radius: var(--radius-full);
+  background: var(--color-neutral);
+  color: var(--color-text-primary);
+  font-size: var(--text-label-size);
+  font-weight: var(--text-label-weight);
+  line-height: var(--text-label-leading);
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
 }
-/* Unsaved changes is the one indicator that is asking for an action. */
-#indicators > [data-indicator="uci-changes"],
-#indicators > a[href*="changes"] { background: var(--status-warn-bg); color: var(--status-warn-fg); }
+#indicators > [data-indicator="poll-status"][data-style="inactive"] { color: var(--color-text-secondary); }
+#indicators > [data-indicator="uci-changes"]::before {
+  content: "";
+  flex: none;
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
+  background-color: var(--color-warning);
+  mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M12%209v3.75m-9.303%203.376c-.866%201.5.217%203.374%201.948%203.374h14.71c1.73%200%202.813-1.874%201.948-3.374L13.949%203.378c-.866-1.5-3.032-1.5-3.898%200L2.697%2016.126ZM12%2015.75h.007v.008H12v-.008Z'/></svg>") center / contain no-repeat;
+}
+@media (hover: hover) {
+  #indicators > :is(span, a):hover {
+    background-image: linear-gradient(var(--color-overlay-hover), var(--color-overlay-hover));
+  }
+}
 
 /* ── Realtime graphs ─────────────────────────────────────────
    The only three !important in this file, for the same reason each time:
@@ -2333,6 +2073,41 @@ input:disabled, select:disabled, textarea:disabled {
    rather than imposing a preference on someone's data.
 
    The series colours stay untouched. They are the data. */
+/* The graph frame, written into the markup by the realtime and channel views:
+   a black border on a white fill, from before LuCI had a theme to ask. On a
+   dark ground it is a white slab with a hard edge, and at full width with no
+   card around it there is nothing holding it to the page.
+
+   This is the one place the theme overrides an inline style. The zone colours
+   and the legend rules stay because they carry meaning the graph needs; a
+   border colour and a page-coloured fill carry none. Matched on the declared
+   border so the rule finds the frame in both the old views and the current
+   ones, which still write the same string. */
+#view div[style*="border:1px solid #000"] {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg);
+  background: var(--card) !important;
+  overflow: hidden;
+}
+/* Where a card already frames the graph — the current views put it in one —
+   the frame would be a second border a few pixels inside the first. It keeps
+   the fill and gives up the edge; the card is the boundary. The older views
+   this rule exists for emit no card, and there the frame is the only thing
+   holding the graph to the page. */
+#view .cbi-section div[style*="border:1px solid #000"] {
+  border-color: transparent !important;
+  border-radius: 0;
+}
+/* With no card around it the frame is the only thing on the page that has not
+   been given the content inset, so it ran wider than the title, the tabs and
+   the table beneath it by one inset at each end. The width is declared inline
+   as 100%, which would then overflow by both margins; auto fills what is left
+   after them instead. */
+#view div[style*="border:1px solid #000"]:not(.cbi-section *) {
+  margin-inline: calc(var(--sp-4) + var(--hairline));
+  inline-size: auto !important;
+}
+
 .cbi-section div:has(> svg[version]) {
   background: var(--card) !important;
   /* The section around it is already a card, and a second border a few pixels
@@ -2425,15 +2200,3 @@ input:disabled, select:disabled, textarea:disabled {
 
 .cbi-dropdown:not([multiple]) { block-size: var(--control-h); }
 
-/* 密页的灰阶分档。量出来的问题是：进程页 935 个带文字的元素里 99% 是同一档，
-   软件包页 527 个里 81%，防火墙规则 164 个里 96%——列与列之间没有任何轻重。
-   三条规则不需要知道每页有几列、哪一列重要：正文走 --content-foreground 的
-   上限档，表头是标签不是数据所以退到次级档，表格里第一列之外的单元格同样退档。
-   参考主题里没有一家做这件事，它们的表格也是通篇一个色。 */
-.shell-content { color: var(--content-foreground); }
-.shell-content .th { color: var(--muted-foreground); }
-
-/* 首列领读。它对绝大多数 LuCI 表格成立（软件包、防火墙、接口、DHCP 的第一列
-   都是那一行的名字），但不是全部：进程页的首列是 PID，真正要读的是「命令」。
-   按语义分列要一页一条规则，那不是这层该有的形状，所以取通例。 */
-.shell-content .tr > .td:not(:first-child) { color: var(--muted-foreground); }

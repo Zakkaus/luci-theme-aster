@@ -9,7 +9,6 @@
   /* Surfaces and text */
   --background: var(--color-background-body);
   --foreground: var(--color-text-primary);
-  --content-foreground: var(--color-text-primary);
   --card: var(--color-background-card);
   --card-foreground: var(--color-text-primary);
   --popover: var(--color-background-popover);
@@ -29,7 +28,6 @@
   --destructive: var(--color-error);
   --destructive-foreground: var(--color-on-error);
   --scrim: var(--color-overlay);
-  --bar-fill: var(--color-text-primary);
 
   /* Lines and focus */
   --border: var(--color-border);
@@ -93,7 +91,6 @@
   --text-base: var(--text-body-size);
   --text-md: var(--text-body-size);
   --text-lg: var(--text-heading-3-size);
-  --text-xl: var(--text-heading-2-size);
   --lh-latin: var(--text-body-leading);
   /* Chinese needs more leading than any Astryx text role carries: raw. */
   --lh-cjk: 1.8;

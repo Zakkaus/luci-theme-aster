@@ -143,6 +143,7 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-success-muted: light-dark(#0B991F33, #0B991F3F);
   --color-error: light-dark(#E3193B, #F5394F);
   --color-error-muted: light-dark(#E3193B33, #F5394F3F);
+  --color-warning: light-dark(#E9AF08, #F2C00B);
   --color-warning-muted: light-dark(#E2A40033, #E2A4003F);
   --color-text-error: var(--color-text-red);
   --color-border-error: var(--color-text-error);
@@ -194,6 +195,15 @@ html[data-theme="dark"] { color-scheme: dark; }
 
   /* Icon size sm: the side nav, the top bar and the indicators. */
   --aster-icon-sm: 16px;
+
+  /* Grid tracks: cards wrap below 320 wide, as Grid minmax(320px, 1fr). */
+  --aster-card-min: 320px;
+
+  /* A label column in a key/value list (MetadataList dt). */
+  --aster-label-w: 112px;
+
+  /* Progress bar track height. */
+  --aster-progress-h: 8px;
 }
 
 /* Bridge: graphite names, expressed through Astryx tokens. TEMPORARY.
@@ -207,7 +217,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   /* Surfaces and text */
   --background: var(--color-background-body);
   --foreground: var(--color-text-primary);
-  --content-foreground: var(--color-text-primary);
   --card: var(--color-background-card);
   --card-foreground: var(--color-text-primary);
   --popover: var(--color-background-popover);
@@ -227,7 +236,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --destructive: var(--color-error);
   --destructive-foreground: var(--color-on-error);
   --scrim: var(--color-overlay);
-  --bar-fill: var(--color-text-primary);
 
   /* Lines and focus */
   --border: var(--color-border);
@@ -291,7 +299,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --text-base: var(--text-body-size);
   --text-md: var(--text-body-size);
   --text-lg: var(--text-heading-3-size);
-  --text-xl: var(--text-heading-2-size);
   --lh-latin: var(--text-body-leading);
   /* Chinese needs more leading than any Astryx text role carries: raw. */
   --lh-cjk: 1.8;

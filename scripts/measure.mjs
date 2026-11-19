@@ -1,0 +1,227 @@
+#!/usr/bin/env node
+/**
+ * Measures the Status > Overview page of a LuCI device running the theme and
+ * compares it with the reference page's measurements (spec.json, written by
+ * lab/new-theme/astryx-ref/scripts/measure.mjs). Adapted from that script:
+ * same getComputedStyle readings, same viewports (desktop 1440 x 900, phone
+ * 390 x 844), light and dark.
+ *
+ *   node scripts/measure.mjs <base url> <password> --spec <spec.json>
+ *        [--user root] [--json <out file>]
+ *
+ *   <base url>  the device, e.g. http://127.0.0.1:18025
+ *
+ * Box values (widths, heights, paddings, gaps, radii, font sizes) pass within
+ * 1px; colours and font weights must match exactly. Exit 1 when any field is
+ * outside that, when the login fails, when the overview does not render, or
+ * when a field finds nothing to measure. Nothing is written to the device:
+ * the login is the ordinary form POST, and light and dark are chosen the way
+ * a reader chooses them, through the theme's own browser setting
+ * (localStorage "aster-theme"), not through UCI.
+ *
+ * Playwright is not a dependency of this repository. Point PLAYWRIGHT at its
+ * index.mjs (default: the bare specifier "playwright"); CHROME_PATH, when set,
+ * picks the browser binary.
+ */
+import fs from 'node:fs';
+
+const args = process.argv.slice(2);
+const opt = (name, dflt) => {
+  const i = args.indexOf(name);
+  if (i < 0) return dflt;
+  const v = args[i + 1];
+  args.splice(i, 2);
+  return v;
+};
+const specPath = opt('--spec');
+const user = opt('--user', 'root');
+const jsonOut = opt('--json');
+const [baseArg, password] = args;
+if (!baseArg || password === undefined || !specPath) {
+  console.error('usage: measure.mjs <base url> <password> --spec <spec.json> [--user root] [--json <file>]');
+  process.exit(1);
+}
+const base = `${baseArg.replace(/\/+$/, '')}/cgi-bin/luci/`;
+const spec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
+const {chromium} = await import(process.env.PLAYWRIGHT ?? 'playwright');
+
+/* Each field names where the reference value lives in spec.json and what the
+ * theme's counterpart is. `from` is [section, key, property]; `take` turns a
+ * measured element (or two) into the same string form spec.json uses.
+ * `devices` limits a field to where the reference measured it. */
+const FIELDS = [
+  // Side nav: the panel and its rows. On the phone they are the drawer's.
+  {name: 'side nav width', from: ['frame', 'Side nav panel (AppShell sidenav)', 'width'], devices: ['desktop'], sel: '#sidebar', prop: 'width'},
+  {name: 'side nav width (drawer)', from: ['drawer', 'drawer', 'width'], devices: ['phone'], drawer: true, sel: '#sidebar', prop: 'width'},
+  {name: 'side nav item height (group)', from: ['components', 'SideNavItem group row (狀態)', 'height'], devices: ['desktop'], sel: '#mainmenu .nav-label', prop: 'height'},
+  {name: 'side nav item height (page)', from: ['components', 'SideNavItem child row (路由)', 'height'], devices: ['desktop'], sel: '#mainmenu .nav-group:not([data-collapsed]) > .nav-item:not([data-active])', prop: 'height'},
+  {name: 'side nav item height (drawer)', from: ['drawer', 'item', 'height'], devices: ['phone'], drawer: true, sel: '#mainmenu .nav-group:not([data-collapsed]) > .nav-item:not([data-active])', prop: 'height'},
+  {name: 'side nav item radius', from: ['components', 'SideNavItem child row (路由)', 'radius'], devices: ['desktop'], sel: '#mainmenu .nav-item', prop: 'radius'},
+  {name: 'side nav selected background', from: ['components', 'SideNavItem selected (概覽)', 'background'], devices: ['desktop'], sel: '#mainmenu .nav-item[data-active]', prop: 'background', exact: true},
+  {name: 'side nav selected colour', from: ['components', 'SideNavItem selected (概覽)', 'color'], devices: ['desktop'], sel: '#mainmenu .nav-item[data-active]', prop: 'color', exact: true},
+  // Top bar and page frame.
+  {name: 'top bar height', from: ['frame', 'Top bar (AppShell header)', 'height'], sel: '.shell-header', prop: 'height'},
+  {name: 'top bar padding', from: ['frame', 'TopNav', 'padding'], sel: '.shell-header', prop: 'padding'},
+  {name: 'frame padding', from: ['frame', 'Main content (LayoutContent)', 'padding'], sel: '.shell-content', prop: 'padding'},
+  {name: 'section gap', from: ['frame', 'Page VStack (band gap)', 'gap'], measure: 'sectionGap'},
+  {name: 'card gap', from: ['frame', 'Grid: 系統 + 記憶體 cards', 'gap'], sel: '#view', prop: 'gap'},
+  // Cards.
+  {name: 'card radius', from: ['components', 'Card (default)', 'radius'], sel: '#view > .cbi-section', prop: 'radius'},
+  {name: 'card padding', from: ['components', 'Card (default)', 'padding'], sel: '#view > .cbi-section', prop: 'padding'},
+  {name: 'card border', from: ['components', 'Card (default)', 'border'], sel: '#view > .cbi-section', prop: 'border', exact: true},
+  // Type.
+  {name: 'h1 size', from: ['components', 'Heading h1 (概覽)', 'fontSize'], sel: '.shell-inner > h2, #view > h2', prop: 'fontSize'},
+  {name: 'h1 weight', from: ['components', 'Heading h1 (概覽)', 'weight'], sel: '.shell-inner > h2, #view > h2', prop: 'weight', exact: true},
+  {name: 'card title size', from: ['components', 'Heading h2 (section)', 'fontSize'], sel: '#view > .cbi-section :is(h2, h3)', prop: 'fontSize'},
+  {name: 'base text size', from: ['components', 'Table body cell', 'fontSize'], sel: '#view .td', prop: 'fontSize'},
+  // Controls.
+  {name: 'button height', from: ['components', 'Button secondary md (top bar)', 'height'], sel: '#indicators > *', prop: 'height'},
+  {name: 'button radius', from: ['components', 'Button secondary md (top bar)', 'radius'], sel: '#indicators > *', prop: 'radius'},
+  // A data row of a table with a header row; where the overview has none (no
+  // DHCP leases, no wireless stations), a row of a key/value table, which the
+  // reference draws as a MetadataList row (24 + 8, within the 33's tolerance).
+  {name: 'table row height', from: ['components', 'Table body row', 'height'], devices: ['desktop'], sel: '#view .table:has(.th) > .tr:has(> .td):not(.placeholder)', fallback: '#view .table:not(:has(.th)) > .tr:not(:has(.cbi-progressbar))', prop: 'height'},
+  {name: 'icon size', from: ['components', 'Icon sm', 'width'], sel: '.shell-header .icon-btn:not([hidden]) svg, .brand .mark svg', prop: 'width', visible: true},
+  // Main colours.
+  {name: 'shell background', from: ['frame', 'AppShell root', 'background'], sel: '.shell', prop: 'background', exact: true},
+  {name: 'text', from: ['frame', 'AppShell root', 'color'], sel: '.shell', prop: 'color', exact: true},
+  {name: 'surface', from: ['components', 'Card (default)', 'background'], sel: '#view > .cbi-section', prop: 'background', exact: true},
+  {name: 'accent', from: ['frame', 'NavIcon (brand mark)', 'background'], sel: '.shell-header .brand .mark', prop: 'background', exact: true},
+  {name: 'on-accent', from: ['frame', 'NavIcon (brand mark)', 'color'], sel: '.shell-header .brand .mark', prop: 'color', exact: true},
+];
+
+/* In the page: the reference script's box() reduced to the properties above. */
+function readAll(fields) {
+  const four = (s, p) => {
+    const v = ['Top', 'Right', 'Bottom', 'Left'].map((k) => s[`${p}${k}`]);
+    return v.every((x) => x === v[0]) ? v[0] : v.join(' ');
+  };
+  const border = (s) => {
+    const sides = ['Top', 'Right', 'Bottom', 'Left'].map((k) => (parseFloat(s[`border${k}Width`]) && s[`border${k}Style`] !== 'none'
+      ? `${s[`border${k}Width`]} ${s[`border${k}Style`]} ${s[`border${k}Color`]}` : 'none'));
+    return sides.every((b) => b === sides[0]) ? sides[0] : sides.join('; ');
+  };
+  const shown = (el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden';
+  };
+  const px = (n) => `${Math.round(n * 100) / 100}px`;
+  const read = (el, prop) => {
+    const s = getComputedStyle(el);
+    const r = el.getBoundingClientRect();
+    switch (prop) {
+      case 'width': return px(r.width);
+      case 'height': return px(r.height);
+      case 'padding': return four(s, 'padding');
+      case 'gap': return `${s.rowGap} / ${s.columnGap}`;
+      case 'radius': return s.borderRadius;
+      case 'border': return border(s);
+      case 'background': return s.backgroundColor;
+      case 'color': return s.color;
+      case 'fontSize': return s.fontSize;
+      case 'weight': return s.fontWeight;
+    }
+    return null;
+  };
+  const out = {};
+  for (const f of fields) {
+    if (f.measure === 'sectionGap') {
+      // From the page title to the first card under it.
+      const title = document.querySelector('.shell-inner > h2, #view > h2');
+      const card = [...document.querySelectorAll('#view > .cbi-section')].find(shown);
+      out[f.name] = title && card ? {value: `${px(card.getBoundingClientRect().top - title.getBoundingClientRect().bottom)}`, count: 1} : {value: null, count: 0};
+      continue;
+    }
+    let els = [...document.querySelectorAll(f.sel)].filter(shown);
+    let via = f.sel;
+    if (!els.length && f.fallback) {
+      els = [...document.querySelectorAll(f.fallback)].filter(shown);
+      via = f.fallback;
+    }
+    out[f.name] = {value: els.length ? read(els[0], f.prop) : null, count: els.length, via};
+  }
+  return out;
+}
+
+const nums = (v) => String(v).match(/-?\d+(\.\d+)?(?=px)/g)?.map(Number) ?? [];
+/* "24px / 24px" against "24px": a single value stands for all of them. */
+function compare(got, want, exact) {
+  if (got == null) return false;
+  if (exact) return got.replace(/\s+/g, ' ') === want.replace(/\s+/g, ' ');
+  const g = nums(got);
+  const w = nums(want);
+  if (!g.length || !w.length) return got === want;
+  const len = Math.max(g.length, w.length);
+  for (let i = 0; i < len; i++) {
+    const a = g[Math.min(i, g.length - 1)];
+    const b = w[Math.min(i, w.length - 1)];
+    // A radius of 9999px and the 50% / huge value a browser reports for a pill
+    // both mean "fully round".
+    if (a >= 9999 && b >= 9999) continue;
+    if (Math.abs(a - b) > 1) return false;
+  }
+  return true;
+}
+
+const browser = await chromium.launch(process.env.CHROME_PATH ? {executablePath: process.env.CHROME_PATH} : {});
+const rows = [];
+let failures = 0;
+const fail = (msg) => { console.log(`FAIL ${msg}`); failures++; };
+
+for (const [device, viewport] of Object.entries({desktop: {width: 1440, height: 900}, phone: {width: 390, height: 844}})) {
+  for (const mode of ['light', 'dark']) {
+    const key = `${device}-${mode}`;
+    const ref = spec[key];
+    if (!ref) { fail(`${key}: not in ${specPath}`); continue; }
+    const ctx = await browser.newContext({viewport, deviceScaleFactor: 1, colorScheme: mode});
+    await ctx.addInitScript((m) => { try { localStorage.setItem('aster-theme', m); } catch (e) {} }, mode);
+    const page = await ctx.newPage();
+
+    const r = await ctx.request.post(base, {form: {luci_username: user, luci_password: password}, maxRedirects: 0});
+    if (r.status() !== 302) { fail(`${key}: login returned ${r.status()}, want 302`); await ctx.close(); continue; }
+    const resp = await page.goto(`${base}admin/status/overview`, {waitUntil: 'load'});
+    if (!resp || resp.status() !== 200) { fail(`${key}: overview returned ${resp?.status()}`); await ctx.close(); continue; }
+    // The overview polls, so the network never idles: wait for its cards.
+    const ok = await page.waitForSelector('#view > .cbi-section:not([style*="display: none"])', {timeout: 150000}).then(() => true, () => false);
+    if (!ok) { fail(`${key}: overview rendered no card`); await ctx.close(); continue; }
+    await page.waitForSelector('#mainmenu .nav-item', {timeout: 15000}).catch(() => {});
+    await page.waitForTimeout(1500);
+    // luci-app-attendedsysupgrade asks on the overview whether to check for
+    // upgrades. Its last button, Close, dismisses the dialog and saves nothing.
+    if (await page.locator('#modal_overlay .modal').isVisible().catch(() => false)) {
+      await page.locator('#modal_overlay .modal button, #modal_overlay .modal .btn').last().click();
+      await page.waitForTimeout(500);
+    }
+    const theme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
+    if (theme !== mode) fail(`${key}: data-theme is ${theme}`);
+
+    const plain = FIELDS.filter((f) => !f.drawer && (!f.devices || f.devices.includes(device)));
+    const got = await page.evaluate(readAll, plain);
+    const drawerFields = FIELDS.filter((f) => f.drawer && (!f.devices || f.devices.includes(device)));
+    if (drawerFields.length) {
+      await page.click('#sidebar-toggle');
+      await page.waitForTimeout(500);
+      Object.assign(got, await page.evaluate(readAll, drawerFields));
+    }
+
+    for (const f of [...plain, ...drawerFields]) {
+      const [section, k, prop] = f.from;
+      const want = ref[section]?.[k]?.[prop];
+      const m = got[f.name];
+      if (want == null) { fail(`${key} ${f.name}: spec has no ${f.from.join(' > ')}`); continue; }
+      const pass = m.count > 0 && compare(m.value, want, f.exact);
+      rows.push({key, field: f.name, measured: m.value ?? '(none)', expected: want, samples: m.count, via: m.via, pass});
+      if (f.fallback && m.via === f.fallback) console.log(`note ${key} ${f.name}: no header table, measured ${f.fallback}`);
+      if (!pass) fail(`${key} ${f.name}: ${m.count ? `measured ${m.value}` : 'no sample'}, expected ${want}`);
+    }
+    await ctx.close();
+  }
+}
+await browser.close();
+
+const w = (s, n) => String(s).padEnd(n);
+console.log(`\n${w('view', 14)}${w('field', 32)}${w('measured', 34)}${w('expected', 34)}result`);
+for (const r of rows) console.log(`${w(r.key, 14)}${w(r.field, 32)}${w(r.measured, 34)}${w(r.expected, 34)}${r.pass ? 'ok' : 'FAIL'}`);
+if (jsonOut) fs.writeFileSync(jsonOut, JSON.stringify(rows, null, 2));
+console.log(failures ? `\nRESULT FAIL ${failures}` : `\nRESULT OK ${rows.length} fields`);
+process.exit(failures ? 1 : 0);
