@@ -367,8 +367,9 @@ button:disabled, .cbi-button:disabled,
    carries only the shape and takes its colour from background-color, so one
    set of four shapes serves both schemes and all five palettes.
 
-   Shapes are Lucide (ISC): triangle-alert, octagon-alert, circle-check,
-   info. */
+   Shapes are Heroicons 2.2.0 outline (MIT, LICENSES/heroicons-MIT.txt),
+   path data verbatim: InformationCircle, ExclamationTriangle,
+   ExclamationCircle, CheckCircle. */
 .alert-message::before {
   content: "";
   /* Floated, not absolutely positioned. An absolute icon needs the box to
@@ -381,14 +382,14 @@ button:disabled, .cbi-button:disabled,
   inline-size: 1.25rem;
   block-size: 1.25rem;
   background-color: var(--muted-foreground);
-  mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'><circle%20cx='12'%20cy='12'%20r='10'/><path%20d='M12%2016v-4'/><path%20d='M12%208h.01'/></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='m11.25%2011.25.041-.02a.75.75%200%200%201%201.063.852l-.708%202.836a.75.75%200%200%200%201.063.853l.041-.021M21%2012a9%209%200%201%201-18%200%209%209%200%200%201%2018%200Zm-9-3.75h.008v.008H12V8.25Z'/></svg>") center / contain no-repeat;
 }
-.alert-message.warning::before { background-color: var(--status-warn-fg); mask-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='m21.73%2018-8-14a2%202%200%200%200-3.48%200l-8%2014A2%202%200%200%200%204%2021h16a2%202%200%200%200%201.73-3'/><path%20d='M12%209v4'/><path%20d='M12%2017h.01'/></svg>"); }
+.alert-message.warning::before { background-color: var(--status-warn-fg); mask-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M12%209v3.75m-9.303%203.376c-.866%201.5.217%203.374%201.948%203.374h14.71c1.73%200%202.813-1.874%201.948-3.374L13.949%203.378c-.866-1.5-3.032-1.5-3.898%200L2.697%2016.126ZM12%2015.75h.007v.008H12v-.008Z'/></svg>"); }
 .alert-message.error::before,
-.alert-message.danger::before  { background-color: var(--status-bad-fg);  mask-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M12%2016h.01'/><path%20d='M12%208v4'/><path%20d='M15.312%202a2%202%200%200%201%201.414.586l4.688%204.688A2%202%200%200%201%2022%208.688v6.624a2%202%200%200%201-.586%201.414l-4.688%204.688a2%202%200%200%201-1.414.586H8.688a2%202%200%200%201-1.414-.586l-4.688-4.688A2%202%200%200%201%202%2015.312V8.688a2%202%200%200%201%20.586-1.414l4.688-4.688A2%202%200%200%201%208.688%202z'/></svg>"); }
-.alert-message.success::before { background-color: var(--status-ok-fg);   mask-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'><circle%20cx='12'%20cy='12'%20r='10'/><path%20d='m9%2012%202%202%204-4'/></svg>"); }
+.alert-message.danger::before  { background-color: var(--status-bad-fg);  mask-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M12%209v3.75m9-.75a9%209%200%201%201-18%200%209%209%200%200%201%2018%200Zm-9%203.75h.008v.008H12v-.008Z'/></svg>"); }
+.alert-message.success::before { background-color: var(--status-ok-fg);   mask-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M9%2012.75%2011.25%2015%2015%209.75M21%2012a9%209%200%201%201-18%200%209%209%200%200%201%2018%200Z'/></svg>"); }
 .alert-message.notice::before,
-.alert-message.info::before    { background-color: var(--status-info-fg); mask-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'><circle%20cx='12'%20cy='12'%20r='10'/><path%20d='M12%2016v-4'/><path%20d='M12%208h.01'/></svg>"); }
+.alert-message.info::before    { background-color: var(--status-info-fg); mask-image: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='m11.25%2011.25.041-.02a.75.75%200%200%201%201.063.852l-.708%202.836a.75.75%200%200%200%201.063.853l.041-.021M21%2012a9%209%200%201%201-18%200%209%209%200%200%201%2018%200Zm-9-3.75h.008v.008H12V8.25Z'/></svg>"); }
 
 /* The float has to be cleared, or a short alert's box closes above its own
    icon. */

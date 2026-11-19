@@ -24,13 +24,13 @@ return baseclass.extend({
 	},
 
 	bind() {
-		const group = document.querySelector('.theme-switch');
+		/* Two copies: the top bar's, and the drawer's on a phone. One state. */
+		const opts = document.querySelectorAll('.theme-switch [role="radio"][value]');
 
-		if (!group)
+		if (!opts.length)
 			return;
 
 		const root = document.documentElement;
-		const opts = group.querySelectorAll('[role="radio"][value]');
 
 		/* The choice is held here first and persisted second. A browser with
 		   site data blocked throws on both read and write, and reading the
@@ -60,14 +60,14 @@ return baseclass.extend({
 				return;
 
 			if (mode === 'light' || mode === 'dark') {
-				const c = (mode === 'dark') ? '#101010' : '#fbfbfb';
+				const c = (mode === 'dark') ? '#18181B' : '#F4F4F5';
 
 				l.setAttribute('content', c);
 				d.setAttribute('content', c);
 			}
 			else {
-				l.setAttribute('content', '#fbfbfb');
-				d.setAttribute('content', '#101010');
+				l.setAttribute('content', '#F4F4F5');
+				d.setAttribute('content', '#18181B');
 			}
 		};
 

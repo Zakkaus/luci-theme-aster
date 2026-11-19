@@ -1,0 +1,17 @@
+/* Layout: the sizes the shell and the component layer need that the Astryx
+   theme has no token for. Values are the reference page's measurements
+   (lab/new-theme/astryx-ref/spec.json); scripts/tokens.mjs appends this
+   block to tokens.css, the only stylesheet allowed px values. A name nothing
+   reads is an error, as in the bridge. */
+:root {
+  /* AppShell: side nav 240 wide (the reference resizes it between 200 and
+     320), top bar 64, 52 on a phone, drawer panel 320. */
+  --aster-sidenav-w: 240px;
+  --aster-rail-w: 60px;
+  --aster-topbar-h: 64px;
+  --aster-topbar-h-phone: 52px;
+  --aster-drawer-w: 320px;
+
+  /* Icon size sm: the side nav, the top bar and the indicators. */
+  --aster-icon-sm: 16px;
+}

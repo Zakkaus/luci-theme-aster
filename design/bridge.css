@@ -38,8 +38,6 @@
   --ring: var(--focus-outline-color);
   --focus-ring: 0 0 0 var(--focus-outline-width) var(--color-accent-muted);
   --hairline: var(--border-width);
-  --scrollbar-thumb: var(--color-border-emphasized);
-  --scrollbar-thumb-hover: var(--color-text-disabled);
 
   /* Status pairs: muted fill and the text that sits on it */
   --status-ok-bg: var(--color-success-muted);
@@ -62,14 +60,12 @@
   --elev-2: var(--shadow-med);
   --elev-3: var(--shadow-high);
   --elev-press: var(--shadow-low);
-  --card-shadow: var(--shadow-low);
 
   /* Radius: graphite's ladder (6/8/10/14/18 px) onto the theme's three steps */
   --radius-sm: var(--radius-inner);
   --radius-md: var(--radius-inner);
   --radius-lg: var(--radius-element);
   --radius-xl: var(--radius-container);
-  --radius-2xl: var(--radius-container);
 
   /* Spacing: same values, Astryx names */
   --sp: var(--spacing-2);
@@ -83,22 +79,14 @@
   --login-inset: var(--spacing-8);
   --tap-min: var(--spacing-11);
 
-  /* Controls. 50px has no element size in Astryx: raw. */
+  /* Controls */
   --control-h-sm: var(--size-element-sm);
   --control-h: var(--size-element-lg);
-  --control-h-lg: 3.125rem;
   /* One width for a field that is not full width: raw. */
   --field-w: 13rem;
 
-  /* Shell geometry: no Astryx token, raw until M2 sets the reference sizes. */
-  --sidebar-w: 15rem;
-  --header-h: 3.25rem;
-  --header-h-admin: 3.5rem;
-  --content-max: 72rem;
-  --bottomnav-h: 4rem;
 
   /* Type */
-  --font-sans: var(--font-family-body);
   --font-mono: var(--font-family-code);
   --text-xs: var(--text-supporting-size);
   --text-sm: var(--text-supporting-size);
@@ -118,5 +106,4 @@
   --dur-hover: var(--duration-fast);
   --dur-surface: var(--duration-fast-max);
   --dur-enter: var(--duration-medium-min);
-  --dur-enter-lg: var(--duration-medium);
 }

@@ -25,5 +25,6 @@ and an `.apk` from the 25.12 SDK.
 
 ## Licence
 
-Apache-2.0, see `LICENSE`. The Lucide icons are ISC, see
-`LICENSES/lucide-ISC.txt`.
+Apache-2.0, see `LICENSE`. The icons are Heroicons 2.2.0 outline
+(https://github.com/tailwindlabs/heroicons, taken from the `@heroicons/react`
+2.2.0 package), MIT, see `LICENSES/heroicons-MIT.txt`.

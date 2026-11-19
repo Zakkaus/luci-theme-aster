@@ -1,108 +1,355 @@
-/* Application shell: sidebar, top bar, and the phone equivalent.
-   Copied out of the design book so a project can use it without the book.
-   Depends on tokens.css only; every value here comes from a token. Its own
-   sizes (sidebar, header, content width) live in tokens.css too. */
+/* Shell: the top bar, the side nav, the page frame and the phone drawer,
+   after Astryx's AppShell, TopNav, SideNav and LayoutContent as the reference
+   page measures them (lab/new-theme/astryx-ref/spec.md, section 1).
 
-.shell { display: flex; min-block-size: 22rem; background: var(--background); }
-.shell-aside {
-  inline-size: var(--sidebar-w); flex-shrink: 0; display: flex; flex-direction: column;
-  border-inline-end: var(--hairline) solid var(--border); background: var(--background);
+   Every value is a token. Sizes Astryx has no token for are the --aster-*
+   names in tokens.css (design/layout.css). Inside .shell the theme's AppShell
+   override is in force, so --color-background-body is the shell wash
+   (#F4F4F5 / #18181B), not the theme-level page colour.
+
+   Desktop: the top bar spans the width, the side nav and the main column sit
+   under it and scroll on their own. Phone (48rem and below): the document
+   scrolls, the top bar is fixed and the side nav becomes a drawer that slides
+   in from the end side. */
+
+.shell {
+  display: grid;
+  grid-template-columns: var(--aster-sidenav-w) minmax(0, 1fr);
+  grid-template-rows: var(--aster-topbar-h) minmax(0, 1fr);
+  grid-template-areas: "top top" "side main";
+  block-size: 100vh;
+  overflow: hidden;
+  background: var(--color-background-body);
+  color: var(--color-text-primary);
+  scrollbar-color: var(--color-border-emphasized) transparent;
+  scrollbar-width: thin;
 }
-.shell-aside[data-admin] { background: color-mix(in oklab, var(--card) 50%, transparent); }
-.shell-aside[data-admin] .brand { block-size: var(--header-h-admin); }
-.shell-main { flex: 1; display: flex; flex-direction: column; min-inline-size: 0; }
+@supports (block-size: 100dvh) { .shell { block-size: 100dvh; } }
+
+/* ── Top bar ─────────────────────────────────────────────────── */
+
 .shell-header {
-  block-size: var(--header-h); flex-shrink: 0;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 var(--sp-5); border-block-end: var(--hairline) solid var(--border);
-  background: color-mix(in oklab, var(--background) 80%, transparent);
-  backdrop-filter: blur(12px) saturate(1.5);
-  position: sticky; inset-block-start: 0; z-index: 30;
+  grid-area: top;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+  min-inline-size: 0;
+  padding: var(--spacing-2);
+  background: var(--color-background-body);
 }
-.shell-content { flex: 1; padding: var(--sp-5); overflow: auto; }
-.shell-inner { max-inline-size: var(--content-max); margin: 0 auto; inline-size: 100%; }
 
-/* The brand block and the top bar are the two halves of one band across the top
-   of the screen, so their height is one token rather than two values that happen
-   to be close. Left to its own padding this block came out about 6px taller than
-   the bar beside it, which puts the product name above the page title and the
-   rule under it below the bar's bottom edge. */
-.brand { display: flex; align-items: center; gap: var(--sp-2);
-  block-size: var(--header-h); box-sizing: border-box;
-  padding-inline: var(--sp-4); padding-block: 0;
-  /* Usually an <a> to the home route, which otherwise takes the browser's
-     default link blue — the one colour this system does not have. */
-  color: inherit; text-decoration: none; }
+/* TopNav heading: the mark, the host name and the board under it. */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  min-inline-size: 0;
+  padding-inline-end: var(--spacing-2);
+  border-radius: var(--radius-element);
+  color: inherit;
+  text-decoration: none;
+}
+/* NavIcon: a filled accent circle with the glyph in the on-accent colour. */
 .brand .mark {
-  inline-size: 26px; block-size: 26px; border-radius: var(--radius-sm); flex-shrink: 0;
-  background: var(--foreground); color: var(--background);
-  display: grid; place-items: center; font: 700 0.6875rem/1 var(--font-mono);
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: var(--size-element-md);
+  block-size: var(--size-element-md);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
 }
-.brand .name { font-size: .8rem; font-weight: 700; letter-spacing: -.01em; }
-/* A divider needs room on both sides. With no top margin it sits against the
-   block above it and reads as that block's underline, not as a separator. */
-.rule { block-size: 1px; background: var(--border); margin: var(--sp-3) var(--sp-4); }
+.brand-text { display: grid; min-inline-size: 0; }
+.brand .name {
+  font-size: var(--text-heading-3-size);
+  font-weight: var(--text-heading-3-weight);
+  line-height: var(--text-heading-3-leading);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.brand .sub {
+  color: var(--color-text-secondary);
+  font-size: var(--text-supporting-size);
+  line-height: var(--text-supporting-leading);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-.nav { display: flex; flex-direction: column; gap: var(--sp-4); padding: 0 var(--sp-3) var(--sp-4); flex: 1; overflow-y: auto; }
-.nav-group { display: flex; flex-direction: column; gap: var(--sp-2); }
-.nav-label {
-  font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em;
-  color: var(--muted-foreground); padding: 0 var(--sp-3); margin-block-end: var(--sp-1);
+.hdr-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  flex: none;
 }
-.nav-item {
-  position: relative; display: flex; align-items: center; gap: var(--sp-3);
-  border-radius: var(--radius-md); padding: var(--sp-2) var(--sp-3);
-  font-size: 0.875rem; color: var(--muted-foreground); text-decoration: none;
-  transition: all .15s ease;
-}
-.nav-item:hover { background: var(--accent); color: var(--foreground); }
-.nav-item[data-active] { background: oklch(from var(--foreground) l c h / 6%); color: var(--foreground); font-weight: 600; }
-/* 激活态那条左轨：3px 宽、16px 高、只圆右边。它是「你在这里」的唯一信号，
-   不靠颜色，所以在两种主题和色觉差异下都成立。 */
-.nav-item[data-active]::before {
-  content: ""; position: absolute; inset-inline-start: 0; inset-block-start: 50%; transform: translateY(-50%);
-  inline-size: 3px; block-size: 16px; border-radius: 0 var(--radius-full) var(--radius-full) 0; background: var(--foreground);
-}
-.ico { inline-size: 1rem; block-size: 1rem; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+#indicators { display: flex; align-items: center; gap: var(--spacing-2); }
 
-.hdr-actions { display: flex; align-items: center; gap: var(--sp-2); }
+/* Icon button: md size, ghost until hovered, round like the reference's
+   top-bar controls. */
 .icon-btn {
-  inline-size: 2rem; block-size: 2rem; display: grid; place-items: center;
-  border: none; background: transparent; color: var(--muted-foreground);
-  border-radius: var(--radius-md); cursor: pointer;
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: var(--size-element-md);
+  block-size: var(--size-element-md);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-icon-primary);
+  font: inherit;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard);
 }
-.icon-btn:hover { background: var(--accent); color: var(--foreground); }
-.avatar {
-  inline-size: 2rem; block-size: 2rem; border-radius: var(--radius-full); margin-inline-start: var(--sp-1);
-  background: oklch(from var(--foreground) l c h / 6%); color: var(--foreground);
-  display: grid; place-items: center; font-size: 0.6875rem; font-weight: 600; cursor: pointer;
+@media (hover: hover) {
+  .icon-btn:hover { background: var(--color-overlay-hover); }
+}
+.icon-btn:active { background: var(--color-overlay-pressed); }
+
+/* Three modes as one segmented control; the chosen one takes the secondary
+   button fill. */
+.theme-switch {
+  display: flex;
+  gap: var(--spacing-0-5);
+  padding: var(--spacing-0-5);
+  border-radius: var(--radius-full);
+}
+.theme-switch [role="radio"] { color: var(--color-icon-secondary); }
+.theme-switch [role="radio"][aria-checked="true"] {
+  background: var(--color-neutral);
+  color: var(--color-icon-primary);
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   外壳 — 手机
-   侧栏收起，底部导航接管主导航，正文底部留出 5rem 给它，
-   并且加上 safe-area，否则在带 home indicator 的机器上最后一行被遮盖。
-   ══════════════════════════════════════════════════════════════════ */
-.phone {
-  inline-size: 22rem; max-inline-size: 100%; border: 1px solid var(--border);
-  border-radius: var(--radius-2xl); overflow: hidden; background: var(--background);
-  display: flex; flex-direction: column; min-block-size: 30rem; position: relative;
+/* The drawer toggle and the drawer's own head exist only on a phone. */
+#sidebar-toggle,
+.drawer-head,
+.drawer-foot { display: none; }
+
+/* Heroicons outline: 24-unit artwork drawn at the sm size with the set's
+   own 1.5 stroke, which the markup carries. */
+.ico {
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
+  flex: none;
 }
-.phone-header {
-  block-size: var(--header-h); display: flex; align-items: center; justify-content: space-between;
-  padding: 0 var(--sp-4); border-block-end: var(--hairline) solid var(--border);
-  background: color-mix(in oklab, var(--background) 80%, transparent); backdrop-filter: blur(12px);
+/* A span, because LuCI's E() cannot create SVG elements. */
+.ico-host { display: inline-flex; flex: none; }
+
+/* ── Side nav ────────────────────────────────────────────────── */
+
+.shell-aside {
+  grid-area: side;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--color-background-body);
 }
-.phone-body { flex: 1; padding: var(--sp-4) var(--sp-4) calc(var(--bottomnav-h) + var(--sp-4)); overflow: auto; }
-.bottomnav {
-  position: absolute; inset-inline: 0; inset-block-end: 0; block-size: var(--bottomnav-h);
-  display: grid; grid-auto-flow: column; align-items: center;
-  border-top: 1px solid var(--border);
-  background: color-mix(in oklab, var(--background) 92%, transparent); backdrop-filter: blur(12px);
-  padding-block-end: env(safe-area-inset-bottom, 0);
+
+/* The items list: 4 above and below, an 8 gutter each side, so a row is the
+   side nav's width less 16. */
+.nav {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: var(--spacing-1) var(--spacing-2);
 }
-.bn-item {
-  display: flex; flex-direction: column; align-items: center; gap: var(--sp-1);
-  font-size: 0.6875rem; color: var(--muted-foreground); text-decoration: none; padding: var(--sp-2) 0;
+.nav-group { display: flex; flex-direction: column; }
+/* Logout is the one top-level page with no group; it sits at the foot of the
+   list as in the reference. */
+.nav > .nav-group:last-child:has(> .nav-item:only-child) {
+  margin-block-start: auto;
+  padding-block-start: var(--spacing-4);
 }
-.bn-item[data-active] { color: var(--foreground); font-weight: 600; }
+
+/* SideNavItem: one 36 row for a group and for a page. */
+.nav-label,
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  min-block-size: var(--size-element-md);
+  padding: 0 var(--spacing-2);
+  border-radius: var(--radius-element);
+  color: var(--color-text-primary);
+  font-size: var(--text-body-size);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--text-body-leading);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+/* A page under a group starts where the group's label starts. */
+.nav-label ~ .nav-item { padding-inline-start: var(--spacing-8); }
+.nav-label > .ico-host:first-child,
+.nav-item > .ico-host:first-child { color: var(--color-icon-secondary); }
+.nav-label > span:not(.ico-host),
+.nav-item > span:not(.ico-host) {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* The chevron points down while closed and up while open. */
+.nav-label > .chevron {
+  color: var(--color-icon-secondary);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+.nav-label[aria-expanded="true"] > .chevron { transform: rotate(180deg); }
+.nav-group[data-collapsed] > .nav-item { display: none; }
+
+@media (hover: hover) {
+  .nav-label:hover,
+  .nav-item:hover { background: var(--color-overlay-hover); }
+}
+.nav-item[data-active] {
+  background: var(--color-accent-muted);
+  color: var(--color-text-accent);
+  font-weight: var(--font-weight-medium);
+}
+
+/* The collapse control at the foot of the side nav. */
+.rail-toggle {
+  margin: var(--spacing-2);
+  color: var(--color-icon-secondary);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+/* The mode row only appears when a device has more than one mode. */
+#modemenu {
+  display: flex;
+  gap: var(--spacing-1);
+  margin: 0;
+  padding: var(--spacing-1) var(--spacing-2);
+  list-style: none;
+}
+
+/* ── Main column ─────────────────────────────────────────────── */
+
+.shell-main {
+  grid-area: main;
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  min-block-size: 0;
+  overflow-y: auto;
+}
+/* LayoutContent: 24 on every side, no maximum width. */
+.shell-content { flex: 1; padding: var(--spacing-6); }
+.shell-inner { inline-size: 100%; }
+
+.shell-footer {
+  padding: 0 var(--spacing-6) var(--spacing-6);
+  color: var(--color-text-secondary);
+  font-size: var(--text-supporting-size);
+  line-height: var(--text-supporting-leading);
+}
+.shell-footer a { color: inherit; }
+
+/* ── Rail (wide screens) ─────────────────────────────────────────
+   The side nav narrows to its group icons. A group cannot open inside the
+   rail, so its label widens the side nav again (menu-aster.js). */
+@media (min-width: 48.0625rem) {
+  :root[data-rail] .shell { grid-template-columns: var(--aster-rail-w) minmax(0, 1fr); }
+  :root[data-rail] .nav-label > span:not(.ico-host),
+  :root[data-rail] .nav-label > .chevron,
+  :root[data-rail] .nav-item > span:not(.ico-host),
+  :root[data-rail] .nav-group > .nav-item:not(:only-child) { display: none; }
+  :root[data-rail] .nav-label,
+  :root[data-rail] .nav-item { justify-content: center; padding-inline: 0; }
+  :root[data-rail] .nav-group:has(.nav-item[data-active]) > .nav-label {
+    background: var(--color-accent-muted);
+    color: var(--color-text-accent);
+  }
+  :root[data-rail] .nav-group:has(.nav-item[data-active]) > .nav-label > .ico-host { color: inherit; }
+  :root[data-rail] .rail-toggle { transform: rotate(180deg); }
+  .shell { transition: grid-template-columns var(--duration-fast-max) var(--ease-standard); }
+}
+
+/* ── Phone ───────────────────────────────────────────────────── */
+
+@media (max-width: 48rem) {
+  .shell {
+    display: block;
+    block-size: auto;
+    min-block-size: 100vh;
+    overflow: visible;
+    padding-block-start: var(--aster-topbar-h-phone);
+  }
+  @supports (min-block-size: 100dvh) { .shell { min-block-size: 100dvh; } }
+
+  /* Fixed rather than sticky: the document scrolls here, and fixed does not
+     depend on the ancestors' overflow. */
+  .shell-header {
+    position: fixed;
+    inset-block-start: 0;
+    inset-inline: 0;
+    z-index: 30;
+    block-size: var(--aster-topbar-h-phone);
+  }
+  .brand .sub,
+  .shell-header .theme-switch,
+  .rail-toggle { display: none; }
+  #sidebar-toggle,
+  .drawer-head,
+  .drawer-foot { display: flex; }
+  #sidebar-toggle { display: grid; }
+
+  .shell-main { overflow: visible; }
+  .shell-content { overflow-x: auto; }
+
+  /* The drawer: a surface panel from the end side over a scrim. */
+  .shell-aside {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-end: 0;
+    z-index: 40;
+    inline-size: min(var(--aster-drawer-w), 100%);
+    background: var(--color-background-surface);
+    border-inline-start: var(--border-width) solid var(--color-border);
+    box-shadow: var(--shadow-high);
+    transform: translateX(101%);
+    visibility: hidden;
+    transition:
+      transform var(--duration-fast-max) var(--ease-standard),
+      visibility 0s linear var(--duration-fast-max);
+  }
+  :dir(rtl) .shell-aside { transform: translateX(-101%); }
+  body:has(#sidebar-toggle[aria-expanded="true"]) .shell-aside {
+    transform: none;
+    visibility: visible;
+    transition: transform var(--duration-fast-max) var(--ease-standard);
+  }
+  /* A ::after cannot take a click; menu-aster.js closes on a click outside. */
+  body:has(#sidebar-toggle[aria-expanded="true"])::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    background: var(--color-overlay);
+  }
+
+  .drawer-head {
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-2);
+    flex: none;
+    min-block-size: var(--aster-topbar-h-phone);
+    padding: var(--spacing-2);
+    border-block-end: var(--border-width) solid var(--color-border);
+  }
+  .drawer-foot {
+    justify-content: center;
+    padding: var(--spacing-2);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+  .nav { padding-block: var(--spacing-3); }
+}

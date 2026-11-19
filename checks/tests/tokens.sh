@@ -48,6 +48,16 @@ cp "$root/design/bridge.css" "$tmp/dead-bridge.css"
 sed -i 's/^:root {$/:root {\n  --tokens-test-unused: 1px;/' "$tmp/dead-bridge.css"
 expect 1 "nothing reads (delete them): --tokens-test-unused" "unread bridge entry" -- --styles "$tmp/dead" --bridge "$tmp/dead-bridge.css"
 
+copy deadlayout
+cp "$root/design/layout.css" "$tmp/dead-layout.css"
+sed -i 's/^:root {$/:root {\n  --aster-tokens-test-unused: 1px;/' "$tmp/dead-layout.css"
+expect 1 "layout entries nothing reads (delete them): --aster-tokens-test-unused" "unread layout entry" -- --styles "$tmp/deadlayout" --layout "$tmp/dead-layout.css"
+
+copy clash
+cp "$root/design/layout.css" "$tmp/clash-layout.css"
+sed -i 's/^:root {$/:root {\n  --spacing-4: 16px;/' "$tmp/clash-layout.css"
+expect 1 "layout redefines theme or bridge tokens: --spacing-4" "layout redefining a theme token" -- --styles "$tmp/clash" --layout "$tmp/clash-layout.css"
+
 if [[ $failures -ne 0 ]]; then
 	echo "$failures test(s) failed"
 	exit 1
