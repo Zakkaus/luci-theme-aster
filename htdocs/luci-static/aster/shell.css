@@ -1,14 +1,7 @@
 /* Application shell: sidebar, top bar, and the phone equivalent.
    Copied out of the design book so a project can use it without the book.
-   Depends on tokens.css only; every value here comes from a token. */
-
-:root {
-  --sidebar-w: 14rem;      /* w-56 */
-  --header-h: 3.25rem;     /* h-13 前台 */
-  --header-h-admin: 3.5rem;/* h-14 后台 */
-  --content-max: 72rem;    /* max-w-6xl */
-  --bottomnav-h: 4rem;
-}
+   Depends on tokens.css only; every value here comes from a token. Its own
+   sizes (sidebar, header, content width) live in tokens.css too. */
 
 .shell { display: flex; min-block-size: 22rem; background: var(--background); }
 .shell-aside {

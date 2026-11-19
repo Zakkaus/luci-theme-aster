@@ -6,7 +6,10 @@
   "description": "Development-only tooling: builds the Astryx theme and generates tokens.css. The OpenWrt package does not need Node.",
   "scripts": {
     "theme": "astryx theme build design/aster.ts --out design/built/aster.css --icons-specifier ../icons",
-    "check:theme": "astryx theme build design/aster.ts --out design/built/aster.css --icons-specifier ../icons --check"
+    "check:theme": "astryx theme build design/aster.ts --out design/built/aster.css --icons-specifier ../icons --check",
+    "tokens": "node scripts/tokens.mjs",
+    "check:tokens": "node scripts/tokens.mjs --check",
+    "test:tokens": "bash checks/tests/tokens.sh"
   },
   "devDependencies": {
     "@astryxdesign/cli": "0.7.16",
