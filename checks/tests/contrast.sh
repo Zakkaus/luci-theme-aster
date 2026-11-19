@@ -23,9 +23,10 @@ expect contrast "#dddddd on #ffffff" "low-contrast card titles" -- "$url" "$pass
 	--debug-css 'admin/status/overview=#view .cbi-section :is(h2, h3) { color: #ddd !important }'
 expect contrast "separator" "bright separator with the bound applied in light mode" -- "$url" "$password" --pages "$tmp/overview.txt" \
 	--separator-modes light --debug-css 'admin/status/overview=#view .td { border-block-end: 1px solid #000 !important }'
-expect contrast "field-border" "near-white field border, rule enforced" -- "$url" "$password" --pages "$tmp/form.txt" --debug-css "$pale"
-expect contrast "WAIVED (field-border" "near-white field border, rule waived" -- "$url" "$password" --pages "$tmp/form.txt" --debug-css "$pale" \
-	--field-border waive --text 99
+expect contrast "field-border" "near-white field border, rule enforced" -- "$url" "$password" --pages "$tmp/form.txt" --debug-css "$pale" \
+	--field-border enforce
+expect contrast "WAIVED (field-border" "near-white field border, rule waived by default" -- "$url" "$password" --pages "$tmp/form.txt" --debug-css "$pale" \
+	--text 99
 expect contrast "admin/no/such/page: HTTP 404" "page-list entry that 404s" -- "$url" "$password" --pages "$tmp/missing.txt"
 expect contrast "(login): login returned 403" "wrong password" -- "$url" "$password-wrong" --pages "$tmp/overview.txt"
 finish

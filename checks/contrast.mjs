@@ -21,10 +21,10 @@
  *              (appearance: none): border or fill against what is around
  *              it, --ui (3).
  *   field-border  the same for a text field, textarea, select or dropdown,
- *              --ui (3), reported as its own rule: --field-border enforce
- *              (default) fails the run on it, --field-border waive lists
- *              its findings under WAIVED and passes (WCAG 1.4.11; the owner
- *              decides whether the Astryx field border is kept).
+ *              --ui (3), reported as its own rule. Waived by default (owner
+ *              2026-11-19: keep Astryx field border, #ccd3db, 1.51:1): its
+ *              findings are listed under WAIVED and do not fail the run.
+ *              --field-border enforce applies it like any other rule.
  *              Buttons with words are identified by their words (1.4.11).
  *   focus      up to --focus-limit buttons, fields, checkboxes, links and
  *              tabs a page, focused from the keyboard: the ring (outline,
@@ -46,7 +46,7 @@ import {CHECKS, die, parseArgs, readPages, parseDebugCss, openPage, eachCombo, w
 
 const usage = 'usage: node checks/contrast.mjs <base url> <password> [--user root] [--pages <file>]... [--viewports desktop,phone] [--modes light,dark] [--text 4.5] [--large 3] [--ui 3] [--focus 3] [--separator-max 1.5] [--separator-modes dark] [--focus-limit 3] [--field-border enforce|waive] [--json <file>] [--out <file>] [--timeout ms] [--settle ms] [--debug-css <page>=<css>]...';
 const opt = parseArgs(process.argv.slice(2), {
-  flags: {user: 'root', viewports: 'desktop,phone', modes: 'light,dark', text: '4.5', large: '3', ui: '3', focus: '3', 'separator-max': '1.5', 'separator-modes': 'dark', 'field-border': 'enforce', 'focus-limit': '3', json: undefined, out: undefined, timeout: '60000', settle: '1500'},
+  flags: {user: 'root', viewports: 'desktop,phone', modes: 'light,dark', text: '4.5', large: '3', ui: '3', focus: '3', 'separator-max': '1.5', 'separator-modes': 'dark', 'field-border': 'waive', 'focus-limit': '3', json: undefined, out: undefined, timeout: '60000', settle: '1500'},
   repeat: ['pages', 'debug-css'],
   usage,
 });
