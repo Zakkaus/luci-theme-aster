@@ -133,8 +133,13 @@ export async function launch() {
  * login: LuCI answers a good one with 302 and a sysauth cookie. */
 export async function session(browser, opt, device, mode) {
   const ctx = await browser.newContext({viewport: VIEWPORTS[device], deviceScaleFactor: 1, colorScheme: mode});
+  /* oc_guide_done and oc_guide_autostart keep OpenClash's first-visit tour
+   * and hint bubble (guide.js, status.js) from covering its pages. */
   await ctx.addInitScript(([m, p]) => {
-    try { localStorage.setItem('aster-theme', m); localStorage.setItem('aster-palette', p); } catch (e) {}
+    try {
+      localStorage.setItem('aster-theme', m); localStorage.setItem('aster-palette', p);
+      localStorage.setItem('oc_guide_done', '1'); localStorage.setItem('oc_guide_autostart', '0');
+    } catch (e) {}
   }, [mode, opt.palette ?? 'aster']);
   const r = await ctx.request.post(opt.base, {form: {luci_username: opt.user, luci_password: opt.password}, maxRedirects: 0});
   const cookie = (await ctx.cookies()).some((c) => c.name.startsWith('sysauth'));
