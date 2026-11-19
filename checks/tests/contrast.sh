@@ -12,44 +12,52 @@ set -euo pipefail
 source "$(dirname "$0")/gate-lib.sh"
 url=$1 password=$2
 
-printf 'admin/status/overview\n' >"$tmp/overview.txt"
+# The gate fails a run that has no field-border, focus or separator sample
+# at all; no single page has all three, so each case runs its page with the
+# overview (separators) and Dropbear (fields). Their Astryx field borders
+# are listed as waived (waived:field-border), as in every full run.
+printf 'admin/status/overview\nadmin/system/admin/dropbear\n' >"$tmp/base.txt"
 printf 'admin/status/overview\nadmin/no/such/page\n' >"$tmp/missing.txt"
-printf 'admin/system/system\n' >"$tmp/form.txt"
-printf 'admin/system/admin/dropbear\n' >"$tmp/dropbear.txt"
-printf 'admin/system/admin/uhttpd\n' >"$tmp/uhttpd.txt"
+printf 'admin/status/overview\nadmin/system/system\n' >"$tmp/form.txt"
+printf 'admin/status/overview\nadmin/system/admin/dropbear\nadmin/system/admin/uhttpd\n' >"$tmp/uhttpd.txt"
 # Text fields, selects and dropdowns only: a near-white border on a
 # checkbox would break the ui rule as well.
 pale='admin/system/system=#view :is(input:not([type="checkbox"], [type="radio"]), select, textarea, .cbi-dropdown:not(.btn)) { border-color: #f8f8f8 !important }'
 
 # Errors.
 expect contrast 1 error "page-list entry that 404s" "admin/no/such/page: HTTP 404" -- "$url" "$password" --pages "$tmp/missing.txt"
-expect contrast 1 error "wrong password" "(login): login returned 403" -- "$url" "$password-wrong" --pages "$tmp/overview.txt"
+expect contrast 1 error "wrong password" "(login): login returned 403" -- "$url" "$password-wrong" --pages "$tmp/base.txt"
+
+# The baseline the cases below break: only the waived field border.
+expect contrast 0 waived:field-border "baseline: overview and Dropbear" -- "$url" "$password" --pages "$tmp/base.txt"
 
 # Text: body text in table cells, and card titles (22px semibold is body
 # size for WCAG), each #dddddd on the white card (1.36:1).
-expect contrast 1 text "low-contrast body text" "#dddddd on #ffffff" -- "$url" "$password" --pages "$tmp/overview.txt" \
+expect contrast 1 text,waived:field-border "low-contrast body text" "#dddddd on #ffffff" -- "$url" "$password" --pages "$tmp/base.txt" \
 	--debug-css 'admin/status/overview=#view .td { color: #ddd !important }'
-expect contrast 1 text "low-contrast card titles" "#dddddd on #ffffff" -- "$url" "$password" --pages "$tmp/overview.txt" \
+expect contrast 1 text,waived:field-border "low-contrast card titles" "#dddddd on #ffffff" -- "$url" "$password" --pages "$tmp/base.txt" \
 	--debug-css 'admin/status/overview=#view .cbi-section :is(h2, h3) { color: #ddd !important }'
 
-# Large text, on a phone: the 26px page title at #cccccc (1.61:1, under 3).
-expect contrast 1 large "low-contrast page title on a phone" -- "$url" "$password" --pages "$tmp/overview.txt" --viewports phone \
+# Large text: the 26px page title at #cccccc (1.61:1, under 3). (The
+# phone case is in tests/uniform.sh: on a phone these pages draw no
+# separator, which the run requires.)
+expect contrast 1 large,waived:field-border "low-contrast page title" -- "$url" "$password" --pages "$tmp/base.txt" \
 	--debug-css 'admin/status/overview=#maincontent h2[name="content"] { color: #ccc !important }'
 
 # UI boundary: an unchecked checkbox with a near-white border on white, and
 # a split button (Save & Apply) turned white with a near-white border but
 # dark words.
-expect contrast 1 ui "checkbox boundary" -- "$url" "$password" --pages "$tmp/dropbear.txt" \
+expect contrast 1 ui,waived:field-border "checkbox boundary" -- "$url" "$password" --pages "$tmp/base.txt" \
 	--debug-css 'admin/system/admin/dropbear=#view input[type="checkbox"]:not(:checked) { border-color: #f4f4f4 !important; background-color: #fff !important }'
-expect contrast 1 ui "split button boundary" -- "$url" "$password" --pages "$tmp/uhttpd.txt" \
+expect contrast 1 ui,waived:field-border "split button boundary" -- "$url" "$password" --pages "$tmp/uhttpd.txt" \
 	--debug-css 'admin/system/admin/uhttpd=#maincontent .cbi-dropdown:is(.btn, .cbi-button) { background-color: #fff !important; border: 1px solid #fafafa !important } #maincontent .cbi-dropdown:is(.btn, .cbi-button), #maincontent .cbi-dropdown:is(.btn, .cbi-button) * { color: #222 !important }'
 
 # Focus: no ring at all on the page's controls.
-expect contrast 1 focus "no focus ring" "no focus ring" -- "$url" "$password" --pages "$tmp/overview.txt" \
+expect contrast 1 focus,waived:field-border "no focus ring" "no focus ring" -- "$url" "$password" --pages "$tmp/base.txt" \
 	--debug-css 'admin/status/overview=#maincontent :is(:focus, :focus-visible) { outline: none !important; box-shadow: none !important }'
 
 # Separator, in dark mode as the rule applies by default: white cell rules.
-expect contrast 1 separator "bright separator in dark mode" -- "$url" "$password" --pages "$tmp/overview.txt" --modes dark \
+expect contrast 1 separator,waived:field-border "bright separator in dark mode" -- "$url" "$password" --pages "$tmp/base.txt" --modes dark \
 	--debug-css 'admin/status/overview=#view .td { border-block-end: 1px solid #fff !important }'
 
 # Field border alone: waived by default (exit 0, listed as waived), and a

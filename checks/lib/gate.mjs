@@ -180,7 +180,10 @@ export async function openPage(ctx, opt, entry, mode, debugCss) {
     await ((await close.count()) ? close.first() : page.locator('#modal_overlay .modal :is(button, .btn)').last()).click();
     await page.waitForTimeout(500);
   }
-  for (const d of debugCss) if (d.page === entry.id || d.page === entry.path) await page.addStyleTag({content: d.css});
+  // A test stylesheet changes colours the theme transitions: wait for them.
+  const mine = debugCss.filter((d) => d.page === entry.id || d.page === entry.path);
+  for (const d of mine) await page.addStyleTag({content: d.css});
+  if (mine.length) await page.waitForTimeout(opt.settle);
   let note = '';
   if (entry.modal) {
     try {

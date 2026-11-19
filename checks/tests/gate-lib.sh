@@ -55,7 +55,7 @@ expect() {
 		echo "ok   $label: exit $got, failed rules {$have}${text:+, says \"$text\"}"
 	else
 		echo "FAIL $label: exit $got (want $want), failed rules {$have} (want {$rules_want})${text:+, want \"$text\"}"
-		tail -20 "$tmp/out" "$tmp/err" | sed 's/^/    /'
+				tail -n 20 "$tmp/out" "$tmp/err" | sed 's/^/    /' || true
 		failures=$((failures + 1))
 	fi
 }

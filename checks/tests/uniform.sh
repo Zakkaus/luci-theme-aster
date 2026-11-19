@@ -18,6 +18,7 @@ printf 'admin/system/reboot require=button\n' >"$tmp/reboot.txt"
 printf 'admin/system/reboot require=button,checkbox\n' >"$tmp/reboot-checkbox.txt"
 printf 'admin/network/firewall/rules require=table@rows\n' >"$tmp/rules.txt"
 printf 'admin/network/network\n' >"$tmp/network.txt"
+printf 'admin/system/admin/dropbear\n' >"$tmp/dropbear.txt"
 node -e '
 	const fs = require("fs");
 	const [src, out] = process.argv.slice(1);
@@ -46,9 +47,10 @@ expect uniform 1 "missing checkbox" "required class the page lacks" -- "$url" "$
 expect uniform 1 "missing table" "phone hides a table's data rows" "the page's tables hold" -- "$url" "$password" --pages "$tmp/rules.txt" --viewports phone \
 	--debug-css 'admin/network/firewall/rules=#view .table .tr:not(.placeholder):has(> .td) { display: none !important }'
 
-# Dark: a card fill that only dark mode gets wrong.
-expect uniform 1 "card background" "dark card fill changed" -- "$url" "$password" --pages "$tmp/overview.txt" --modes dark \
-	--debug-css 'admin/status/overview=#view > .cbi-section { background-color: rgb(0, 0, 0) !important }'
+# Dark: a card fill that only dark mode gets wrong. (Not the overview: a
+# fill there would turn its frameless port band into a card as well.)
+expect uniform 1 "card background" "dark card fill changed" -- "$url" "$password" --pages "$tmp/dropbear.txt" --modes dark \
+	--debug-css 'admin/system/admin/dropbear=#view .cbi-section { background-color: rgb(0, 0, 0) !important }'
 
 # Content wider than its card: the rule 26d0959 dropped, put back. It made
 # the interfaces table 15,200 px wide inside its card; the page itself did
