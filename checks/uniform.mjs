@@ -56,7 +56,12 @@ function collect(cfg) {
   const scope = cfg.modal ? document.querySelector('#modal_overlay .modal') : document.querySelector('#maincontent');
   if (!scope) return [];
   const out = [];
-  const add = (cls, prop, v, el) => out.push([cls, prop, v, where(el)]);
+  // The path, plus the element's own words when it has any, so a report
+  // line can be found on the page.
+  const add = (cls, prop, v, el) => {
+    const t = ownText(el).slice(0, 24);
+    out.push([cls, prop, v, t ? `${where(el)} "${t}"` : where(el)]);
+  };
   const all = (sel) => [...scope.querySelectorAll(sel)].filter((el) => (cfg.modal || !el.closest('#modal_overlay')) && visible(el));
   const px = (v) => Math.round(parseFloat(v) * 100) / 100;
   const col = (s) => {
@@ -79,15 +84,17 @@ function collect(cfg) {
   const box = (el) => el.getBoundingClientRect();
   const CARD = '.cbi-section, .cbi-section-node';
   const BTN = 'button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button';
-  const FIELD = 'input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"], [type="reset"], [type="file"], [type="hidden"], [type="image"]), select:not([multiple]), .cbi-dropdown';
+  // A .cbi-dropdown.btn is a split button (Diagnostics, page actions).
+  const FIELD = 'input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"], [type="reset"], [type="file"], [type="hidden"], [type="image"]), select:not([multiple]), .cbi-dropdown:not(.btn)';
 
   // Buttons: variant from luci-base's class, size from where it sits (a
   // table cell holds the small one). A button with no words is an icon one.
   for (const el of all(BTN)) {
-    if (el.parentElement?.closest(BTN) || el.closest('.cbi-dropdown')) continue;
+    if (el.parentElement?.closest(BTN) || el.parentElement?.closest('.cbi-dropdown')) continue;
     const s = getComputedStyle(el);
     const text = (el.matches('input') ? el.value : el.textContent).trim();
-    const variant = el.matches('.cbi-button-link') ? 'link'
+    const variant = el.matches('.cbi-dropdown') ? 'dropdown'
+      : el.matches('.cbi-button-link') ? 'link'
       : el.matches('.cbi-button-negative, .cbi-button-remove') ? 'danger'
       : el.matches('.cbi-button-positive, .cbi-button-apply, .cbi-button-save, .cbi-button-action, .btn.important') ? 'primary' : 'secondary';
     const size = el.closest('td, .td') ? 'sm' : 'md';
@@ -162,11 +169,13 @@ function collect(cfg) {
     }
   }
 
-  // Cards: the outermost .cbi-section / .cbi-section-node. One with neither
-  // a border nor a fill is a frameless band (the overview's port status),
-  // not a card. Dialog sections are the dialog's, not cards.
+  // Cards: the outermost .cbi-section / .cbi-section-node, and a table
+  // standing alone in the view (24.10 writes Processes and others that way).
+  // One with neither a border nor a fill is not a card: a frameless band
+  // (the overview's port status) or a table not framed yet. Dialog sections
+  // are the dialog's, not cards.
   if (!cfg.modal) {
-    const cards = all(CARD).filter((el) => !el.parentElement.closest(CARD));
+    const cards = all(`${CARD}, #view > :is(table, .table), #view > .cbi-map > :is(table, .table)`).filter((el) => !el.parentElement.closest(CARD));
     const framed = new Set();
     for (const el of cards) {
       const s = getComputedStyle(el);
@@ -249,7 +258,7 @@ function widthTest(cfg) {
   if (!scope) return [];
   const out = [];
   const long = 'W'.repeat(60);
-  const sel = '.cbi-value-field :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"], [type="reset"], [type="file"], [type="hidden"], [type="image"]), select:not([multiple]), .cbi-dropdown)';
+  const sel = '.cbi-value-field :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"], [type="reset"], [type="file"], [type="hidden"], [type="image"]), select:not([multiple]), .cbi-dropdown:not(.btn))';
   const fields = [...scope.querySelectorAll(sel)]
     .filter((el) => !el.closest('td, .td') && !el.parentElement.closest('.cbi-dropdown') && (cfg.modal || !el.closest('#modal_overlay')) && visible(el))
     .slice(0, cfg.limit);

@@ -22,7 +22,7 @@ admin/status/realtime/bandwidth      require=font.body,heading.page,card,tab
 admin/status/realtime/connections    require=font.body,heading.page,card,table,tab
 
 # System
-admin/system/system                  require=font.body,heading.page,card,button,field,checkbox,form.label,tab
+admin/system/system                  require=font.body,heading.page,card,button,field,form.label,tab
 admin/system/admin/password          require=font.body,heading.page,card,button,field.input,form.label,tab
 admin/system/admin/dropbear          require=font.body,heading.page,card,button,field,checkbox,form.label,tab
 admin/system/admin/sshkeys           require=font.body,heading.page,card,button,field.input,tab

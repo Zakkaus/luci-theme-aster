@@ -63,7 +63,7 @@ function collect(cfg) {
   const shell = (el) => !cfg.modal && !el.closest('#maincontent');
   const disabled = (el) => !!el.closest(':disabled, [disabled], .disabled, [aria-disabled="true"]');
   const push = (kind, fgc, bgc, el, text, extra = {}) => out.push({kind, ratio: Math.round(ratio(fgc, bgc) * 100) / 100, fg: hex(fgc), bg: hex(bgc), where: where(el), text: text.slice(0, 40), shell: shell(el), ...extra});
-  const FIELD = 'input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"], [type="reset"], [type="file"], [type="hidden"], [type="image"]), select, textarea, .cbi-dropdown';
+  const FIELD = 'input:not([type="checkbox"], [type="radio"], [type="range"], [type="button"], [type="submit"], [type="reset"], [type="file"], [type="hidden"], [type="image"]), select, textarea, .cbi-dropdown:not(.btn)';
 
   for (const el of scope.querySelectorAll('*')) {
     if (el.matches('option, script, style, noscript, title')) continue;
