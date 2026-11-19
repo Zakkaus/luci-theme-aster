@@ -151,9 +151,23 @@ function collect(cfg) {
     // value over a track), not a table row: its cells are read, its height
     // is not.
     const progress = !!row.querySelector('.cbi-progressbar');
-    const base = progress ? 'table.progress' : headerOf.get(table) ? 'table' : 'table.kv';
     const cells = [...row.children].filter((c) => c.matches('th, td, .th, .td') && visible(c));
     if (!cells.length) continue;
+    // A header table folded on a phone (a row is a grid, not a table row):
+    // the reference's collapsible table, the first cell in body text and
+    // the dropped columns stacked under it as supporting text (spec.md,
+    // Phone layout). Its cells are their own classes; row heights vary
+    // with the number of columns and are not read.
+    if (!progress && headerOf.get(table) && getComputedStyle(row).display === 'grid') {
+      cells.forEach((c, i) => {
+        const s = getComputedStyle(c);
+        const cls = c.matches('.cbi-section-actions') ? 'table.fold.td.actions' : i === 0 ? 'table.fold.td.first' : 'table.fold.td.stacked';
+        add(cls, 'paddingInlineStart', px(s.paddingInlineStart), c);
+        add(cls, 'fontSize', px(s.fontSize), c);
+      });
+      continue;
+    }
+    const base = progress ? 'table.progress' : headerOf.get(table) ? 'table' : 'table.kv';
     if (isHeader(row)) add(`${base}.header`, 'height', px(box(row).height), row);
     else if (!progress && cells.every((c) => lines(c) <= 1)) {
       const kind = row.querySelector('input:not([type="hidden"]), select, textarea, .cbi-dropdown') ? 'control' : row.querySelector(BTN) ? 'button' : 'text';

@@ -148,6 +148,10 @@
 /* The diagnostics page lays three tools out as three cells of one row. */
 .table:has(.diag-action) { table-layout: fixed; }
 .td > input + .diag-action { display: block; margin: var(--spacing-2) 0 0; }
+/* 24.10 writes Processes, Startup, the logs and others as a table straight
+   in the view; the table is the Card. A collapsed table takes no padding or
+   radius, so it keeps its borders separate. */
+#view > :is(table, .table), #view > .cbi-map > :is(table, .table) { border-collapse: separate; }
 /* A table that does not fit scrolls inside its card, not the page. */
 :is(.cbi-section, .cbi-section-node) > div:not(.cbi-section-node):has(> .table),
 .shell-inner > div:has(> .table),
@@ -521,8 +525,11 @@
   .cbi-value-field { --field-w: 100%; flex-basis: auto; }
   /* CBI wraps a widget in a bare div, which must span the row too. */
   .cbi-value-field > :not(button, .btn, .cbi-button, .cbi-checkbox) { flex-basis: 100%; }
+  /* The diagnostics tools stack instead of sharing a row (layout). */
+  .table:has(.diag-action) > .tr { display: flex; flex-direction: column; gap: var(--spacing-4); }
+  .table:has(.diag-action) > .tr > .td { display: block; padding-inline: 0; border: 0; }
   /* A wide table without a header row scrolls inside its card. */
-  .table:not(:has(> .tr > .th)) { display: block; overflow-x: auto; }
+  .table:not(:has(> .tr > .th, > .thead > .tr > .th)) { display: block; overflow-x: auto; }
   .cbi-page-actions { position: static; }
   /* A dialog fits the screen. */
   #modal_overlay { padding: var(--spacing-4); }

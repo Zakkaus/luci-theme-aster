@@ -10,7 +10,7 @@
     "button.*.sm": {"_source": "spec Button secondary sm", "height": 32, "radius": 9999, "fontSize": 15, "paddingInline": 12},
     "button.icon.*": {"height": null, "radius": null, "fontSize": null, "paddingInline": null},
 
-    "field.*": {"_source": "Astryx 0.7.16 TextField and Select md, measured in M3 (STATE.md, M3 port): height --size-element-md, radius --radius-element, body size; formWidth is --aster-field-w (layout.css), desktop only. border stays the majority until the owner decides the field border (contrast rule field-border)", "height": 36, "radius": 12, "border": null, "fontSize": 15, "formWidth": {"desktop": 256, "phone": null}, "textWidth": 0},
+    "field.*": {"_source": "Astryx 0.7.16 TextField and Select md, measured in M3 (STATE.md, M3 port): height --size-element-md, radius --radius-element, body size; formWidth is --aster-field-w (layout.css), desktop only; border is Astryx's emphasized border (owner 2026-11-19: keep Astryx field border)", "height": 36, "radius": 12, "border": {"light": "1px solid rgb(204, 211, 219)", "dark": "1px solid rgb(73, 77, 83)"}, "fontSize": 15, "formWidth": {"desktop": 256, "phone": null}, "textWidth": 0},
     "checkbox": {"_source": "Astryx 0.7.16 Checkbox, measured in M3 (STATE.md, M3 port): 24", "size": 24},
     "radio": {"_source": "Astryx 0.7.16 Radio, measured in M3 (STATE.md, M3 port): 24", "size": 24},
 
@@ -20,6 +20,9 @@
     "table.row.control": {"height": null},
     "table.th": {"_source": "spec Table header cell", "paddingBlock": 4, "paddingInlineStart": 16, "fontSize": 15, "fontWeight": "600"},
     "table.td": {"_source": "spec Table body cell", "paddingBlock": 4, "paddingInlineStart": 16, "fontSize": 15},
+    "table.fold.td.first": {"_source": "spec Phone layout: collapsible table, host name cell (15, 16 inline start)", "paddingInlineStart": 16, "fontSize": 15},
+    "table.fold.td.stacked": {"_source": "spec Phone layout: dropped columns stacked under the first as supporting text", "paddingInlineStart": 16, "fontSize": 13},
+    "table.fold.td.actions": {"paddingInlineStart": null, "fontSize": null},
     "table.kv.row.text": {"_source": "M2 overview System card (spec has no key/value table)", "height": 33},
     "table.kv.row.*": {"height": null},
     "table.kv.td": {"_source": "M2 overview System card", "paddingBlock": 4, "paddingInlineStart": 16, "fontSize": 15},

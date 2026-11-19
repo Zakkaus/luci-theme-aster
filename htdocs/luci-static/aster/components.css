@@ -23,7 +23,9 @@
    Form row      Field layout   .cbi-value, .cbi-value-title, .cbi-value-field,
                                 .cbi-value-error, .control-group
    Card          Card           .cbi-section, .cbi-section-node, .ifacebox
-                                (+ .ifacebox-head/-body), .cbi-page-actions
+                                (+ .ifacebox-head/-body), .cbi-page-actions,
+                                a table straight in the view (24.10 status
+                                pages)
                                 (--card-*); Card variant of .ifacebox: the
                                 overview's boxes (--ifacebox-body-*)
    MetadataList  MetadataList   .cbi-section .table without a header row
@@ -187,8 +189,9 @@ hr {
    TextField: md 36 high, 8 inline, element radius, an emphasized border
    on the surface. One height for every control in a row: a field, a
    select and the button beside it are all 36. Hover adds a 2 inset ring
-   in the border colour at 30 %; focus turns the border accent with a 2
-   inset ring in the accent's muted tint (no outline); disabled is half
+   in the border colour at 30 %; focus turns the border accent with a 1
+   inset accent ring, a 2 accent edge (no outline; Astryx's accent-muted
+   ring is 1.2:1, under the 3:1 a focus indicator needs); disabled is half
    opaque; read-only looks the same as editable; invalid has the error
    border, also on hover and focus. --field-w sets the width. */
 
@@ -203,7 +206,7 @@ hr {
   border: var(--border-width) solid var(--field-border, var(--color-border-emphasized));
   border-radius: var(--radius-element);
   background-color: var(--field-bg, var(--color-background-surface));
-  box-shadow: inset 0 0 0 calc(var(--border-width) * 2) var(--field-ring);
+  box-shadow: inset 0 0 0 var(--field-ring-w, calc(var(--border-width) * 2)) var(--field-ring);
   color: var(--color-text-primary);
   font: inherit;
   font-size: var(--text-body-size);
@@ -228,7 +231,8 @@ hr {
 }
 :where(:is(input, textarea, select):focus, .cbi-dropdown:not(.btn, .cbi-button):is([open], :focus-visible)) {
   --field-border: var(--color-accent);
-  --field-ring: var(--color-accent-muted);
+  --field-ring: var(--color-accent);
+  --field-ring-w: var(--border-width);
   outline: none;
 }
 :where(input, textarea)::placeholder { color: var(--color-text-secondary); }
@@ -286,11 +290,14 @@ hr {
 :where(:is(.cbi-dropdown:not(.btn, .cbi-button)) > ul > li[placeholder]) { color: var(--color-text-secondary); }
 :where(.cbi-dropdown > ul > li[display]:not([display="0"])) { border-inline-start: var(--border-width) solid var(--color-border); }
 :where(.cbi-dropdown > ul > li img) { block-size: var(--aster-icon-sm); inline-size: auto; }
-/* The chevron segment: square, the control's height. */
+/* The chevron segment: centred; a Select's is 32 wide in the secondary
+   icon colour (a ComboButton's is the button's own, above). */
 :where(.cbi-dropdown > :is(.open, .more)) {
   flex: none;
   align-items: center;
   justify-content: center;
+}
+:where(.cbi-dropdown:not(.btn, .cbi-button) > :is(.open, .more)) {
   inline-size: var(--size-element-sm);
   color: var(--color-icon-secondary);
 }
@@ -531,9 +538,10 @@ hr {
 @property --card-radius { syntax: "*"; inherits: false; }
 @property --card-shadow { syntax: "*"; inherits: false; }
 
-:where(.cbi-section, .cbi-section-node, .ifacebox, .cbi-page-actions) {
+:where(.cbi-section, .cbi-section-node, .ifacebox, .cbi-page-actions, #view > :is(table, .table), #view > .cbi-map > :is(table, .table)) {
   --card-pad: calc(var(--spacing-4) - var(--border-width));
   box-sizing: border-box;
+  min-inline-size: 0;
   padding: var(--card-pad);
   border: var(--card-border-width, var(--border-width)) solid var(--card-border, var(--color-border));
   border-radius: var(--card-radius, var(--radius-container));
@@ -643,9 +651,13 @@ hr {
   white-space: nowrap;
 }
 @media (hover: hover) {
-  :where(.table > .tr:has(> .td):not(.placeholder)):hover { background-color: var(--color-overlay-hover); }
+  :where(.table .tr:has(> .td):not(.placeholder)):hover { background-color: var(--color-overlay-hover); }
 }
 :where(.tr.placeholder) { display: table-caption; caption-side: bottom; }
+/* A form section (form.js) puts the message row in a tbody of its own,
+   where a caption cannot sit: the tbody becomes the caption. */
+:where(.tbody:has(> .tr.placeholder:only-child)) { display: table-caption; caption-side: bottom; }
+:where(.tbody > .tr.placeholder) { display: block; }
 :where(.tr.placeholder > .td) {
   display: block;
   padding-block: var(--spacing-6);
@@ -662,22 +674,25 @@ hr {
 /* Collapsible: below 768 a table with a header row folds each row into a
    stack, as the reference's lease table does. The first cell in primary
    text; the others under it in supporting text, each with its column name
-   (LuCI's data-title); the action cell at the end. */
+   (LuCI's data-title); the action cell at the end. A form section's table
+   (form.js) keeps its rows in thead and tbody, a status table (ui.Table)
+   straight in the table; both are reached. */
 @media (max-width: 48rem) {
-  :where(#view .table:has(> .tr > .th)) { display: block; overflow: visible; }
-  :where(#view .table:has(> .tr > .th) > .tr:has(> .th)) { display: none; }
-  :where(#view .table:has(> .tr > .th) > .tr.placeholder) { display: block; }
-  :where(#view .table:has(> .tr > .th) > .tr:not(:has(> .th), .placeholder)) {
+  :where(#view .table:has(> .tr > .th, > .thead > .tr > .th)) { display: block; overflow: visible; }
+  :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) > :is(.thead, .tbody, .tfoot)) { display: contents; }
+  :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr:has(> .th)) { display: none; }
+  :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr.placeholder) { display: block; }
+  :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr:not(:has(> .th), .placeholder)) {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     column-gap: var(--spacing-3);
-    padding: var(--spacing-2) var(--card-pad, var(--spacing-0));
+    padding-block: var(--spacing-1);
     border-block-end: var(--border-width) solid var(--color-border);
   }
-  :where(#view .table:has(> .tr > .th) > .tr > .td) {
+  :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td) {
     display: block;
     grid-column: 1;
-    padding: 0;
+    padding: 0 var(--spacing-2) 0 var(--spacing-4);
     border: 0;
     color: var(--color-text-secondary);
     font-size: var(--text-supporting-size);
@@ -685,22 +700,31 @@ hr {
     overflow-wrap: anywhere;
     text-align: start;
   }
-  :where(#view .table:has(> .tr > .th) > .tr > .td:first-child) {
+  :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td:first-child) {
     color: var(--color-text-primary);
     font-size: var(--text-body-size);
     line-height: var(--text-body-leading);
   }
-  :where(#view .table:has(> .tr > .th) > .tr > .td[data-title]:not(:first-child, .cbi-section-actions))::before {
+  :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td[data-title]:not(:first-child, .cbi-section-actions))::before {
     content: attr(data-title);
     margin-inline-end: var(--spacing-2);
     font-weight: var(--font-weight-medium);
   }
-  :where(#view .table:has(> .tr > .th) > .tr > .td:has(> :is(input:not([type="checkbox"]), select, .cbi-dropdown, .cbi-dynlist)))::before { display: block; }
-  :where(#view .table:has(> .tr > .th) > .tr > .td.cbi-section-actions) {
+  :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td:has(> :is(input:not([type="checkbox"]), select, .cbi-dropdown, .cbi-dynlist)))::before { display: block; }
+  :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions) {
+    padding-inline: 0 var(--spacing-4);
     grid-column: 2;
     grid-row: 1 / span 8;
     align-self: center;
   }
+  /* Three actions or more (Processes, Startup) take a line of their own
+     under the stack instead of the column beside it. */
+  :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions:has(> * > :nth-child(3))) {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    padding: var(--spacing-2) var(--spacing-4) 0;
+  }
+  :where(#view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions:has(> * > :nth-child(3)) > *) { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
 }
 
 /* ── MetadataList ────────────────────────────────────────────────
