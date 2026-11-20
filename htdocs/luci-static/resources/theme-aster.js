@@ -29,7 +29,8 @@ return baseclass.extend({
 	/* Marks for what LuCI says only in its words, kept as views re-render:
 	 *  - a ▲ or ▼ before a traffic count (the overview's ports) goes into a
 	 *    .aster-glyph span, which components.css draws as the ArrowUp or
-	 *    ArrowDown icon (Icon glyphs);
+	 *    ArrowDown icon (Icon glyphs); a port with no link that counted
+	 *    0 B both ways gets .aster-idle (luci.css hides the counts);
 	 *  - an interface's Error entry (interfaces.js render_status: a
 	 *    "<strong>Error:</strong> text" item) gets .aster-error, set in the
 	 *    error ink (luci.css, Network pages);
@@ -58,6 +59,12 @@ return baseclass.extend({
 				hits.push(walk.currentNode);
 
 			hits.forEach((n) => n.replaceWith(...n.data.split(/([▲▼])/).filter(Boolean).map((s) => /^[▲▼]$/.test(s) ? glyph(s) : s)));
+
+			root.querySelectorAll('.ifacebox:has(img[src*="_down."]) .cbi-tooltip-container').forEach((c) => {
+				const t = [...c.childNodes].filter((n) => !n.classList?.contains('cbi-tooltip')).map((n) => n.textContent).join('');
+
+				c.classList.toggle('aster-idle', /^(\s*[▲▼]\s*0 B){2}\s*$/.test(t));
+			});
 
 			root.querySelectorAll('span:not(.aster-error) > strong:first-child').forEach((s) => {
 				if (s.textContent.trim().replace(/[:：]$/, '') === error)

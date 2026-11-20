@@ -519,83 +519,87 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   & :is(.ifacebox-body > div, .td) > .ifacebadge:has(> img:is([src*="/signal-000-000"], [src*="/signal-none"]))::before { background-color: var(--color-icon-secondary); }
   & .ifacebox > .ifacebox-body > img,
   & :is(.ifacebox-body > div, .td) > .ifacebadge > img { display: none; }
-  /* Port tiles, the reference's port band. The Port status card is the reference's section: its title over a grid of
-     port tiles with no card around them. */
+  /* Port tiles, the reference's port band. The Port status card is the
+     reference's section: its title over the tiles, no card around them. Its
+     title and Hide/Show sit 16 in, on the line where every other card's
+     title and chevron sit (and where the tiles' text starts and ends). */
   & > .cbi-section:has(img[src*="/port_"]) {
     --card-pad: 0;
     --card-border-width: 0;
     --card-radius: 0;
     --card-bg: transparent;
+    & > .cbi-title { padding-inline: var(--spacing-4); }
   }
   /* 29_ports.js writes a 70 px grid and box sizes inline (!important to
-     override); the dashboard template's tile Grid (auto-fit): at least 160
-     a tile, 16 apart, five a row at most, the tiles of a row filling it. */
+     override). The tiles wrap 16 apart, at least 160 each, and the tiles of
+     a row share it, the last row's included: no row ends half empty (a
+     lone wan tile beside three empty tracks, owner 2026-11-21). */
   & div[style*="grid-template-columns"]:has(> .ifacebox) {
-    grid-template-columns: repeat(auto-fit, minmax(max(var(--aster-port-min), (100% - 4 * var(--spacing-4)) / 5), 1fr)) !important;
+    display: flex !important;
+    flex-wrap: wrap;
     gap: var(--spacing-4);
     margin: 0 !important;
   }
+  /* A tile is a metric tile: the name (Heading 4), the link state, then the
+     traffic as its value (body, primary ink). LuCI lists lan ports before
+     wan; the uplink comes first (its zone badge is LuCI's wan colour,
+     firewall.js getColorForName). */
   & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) {
-    position: relative;
+    flex: 1 1 var(--aster-port-min);
     min-inline-size: 0 !important;
     max-inline-size: none !important;
     margin: 0 !important;
-    /* The name row: the icon, green with a link, then the name. Its bold is
-       inline; the heading weight is 600. The end stays free for the zone dots. */
+    &:has(.zonebadge[style*="240, 144, 144"]) { order: -1; }
     & > .ifacebox-head:first-child {
-      padding-inline-end: var(--spacing-6);
-      font-weight: var(--text-heading-3-weight) !important;
-      &::before { background-color: var(--color-icon-success); }
+      font-size: var(--text-heading-4-size);
+      font-weight: var(--text-heading-4-weight) !important;
+      line-height: var(--text-heading-4-leading);
     }
     & > .ifacebox-body { text-align: start; }
-    /* The speed ("10 GbE", "no link"): body text on one line, muted without a
-       link. The <br> after the hidden image would leave an empty line. */
+    /* The link state: a StatusDot (8, success with a carrier, neutral
+       without) and LuCI's words ("10 GbE", "no link"), supporting text on
+       one line; state is never the colour alone. The <br> after the hidden
+       image would leave an empty line. */
     & > .ifacebox-body:nth-child(2) {
-      --ifacebox-body-fg: var(--color-text-primary);
-      --ifacebox-body-size: var(--text-body-size);
-      --ifacebox-body-leading: var(--text-body-leading);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       & > br { display: none; }
+      &::before {
+        content: "";
+        display: inline-block;
+        inline-size: var(--spacing-2);
+        block-size: var(--spacing-2);
+        margin-inline-end: var(--spacing-2);
+        border-radius: var(--radius-full);
+        background-color: var(--color-icon-success);
+        vertical-align: middle;
+      }
     }
-    /* A port with no carrier is the reference's muted Card: the sunken fill, no
-       edge, muted text. LuCI says so only in the image: port_down, port_pse_down. */
+    /* No carrier (LuCI says so only in the image: port_down, port_pse_down):
+       the same surface and edge, muted ink, a neutral dot. */
     &:has(> .ifacebox-body > img[src*="_down."]) {
-      --card-border: transparent;
-      --card-bg: var(--color-background-muted);
-      & > .ifacebox-head:first-child::before { background-color: var(--color-icon-secondary); }
-      & > .ifacebox-body:nth-child(2) { --ifacebox-body-fg: var(--color-text-secondary); }
+      & > .ifacebox-head:first-child { color: var(--color-text-secondary); }
+      & > .ifacebox-body:nth-child(2)::before { background-color: var(--color-icon-secondary); }
+      & > .ifacebox-body > .cbi-tooltip-container { color: var(--color-text-secondary); }
     }
-    /* The zone bars (inline flex: 1 and height) become 8 dots in LuCI's
-       colours at the name row's end, where the reference puts the role. */
-    & > .ifacebox-head.cbi-tooltip-container {
-      position: absolute;
-      inset-block-start: calc(var(--spacing-4) - var(--border-width));
-      inset-inline-end: calc(var(--spacing-4) - var(--border-width));
-      block-size: calc(var(--text-heading-3-size) * var(--text-heading-3-leading));
-      align-items: center;
-      gap: var(--spacing-1);
-    }
-    & > .ifacebox-head > .zonebadge {
-      flex: none !important;
-      inline-size: var(--spacing-2);
-      block-size: var(--spacing-2) !important;
-      min-inline-size: 0;
-      min-block-size: 0; /* the Badge's 20; a StatusDot is 8 round */
-      padding: 0;
-      border-radius: var(--radius-full);
-      background-image: none;
-    }
-    /* Traffic: "▲ sent", "▼ received", two supporting lines 4 apart; the
-       arrows are ArrowUp / ArrowDown icons (.aster-glyph, Icon glyphs); the
-       80 % size is inline. */
+    /* LuCI's zone bars are colour only and the wan one reads as an error;
+       the link state is the dot above. */
+    & > .ifacebox-head.cbi-tooltip-container { display: none !important; }
+    /* Traffic: "↑ sent", "↓ received", body text in primary ink, two lines
+       4 apart; the arrows (.aster-glyph, ArrowUp / ArrowDown) at text size,
+       centred on the digits (cap height 0.7 em: the icon's middle 0.35 em
+       above the baseline; the glyph's own size is 0). The 80 % size is inline. A port with no link
+       and nothing counted (theme-aster.js: .aster-idle) shows no traffic. */
     & > .ifacebox-body > .cbi-tooltip-container {
-      color: var(--color-text-secondary);
-      font-size: var(--text-supporting-size) !important;
+      color: var(--color-text-primary);
+      font-size: var(--text-body-size) !important;
       font-variant-numeric: tabular-nums;
-      line-height: calc(var(--text-supporting-size) * var(--text-supporting-leading) + var(--spacing-1));
+      line-height: calc(var(--text-body-size) * var(--text-body-leading) + var(--spacing-1));
+      & > .aster-glyph { margin-inline-end: var(--spacing-1); vertical-align: calc(var(--text-body-size) * -0.15); }
+      & > .aster-glyph::before { inline-size: var(--text-body-size); block-size: var(--text-body-size); }
     }
+    & > .ifacebox-body:has(> .aster-idle) { display: none; }
   }
   /* PoE: inline black, grey and red, picked for a white page; black on a dark
      card cannot be read. */

@@ -114,11 +114,16 @@ const FIELDS = [
   {name: 'port tile padding', from: ['components', 'Port tile (Card)', 'padding'], sel: PORT_UP, prop: 'padding'},
   {name: 'port tile border', from: ['components', 'Port tile (Card)', 'border'], sel: PORT_UP, prop: 'border', exact: true},
   {name: 'port tile background', from: ['components', 'Port tile (Card)', 'background'], sel: PORT_UP, prop: 'background', exact: true},
-  {name: 'port name size', from: ['components', 'Heading h3 (port name, radio SSID)', 'fontSize'], sel: `${PORT_UP} > .ifacebox-head:first-child`, prop: 'fontSize'},
+  // A tile is a metric tile (owner's port sheet, 2026-11-21): the name a
+  // Heading 4 (the body size), the link state supporting text after a
+  // StatusDot (success with a link), the traffic the value in body size;
+  // the port icon neutral, as the state is the dot and its words.
+  {name: 'port name size', from: ['components', 'Port tile: speed text', 'fontSize'], sel: `${PORT_UP} > .ifacebox-head:first-child`, prop: 'fontSize'},
   {name: 'port icon size', from: ['components', 'Port tile: port icon', 'width'], sel: `${PORT_UP} > .ifacebox-head:first-child`, pseudo: '::before', prop: 'width'},
-  {name: 'port icon colour', from: ['components', 'Port tile: port icon', 'color'], sel: `${PORT_UP} > .ifacebox-head:first-child`, pseudo: '::before', prop: 'background', exact: true},
-  {name: 'port speed size', from: ['components', 'Port tile: speed text', 'fontSize'], sel: `${PORT_UP} > .ifacebox-body:nth-child(2)`, prop: 'fontSize'},
-  {name: 'port traffic size', from: ['components', 'Port tile: TX/RX text', 'fontSize'], sel: `${PORT_UP} > .ifacebox-body > .cbi-tooltip-container`, prop: 'fontSize'},
+  {name: 'port icon colour', from: ['components', 'Port tile: port icon', 'color'], want: {light: 'rgb(78, 96, 111)', dark: 'rgb(170, 175, 181)'}, sel: `${PORT_UP} > .ifacebox-head:first-child`, pseudo: '::before', prop: 'background', exact: true},
+  {name: 'port state dot', from: ['components', 'Port tile: port icon', 'color'], want: {light: 'rgb(9, 68, 31)', dark: 'rgb(165, 246, 144)'}, sel: `${PORT_UP} > .ifacebox-body:nth-child(2)`, pseudo: '::before', prop: 'background', exact: true},
+  {name: 'port speed size', from: ['components', 'Port tile: TX/RX text', 'fontSize'], sel: `${PORT_UP} > .ifacebox-body:nth-child(2)`, prop: 'fontSize'},
+  {name: 'port traffic size', from: ['components', 'Port tile: speed text', 'fontSize'], sel: `${PORT_UP} > .ifacebox-body > .cbi-tooltip-container`, prop: 'fontSize'},
   // Main colours.
   {name: 'shell background', from: ['frame', 'AppShell root', 'background'], sel: '.shell', prop: 'background', exact: true},
   {name: 'text', from: ['frame', 'AppShell root', 'color'], sel: '.shell', prop: 'color', exact: true},
