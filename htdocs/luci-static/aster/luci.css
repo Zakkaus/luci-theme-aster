@@ -22,6 +22,14 @@
   --button-fg: var(--color-on-accent);
   --button-divider: var(--color-on-accent);
 }
+/* In a table row every action is the secondary Button, small (doona's
+   row actions; Astryx ActionGroup: one primary at most, on the page, not
+   repeated down the rows). Diagnostics' tools are the page's own actions. */
+:is(.td, td) :is(.cbi-button-positive, .cbi-button-apply, .cbi-button-save, .cbi-button-action, .cbi-button-primary, .btn.primary, .btn.important):not(.diag-action) {
+  --button-bg: var(--color-neutral);
+  --button-fg: var(--color-text-primary);
+  --button-divider: var(--color-border);
+}
 /* Destructive (.cbi-button-negative, .cbi-button-remove): on a page or in
    a table row an ordinary secondary button, as Terminate and Kill are in
    Processes. Red only where it confirms: the dialog's action takes Astryx's
