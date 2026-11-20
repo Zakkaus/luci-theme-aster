@@ -136,7 +136,7 @@ html[data-theme="dark"] { color-scheme: dark; }
    its AppShell overrides (.astryx-app-shell). */
 :root {
   --color-accent: light-dark(#286983, #9CCFD8);
-  --color-accent-muted: light-dark(#28698319, #9CCFD826);
+  --color-accent-muted: light-dark(#28698319, #9CCFD838);
   --color-background-body: light-dark(#FAF4ED, #191724);
   --color-background-card: light-dark(#FFFAF3, #1F1D2E);
   --color-background-muted: light-dark(#F2E9E1, #191724);
@@ -228,7 +228,7 @@ html[data-theme="dark"] { color-scheme: dark; }
 
 :root[data-palette="relay"] {
   --color-accent: light-dark(#315FD3, #87A9FA);
-  --color-accent-muted: light-dark(#315FD316, #87A9FA26);
+  --color-accent-muted: light-dark(#315FD316, #87A9FA38);
   --color-background-body: light-dark(#F3F4F7, #181A20);
   --color-background-card: light-dark(#FFFFFF, #20232A);
   --color-background-muted: light-dark(#E9ECF2, #15171D);
@@ -270,7 +270,7 @@ html[data-theme="dark"] { color-scheme: dark; }
 
 :root[data-palette="teal"] {
   --color-accent: light-dark(#246B69, #7DC8BC);
-  --color-accent-muted: light-dark(#246B6919, #7DC8BC24);
+  --color-accent-muted: light-dark(#246B6919, #7DC8BC38);
   --color-background-body: light-dark(#F1F5F3, #161D1C);
   --color-background-card: light-dark(#FCFEFD, #1D2826);
   --color-background-muted: light-dark(#E4ECE8, #131A19);
@@ -312,7 +312,7 @@ html[data-theme="dark"] { color-scheme: dark; }
 
 :root[data-palette="plum"] {
   --color-accent: light-dark(#785378, #C9A2C5);
-  --color-accent-muted: light-dark(#78537819, #C9A2C526);
+  --color-accent-muted: light-dark(#78537819, #C9A2C538);
   --color-background-body: light-dark(#F6F3F0, #201C20);
   --color-background-card: light-dark(#FFFDFA, #292529);
   --color-background-muted: light-dark(#ECE7E3, #1C181C);

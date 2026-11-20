@@ -15,12 +15,17 @@
  * Node built-ins only.
  */
 
-/* Relay Blue, Sounding Teal and Herbarium Plum were designed for this
+/* accent-muted in dark is 22 % (0x38) in the four palettes below: their
+   pastel dark accents at 15 % made the selected side nav row read as the
+   hovered row's grey (QA 2026-11-20); at 22 % it is 1.3:1 or more from the
+   hover and the row's words stay 6.5:1 or more. Aster keeps Astryx's 16 %.
+
+   Relay Blue, Sounding Teal and Herbarium Plum were designed for this
    project. The field border (--color-border-emphasized) stays Astryx's
    #CCD3DB in light, as in Aster, and is waived in the contrast gate. */
 const RELAY = {
   '--color-accent': ['#315FD3', '#87A9FA'],
-  '--color-accent-muted': ['#315FD316', '#87A9FA26'],
+  '--color-accent-muted': ['#315FD316', '#87A9FA38'],
   '--color-on-accent': ['#FFFFFF', '#101D37'],
   '--color-text-accent': ['#274EAD', '#A9C2FF'],
   '--color-background-body': ['#F3F4F7', '#181A20'],
@@ -43,7 +48,7 @@ const RELAY = {
 
 const TEAL = {
   '--color-accent': ['#246B69', '#7DC8BC'],
-  '--color-accent-muted': ['#246B6919', '#7DC8BC24'],
+  '--color-accent-muted': ['#246B6919', '#7DC8BC38'],
   '--color-on-accent': ['#FFFFFF', '#112D2A'],
   '--color-text-accent': ['#175A59', '#9ADACE'],
   '--color-background-body': ['#F1F5F3', '#161D1C'],
@@ -66,7 +71,7 @@ const TEAL = {
 
 const PLUM = {
   '--color-accent': ['#785378', '#C9A2C5'],
-  '--color-accent-muted': ['#78537819', '#C9A2C526'],
+  '--color-accent-muted': ['#78537819', '#C9A2C538'],
   '--color-on-accent': ['#FFFFFF', '#302033'],
   '--color-text-accent': ['#69456B', '#DEC0DB'],
   '--color-background-body': ['#F6F3F0', '#201C20'],
@@ -115,7 +120,7 @@ const PLUM = {
    Main's iris, gold and foam pass as they are. */
 const ROSE_PINE = {
   '--color-accent': ['#286983', '#9CCFD8'],
-  '--color-accent-muted': ['#28698319', '#9CCFD826'],
+  '--color-accent-muted': ['#28698319', '#9CCFD838'],
   '--color-on-accent': ['#FFFAF3', '#191724'],
   '--color-text-accent': ['#286983', '#9CCFD8'],
   '--color-background-body': ['#FAF4ED', '#191724'],
