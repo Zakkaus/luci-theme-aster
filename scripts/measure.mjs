@@ -39,9 +39,11 @@ const specPath = opt('--spec');
 const user = opt('--user', 'root');
 const jsonOut = opt('--json');
 const palette = opt('--palette', 'aster');
+// Tests only: a stylesheet laid over the overview before it is read.
+const cssPath = opt('--css');
 const [baseArg, password] = args;
 if (!baseArg || password === undefined || !specPath) {
-  console.error('usage: measure.mjs <base url> <password> --spec <spec.json> [--user root] [--palette aster] [--json <file>]');
+  console.error('usage: measure.mjs <base url> <password> --spec <spec.json> [--user root] [--palette aster] [--json <file>] [--css <file>]');
   process.exit(1);
 }
 const base = `${baseArg.replace(/\/+$/, '')}/cgi-bin/luci/`;
@@ -197,10 +199,15 @@ function readAll(fields) {
       }
       const shared = [...rowsByTop.values()].filter((b) => b.length > 1);
       const spread = Math.max(0, ...shared.map((b) => Math.max(...b) - Math.min(...b)));
-      // No row of two cards (System, and Storage with a long mount list,
-      // each take a row of their own on the test boxes): nothing can end or
-      // start unevenly, so the rule holds; count 0 says no row was read.
-      out[f.name] = {value: px(spread), count: shared.length};
+      // The cards that must pair (layout/SPEC.md): bar cards, i.e. Memory
+      // and Storage with fewer than 7 bar rows; a card with a wide table or
+      // interface boxes (Network's connection bar) is not one. With two
+      // of them on the page a row of two must exist; with one (24.10 has no
+      // Storage) there is nothing to pair and the rule does not apply.
+      const pairable = [...document.querySelectorAll('#view > .cbi-section')].filter(shown).filter((c) =>
+        c.querySelector('.tr > .td > .cbi-progressbar') && !c.querySelector('.tr > .td:nth-child(3), .th, .ifacebox, .network-status-table') &&
+        c.querySelectorAll('.tr:has(> .td > .cbi-progressbar)').length < 7).length;
+      out[f.name] = {value: px(spread), count: shared.length, pairable};
       continue;
     }
     let els = [...document.querySelectorAll(f.sel)].filter(shown);
@@ -265,6 +272,7 @@ for (const [device, viewport] of Object.entries({desktop: {width: 1440, height: 
       await page.locator('#modal_overlay .modal button, #modal_overlay .modal .btn').last().click();
       await page.waitForTimeout(500);
     }
+    if (cssPath) { await page.addStyleTag({content: fs.readFileSync(cssPath, 'utf8')}); await page.waitForTimeout(300); }
     const theme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
     if (theme !== mode) fail(`${key}: data-theme is ${theme}`);
     // Rosé Pine, the theme's default palette, carries no attribute.
@@ -285,10 +293,13 @@ for (const [device, viewport] of Object.entries({desktop: {width: 1440, height: 
       const want = (typeof f.want === 'object' ? f.want[key.split('-')[1]] : f.want) ?? ref[section]?.[k]?.[prop];
       const m = got[f.name];
       if (want == null) { fail(`${key} ${f.name}: spec has no ${f.from.join(' > ')}`); continue; }
-      const pass = m.count > 0 && compare(m.value, want, f.exact);
-      rows.push({key, field: f.name, measured: m.value ?? '(none)', expected: want, samples: m.count, via: m.via, pass});
+      // A same-row field with fewer than two cards that pair has no row to
+      // read: not applicable, reported as such; with two it needs a row.
+      const na = f.measure === 'rowSpread' && m.count === 0 && m.pairable < 2;
+      const pass = na || (m.count > 0 && compare(m.value, want, f.exact));
+      rows.push({key, field: f.name, measured: na ? `n/a (${m.pairable} bar card)` : m.value ?? '(none)', expected: want, samples: m.count, via: m.via, pass});
       if (f.fallback && m.via === f.fallback) console.log(`note ${key} ${f.name}: no header table, measured ${f.fallback}`);
-      if (!pass) fail(`${key} ${f.name}: ${m.count ? `measured ${m.value}` : 'no sample'}, expected ${want}`);
+      if (!pass) fail(`${key} ${f.name}: ${m.count ? `measured ${m.value}` : f.measure === 'rowSpread' ? `no row of two cards, ${m.pairable} bar cards` : 'no sample'}, expected ${want}`);
     }
     await ctx.close();
   }

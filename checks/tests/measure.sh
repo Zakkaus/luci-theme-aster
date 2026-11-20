@@ -4,8 +4,9 @@
 #   checks/tests/measure.sh <base url> <password> <spec.json>
 #
 # A spec copy with one box value moved by 6px, a spec copy with one colour
-# changed, and a wrong password must each exit 1 and say why. (The passing
-# run is measure.mjs itself.) Needs Playwright, as measure.mjs does.
+# changed, a wrong password, bar cards on rows of their own and a pair not
+# stretched must each exit 1 and say why. (The passing run is measure.mjs
+# itself.) Needs Playwright, as measure.mjs does.
 set -euo pipefail
 
 root=$(cd "$(dirname "$0")/../.." && pwd)
@@ -42,6 +43,13 @@ node -e '
 expect "desktop-light top bar height: measured 64px, expected 70px" "top bar height moved by 6px in the spec" -- "$url" "$password" --spec "$tmp/box.json"
 expect "desktop-dark surface: measured rgb(31, 31, 34), expected rgb(32, 31, 34)" "surface colour off by one in the spec" -- "$url" "$password" --spec "$tmp/colour.json"
 expect "login returned" "wrong password" -- "$url" "$password-wrong" --spec "$spec"
+# Memory and Storage each forced onto a row of their own: two bar cards and
+# no row of two must fail, not pass on zero samples.
+printf '%s\n' '#view > .cbi-section { flex-basis: 100% !important; }' > "$tmp/solo.css"
+expect "desktop-light same-row card bottoms: no row of two cards, 2 bar cards" "bar cards on rows of their own" -- "$url" "$password" --spec "$spec" --css "$tmp/solo.css"
+# The pair kept but not stretched: Memory and Storage end at different heights.
+printf '%s\n' '#view:has(> .cbi-section) { align-items: flex-start !important; }' > "$tmp/start.css"
+expect "desktop-light same-row card bottoms: measured" "paired cards not stretched" -- "$url" "$password" --spec "$spec" --css "$tmp/start.css"
 
 if [[ $failures -ne 0 ]]; then
 	echo "$failures test(s) failed"
