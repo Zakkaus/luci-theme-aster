@@ -679,6 +679,12 @@ html body[data-page^="admin-services-openclash"] .oc :is(button, .btn, .cbi-butt
   --radius-lg: var(--radius-full);
 }
 html body[data-page^="admin-services-openclash"] .oc .icon-btn { --icon-btn-size: var(--button-h, var(--size-element-md)); }
+/* Running Status: the state and its switch, then the Restart and Overwrite
+   chips, wrap onto a second line when they do not fit (layout); at the
+   chips' 32 they overran oc-client.css's 120 cap on a phone and were cut. */
+html body[data-page^="admin-services-openclash"] .oc .core-main-controls { flex-wrap: wrap; }
+html body[data-page^="admin-services-openclash"] .oc .core-status-toggle { flex: 1 1 auto; }
+html body[data-page^="admin-services-openclash"] .oc .core-control-buttons { max-inline-size: none; }
 /* Its log highlighter's level, timestamp and category inks (oc-common.css
    --teal, --magenta, --orange and the rest, on a 15% tint of themselves)
    become the theme's text inks; an accent-tinted chip (a version, the
