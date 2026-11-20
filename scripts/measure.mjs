@@ -111,8 +111,9 @@ const FIELDS = [
   {name: 'shell background', from: ['frame', 'AppShell root', 'background'], sel: '.shell', prop: 'background', exact: true},
   {name: 'text', from: ['frame', 'AppShell root', 'color'], sel: '.shell', prop: 'color', exact: true},
   {name: 'surface', from: ['components', 'Card (default)', 'background'], sel: '#view > .cbi-section', prop: 'background', exact: true},
-  {name: 'accent', from: ['frame', 'NavIcon (brand mark)', 'background'], sel: '.shell-header .brand .mark', prop: 'background', exact: true},
-  {name: 'on-accent', from: ['frame', 'NavIcon (brand mark)', 'color'], sel: '.shell-header .brand .mark', prop: 'color', exact: true},
+  // The reference fills its NavIcon with the accent; the theme draws the
+  // mark itself in the accent, on no badge, so nothing shows on-accent here.
+  {name: 'accent', from: ['frame', 'NavIcon (brand mark)', 'background'], sel: '.shell-header .brand .mark', prop: 'color', exact: true},
 ];
 
 /* In the page: the reference script's box() reduced to the properties above. */

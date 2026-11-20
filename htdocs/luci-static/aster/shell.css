@@ -51,17 +51,9 @@
   color: inherit;
   text-decoration: none;
 }
-/* NavIcon: a filled accent circle with the glyph in the on-accent colour. */
-.brand .mark {
-  display: grid;
-  place-items: center;
-  flex: none;
-  inline-size: var(--size-element-md);
-  block-size: var(--size-element-md);
-  border-radius: var(--radius-full);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-}
+/* NavIcon: the mark alone in the palette's accent, 28 as doona's logo. */
+.brand .mark { display: grid; flex: none; color: var(--color-accent); }
+.brand .mark > .ico { inline-size: var(--spacing-7); block-size: var(--spacing-7); }
 .brand-text { display: grid; min-inline-size: 0; }
 .brand .name {
   font-size: var(--text-heading-3-size);

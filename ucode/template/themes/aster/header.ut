@@ -10,9 +10,8 @@
  #tabmenu, #modemenu, plus the body's lang_ class and data-page attribute.
 
  The brand mark is the theme's logo, Ray Floret: six quills round the
- centre, drawn in the on-accent colour on the accent badge, so it takes the
- palette's accent. logo.svg (the favicon) is the same mark on a static
- Aster-blue disc.
+ centre, drawn in the palette's accent with no badge behind it. logo.svg
+ (the favicon) is the same mark on a static Aster-blue disc.
 
  The other icons are Heroicons 2.2.0 outline (MIT,
  https://github.com/tailwindlabs/heroicons), the path data copied verbatim
