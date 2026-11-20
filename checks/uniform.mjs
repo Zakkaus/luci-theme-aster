@@ -427,6 +427,145 @@ function collect(cfg) {
     if (n && n.matches('.cbi-value')) add('form.row', 'gap', px(box(n).top - box(el).bottom), el);
   }
 
+  // Spacing contract (space.*; lab spacing audit 2026-11-20): box to box
+  // distances by role, as a container owns them. Page inset 24, page title
+  // -> description 4, title or description -> what follows 24, tabs ->
+  // content 16, block -> block in a column 16, card padding 16, heading
+  // (its own box) -> content 16, section description -> content 16, form
+  // row padding 8, label -> field 16 inline / 4 stacked, field -> help 4,
+  // controls on a line 8, dialog padding, title and footer 16, tab -> tab
+  // 2. An app's own widget (APP_OWN) is reported (report.space.*), not
+  // judged. Touching boxes (0) are a gap of 0, not skipped.
+  {
+    const put = (cls, prop, v, el) => add(el.closest(APP_OWN) ? `report.${cls}` : cls, prop, v, el);
+    const inPage = (e) => cfg.modal || !e.closest('#modal_overlay');
+    const shown = (e) => e && visible(e) && !['absolute', 'fixed'].includes(getComputedStyle(e).position) && !e.matches('script, style, br, input[type="hidden"]');
+    const sib = (e, dir) => { let n = e[dir]; while (n && !shown(n)) n = n[dir]; return n; };
+    // The bottom of the row a block ends: blocks before it on the same line
+    // (a grid of cards) end with it.
+    const rowEnd = (a) => {
+      let b = box(a).bottom;
+      for (let p = sib(a, 'previousElementSibling'); p && Math.abs(box(p).top - box(a).top) < 1; p = sib(p, 'previousElementSibling')) b = Math.max(b, box(p).bottom);
+      return b;
+    };
+    const HEAD = 'h2, h3, h4, legend';
+    const DESCR = '.cbi-map-descr, .cbi-section-descr';
+    const TABS = '.cbi-tabmenu, #tabmenu';
+    const CTRL = `${BTN}, ${FIELD}, input[type="checkbox"], input[type="radio"], .control-group`;
+    const FOOT = ':is(.right, .button-row, div:has(> .left + .right))';
+    const title = cfg.modal ? null : [...scope.querySelectorAll('h2')].find((h) => shown(h) && inPage(h) && !h.closest(CARD));
+    const pageDescr = title && sib(title, 'nextElementSibling')?.matches(DESCR) ? sib(title, 'nextElementSibling') : null;
+
+    // Page inset: content to #maincontent's edges, top and sides; the
+    // bottom (to the save bar on a wide screen) where the page is longer
+    // than the main column, so the column does not stretch.
+    if (!cfg.modal) {
+      const inner = scope.querySelector(':scope > .shell-inner') ?? scope;
+      const tops = [...inner.querySelectorAll(':scope > *, :scope > * > *, :scope > * > * > *')].filter((e) => shown(e) && !e.closest('.cbi-page-actions'));
+      if (tops.length) {
+        const m = box(scope);
+        const v = [px(Math.min(...tops.map((e) => box(e).top)) - m.top), px(box(inner).left - m.left), px(m.right - box(inner).right)];
+        const main = document.querySelector('.shell-main');
+        if (cfg.device === 'phone' || (main && main.scrollHeight > main.clientHeight + 1)) v.push(px(m.bottom - Math.max(...tops.map((e) => box(e).bottom))));
+        put('space.page.inset', 'padding', v, inner);
+      }
+    }
+
+    // Neighbours in a column: each container's shown children, in order.
+    const COLUMN = '.shell-inner, #view, #view > div:not([class]), form, .cbi-map, .cbi-section, .cbi-section-node, .cbi-tabcontainer, [data-tab]:not(li), #content_syslog, .nft-table, .cbi-value';
+    const columns = [...(cfg.modal ? [scope] : []), ...scope.querySelectorAll(COLUMN)].filter((c) => shown(c) && inPage(c) && !c.closest('td, .td'));
+    for (const c of columns) {
+      const kids = [...c.children].filter(shown);
+      for (let i = 1; i < kids.length; i++) {
+        const a = kids[i - 1], b = kids[i];
+        const end = rowEnd(a);
+        if (box(b).top < end - 0.5) continue; // beside it, not under it
+        if (a.matches('.cbi-value-title') || b.matches('.cbi-value-title, .cbi-value-field')) continue; // label.field
+        if (a.matches('.cbi-value') && b.matches('.cbi-value')) continue; // rows abut: formrow.pad
+        if (a.matches(CTRL) && b.matches(CTRL)) continue; // a wrapped line of controls
+        const gap = px(box(b).top - end);
+        if (cfg.modal && c === scope) {
+          if (a.matches('h4') || b.matches(FOOT)) put('space.dialog', 'gap', gap, b);
+          continue;
+        }
+        if (a === title) put(b.matches(DESCR) ? 'space.title.desc' : 'space.title.next', 'gap', gap, b);
+        else if (a === pageDescr) put('space.title.next', 'gap', gap, b);
+        else if (a.matches(TABS)) put('space.tabs.content', 'gap', gap, b);
+        else if (a.matches(`${HEAD}, .cbi-title`)) {
+          const h = a.matches('.cbi-title') ? a.querySelector(HEAD) ?? a : a;
+          put('space.heading.content', 'gap', px(box(b).top - box(h).bottom), b);
+        } else if (a.matches(DESCR)) put('space.descr.content', 'gap', gap, b);
+        else if (b.matches('.cbi-page-actions')) put('space.page.inset', 'padding', gap, b);
+        else put('space.block', 'gap', gap, b);
+      }
+    }
+
+    // Dialog: 16 inside its edge, top and bottom.
+    if (cfg.modal && !scope.matches('.alert-message')) {
+      const kids = [...scope.children].filter(shown);
+      if (kids.length) put('space.dialog', 'gap', [px(box(kids[0]).top - box(scope).top), px(box(scope).bottom - Math.max(...kids.map((e) => box(e).bottom)))], scope);
+    }
+
+    // Card padding: the outer edge to the content, top and bottom (the
+    // inline side is the card's padding, which tables bleed over).
+    for (const el of framed) {
+      if (el.matches('table, .table')) continue;
+      const kids = [...el.children].filter(shown);
+      if (!kids.length) continue;
+      put('space.card.pad', 'padding', [px(Math.min(...kids.map((e) => box(e).top)) - box(el).top), px(box(el).bottom - Math.max(...kids.map((e) => box(e).bottom)))], el);
+    }
+
+    // Form rows: 8 above and below (16 between two rows); the label 16
+    // before its field on a line, 4 above it stacked; help 4 under the
+    // field. A toolbar's label (System Log, Software) is a label too.
+    for (const el of all('.cbi-value')) {
+      if (el.closest('td, .td')) continue;
+      const s = getComputedStyle(el);
+      put('space.formrow.pad', 'padding', [px(s.paddingTop), px(s.paddingBottom)], el);
+    }
+    // On a toolbar's line a label is one of its controls (8 apart).
+    // A progress bar's value text sits a line over its track: it starts
+    // there; on the label's own line it is the line's end, not a field.
+    const labelGap = (t, f, el, bar) => {
+      const a = box(t), b = {left: box(f).left, top: box(f).top};
+      const v = getComputedStyle(f, '::before');
+      if (f.matches('.cbi-progressbar') && v.content !== 'none') {
+        b.top = box(f).bottom - parseFloat(v.bottom) - parseFloat(v.lineHeight);
+        if (b.top < a.bottom - 1) return;
+      }
+      if (b.top < a.bottom - 1) put(bar ? 'space.control.row' : 'space.label.field', bar ? 'gap' : 'inline', px(b.left - a.right), el);
+      else put('space.label.field', 'stacked', px(b.top - a.bottom), el);
+    };
+    for (const el of all('.cbi-value:not(.aster-same-label)')) {
+      if (el.closest('td, .td')) continue;
+      const t = el.querySelector(':scope > .cbi-value-title'), f = el.querySelector(':scope > .cbi-value-field');
+      if (shown(t) && shown(f) && t.textContent.trim()) labelGap(t, f, el);
+    }
+    for (const el of all('label:not(.cbi-value-title, .cbi-value *, td *, .td *)')) {
+      const p = sib(el, 'previousElementSibling'), n = sib(el, 'nextElementSibling');
+      if (p?.matches('input[type="checkbox"], input[type="radio"]') || !n?.matches(`${CTRL}, .cbi-progressbar`)) continue;
+      labelGap(el, n, el, true);
+    }
+    for (const el of all('.cbi-value-description')) {
+      const prev = [];
+      for (let p = sib(el, 'previousElementSibling'); p; p = sib(p, 'previousElementSibling')) prev.push(p);
+      if (prev.length) put('space.field.help', 'gap', px(box(el).top - Math.max(...prev.map((e) => box(e).bottom))), el);
+    }
+
+    // Controls on one line, and tabs.
+    for (const el of all(CTRL)) {
+      if (el.parentElement.closest('.cbi-dropdown, .tabs, .cbi-tabmenu')) continue;
+      const n = sib(el, 'nextElementSibling');
+      if (!n || !n.matches(CTRL)) continue;
+      const a = box(el), b = box(n);
+      if (b.left >= a.right - 0.5 && Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 1) put('space.control.row', 'gap', px(b.left - a.right), n);
+    }
+    for (const el of all('.tabs > li, .cbi-tabmenu > li')) {
+      const n = sib(el, 'nextElementSibling');
+      if (n && Math.abs(box(n).top - box(el).top) < 1) put('space.tabs.item', 'gap', px(box(n).left - box(el).right), n);
+    }
+  }
+
   // Side nav (outside the page's content): the space between two rows that
   // follow each other, so a hovered row never touches the selected one.
   // Logout sits apart at the foot of the list and is not read.
@@ -651,6 +790,7 @@ for (const r of results) {
     if (!r.samples.some(([c]) => classMatches(cls, c))) missing.push({page: r.entry.id, combo: r.combo, cls, ...(only === 'rows' ? {rows: r.rows} : {})});
   }
   for (const [cls, prop, v, where] of r.samples) {
+    if (cls.startsWith('report.')) continue; // an app's own widget: in the distributions only
     let want = lookup(cls, prop, r.device, r.mode);
     if (want === undefined) unlisted.add(`${cls} ${prop}`);
     if (want == null) want = majority(`${r.combo}|${cls}|${prop}`);

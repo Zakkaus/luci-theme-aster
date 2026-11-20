@@ -68,8 +68,9 @@ export function die(msg) {
  * path and modal) adds its require= classes to the first one: the 25.12
  * list asks for what only 25.12 draws on a page both versions have.
  * tab= selects a tab of the page's first tab group with that data-tab name
- * (a Lua CBI page's tabs, a JS view's tabs) before measuring; the entry is
- * its own page ("<path> #<tab>"). */
+ * (a Lua CBI page's tabs, a JS view's tabs) before measuring; tab=a/b then
+ * selects b in the tab group shown inside a (DHCP's nested tabs). The entry
+ * is its own page ("<path> #<tab>"). */
 const QUALIFIERS = ['desktop', 'rows'];
 export function readPages(files) {
   const pages = [];
@@ -228,13 +229,16 @@ export async function openPage(ctx, opt, entry, mode, debugCss) {
     await page.waitForTimeout(opt.settle);
   }
   if (entry.tab) {
-    const tab = page.locator(`.cbi-tabmenu > li[data-tab="${entry.tab}"]`).first();
-    try {
-      await tab.waitFor({state: 'visible', timeout: opt.timeout});
-      await tab.locator('a').first().click();
-      await page.waitForFunction((t) => document.querySelector(`.cbi-tabmenu > li[data-tab="${t}"]`)?.classList.contains('cbi-tab'), entry.tab, {timeout: opt.timeout});
-    } catch (e) {
-      return fail(`tab ${entry.tab}: ${String(e.message).split('\n')[0]}`);
+    // a/b: tab a, then tab b of the group shown inside it (DHCP's nested tabs).
+    for (const name of entry.tab.split('/')) {
+      const tab = page.locator(`.cbi-tabmenu > li[data-tab="${name}"]:visible`).first();
+      try {
+        await tab.waitFor({state: 'visible', timeout: opt.timeout});
+        await tab.locator('a').first().click();
+        await page.waitForFunction((t) => [...document.querySelectorAll(`.cbi-tabmenu > li[data-tab="${t}"]`)].some((l) => l.offsetParent && l.classList.contains('cbi-tab')), name, {timeout: opt.timeout});
+      } catch (e) {
+        return fail(`tab ${entry.tab}: ${String(e.message).split('\n')[0]}`);
+      }
     }
     note = note ? `${note}, tab ${entry.tab}` : `tab ${entry.tab}`;
     await page.waitForTimeout(opt.settle);

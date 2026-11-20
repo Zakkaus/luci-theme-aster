@@ -34,7 +34,8 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
 - `pages.txt` lists the core pages both 24.10 and 25.12 have;
   `pages-25.12.txt` the ones only 25.12 has. A line is
   `<path> [modal=interface-edit] [tab=<name>] [require=<class>,...]`
-  (`tab=` selects that tab of the page's first tab group); a required class
+  (`tab=` selects that tab of the page's first tab group, `tab=a/b` then
+  tab b of the group inside a); a required class
   must have a sample on that page at every viewport and mode
   (`<class>@desktop` for the desktop only; `<class>@rows` on the desktop,
   and on a phone whenever the page's tables hold a data row). A page that
@@ -51,6 +52,17 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
 - `uniform.mjs` reads a rule under a card's last row (`card lastRule`): a
   bottom border or an `<hr>` inside a card with nothing drawn below it
   (Astryx drops the last row's divider; the card's edge closes it).
+- `uniform.mjs` reads the spacing contract (`space.*`, values in
+  `uniform.json`): box-to-box distances by role, as each container owns
+  them. Page inset 24 (and the last block to an in-flow save bar), page
+  title to its description 4, title or description to what follows 24,
+  tabs to content 16, tab to tab 2, block to block in a column 16, card
+  padding 16 (top and bottom, to the content), a heading's own box to its
+  content 16, a section description to its content 16, form row padding 8,
+  label to field 16 on one line and 4 stacked, field to help 4, controls on
+  a line 8 (a toolbar's label is one of them), dialog padding, title and
+  footer 16. An app's own widget (`APP_OWN`) is reported as
+  `report.space.*` in the distributions and not judged.
 - `uniform.mjs` reads the side nav's row gap (`nav.item gap`), so a
   hovered row never touches the selected one.
 - It opens ui.js's tooltip on up to three `[data-tooltip]` triggers a page

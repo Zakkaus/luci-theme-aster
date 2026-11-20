@@ -5,3 +5,18 @@
 # System: 25.12's first tab has a checkbox (Full TimeZone Name); 24.10's has none.
 admin/system/system                  require=checkbox
 admin/network/dns                    require=font.body,heading.page,card,button,field,checkbox,form.label,tab
+# DHCP's and DNS's tabs, and the tab groups inside them (spacing contract).
+admin/network/dhcp tab=dnsmasq            require=font.body,card,tab
+admin/network/dhcp tab=dnsmasq/devices    require=font.body,card,tab
+admin/network/dhcp tab=dnsmasq/logging    require=font.body,card,tab
+admin/network/dhcp tab=dnsmasq/files      require=font.body,card,tab
+admin/network/dhcp tab=dnsmasq/relay      require=font.body,card,tab
+admin/network/dhcp tab=dnsmasq/tagsparent require=font.body,card,tab
+admin/network/dhcp tab=dnsmasq/pxe_tftp   require=font.body,card,tab
+admin/network/dhcp tab=odhcpd             require=font.body,card,tab
+admin/network/dhcp tab=odhcpd/pxe6        require=font.body,card,tab
+admin/network/dns tab=cache               require=font.body,card,tab
+admin/network/dns tab=dnsrecords          require=font.body,card,tab
+admin/network/dns tab=dnsrecords/srvhosts require=font.body,card,tab
+admin/network/dns tab=forward             require=font.body,card,tab
+admin/network/dns tab=ipsets              require=font.body,card,tab

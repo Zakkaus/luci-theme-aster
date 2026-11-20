@@ -98,6 +98,40 @@ expect uniform 0 "" "status dialog icon before its words" -- "$url" "$password" 
 expect uniform 1 "banner.icon gap" "status dialog icon on its words" -- "$url" "$password" --pages "$tmp/status.txt" \
 	--debug-css 'admin/system/reboot=#modal_overlay > .alert-message { padding-inline-start: 16px !important }'
 
+# Spacing contract (space.*): one region or page-level gap off on one page.
+printf 'admin/network/network modal=interface-edit\n' >"$tmp/iface-edit.txt"
+printf 'admin/system/flash\n' >"$tmp/flash.txt"
+expect uniform 1 "space.page.inset padding" "page inset 32 on top" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=.shell-content { padding-block-start: 32px !important }'
+expect uniform 1 "space.title.desc gap" "page title 12 over its description" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=.cbi-map-descr { margin-block-start: 12px !important }'
+expect uniform 1 "space.title.next gap" "page title 40 over the first block" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=.shell-inner > h2 { margin-block-end: 40px !important }'
+expect uniform 1 "space.tabs.content gap" "tabs 24 over their content" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=.cbi-tabmenu { margin-block-end: 24px !important }'
+expect uniform 1 "space.tabs.item gap" "tabs 8 apart" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=.cbi-tabmenu { gap: 8px !important }'
+expect uniform 1 "space.block gap" "a Remove row 24 over its section" -- "$url" "$password" --pages "$tmp/dropbear.txt" \
+	--debug-css 'admin/system/admin/dropbear=.cbi-section-remove { margin-block-end: 24px !important }'
+expect uniform 1 "space.card.pad padding" "card content 8 lower" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=.cbi-title { margin-block-start: 8px !important }'
+expect uniform 1 "space.heading.content gap" "card title keeps its margin inside the title row" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=.cbi-title > h3 { margin-block-end: 16px !important }'
+expect uniform 1 "space.descr.content gap" "section description 24 over its content" -- "$url" "$password" --pages "$tmp/flash.txt" \
+	--debug-css 'admin/system/flash=.cbi-section .cbi-section-descr { margin-block-end: 24px !important }'
+expect uniform 1 "space.formrow.pad padding" "form rows pad 12" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=.cbi-value { padding-block: 12px !important }'
+expect uniform 1 "space.label.field inline" "label 24 before its field" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=.cbi-value { column-gap: 24px !important }'
+expect uniform 1 "space.label.field stacked" "phone: label 8 over its field" -- "$url" "$password" --pages "$tmp/system.txt" --viewports phone \
+	--debug-css 'admin/system/system=.cbi-value > .cbi-value-title { margin-block-end: 8px !important }'
+expect uniform 1 "space.field.help gap" "help 8 under its field" -- "$url" "$password" --pages "$tmp/dropbear.txt" \
+	--debug-css 'admin/system/admin/dropbear=.cbi-value-description { margin-block-start: 8px !important }'
+expect uniform 1 "space.control.row gap" "save bar buttons 16 apart" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=.cbi-page-actions { gap: 16px !important }'
+expect uniform 1 "space.dialog gap" "dialog footer 8 under the form" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
+	--debug-css 'admin/network/network=#modal_overlay .button-row { margin-block-start: 8px !important }'
+
 # Lua CBI map (APPS=1: a box with OpenClash, as apps-install.sh leaves it).
 # A header table in a Lua map folds on a phone like a JS view's, and the
 # gate reads it as a fold; a row drawn as a flex column instead of the
