@@ -28,7 +28,8 @@
  *              Buttons with words are identified by their words (1.4.11).
  *   focus      up to --focus-limit buttons, fields, checkboxes, links and
  *              tabs a page, focused from the keyboard: the ring (outline,
- *              else box shadow) against what is around it, --focus (3). No
+ *              else box shadow) against what is around it, --focus (3); an
+ *              outline drawn over an inset box-shadow ring fails. No
  *              ring at all fails.
  *   separator  table cell rules, row and section dividers, <hr>: the line
  *              against the surface it sits on must stay at or under
@@ -168,6 +169,10 @@ function readFocus(count) {
     const label = (el.textContent || el.getAttribute('name') || el.tagName).trim().slice(0, 40);
     const base = {kind: 'focus', where: where(el), text: label, shell: !el.closest('#maincontent') && !el.closest('#modal_overlay')};
     if (!ring) { out.push({...base, ratio: 0, fg: 'none', bg: hex(around), note: 'no focus ring'}); continue; }
+    // One ring: an outline over a Field's own inset ring reads as two.
+    const inset = s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0 && /inset/.test(s.boxShadow)
+      && (s.boxShadow.match(/(?:rgba?|oklch|oklab|color|lab|lch)\([^)]*\)/g) ?? []).some((c) => rgba(c)[3] > 0);
+    if (inset) { out.push({...base, ratio: 0, fg: hex(rgba(ring)), bg: hex(around), note: 'double focus ring (outline and inset ring)'}); continue; }
     const c = rgba(ring);
     const fg = over([c[0], c[1], c[2], c[3] * op], around);
     out.push({...base, ratio: Math.round(ratio(fg, around) * 100) / 100, fg: hex(fg), bg: hex(around)});

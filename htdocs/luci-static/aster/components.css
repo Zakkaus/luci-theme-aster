@@ -87,8 +87,10 @@ html fieldset > legend + * { clear: both; }
 html a, html button, html [role="button"], html label[for], html summary,
 html input[type="checkbox"], html input[type="radio"] { -webkit-tap-highlight-color: transparent; }
 
-/* Focus ring: 2 wide, 3 off the edge, in the accent. */
-html :focus-visible {
+/* Focus ring: 2 wide, 3 off the edge, in the accent, from the keyboard
+   only. Zero weight past html, so a Field's own focus (its accent border
+   and inset ring, below) replaces it instead of doubling it. */
+html :where(:focus-visible) {
   outline: var(--focus-outline-width) solid var(--focus-outline-color);
   outline-offset: var(--focus-outline-offset);
 }
@@ -473,7 +475,7 @@ html :where(:is(input[type="checkbox"], input[type="radio"]):disabled) { opacity
 html :where(input[type="checkbox"].cbi-input-invalid) { border-color: var(--color-border-error); }
 /* The tap target grows around the box on a touch screen. */
 @media (pointer: coarse) {
-  html :where(input[type="checkbox"], input[type="radio"]) { outline: var(--spacing-2) solid transparent; outline-offset: 0; }
+  html :where(:is(input[type="checkbox"], input[type="radio"]):not(:focus-visible)) { outline: var(--spacing-2) solid transparent; outline-offset: 0; }
 }
 /* LuCI's checkbox widget: the box and an empty label for it. */
 html :where(.cbi-checkbox) { display: inline-flex; align-items: center; gap: var(--spacing-2); min-block-size: var(--size-element-md); }

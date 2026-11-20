@@ -57,6 +57,9 @@ expect contrast 1 ui,waived:field-border "split button boundary" -- "$url" "$pas
 expect contrast 1 focus,waived:field-border "no focus ring" "no focus ring" -- "$url" "$password" --pages "$tmp/base.txt" \
 	--debug-css 'admin/status/overview=#maincontent :is(:focus, :focus-visible) { outline: none !important; box-shadow: none !important }'
 
+# Focus: an outline over a field's inset accent ring (the doubled ring).
+expect contrast 1 focus,waived:field-border "double focus ring on a field" "double focus ring" -- "$url" "$password" --pages "$tmp/base.txt" \
+	--debug-css 'admin/system/admin/dropbear=#view input:focus-visible { outline: 2px solid #286983 !important; outline-offset: 3px !important }'
 # Separator, in dark mode as the rule applies by default: white cell rules.
 expect contrast 1 separator,waived:field-border "bright separator in dark mode" -- "$url" "$password" --pages "$tmp/base.txt" --modes dark \
 	--debug-css 'admin/status/overview=#view .td { border-block-end: 1px solid #fff !important }'
