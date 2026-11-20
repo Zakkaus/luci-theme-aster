@@ -11,7 +11,8 @@
 
  The brand mark is the theme's logo, Ray Floret: six quills round the
  centre, drawn in the palette's accent with no badge behind it. logo.svg
- (the favicon) is the same mark on a static Aster-blue disc.
+ (the favicon) is the same mark, bare, in Rosé Pine's accent; theme-aster.js
+ redraws it in the page's accent.
 
  The other icons are Heroicons 2.2.0 outline (MIT,
  https://github.com/tailwindlabs/heroicons), the path data copied verbatim

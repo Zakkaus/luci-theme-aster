@@ -134,6 +134,8 @@ return baseclass.extend({
 		   palette's shell, read from the stylesheet, as the head script in
 		   header.ut does on load. */
 		const bar = () => {
+			this.icon();
+
 			const m = /light-dark\(\s*([^,]+?)\s*,\s*([^)]+?)\s*\)/.exec(getComputedStyle(root).getPropertyValue('--color-background-body'));
 			const l = document.getElementById('aster-bar-light');
 			const d = document.getElementById('aster-bar-dark');
@@ -178,7 +180,29 @@ return baseclass.extend({
 		});
 
 		reflect();
+		this.icon();
+		matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => this.icon());
 		this.palettes(bar);
+	},
+
+	/* The tab icon: logo.svg's mark redrawn in the accent the page resolves
+	 * for its palette and scheme (a probe's computed colour resolves the
+	 * token's light-dark()). */
+	icon() {
+		const link = document.querySelector('link[rel="icon"]');
+		const probe = document.createElement('i');
+
+		if (!link)
+			return;
+
+		probe.style.color = 'var(--color-accent)';
+		document.body.appendChild(probe);
+		const c = getComputedStyle(probe).color;
+		probe.remove();
+
+		const q = [0, 60, 120, 180, 240, 300].map((a) => `<use href="#q" transform="rotate(${a} 12 12)"/>`).join('');
+
+		link.href = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${c}"><defs><path id="q" d="M10.1 8.8C8.4 6.1 10.2 3 13.6 1.2C15.3 4.5 14.5 7.7 13.1 9.3Z"/></defs>${q}</svg>`);
 	},
 
 	/* The palette menus: the top bar's, and the drawer's on a phone. Menu

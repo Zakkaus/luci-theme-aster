@@ -1,15 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
   <title>Ray Floret</title>
-  <!-- The Aster mark on the Aster palette's accent disc. A favicon
-       inherits no colour and does not follow the reader's palette, so the
-       colours are stated here: the light accent and on-accent ink, and the
-       dark pair for a dark browser chrome. -->
-  <style>:root{--badge:#225BFF;--ink:#FFFFFF}@media(prefers-color-scheme:dark){:root{--badge:#3D87FF;--ink:#0B1020}}</style>
-  <circle cx="16" cy="16" r="16" fill="var(--badge)"/>
-  <g transform="translate(4 4)" color="var(--ink)" fill="currentColor">
-    <defs><path id="quill" d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z"/></defs>
-    <use href="#quill"/><use href="#quill" transform="rotate(60 12 12)"/>
-    <use href="#quill" transform="rotate(120 12 12)"/><use href="#quill" transform="rotate(180 12 12)"/>
-    <use href="#quill" transform="rotate(240 12 12)"/><use href="#quill" transform="rotate(300 12 12)"/>
-  </g>
+  <!-- The favicon: the Aster mark bare, in the default palette's accent
+       (Rosé Pine: pine in a light browser, foam in a dark one; a favicon
+       inherits no colour, so the values are stated here). theme-aster.js
+       swaps in the same mark in the page's own accent once it loads. The
+       quills are a little fuller than the header's to hold at 16 px. -->
+  <style>:root{fill:#286983}@media(prefers-color-scheme:dark){:root{fill:#9CCFD8}}</style>
+  <defs><path id="quill" d="M10.1 8.8C8.4 6.1 10.2 3 13.6 1.2C15.3 4.5 14.5 7.7 13.1 9.3Z"/></defs>
+  <use href="#quill"/><use href="#quill" transform="rotate(60 12 12)"/>
+  <use href="#quill" transform="rotate(120 12 12)"/><use href="#quill" transform="rotate(180 12 12)"/>
+  <use href="#quill" transform="rotate(240 12 12)"/><use href="#quill" transform="rotate(300 12 12)"/>
 </svg>
