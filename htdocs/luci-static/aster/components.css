@@ -1078,11 +1078,11 @@ html :where(.label:not(.cbi-section .label[data-style]), .badge, .zonebadge, .if
   line-height: var(--text-supporting-leading);
   white-space: nowrap;
 }
-/* Status variants (.label.success / .warning / .danger): Astryx's solid
-   status fills with their on-colour text. */
-html :where(.label.success) { --badge-bg: var(--color-success); --badge-fg: var(--color-on-success); }
-html :where(.label.warning) { --badge-bg: var(--color-warning); --badge-fg: var(--color-on-warning); }
-html :where(.label.danger) { --badge-bg: var(--color-error); --badge-fg: var(--color-on-error); }
+/* Status variants (.label.success / .warning / .danger): Astryx's muted
+   status fills with their on-muted inks (every palette defines both). */
+html :where(.label.success) { --badge-bg: var(--color-success-muted); --badge-fg: var(--color-on-success-muted); }
+html :where(.label.warning) { --badge-bg: var(--color-warning-muted); --badge-fg: var(--color-on-warning-muted); }
+html :where(.label.danger) { --badge-bg: var(--color-error-muted); --badge-fg: var(--color-on-error-muted); }
 /* A device chip or a firewall clause: the muted fill, its icon 16. */
 html :where(.ifacebadge) { --badge-bg: var(--color-background-muted); border-radius: var(--radius-inner); }
 html :where(.ifacebadge img) { inline-size: var(--aster-icon-sm); block-size: var(--aster-icon-sm); }
