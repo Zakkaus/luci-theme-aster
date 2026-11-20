@@ -228,14 +228,16 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
 }
 /* A table under a field sits in a group (no pad of its own): it bleeds by
    the outer card's pad, so its first column lines up with the text above.
-   A table section scrolls sideways, which would clip that bleed: it bleeds
-   itself and takes the pad back as padding, its table bleeds into it. */
-:is(.cbi-value > .table, .cbi-value > .cbi-section.cbi-tblsection, .cbi-value > .cbi-section.cbi-tblsection > .table) {
+   What holds it scrolls sideways (a table section, a row holding the
+   table), which would clip that bleed: it bleeds itself and takes the pad
+   back as padding, the table bleeds into it. */
+:is(.cbi-value:has(> .table), .cbi-value > .table, .cbi-value > .cbi-section.cbi-tblsection, .cbi-value > .cbi-section.cbi-tblsection > .table) {
   flex: none; /* a field row is a flex line: its width, not the row's */
+  box-sizing: border-box;
   inline-size: calc(100% + 2 * var(--card-bleed));
   margin-inline: calc(var(--card-bleed) * -1);
 }
-.cbi-value > .cbi-section.cbi-tblsection { padding-inline: var(--card-bleed); }
+:is(.cbi-value:has(> .table), .cbi-value > .cbi-section.cbi-tblsection) { padding-inline: var(--card-bleed); }
 /* DHCP's lease tables under their headings: content to the next heading
    24, inside the rows (rows abut). Form rows leave 16 between them (8 +
    8); the static leases' group ends 16 lower again, under its Add. */
