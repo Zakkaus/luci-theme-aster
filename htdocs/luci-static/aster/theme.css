@@ -1,6 +1,6 @@
 /* Project layer. Loads after tokens.css, components.css and shell.css and
    holds what is neither a component nor the shell: the status classes, the
-   login screen (M4 restyles it), prose links and a few LuCI leftovers.
+   login screen, prose links and a few LuCI leftovers.
    Every value is a token. */
 
 /* The status classes: Badge's muted status pairs. */
@@ -9,58 +9,128 @@
 .status-pending { background: var(--color-warning-muted); color: var(--color-on-warning-muted); }
 .status-error   { background: var(--color-error-muted);   color: var(--color-on-error-muted); }
 
-/* The login screen. M4 restyles it; M3 only moved it onto the tokens. */
-.login { min-block-size: 100vh; display: grid; place-items: center; padding: var(--spacing-6) var(--spacing-4); background: var(--color-background-body); }
+/* The login screen, after doona's sign-in page (Login.tsx): one card
+   centred both ways on the page background, the same at every width, with
+   the theme switch and palette menu in the page's corner. The block padding
+   clears those controls, so a card taller than the window scrolls and stays
+   centred. Inside, one spacing step: 32 between the card's parts, 24
+   between fields, 4 from a label to its field. Sizes are Astryx's Login
+   Card template: a 400 column, card padding 32 (24 on a phone), large (40)
+   fields and action; the action keeps the theme Button's pill, as doona's
+   does. */
+.login {
+  box-sizing: border-box;
+  min-block-size: 100vh;
+  display: grid;
+  place-items: center;
+  padding: calc(var(--spacing-12) + var(--spacing-6)) var(--spacing-4);
+  background: var(--color-background-body);
+  color: var(--color-text-primary);
+}
 @supports (min-block-size: 100dvh) { .login { min-block-size: 100dvh; } }
+.login-controls {
+  position: absolute;
+  inset-block-start: var(--spacing-3);
+  inset-inline-end: var(--spacing-3);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
 .login-panel {
-  inline-size: 100%;
-  max-inline-size: 24rem;
+  box-sizing: border-box;
+  inline-size: min(25rem, 100%);
   padding: var(--spacing-8);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-container);
   background: var(--color-background-card);
   box-shadow: var(--shadow-med);
 }
-.login-head { display: grid; justify-items: center; gap: var(--spacing-2); margin-block-end: var(--spacing-8); text-align: center; }
-.login-head h1 { margin: 0; font-size: var(--text-heading-3-size); line-height: var(--text-heading-3-leading); }
-.login-head p { margin: 0; color: var(--color-text-secondary); font-size: var(--text-supporting-size); }
+@media (max-width: 39.999rem) { .login-panel { padding: var(--spacing-6); } }
 
-/* The brand mark. */
-.login-head .mark {
-  inline-size: var(--spacing-11);
-  block-size: var(--spacing-11);
-  border-radius: var(--radius-element);
-  display: grid;
-  place-items: center;
-  background: var(--color-text-primary);
-  color: var(--color-background-body);
+/* The mark, bare in the accent, and the device's name beside it. */
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  min-inline-size: 0;
+  font-size: var(--text-heading-2-size);
+  font-weight: var(--text-heading-2-weight);
+  line-height: var(--spacing-10);
+  overflow-wrap: anywhere;
 }
-.login-head .mark > .ico { inline-size: var(--spacing-7); block-size: var(--spacing-7); }
-
-/* The host details under the form. */
-.login-foot {
-  margin: var(--spacing-8) 0 0;
-  padding-block-start: var(--spacing-4);
-  border-block-start: var(--border-width) solid var(--color-border);
-  display: grid;
-  gap: var(--spacing-1);
+.login-mark {
+  flex: none;
+  inline-size: var(--spacing-10);
+  block-size: var(--spacing-10);
+  color: var(--color-accent);
+}
+.login-head { margin-block-start: var(--spacing-8); }
+.login-head h1 {
+  margin: 0;
+  font-size: var(--text-heading-1-size);
+  font-weight: var(--text-heading-1-weight);
+  line-height: var(--text-heading-1-leading);
+}
+.login-note {
+  margin: var(--spacing-2) 0 0;
   color: var(--color-text-secondary);
   font-size: var(--text-supporting-size);
   line-height: var(--text-supporting-leading);
+  overflow-wrap: anywhere;
 }
-.login-foot > div { display: flex; gap: var(--spacing-2); min-inline-size: 0; }
-.login-foot dt { flex: none; }
-.login-foot dd { margin: 0; min-inline-size: 0; color: var(--color-text-primary); overflow-wrap: anywhere; }
+.login-panel > .alert-message { margin: var(--spacing-6) 0 0; }
 
-/* A faint dot grid and a lift behind the card, from the text colour at
-   percentages low enough not to survive a screenshot. */
-.login {
-  background-image:
-    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--color-text-primary) 5%, transparent), transparent 60%),
-    radial-gradient(color-mix(in srgb, var(--color-text-primary) 7%, transparent) var(--border-width), transparent var(--border-width));
-  background-size: 100% 32rem, 1.375rem 1.375rem;
-  background-position: center top, center top;
-  background-repeat: no-repeat, repeat;
+/* The fields: label above field, the theme's Field at the large size and
+   the form's width. Focus is the Field's own accent edge, once: the
+   global ring would draw a second one 3 outside it. */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+  margin-block-start: var(--spacing-8);
+}
+.login-field { display: flex; flex-direction: column; gap: var(--spacing-1); min-inline-size: 0; }
+.login-field > label {
+  color: var(--color-text-secondary);
+  font-size: var(--text-label-size);
+  font-weight: var(--text-label-weight);
+  line-height: var(--text-label-leading);
+}
+.login-field input {
+  --field-w: 100%;
+  --field-h: var(--size-element-lg);
+  padding-inline: var(--spacing-3);
+}
+.login-field input:focus-visible { outline: none; }
+
+/* The password's reveal toggle, inside the field at its end, as doona's
+   TextField draws it; its own ring sits inside its circle. */
+.login-secret { position: relative; display: flex; }
+.login-secret > input:has(+ .login-reveal:not([hidden])) { padding-inline-end: calc(var(--size-element-sm) + var(--spacing-2)); }
+.login-reveal {
+  --button-bg: transparent;
+  --button-fg: var(--color-icon-secondary);
+  --button-px: 0;
+  position: absolute;
+  inset-block-start: calc((var(--size-element-lg) - var(--size-element-sm)) / 2);
+  inset-inline-end: calc((var(--size-element-lg) - var(--size-element-sm)) / 2);
+  inline-size: var(--size-element-sm);
+  min-block-size: var(--size-element-sm);
+  block-size: var(--size-element-sm);
+}
+.login-reveal:focus-visible { outline-offset: calc(var(--focus-outline-width) * -1); }
+.login-reveal .ico { inline-size: var(--aster-icon-md); block-size: var(--aster-icon-md); }
+.login-reveal[aria-pressed="true"] .show,
+.login-reveal:not([aria-pressed="true"]) .hide { display: none; }
+
+/* The form's one action spans it, 8 further down than the field gap. */
+.login-submit {
+  --button-bg: var(--color-accent);
+  --button-fg: var(--color-on-accent);
+  --button-h: var(--size-element-lg);
+  inline-size: 100%;
+  margin-block-start: var(--spacing-2);
 }
 
 /* Links: the surrounding text colour, marked by an underline where they
@@ -68,8 +138,7 @@
    control's box is that control. */
 a { color: inherit; }
 .shell-content :is(p, .td, .cbi-value-description, .cbi-section-descr, .cbi-map-descr) a,
-.shell-footer a,
-.login-panel p a {
+.shell-footer a {
   text-decoration: underline;
   text-underline-offset: 0.2em;
   text-decoration-thickness: var(--border-width);
@@ -78,10 +147,3 @@ a { color: inherit; }
   .shell-content :is(p, .td) a:hover { text-decoration-thickness: calc(var(--border-width) * 2); }
 }
 .shell-content a:is(.btn, .cbi-button, .nav-item, .tab) { text-decoration: none; }
-
-/* The login page has no top bar, so its switch floats in the corner. */
-.login .theme-switch {
-  position: fixed;
-  inset-block-start: var(--spacing-4);
-  inset-inline-end: var(--spacing-4);
-}
