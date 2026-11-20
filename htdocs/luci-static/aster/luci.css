@@ -112,8 +112,10 @@ html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([cl
 }
 .cbi-title > * { margin: 0; }
 /* Hide/Show is an sm icon button: its glyph box, not its 32 hit area,
-   ends on the content edge, where the card's text ends. */
-.cbi-title .label[data-style] { margin-inline-end: calc((var(--aster-icon-sm) - var(--size-element-sm)) / 2); }
+   ends on the content edge, where the card's text ends. Its word is
+   hidden at size 0; no gap after the glyph, or the glyph sits 4 off
+   centre. */
+.cbi-title .label[data-style] { gap: 0; margin-inline-end: calc((var(--aster-icon-sm) - var(--size-element-sm)) / 2); }
 .cbi-title > :is(h2, h3) { flex: 1; align-items: center; }
 
 /* "Loading view…" (luci-base's placeholder for the whole view, the view's
