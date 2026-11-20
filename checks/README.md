@@ -5,6 +5,7 @@
 | `literals.sh` | Colour and px literals live only in `tokens.css` and unported sections | `tests/literals.sh` |
 | `uniform.mjs` | Every page draws each component with the same size, spacing and type as the M2 overview | `tests/uniform.sh` |
 | `contrast.mjs` | WCAG AA on every page, light and dark; dark separators stay faint | `tests/contrast.sh` |
+| `budget.sh` | The five stylesheets as shipped (comments stripped by `scripts/strip-css-comments.pl`, as the package build does) total <= 150,000 B; the three theme scripts <= 35,000 B | `tests/budget.sh` |
 
 `scripts/measure.mjs` compares the overview itself with the reference page.
 

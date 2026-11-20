@@ -11,7 +11,9 @@
     "check:tokens": "node scripts/tokens.mjs --check",
     "test:tokens": "bash checks/tests/tokens.sh",
     "check:literals": "bash checks/literals.sh",
-    "test:literals": "bash checks/tests/literals.sh"
+    "test:literals": "bash checks/tests/literals.sh",
+    "check:budget": "bash checks/budget.sh",
+    "test:budget": "bash checks/tests/budget.sh"
   },
   "devDependencies": {
     "@astryxdesign/cli": "0.7.16",

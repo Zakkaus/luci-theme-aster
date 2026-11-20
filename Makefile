@@ -19,6 +19,16 @@ PKG_LICENSE:=Apache-2.0
 # reproduced from it. The bytes saved are not worth a rendering nobody wrote.
 LUCI_MINIFY_CSS:=0
 
+# What the router gets instead is the same stylesheets with their comments
+# removed, and nothing else changed: scripts/strip-css-comments.pl runs on the
+# build directory's copy (the source keeps every comment). It needs only perl,
+# which the OpenWrt build system already requires. The size budget in
+# checks/budget.sh measures this output.
+define Build/Prepare/luci-theme-aster
+	$(FIND) $(PKG_BUILD_DIR)/htdocs -type f -name '*.css' \
+		-exec perl $(CURDIR)/scripts/strip-css-comments.pl {} +
+endef
+
 # Ship the ucode templates as source. The luci.mk on LuCI master precompiles
 # them to bytecode when CONFIG_LUCI_UTMIN is set, and that bytecode is tied to
 # the SDK's ucode: a package built in one SDK does not load on a router running
