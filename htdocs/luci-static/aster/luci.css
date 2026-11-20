@@ -534,10 +534,11 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
 }
 
 /* The name and the value text share a line. The value ("218.81 GiB /
-   648.51 GiB (33%)", at most about fourteen supporting-size em) keeps its
-   room; a longer name ends in an ellipsis instead of running into it. */
+   648.51 GiB (33%)", at most about thirteen and a half supporting-size
+   em) keeps its room; a longer name ends in an ellipsis instead of
+   running into it ("Active Connections" fits a phone's card). */
 [data-page="admin-status-overview"] .table .tr:has(> .td > .cbi-progressbar) > .td:first-child {
-  max-inline-size: calc(100% - 14 * var(--text-supporting-size));
+  max-inline-size: calc(100% - 13.5 * var(--text-supporting-size));
   overflow: hidden;
   color: var(--color-text-primary);
   font-weight: var(--font-weight-normal);
