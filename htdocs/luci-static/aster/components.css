@@ -18,7 +18,8 @@
                                 #indicators items (variant/size: --button-*);
                                 ComboButton: .cbi-dropdown.btn; IconButton:
                                 .pager arrows, .drag-handle, a dynlist's add,
-                                .cbi-button-neutral[aria-label] in a field
+                                .cbi-button-neutral[aria-label] in a field,
+                                a Lua table's ∧/∨ move buttons
    Field         TextField      input (text-like), textarea (--field-*)
    Select        Select         select, .cbi-dropdown (not a ComboButton)
    Menu          Menu           .cbi-dropdown[open] > ul.dropdown, the
@@ -193,9 +194,10 @@ html :where(button, input[type="button"], input[type="submit"], input[type="rese
 }
 /* IconButton: a button that draws one glyph instead of words (a pager's
    arrows, the drag handle, a dynlist's add, a field's reveal and CIDR
-   switch, which carry an aria-label) is square, as wide as it is high,
-   with no inline padding, and never stretched (Astryx Button isIconOnly). */
-html :where(.pager > :is(.btn, button), .drag-handle, .add-item > .cbi-button-add, .cbi-value-field .cbi-button-neutral[aria-label]) {
+   switch, which carry an aria-label; a Lua table's move buttons labelled
+   ∧ and ∨, as OpenClash's are) is square, as wide as it is high, with no
+   inline padding, and never stretched (Astryx Button isIconOnly). */
+html :where(.pager > :is(.btn, button), .drag-handle, .add-item > .cbi-button-add, .cbi-value-field .cbi-button-neutral[aria-label], .cbi-button-up[value="∧"], .cbi-button-down[value="∨"]) {
   --button-px: 0;
   inline-size: var(--button-h, var(--size-element-md));
   flex: none;
@@ -775,8 +777,10 @@ html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -
   }
   html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > .td.cbi-section-actions > div) { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
   /* A Lua button table (one action per cell, Commit and Apply) stacks
-     its buttons 8 apart. */
-  html :where(form > .cbi-map .table .tr > .td:has(> :is(.btn, .cbi-button):only-child, > div:only-child > :is(.btn, .cbi-button):only-child)) {
+     its buttons 8 apart: the cell, or the option's div in it, which may
+     carry the button's script beside it (OpenClash's Create). (:has()
+     does not nest, hence the div is the box.) */
+  html :where(form > .cbi-map .table .tr > .td:has(> :is(.btn, .cbi-button):only-child), form > .cbi-map .table .tr > .td > div:only-child:has(> :is(.btn, .cbi-button)):not(:has(> :not(script, .btn, .cbi-button)))) {
     padding-block: var(--spacing-1);
   }
 }

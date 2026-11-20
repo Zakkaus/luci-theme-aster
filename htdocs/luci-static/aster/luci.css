@@ -661,3 +661,33 @@ html body[data-page^="admin-services-openclash"] .oc {
    fill its sheet forces (!important, from --primary-color) follows the
    Button variant. */
 html body[data-page^="admin-services-openclash"] .oc.cbi-button { --primary-color: var(--button-bg, var(--color-neutral)); }
+/* OpenClash's sheet sizes every .cbi-input-select to its content; in a
+   form row the select takes the Field width like any other. */
+html body[data-page^="admin-services-openclash"] .cbi-value-field .cbi-input-select {
+  inline-size: var(--field-w) !important; /* oc-common.css width:auto !important */
+}
+/* OpenClash's good/bad notes outside .oc (a map's description) keep its
+   literal fallbacks; they take the status inks. */
+html body[data-page^="admin-services-openclash"] .oc-txt-good { color: var(--color-text-success); }
+html body[data-page^="admin-services-openclash"] .oc-txt-bad { color: var(--color-text-error); }
+/* OpenClash's CodeMirror editors (config, logs) are the Field's code
+   variant: the code font over oc-cm6.css's own stack (!important there). */
+html body[data-page^="admin-services-openclash"] .cm-editor :is(.cm-scroller, .cm-content) {
+  font-family: var(--font-family-code) !important; /* oc-cm6.css .oc .cm-content !important */
+}
+
+/* PassWall (body[data-page^="admin-services-passwall"]): a node row's
+   actions sit 8 apart and wrap, like every table's actions (node_list.htm
+   sets the gap to 0 under 500). */
+html body[data-page^="admin-services-passwall"] .pw-actions > .node-wrapper { flex-wrap: wrap; gap: var(--spacing-2); }
+/* Running Status tiles: the label and the state words in the theme's
+   inks (status.htm's own greys and oranges are under 3:1 on the card). */
+html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .block h4 { color: var(--color-text-secondary) !important; } /* status.htm color:#8898aa!important */
+html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .green { color: var(--color-text-success); }
+html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .red { color: var(--color-text-error); }
+html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .yellow { color: var(--color-text-warning); }
+/* The Running Status tiles go one a row on a narrow phone: two a row
+   (status.htm's own) leave a tile narrower than its icon and label. */
+@media (max-width: 30rem) {
+  html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .pure-u-1-4 { inline-size: 100%; }
+}
