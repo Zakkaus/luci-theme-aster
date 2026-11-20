@@ -129,8 +129,9 @@ html :where(h2, .cbi-section :is(h2, h3), .cbi-section > legend) {
 /* Heading 3: a heading inside a card's content, under the card's title
    (the overview's Active DHCPv4 Leases, Associated Stations). Where the
    card has no title of its own (24.10's leases), its first heading is the
-   title and only the ones after it are Heading 3. */
-html :where(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div:not(.cbi-title) > h3, .cbi-section > div:not(.cbi-title) > h3 ~ h3) {
+   title and only the ones after it are Heading 3. A heading a field writes
+   (.cbi-value > h4: DHCP's Active DHCPv4 Leases) is one too. */
+html :where(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div:not(.cbi-title) > h3, .cbi-section > div:not(.cbi-title) > h3 ~ h3, .cbi-value > h4) {
   font-size: var(--text-heading-3-size);
   font-weight: var(--text-heading-3-weight);
   line-height: var(--text-heading-3-leading);
@@ -622,7 +623,8 @@ html :where(.control-group) { display: flex; flex-wrap: wrap; align-items: cente
 /* ── Card ────────────────────────────────────────────────────────
    The surface, a 1 border, the container radius and 16 from the outer
    edge to the content. --card-pad is the inner padding, which tables
-   bleed back over. */
+   bleed back over; --card-bleed is the outermost card's, which a group
+   inside it keeps (a form's table under a field, DHCP's leases). */
 
 /* The frame parameters belong to the card they are set on: a card inside a
    framed or bare card draws its own frame. --card-pad inherits, because
@@ -635,6 +637,7 @@ html :where(.control-group) { display: flex; flex-wrap: wrap; align-items: cente
 
 html :where(.cbi-section, .cbi-section-node, .ifacebox, #view > :is(table, .table), #view > .cbi-map > :is(table, .table), #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], .nft-chain) {
   --card-pad: calc(var(--spacing-4) - var(--border-width));
+  --card-bleed: var(--card-pad);
   box-sizing: border-box;
   min-inline-size: 0;
   padding: var(--card-pad);
@@ -648,6 +651,7 @@ html :where(.cbi-section, .cbi-section-node, .ifacebox, #view > :is(table, .tabl
    are divided by a rule with 24 on either side. */
 html :where(.cbi-section, .cbi-section-node) :where(.cbi-section, .cbi-section-node) {
   --card-pad: 0;
+  --card-bleed: inherit;
   --card-border-width: 0;
   --card-radius: 0;
   --card-bg: transparent;

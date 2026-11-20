@@ -223,6 +223,18 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
   inline-size: calc(100% + 2 * var(--card-pad, var(--spacing-0)));
   margin-inline: calc(var(--card-pad, var(--spacing-0)) * -1);
 }
+/* A table under a field sits in a group (no pad of its own): it bleeds by
+   the outer card's pad, so its first column lines up with the text above. */
+:is(.cbi-value > .table, .cbi-value > .cbi-section.cbi-tblsection > .table) {
+  flex: none; /* a field row is a flex line: its width, not the row's */
+  inline-size: calc(100% + 2 * var(--card-bleed));
+  margin-inline: calc(var(--card-bleed) * -1);
+}
+/* DHCP's lease tables under their headings: content to the next heading
+   24. Form rows leave 16 between them (8 + 8); the static leases' group
+   ends 16 lower again, under its Add. */
+.cbi-value + .cbi-value:has(> h4:first-child) { margin-block-start: var(--spacing-2); }
+.cbi-value:has(> .cbi-tblsection) + .cbi-value:has(> h4:first-child) { margin-block-start: calc(var(--spacing-2) - var(--spacing-4)); }
 :is(.cbi-section, .cbi-section-node) > div:not(.cbi-value, .cbi-section-node):has(> .table .th) {
   margin-inline: calc(var(--card-pad, var(--spacing-0)) * -1);
   padding-inline: var(--card-pad, var(--spacing-0));
