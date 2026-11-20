@@ -142,6 +142,9 @@ html :where(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div:not(.cbi-t
   font-weight: var(--text-heading-4-weight);
   line-height: var(--text-heading-4-leading);
 }
+/* An <abbr> in a title (LED Configuration) reads as the title: no dotted
+   rule; its expansion stays in the title attribute. */
+html :where(:is(h1, h2, h3, h4, h5, h6, legend) abbr) { text-decoration: none; }
 /* Heading 1: the page title, which LuCI writes as an <h2>. */
 html :where(h1, .shell-content h2:not(.cbi-section *)) {
   font-size: var(--text-heading-1-size);
@@ -225,6 +228,17 @@ html :where(button, input[type="button"], input[type="submit"], input[type="rese
     transform: scale(0.98);
   }
   &:is(:disabled, [disabled], [aria-disabled="true"]) { opacity: 0.5; cursor: default; }
+}
+/* The "more" IconButton after a row's first action (theme-aster.js
+   actions(), doona ActionGroup): square at the Button's height, Heroicons
+   2.2.0 EllipsisVertical (MIT) at 20. */
+html :where(.aster-more) { --button-px: 0; inline-size: var(--button-h, var(--size-element-md)); }
+html :where(.aster-more)::before {
+  content: "";
+  inline-size: var(--aster-icon-md);
+  block-size: var(--aster-icon-md);
+  background-color: currentColor;
+  mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z'/></svg>") center / contain no-repeat;
 }
 /* IconButton (Astryx isIconOnly): a button drawing one glyph (pager
    arrows, drag handle, dynlist add, a field's reveal or CIDR switch, a Lua
@@ -381,6 +395,22 @@ html :where(:is(.cbi-dropdown:not(.btn, .cbi-button)) > ul > li[placeholder]) { 
 html :where(.cbi-dropdown[multiple] > ul) { gap: var(--spacing-1); padding-inline-start: var(--spacing-2); }
 html :where(.cbi-dropdown[multiple] > ul > li[display]) { flex: none; padding: 0; }
 html :where(.cbi-dropdown > ul > li img) { block-size: var(--aster-icon-sm); inline-size: var(--aster-icon-sm); }
+/* LuCI's device images (resources/icons/*.svg, a bitmap look, grey
+   squares in dark) in a list row, a device chip (Devices) and the
+   editor's Status: the Heroicons ServerStack, Wifi for a radio (luci.css
+   --icon-*), 16 in the secondary icon colour; 20 beside the Status. */
+html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip)):has(> img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"]))::before {
+  content: "";
+  display: block;
+  flex: none;
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
+  background-color: var(--color-icon-secondary);
+  mask: var(--icon-server) center / contain no-repeat;
+}
+html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip)):has(> img[src*="/wifi"])::before { mask-image: var(--icon-wifi); }
+html :where(.ifacebadge.large:not(.cbi-tooltip))::before { inline-size: var(--aster-icon-md); block-size: var(--aster-icon-md); }
+html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip)) > img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"]) { display: none; }
 /* The chevron segment: a Select's ends 12 inside the border, in the
    secondary icon colour (a ComboButton's is the button's own, above). */
 html :where(.cbi-dropdown > :is(.open, .more)) {
@@ -444,7 +474,7 @@ html :where(.cbi-dropdown > .open, .add-item > .cbi-button-add, .control-group >
    the default's row says so in supporting text.
    --menu-item-fg sets the rows' ink (the error ink for destructive ones). */
 
-html :where(.cbi-dropdown[open] > ul.dropdown, .palette-menu[open] > [role="menu"]) {
+html :where(.cbi-dropdown[open] > ul.dropdown, .palette-menu[open] > [role="menu"], #aster-more-menu:popover-open) {
   display: block;
   position: absolute;
   z-index: 110;
@@ -463,7 +493,7 @@ html :where(.cbi-dropdown[open] > ul.dropdown, .palette-menu[open] > [role="menu
   transform: translateY(var(--spacing-1));
 }
 html :where(.cbi-dropdown[open] > ul.dropdown[style*="bottom"]) { transform: translateY(calc(var(--spacing-1) * -1)); }
-html :where(.cbi-dropdown[open] > ul.dropdown > li, .palette-menu[open] > [role="menu"] > li) {
+html :where(.cbi-dropdown[open] > ul.dropdown > li, .palette-menu[open] > [role="menu"] > li, #aster-more-menu > li) {
   display: flex;
   align-items: center;
   gap: var(--spacing-2);
@@ -477,9 +507,9 @@ html :where(.cbi-dropdown[optional][open] > ul.dropdown > li[placeholder]) { dis
 html :where(.cbi-dropdown[open] > ul.dropdown > li .hide-open) { display: none; }
 html :where(.cbi-dropdown[open] > ul.dropdown > li .hide-close) { display: initial; }
 html :where(.cbi-dropdown[multiple][open] > ul.dropdown > li > form) { display: flex; pointer-events: none; }
-html :where(.cbi-dropdown[open] > ul.dropdown > li:is(.focus, [selected]), .palette-menu[open] > [role="menu"] > li:is(:focus-visible, [aria-checked="true"])) { background: var(--color-overlay-hover); }
+html :where(.cbi-dropdown[open] > ul.dropdown > li:is(.focus, [selected]), .palette-menu[open] > [role="menu"] > li:is(:focus-visible, [aria-checked="true"]), #aster-more-menu > li:focus-visible) { background: var(--color-overlay-hover); }
 @media (hover: hover) {
-  html :where(.cbi-dropdown[open] > ul.dropdown > li:hover, .palette-menu[open] > [role="menu"] > li:hover) { background: var(--color-overlay-hover); }
+  html :where(.cbi-dropdown[open] > ul.dropdown > li:hover, .palette-menu[open] > [role="menu"] > li:hover, #aster-more-menu > li:not([aria-disabled="true"]):hover) { background: var(--color-overlay-hover); }
 }
 html :where(.cbi-dropdown[open] > ul.dropdown > li[selected], .palette-menu[open] > [role="menu"] > li[aria-checked="true"]) { font-weight: var(--font-weight-medium); }
 html :where(.cbi-dropdown[open]:not([multiple]) > ul.dropdown > li[selected], .palette-menu[open] > [role="menu"] > li[aria-checked="true"])::after {
@@ -492,7 +522,15 @@ html :where(.cbi-dropdown[open]:not([multiple]) > ul.dropdown > li[selected], .p
   mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='m4.5 12.75 6 6 9-13.5'/></svg>") center / contain no-repeat;
 }
 html :where(.cbi-dropdown[open] > ul.dropdown > li[unselectable]) { opacity: 0.5; }
-html :where(.palette-menu[open] > [role="menu"] > li) { cursor: pointer; outline-offset: calc(var(--focus-outline-width) * -1); }
+html :where(.palette-menu[open] > [role="menu"] > li, #aster-more-menu > li) { cursor: pointer; outline-offset: calc(var(--focus-outline-width) * -1); }
+/* A row's "more" menu (theme-aster.js actions(): doona ActionGroup's
+   MoreMenu) lies in the top layer, anchored under its IconButton, end-aligned,
+   flipped above at the viewport edge;
+   a destructive row in the error ink, a disabled one half opaque. */
+html :where(#aster-more-menu:popover-open) { position: fixed; inset: auto; position-anchor: --aster-more; position-area: block-end span-inline-start; position-try-fallbacks: flip-block; min-inline-size: 0; margin: var(--spacing-1) 0; border: 0; transform: none; }
+html :where(.aster-more[aria-expanded="true"]) { anchor-name: --aster-more; }
+html :where(#aster-more-menu > li.negative) { --menu-item-fg: var(--color-text-error); }
+html :where(#aster-more-menu > li[aria-disabled="true"]) { opacity: 0.5; cursor: default; }
 html :where(.palette-menu [role="menu"] small) { color: var(--color-text-secondary); font-size: var(--text-supporting-size); }
 html :where(.palette-swatch) {
   flex: none;
@@ -504,7 +542,7 @@ html :where(.palette-swatch) {
 }
 html :where(.cbi-dropdown[open] > ul.dropdown > li > input.create-item-input) { --field-h: var(--size-element-sm); inline-size: 100%; }
 @media (pointer: coarse) {
-  html :where(.cbi-dropdown[open] > ul.dropdown > li, .palette-menu[open] > [role="menu"] > li) { min-block-size: var(--spacing-11); }
+  html :where(.cbi-dropdown[open] > ul.dropdown > li, .palette-menu[open] > [role="menu"] > li, #aster-more-menu > li) { min-block-size: var(--spacing-11); }
 }
 
 /* ── Checkbox and Radio ──────────────────────────────────────────
@@ -606,8 +644,10 @@ html :where(.cbi-dynlist > .item > span) { pointer-events: none; }
 html :where(.cbi-dynlist > .item code) { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--color-text-secondary); }
 html :where(.cbi-dynlist > .item.dragging) { opacity: 0.5; }
 html :where(.cbi-dynlist) > :is(.item, .add-item > *).drag-over { box-shadow: inset 0 calc(var(--border-width) * 2) 0 var(--color-accent); }
-html :where(.cbi-dynlist > .add-item) { display: flex; gap: var(--spacing-2); min-inline-size: 0; }
-html :where(.cbi-dynlist > .add-item > :is(input, .cbi-dropdown)) { --field-w: auto; flex: 1 1 auto; min-inline-size: 0; }
+/* The add row keeps its button on the field's line (a control group that
+   never wraps); the field takes what the button leaves. */
+html :where(.cbi-dynlist > .add-item) { display: flex; flex-wrap: nowrap; gap: var(--spacing-2); min-inline-size: 0; }
+html :where(.cbi-dynlist > .add-item > :is(input, .cbi-dropdown)) { --field-w: auto; flex: 1 1 0; min-inline-size: 0; }
 @media (prefers-reduced-motion: no-preference) {
   html :where(.cbi-dynlist > .item.flash) { animation: aster-flash var(--duration-medium-min) var(--ease-standard); }
 }
@@ -678,7 +718,7 @@ html :where(.cbi-value:has([data-changed="true"]) > .cbi-value-title)::after {
   background: var(--color-accent);
 }
 /* A field with its own affordance (password reveal, add button). */
-html :where(.control-group) { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); }
+html :where(.control-group:not(.cbi-dynlist > .add-item)) { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); }
 
 /* ── Card ────────────────────────────────────────────────────────
    The surface, a 1 border, the container radius and 16 from the outer
@@ -695,7 +735,7 @@ html :where(.control-group) { display: flex; flex-wrap: wrap; align-items: cente
 @property --card-radius { syntax: "*"; inherits: false; }
 @property --card-shadow { syntax: "*"; inherits: false; }
 
-html :where(.cbi-section, .cbi-section-node, .ifacebox, #view > :is(table, .table), #view > .cbi-map > :is(table, .table), #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], .nft-chain) {
+html :where(.cbi-section, .cbi-section-node, .ifacebox, #view > :is(table, .table), #view > .cbi-map > :is(table, .table), #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], #view > div:not(.cbi-map) > div:has(> .cbi-tabmenu) > div > [data-tab], .nft-chain) {
   --card-pad: calc(var(--aster-space-region) - var(--border-width));
   --card-bleed: var(--card-pad);
   box-sizing: border-box;
@@ -787,8 +827,8 @@ html :where([data-page="admin-status-overview"] .shell-content .ifacebox-body) {
 
 /* ── Table ───────────────────────────────────────────────────────
    Cells 4 / 8 / 4 / 16 with a bottom rule; a body row 33, a header row
-   31; header cells secondary, semibold; the hovered row takes the
-   overlay. The empty message is the caption, so it spans the table. */
+   31; header cells secondary, semibold; no row hover (Table hasHover
+   off: no LuCI row is clickable). The empty message is the caption, so it spans the table. */
 
 html :where(table, .table) {
   display: table;
@@ -821,14 +861,11 @@ html :where(th, .th) {
   line-height: var(--text-heading-5-leading);
   white-space: nowrap;
 }
-@media (hover: hover) {
-  html :where(.table .tr:has(> .td):not(.placeholder)):hover { background-color: var(--color-overlay-hover); }
-}
 html :where(.tr.placeholder) { display: table-caption; caption-side: bottom; }
 /* A form section (form.js) puts the message row in a tbody of its own,
    where a caption cannot sit: the tbody becomes the caption. */
-html :where(.tbody:has(> .tr.placeholder:only-child)) { display: table-caption; caption-side: bottom; }
-html :where(.tbody > .tr.placeholder) { display: block; }
+html :where(.tbody:not(tbody):has(> .tr.placeholder:only-child)) { display: table-caption; caption-side: bottom; }
+html :where(.tbody:not(tbody) > .tr.placeholder) { display: block; }
 /* Lua CBI tables are real <table>s: the parser's <tbody> holds the title row
    and the placeholder; dissolve it so the caption is the table's own. */
 html :where(tbody:has(> .tr.placeholder)) { display: contents; }
@@ -898,9 +935,10 @@ html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -
     & :where(.tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child) + :is(.td, td))::before { content: none; }
     /* The actions take a line of their own under the stack, so the data
        keeps the row's full width (a column beside it left long values a
-       narrow one); several wrap, 8 apart. */
+       narrow one); 8 apart on one line, the rest in the "more" menu where
+       it is too short (Startup's five; theme-aster.js). */
     & :where(.tr > :is(.td, td).cbi-section-actions) { padding: var(--spacing-2) var(--spacing-4) 0; }
-    & :where(.tr > :is(.td, td).cbi-section-actions > div) { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
+    & :where(.tr > :is(.td, td).cbi-section-actions > div) { display: flex; gap: var(--spacing-2); }
   }
   html #view .nft-rules tr > td { padding-block: 0 !important; } /* nftables' <style>, as above */
   /* A Lua button table (one action per cell, Commit and Apply) stacks
@@ -935,16 +973,13 @@ html :where(.cbi-section .table:not(:has(.th)) > .tr > .td:first-child) {
    secondary at regular weight, selected primary at semibold. The list
    has 4 under the tabs and a 1 rule; the indicator is a 2 accent pill
    under the label (12 in from each end) whose bottom edge sits on the
-   list's. Hover and press lay the overlay over the tab. */
+   list's. Hover and press lay the overlay over an unselected tab. */
 
 html :where(.tabs, .cbi-tabmenu) {
   display: flex;
-  flex-wrap: wrap;
   gap: var(--spacing-0-5);
   margin: 0;
-  padding: 0 0 var(--spacing-1);
   list-style: none;
-  border-block-end: var(--border-width) solid var(--color-border);
 }
 html :where(.tabs > li, .cbi-tabmenu > li) { display: inline-flex; align-items: center; }
 html :where(.tab, .cbi-tabmenu > li > a) {
@@ -964,10 +999,13 @@ html :where(.tab, .cbi-tabmenu > li > a) {
   html :where(.tab, .cbi-tabmenu > li > a):hover { background-color: var(--color-overlay-hover); }
 }
 html :where(.tab, .cbi-tabmenu > li > a):active { background-color: var(--color-overlay-pressed); }
+/* The selected tab is its words and the indicator only: no fill under the
+   pointer either (owner 2026-11-21). */
 html :where(.tab[data-active], .cbi-tabmenu > .cbi-tab > a) {
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
 }
+html :where(.tab[data-active], .cbi-tabmenu > .cbi-tab > a):is(:hover, :active) { background-color: transparent; }
 html :where(.tab[data-active], .cbi-tabmenu > .cbi-tab > a)::before {
   content: "";
   position: absolute;
@@ -985,31 +1023,31 @@ html :where(.tab[data-errors], .cbi-tabmenu > li[data-errors])::after {
   margin-inline-start: var(--spacing-1);
   font-variant-numeric: tabular-nums;
 }
-html :where([data-tab-active="false"]) { display: none; }
-/* Narrow: one line that scrolls sideways, as Astryx Tabs do; the selected
-   tab is the list's initial scroll target where the browser has
-   scroll-initial-target. The list's rule is painted inside its padding so
-   the scroll box does not clip the indicator that sits on it. */
-@media (max-width: 48rem) {
-  html :where(.tabs, .cbi-tabmenu) {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    padding-block-end: calc(var(--spacing-1) + var(--border-width));
-    border-block-end: 0;
-    background: linear-gradient(var(--color-border) 0 0) bottom / 100% var(--border-width) no-repeat;
-  }
-  html :where(.tabs > li, .cbi-tabmenu > li) { flex: none; }
-  html :where(.tab[data-active], .cbi-tabmenu > .cbi-tab) { scroll-initial-target: nearest; }
-  /* A list that scrolls fades out 32 at the end that has more (both ends
-     in the middle), so a tab cut at the edge reads as more to scroll. A
-     scroll timeline runs only while the list overflows. */
-  html :where(.tabs, .cbi-tabmenu) {
-    mask: linear-gradient(to right, transparent, black var(--tabs-fade-s) calc(100% - var(--tabs-fade-e)), transparent);
-    animation: aster-tabs-fade linear both;
-    animation-timeline: scroll(self inline);
-  }
+/* A pane shows only while it is the active one: luci-base marks the active
+   pane "true" and leaves the others "false" or unset (form.js's JS tabs). */
+html :where([data-tab-active="false"], [data-tab-title]:not([data-tab-active="true"])) { display: none; }
+/* One line that scrolls sideways at every width, as Astryx TabList does
+   (overflow auto: it always scrolls); the selected tab is the list's
+   initial scroll target where the browser has scroll-initial-target. The
+   list's 1 rule is painted inside its padding, 4 under the tabs, so the
+   scroll box does not clip the indicator that sits on it. */
+html :where(.tabs, .cbi-tabmenu) {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  padding: 0 0 calc(var(--spacing-1) + var(--border-width));
+  background: linear-gradient(var(--color-border) 0 0) bottom / 100% var(--border-width) no-repeat;
+}
+html :where(.tabs > li, .cbi-tabmenu > li) { flex: none; }
+html :where(.tab[data-active], .cbi-tabmenu > .cbi-tab) { scroll-initial-target: nearest; }
+/* A list that scrolls fades out 32 at the end that has more (both ends
+   in the middle), so a tab cut at the edge reads as more to scroll. A
+   scroll timeline runs only while the list overflows. */
+html :where(.tabs, .cbi-tabmenu) {
+  mask: linear-gradient(to right, transparent, black var(--tabs-fade-s) calc(100% - var(--tabs-fade-e)), transparent);
+  animation: aster-tabs-fade linear both;
+  animation-timeline: scroll(self inline);
 }
 @property --tabs-fade-s { syntax: "<length>"; inherits: false; initial-value: 0; }
 @property --tabs-fade-e { syntax: "<length>"; inherits: false; initial-value: 0; }
@@ -1233,7 +1271,30 @@ html :where(#modal_overlay > *) {
   color: var(--color-text-primary);
   box-shadow: var(--shadow-high);
 }
-html :where(#modal_overlay > :not(.alert-message)) { padding: var(--spacing-4); }
+/* Astryx Dialog's height: at most --aster-dialog-max-h; past it the title
+   and the footer stay and the body between them scrolls, its scroll box
+   out to the dialog's edges so a field's focus ring is not cut. */
+html :where(#modal_overlay > :not(.alert-message)) {
+  display: flex;
+  flex-direction: column;
+  max-block-size: var(--aster-dialog-max-h);
+  padding: var(--spacing-4);
+}
+html :where(#modal_overlay > :not(.alert-message) > *) { flex: none; }
+html :where(#modal_overlay > :not(.alert-message) > :not(h4:first-child, :is(.right, .button-row, div:has(> .left + .right)):last-child)) {
+  flex: 0 1 auto;
+  min-block-size: 0;
+  margin-inline: calc(var(--spacing-4) * -1);
+  padding-inline: var(--spacing-4);
+  overflow-y: auto;
+}
+/* Tabs in a scrolling body stay at its top, over the rows that pass. */
+html :where(#modal_overlay .cbi-tabmenu) {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  background-color: var(--color-background-surface);
+}
 html :where(#modal_overlay > * > h4:first-child) {
   margin-block-end: var(--spacing-4);
   font-size: var(--text-heading-2-size);
@@ -1292,8 +1353,11 @@ html :where(.cbi-tooltip) {
   inset-inline-start: 0;
   z-index: 110;
   box-sizing: border-box;
+  /* As wide as its words, up to Astryx's 300; never narrower than they are
+     (a parent's width must not squeeze it to a letter a line). */
   inline-size: max-content;
-  max-inline-size: min(var(--aster-menu-max-w), calc(100vw - var(--tooltip-inset) * 2));
+  min-inline-size: min(max-content, var(--aster-tooltip-max-w), calc(100vw - var(--tooltip-inset) * 2));
+  max-inline-size: min(var(--aster-tooltip-max-w), calc(100vw - var(--tooltip-inset) * 2));
   padding: var(--spacing-1) var(--spacing-2);
   border-radius: var(--radius-container);
   background: var(--color-text-primary);
@@ -1316,6 +1380,21 @@ html :where(.cbi-tooltip[style]) { display: block; opacity: 1; }
 }
 @starting-style {
   html :where(.cbi-tooltip[style], .cbi-tooltip-container:hover > .cbi-tooltip) { opacity: 0; }
+}
+/* A key/value list inside (ui.itemlist: "<strong>Key:</strong> value"
+   lines between <br>s, as the overview's DHCPv6 statistics) is a tight
+   two-column table: keys on one line at medium weight, values beside
+   them, one line a row, all in the tooltip's ink. No page rule reaches in
+   (luci.css keeps its key/value and form-row rules out of .cbi-tooltip). */
+html :where(.cbi-tooltip :has(> .nowrap > strong:first-child)) { display: table; border-spacing: 0; }
+html :where(.cbi-tooltip :has(> .nowrap > strong:first-child) > br) { display: none; }
+html :where(.cbi-tooltip .nowrap:has(> strong:first-child)) { display: table-row; color: inherit; }
+html :where(.cbi-tooltip .nowrap > strong:first-child) {
+  display: table-cell;
+  padding-inline-end: var(--spacing-2);
+  color: inherit;
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
 }
 /* Chips inside take the tooltip's colours. */
 html :where(.cbi-tooltip) :is(.ifacebadge, .zonebadge, .ifacebox, .ifacebox-head, .label) {

@@ -24,6 +24,58 @@ return baseclass.extend({
 		this.lua();
 		this.tooltip();
 		this.marks();
+		this.actions();
+	},
+
+	/* Row actions (doona ActionGroup): one line, else a "more" Menu. */
+	actions() {
+		const view = document.getElementById('view'), neg = '.cbi-button-remove, .cbi-button-negative';
+		let owner;
+
+		if (!view?.showPopover)
+			return;
+
+		const acts = (g) => g.querySelectorAll(':scope > :not(.drag-handle, .aster-more)');
+		const groups = (r) => [...r.querySelectorAll(':is(.td, td) > div')].filter((g) =>
+			acts(g)[1] && !g.querySelector(':scope > :not(.btn, .cbi-button, button, .drag-handle)'));
+		const wide = (e) => e.scrollWidth > e.clientWidth + 1;
+		const menu = document.body.appendChild(E('ul', { id: 'aster-more-menu', role: 'menu', popover: 'auto',
+			beforetoggle: (ev) => {
+				owner.ariaExpanded = ev.newState == 'open';
+				ev.newState == 'open' && menu.replaceChildren(...[...acts(owner.parentNode)].slice(1).sort((x, y) => x.matches(neg) - y.matches(neg)).map((b, i) =>
+					E('li', { role: 'menuitem', tabindex: -1, class: b.matches(neg) ? 'negative' : null, 'aria-disabled': b.disabled || null, autofocus: !i || null,
+						click: b.disabled ? null : () => (menu.hidePopover(), b.click()) }, (b.textContent || b.value).trim())));
+			},
+			keydown: (ev) => {
+				const k = ev.key, a = ev.target, f = menu.firstChild, l = menu.lastChild,
+					go = { ArrowDown: a.nextSibling || f, ArrowUp: a.previousSibling || l, Home: f, End: l }[k];
+				if (go)
+					go.focus();
+				else if (k == 'Enter' || k == ' ')
+					a.click();
+				else
+					return k == 'Tab' && menu.hidePopover();
+				ev.preventDefault();
+			}
+		}));
+		const fit = (t) => {
+			const gs = groups(t), on = (v) => gs.forEach((g) => g.toggleAttribute('data-collapsed', v));
+
+			if (t.offsetWidth) {
+				on(false);
+				on(wide(t.parentNode) || wide(t) || gs.some((g) => wide(g) || g.offsetWidth > g.parentNode.clientWidth));
+			}
+		};
+		const ro = new ResizeObserver((es) => es.forEach((e) => e.target.querySelectorAll(':scope > :is(.table, table)').forEach(fit)));
+		const run = () => new Set(groups(view).map((g) => {
+			g.querySelector('.aster-more') || g.appendChild(E('button', { type: 'button', class: 'btn cbi-button aster-more',
+				'aria-haspopup': 'menu', 'aria-expanded': false, 'aria-label': _('Actions'), popovertarget: 'aster-more-menu',
+				click: (ev) => owner = ev.currentTarget }));
+			return g.closest('.table, table');
+		})).forEach((t) => (ro.observe(t.parentNode), fit(t)));
+
+		run();
+		new MutationObserver(run).observe(view, { childList: true, subtree: true });
 	},
 
 	/* Marks for what LuCI says only in its words, kept as views re-render:

@@ -45,6 +45,7 @@
     "heading.card": {"_source": "Astryx settings and dashboard templates: a section title is Heading 3 (layout/SPEC.md; was spec Heading h2, 22)", "fontSize": 18, "fontWeight": "600"},
     "heading.inner": {"_source": "Heading 4 under a Heading 3 card title (dashboard template card titles; layout/SPEC.md)", "fontSize": 16, "fontWeight": "600"},
     "heading.sub": {"fontSize": null, "fontWeight": null},
+    "heading": {"_source": "Astryx Heading levels (qa2 #11): a title is Heading 1, 2, 3 or 4 as the tokens size them; an <abbr> in it has no dotted rule", "level": "astryx", "abbr": "none"},
     "heading.modal": {"fontSize": null, "fontWeight": null},
 
     "tab": {"_source": "Astryx 0.7.16 Tabs md, measured in M3 (STATE.md, M3 port): 36 high, the selected tab marked by a 2 px accent pill", "height": 36, "indicator": {"light": "bar 2px rgb(34, 91, 255)", "dark": "bar 2px rgb(61, 135, 255)"}},
@@ -53,9 +54,19 @@
     "form.row": {"_source": "Astryx Field layout: a form row spans its card's (or dialog's) content box (fill 0)", "gap": null, "fill": 0},
 
     "nav.item": {"_source": "Astryx 0.7.16 SideNavSection items: flex column, gap --spacing-0-5; the theme keeps it inside a group too, so a hovered row never touches the selected one", "gap": 2},
-    "tooltip": {"_source": "Astryx 0.7.16 Tooltip, measured: text padding 4px 8px, radius 16 (container), 15px body, no arrow, 4 from the anchor; its words fit the box (scrollWidth - clientWidth)", "overflow": 0, "padding": [4, 8, 4, 8], "radius": 16, "fontSize": 15, "arrow": "none", "gap": 4},
+    "tooltip": {"_source": "Astryx 0.7.16 Tooltip, measured: text padding 4px 8px, radius 16 (container), 15px body, no arrow, 4 from the anchor; its words fit the box (scrollWidth - clientWidth); every word inside in its ink (AA against the fill); a key/value line at most two lines; as wide as its words up to max-width 300, so no word that fits a line breaks", "overflow": 0, "padding": [4, 8, 4, 8], "radius": 16, "fontSize": 15, "arrow": "none", "gap": 4, "ink": "AA", "lines": "<= 2", "words": "whole"},
+    "button.field": {"_source": "Astryx ButtonGroup, one primary per group by meaning (qa2 #12): a form row's own action (Sync with browser, Generate archive, Flash image) is the secondary Button", "variant": "secondary"},
+    "button.primary": {"_source": "Astryx ButtonGroup: at most one primary (filled) Button in a group: the save bar, a dialog footer, a table cell, a section", "perGroup": "one"},
+    "table.actions": {"_source": "doona ActionGroup (owner 2026-11-21): a row's action buttons share one line, never stacked; where they do not fit, the first and a more menu (desktop and the phone fold's footer line)", "lines": "one"},
+    "dynlist": {"_source": "Dynlist (the SSH-keys page's add row, owner 2026-11-21): the + on its field's line, never under it", "add": "beside"},
+    "tabs.list": {"_source": "Astryx TabList overflow auto (always scrolls): one line of tabs at every width, scrolled sideways with edge fades (owner 2026-11-21: Channel Analysis)", "lines": "one"},
+    "tabs.pane": {"_source": "Astryx Tabs: one TabPanel shows, the selected tab's (panes of one group under one parent)", "shown": "one"},
+    "frame": {"_source": "Astryx Card: don't nest cards inside other cards; layout/structure: no Cards inside Cards. Only a frame inside a frame is listed (outside the components Astryx puts in a card)", "nested": "none"},
+    "dialog": {"_source": "Astryx Dialog: maxHeight 75dvh, the body scrolls between the title and the footer; the scrim covers the page, the save bar too", "fits": "yes", "scrim": "over the save bar"},
     "banner.icon": {"_source": "Astryx 0.7.16 Banner: gap icon -> text 8; a status dialog (ui.js displayStatus) keeps it", "gap": 8},
 
+    "icon": {"_source": "qa2 #10: LuCI's device images (resources/icons/*.svg, bitmap look) are drawn as Heroicons; a showing one is listed", "legacy": "none"},
+    "zone": {"_source": "qa2 #10: a firewall zone's inline colour as palette tokens (success, error, neutral, or mixed into the card), light and dark", "fill": "token"},
     "glyph": {"_source": "Astryx draws icons (Heroicons), not characters: LuCI's ▾ ⇒ ∗ + × ··· are hidden and drawn as the icon; a showing one is listed", "raw": "none"},
     "footer": {"_source": "Astryx LayoutFooter: the save bar is a region under the main column on a wide screen, so it covers no content (px of the main column under the bar)", "overlap": 0},
     "space.page.inset": {"_source": "lab spacing audit 2026-11-20, contract approved by the owner; Astryx Stack/Card/Dialog: the container owns the gap: page inset 24 (LayoutContent) on top and both sides; bottom to the save bar where the page outgrows the column; the last block to an in-flow save bar (phone)", "padding": 24},

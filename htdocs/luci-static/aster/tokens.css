@@ -158,7 +158,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-on-error: light-dark(#FFFFFF, #191724);
   --color-on-error-muted: light-dark(#8F4F61, #F19DB5);
   --color-on-info-muted: light-dark(#6D5D80, #C4A7E7);
-  --color-on-light: light-dark(#000000, #000000);
   --color-on-success-muted: light-dark(#3E6B73, #74A1B3);
   --color-on-warning-muted: light-dark(#8C5E1F, #F6C177);
   --color-overlay: light-dark(#57527966, #19172499);
@@ -193,7 +192,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-overlay-hover: light-dark(#0536590C, #FFFFFF0C);
   --color-overlay-pressed: light-dark(#05365919, #FFFFFF19);
   --color-background-muted: light-dark(#0536590C, #1111127F);
-  --color-on-light: light-dark(#000000, #000000);
   --color-icon-secondary: light-dark(#4E606F, #AAAFB5);
   --color-background-card: light-dark(#FFFFFF, #1F1F22);
   --color-background-popover: light-dark(#FFFFFF, #28292C);
@@ -250,7 +248,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-on-error: light-dark(#FFFFFF, #19202C);
   --color-on-error-muted: light-dark(#9D303D, #F2ACB3);
   --color-on-info-muted: light-dark(#31617F, #A0CBE3);
-  --color-on-light: light-dark(#000000, #000000);
   --color-on-success-muted: light-dark(#246445, #99D2AF);
   --color-on-warning-muted: light-dark(#80500E, #EDC588);
   --color-overlay: light-dark(#19202C66, #181A2099);
@@ -292,7 +289,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-on-error: light-dark(#FFFFFF, #172824);
   --color-on-error-muted: light-dark(#933B37, #EFAEA9);
   --color-on-info-muted: light-dark(#355E84, #ACCCE6);
-  --color-on-light: light-dark(#000000, #000000);
   --color-on-success-muted: light-dark(#44622E, #BDDA9E);
   --color-on-warning-muted: light-dark(#785017, #E7C697);
   --color-overlay: light-dark(#17282466, #161D1C99);
@@ -334,7 +330,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-on-error: light-dark(#FFFFFF, #292329);
   --color-on-error-muted: light-dark(#943F30, #EFAE9C);
   --color-on-info-muted: light-dark(#3B627F, #ABCCE0);
-  --color-on-light: light-dark(#000000, #000000);
   --color-on-success-muted: light-dark(#4C6134, #C5D4A0);
   --color-on-warning-muted: light-dark(#805017, #EBC492);
   --color-overlay: light-dark(#29232966, #201C2099);
@@ -396,8 +391,11 @@ html[data-theme="dark"] { color-scheme: dark; }
   --aster-form-label-w: 200px;
   --aster-field-w: 256px;
 
-  /* Menu and tooltip: the widest they open. */
+  /* Menu: the widest it opens. Tooltip: Astryx's text box, 300 at most. */
   --aster-menu-max-w: 384px;
+  --aster-tooltip-max-w: 300px;
+  /* EmptyState: its words 360 wide at most (Astryx EmptyState). */
+  --aster-empty-max-w: 360px;
 
   /* Spacing contract (lab spacing audit, 2026-11-20): a container owns the
      space between its children. Two stack steps: 16 inside a page region
@@ -415,4 +413,7 @@ html[data-theme="dark"] { color-scheme: dark; }
   --aster-dialog-sm-w: 400px;
   --aster-dialog-w: 560px;
   --aster-dialog-lg-w: 800px;
+  /* Dialog height: Astryx Dialog's maxHeight; past it the body scrolls
+     between the fixed title and footer. */
+  --aster-dialog-max-h: 75dvh;
 }

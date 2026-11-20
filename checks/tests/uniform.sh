@@ -144,6 +144,70 @@ expect uniform 1 "space.control.row gap" "save bar buttons 16 apart" -- "$url" "
 expect uniform 1 "space.dialog gap" "dialog footer 8 under the form" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
 	--debug-css 'admin/network/network=#modal_overlay .button-row { margin-block-start: 8px !important }'
 
+# Tooltip contents: a key/value list (the DHCPv6 statistics; the gate
+# builds one in the overview's upstream box) in the tooltip's ink, a line
+# at most two lines high.
+expect uniform 1 "tooltip ink" "a page key colour inside a tooltip" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=.cbi-tooltip strong { color: var(--color-text-secondary) !important }'
+expect uniform 1 "tooltip lines" "a tooltip line three lines high" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=.cbi-tooltip .nowrap { display: block !important; padding-block: 24px !important }'
+
+expect uniform 1 "tooltip words" "a tooltip at its min-content width, a letter a line" -- "$url" "$password" --pages "$tmp/rules.txt" \
+	--debug-css 'admin/network/firewall/rules=.cbi-tooltip { inline-size: min-content !important; min-inline-size: 0 !important }'
+
+# Tabs: only the active pane shows (the JS tab panes stacked on first load).
+expect uniform 1 "tabs.pane shown" "every tab pane shown" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=[data-tab-title]:not([data-tab-active="true"]) { display: block !important }'
+
+# Tabs: the strip wrapping onto two lines (24.10 DHCP's 14 at 1440).
+expect uniform 1 "tabs.list lines" "the tab strip on two lines" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=.cbi-tabmenu { flex-wrap: wrap !important; max-inline-size: 240px }'
+
+# Dynlist: the + under its field (the add row wrapping).
+printf 'admin/system/system tab=timesync\n' >"$tmp/timesync.txt"
+expect uniform 1 "dynlist add" "dynlist + under its field" -- "$url" "$password" --pages "$tmp/timesync.txt" \
+	--debug-css 'admin/system/system=.cbi-dynlist > .add-item { flex-wrap: wrap !important } .cbi-dynlist > .add-item > input { flex: 0 0 100% !important }'
+
+# Button variants by meaning: Sync with browser filled; Save filled beside Save & Apply.
+printf 'admin/system/system\n' >"$tmp/system-only.txt"
+expect uniform 1 "button.field variant" "a form row's action filled" -- "$url" "$password" --pages "$tmp/system-only.txt" \
+	--debug-css 'admin/system/system=.cbi-value-field .cbi-button-apply:first-child { --button-bg: var(--color-accent) !important }'
+expect uniform 1 "button.primary perGroup" "Save filled beside Save & Apply" -- "$url" "$password" --pages "$tmp/system-only.txt" \
+	--debug-css 'admin/system/system=.cbi-page-actions > .cbi-button-save { --button-bg: var(--color-accent) !important }'
+
+# Row actions: a row's buttons stacked (Interfaces' Restart, Stop, Edit, Delete).
+printf 'admin/status/processes\n' >"$tmp/processes.txt"
+expect uniform 1 "table.actions lines" "a row's actions on two lines" -- "$url" "$password" --pages "$tmp/processes.txt" \
+	--debug-css 'admin/status/processes=.td > div:has(> :is(.btn, .cbi-button)) { flex-wrap: wrap !important; max-inline-size: 100px }'
+printf 'admin/system/startup\n' >"$tmp/startup.txt"
+expect uniform 1 "table.actions lines" "phone: Startup's five wrapped, no more menu" -- "$url" "$password" --pages "$tmp/startup.txt" --viewports phone \
+	--debug-css 'admin/system/startup=#view .cbi-section-actions > div { flex-wrap: wrap !important } #view .cbi-section-actions > div > * { display: inline-flex !important } #view .aster-more { display: none !important }'
+
+# Headings: a size outside Astryx's levels; an <abbr>'s dotted rule.
+printf 'admin/status/nftables\n' >"$tmp/nftables.txt"
+printf 'admin/system/leds\n' >"$tmp/leds.txt"
+expect uniform 1 "heading level" "a chain title at 17" -- "$url" "$password" --pages "$tmp/nftables.txt" \
+	--debug-css 'admin/status/nftables=.nft-chain h4 { font-size: 17px !important }'
+expect uniform 1 "heading abbr" "a dotted <abbr> in the LED title" -- "$url" "$password" --pages "$tmp/leds.txt" \
+	--debug-css 'admin/system/leds=h2 abbr { text-decoration: underline dotted !important }'
+
+# Icons: LuCI's device image showing; a zone's inline colour.
+expect uniform 1 "icon legacy" "the editor's Status image" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
+	--debug-css 'admin/network/network=#modal_overlay .ifacebadge.large > img { display: inline !important }'
+printf 'admin/network/firewall/zones\n' >"$tmp/zones.txt"
+expect uniform 1 "zone fill" "zone chips in LuCI's inline colours" -- "$url" "$password" --pages "$tmp/zones.txt" \
+	--debug-css 'admin/network/firewall/zones=html .zonebadge[style] { background-color: rgb(var(--zone-color-rgb)) !important }'
+
+# Frames: a form row framed inside its card.
+expect uniform 1 "frame nested" "a form row framed inside its card" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=.cbi-value { box-shadow: 0 0 0 1px var(--color-border) !important }'
+
+# Dialog: a tall one runs past the window; the save bar over the scrim.
+expect uniform 1 "dialog fits" "dialog taller than the window" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
+	--debug-css 'admin/network/network=#modal_overlay > .modal { max-block-size: none !important }'
+expect uniform 1 "dialog scrim" "save bar over the dialog's scrim" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
+	--debug-css 'admin/network/network=.cbi-page-actions { z-index: 200 !important }'
+
 # Lua CBI map (APPS=1: a box with OpenClash, as apps-install.sh leaves it).
 # A header table in a Lua map folds on a phone like a JS view's, and the
 # gate reads it as a fold; a row drawn as a flex column instead of the

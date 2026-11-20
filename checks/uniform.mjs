@@ -56,7 +56,7 @@ try {
 /* Returns [class, property, value, where] for every sample. Values are px
  * numbers, arrays of px numbers, or strings compared exactly. */
 function collect(cfg) {
-  const {rgba, visible, where, ownText} = window.__ag;
+  const {rgba, over, behind, ratio, visible, where, ownText} = window.__ag;
   const scope = cfg.modal ? document.querySelector('#modal_overlay .modal') : document.querySelector('#maincontent');
   if (!scope) return [];
   const out = [];
@@ -170,6 +170,26 @@ function collect(cfg) {
     add(cls, 'paddingInline', el.matches('.cbi-dropdown') ? [px(pad.paddingLeft), px(pad.paddingRight)] : [px(s.paddingLeft), px(s.paddingRight)], el);
   }
 
+  // One primary per group, by meaning (Astryx ButtonGroup): a form row's
+  // own action is secondary; a save bar, dialog footer, cell or section
+  // holds at most one filled button. Filled = the accent fill.
+  {
+    const probe = document.body.appendChild(document.createElement('i'));
+    probe.style.background = 'var(--color-accent)';
+    const accent = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    const per = new Map();
+    for (const el of all(BTN)) {
+      if (!visible(el) || el.parentElement?.closest(BTN) || el.parentElement?.closest('.cbi-dropdown')) continue;
+      const filled = getComputedStyle(el).backgroundColor === accent;
+      if (el.closest('.cbi-value-field') && !el.matches('.cbi-dropdown')) add('button.field', 'variant', filled ? 'primary' : 'secondary', el);
+      if (!filled) continue;
+      const g = el.closest('.cbi-page-actions, .modal, td, .td, .cbi-section, #view') ?? document.body;
+      per.set(g, (per.get(g) ?? 0) + 1);
+    }
+    for (const [g, n] of per) add('button.primary', 'perGroup', n === 1 ? 'one' : `${n}`, g); // a string, as table.actions
+  }
+
   // Single-line fields: text inputs, selects and luci-base's dropdown widget.
   for (const el of all(FIELD)) {
     if (el.parentElement?.closest('.cbi-dropdown')) continue;
@@ -185,8 +205,15 @@ function collect(cfg) {
       // around it (a card, a dialog): read what the field itself leaves of
       // the row, less the buttons on its line (a dynlist's add, a
       // password's reveal). That the row fills its frame is form.row fill.
-      if (cfg.device === 'phone') add(cls, 'formFill', px(lineFill(el, field)), el);
-      else add(cls, 'formWidth', px(box(el).width), el);
+      // A dynlist's add field shares its row with the + (Dynlist): the
+      // list is the field, as wide as any other.
+      const list = el.closest('.cbi-dynlist');
+      if (cfg.device === 'phone') add(cls, 'formFill', px(lineFill(list ?? el, field)), el);
+      else add(cls, 'formWidth', px(box(list ?? el).width), el);
+      if (list && el.parentElement.matches('.add-item')) {
+        const b = el.parentElement.querySelector(':scope > .cbi-button-add');
+        if (b && visible(b)) add('dynlist', 'add', box(b).top < box(el).bottom - 1 ? 'beside' : 'below', b);
+      }
     }
     // The space between a field and the button on its line.
     const next = after(el, field ?? el.parentElement)[0];
@@ -249,6 +276,14 @@ function collect(cfg) {
     // the component's selector, not how the row happens to be drawn, so a
     // fold that breaks is read as one. Row heights vary with the number of
     // columns and are not read.
+    // A row's actions share one line (doona ActionGroup), never stacked:
+    // those that do not fit are in the "more" menu (theme-aster.js).
+    for (const c of cells) {
+      const acts = [...c.querySelectorAll(':scope > :is(.btn, .cbi-button, button), :scope > div > :is(.btn, .cbi-button, button)')].filter((b) => visible(b) && !b.closest('.cbi-dropdown'));
+      if (acts.length < 2) continue;
+      const n = new Set(acts.map((b) => Math.round(box(b).top))).size; // a string: a count read as px would pass 2 within the 1px tolerance
+      add('table.actions', 'lines', n === 1 ? 'one' : `${n} lines`, c);
+    }
     if (!progress && cfg.device === 'phone' && table.matches(FOLD)) {
       add('table.fold.row', 'display', getComputedStyle(row).display, row);
       cells.forEach((c, i) => {
@@ -408,6 +443,11 @@ function collect(cfg) {
   for (const el of all('.tabs > li > .tab, .cbi-tabmenu > li')) {
     add('tab', 'height', px(box(el).height), el);
     if (el.matches('[data-active], .cbi-tab')) add('tab', 'indicator', indicator(el), el);
+  }
+  // The strip is one line at every width (Astryx TabList scrolls).
+  for (const ul of all('.tabs, .cbi-tabmenu')) {
+    const n = new Set([...ul.children].filter(visible).map((li) => Math.round(box(li).top))).size;
+    if (n) add('tabs.list', 'lines', n === 1 ? 'one' : `${n} lines`, ul); // a string, as table.actions
   }
 
   // Form rows: the label column and the gap to the next row.
@@ -601,6 +641,42 @@ function collect(cfg) {
     // the pill rule would read as 9999.
     add('tooltip', 'radius', px(s.borderTopLeftRadius), el);
     add('tooltip', 'fontSize', px(s.fontSize), el);
+    // Its words are in its own ink: every text against the fill under it
+    // (the tooltip's, and a chip's tint over it), WCAG AA 4.5. The fill is
+    // read as declared, not through the fade-in's opacity.
+    const fill = (e) => {
+      let c = over(rgba(s.backgroundColor), behind(tip, false).bg);
+      for (const a of [...tip.querySelectorAll('*')].filter((x) => x.contains(e))) c = over(rgba(getComputedStyle(a).backgroundColor), c);
+      return c;
+    };
+    let low = null;
+    for (const e of [tip, ...tip.querySelectorAll('*')]) {
+      if (!ownText(e) || !visible(e)) continue;
+      const f = fill(e);
+      const r = ratio(over(rgba(getComputedStyle(e).color), f), f);
+      if (r < 4.5 && (!low || r < low.r)) low = {r, e};
+    }
+    add('tooltip', 'ink', low ? `${low.r.toFixed(2)}:1` : 'AA', low ? low.e : el);
+    // The box is as wide as its words up to the Tooltip's 300: no word that
+    // would fit on a line is broken over two (a tooltip shrunk to its
+    // min-content stood one letter a line).
+    const room = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--aster-tooltip-max-w')) - parseFloat(s.paddingLeft) - parseFloat(s.paddingRight);
+    let broken = null;
+    const tw = document.createTreeWalker(tip, NodeFilter.SHOW_TEXT);
+    for (let n = tw.nextNode(); n && !broken; n = tw.nextNode()) {
+      for (const m of n.data.matchAll(/[^\s\-\/]+/g)) { // a hyphen or slash is a break opportunity
+        const rg = document.createRange();
+        rg.setStart(n, m.index);
+        rg.setEnd(n, m.index + m[0].length);
+        const rects = [...rg.getClientRects()].filter((q) => q.width > 0);
+        const w = rects.reduce((a, q) => a + q.width, 0);
+        if (new Set(rects.map((q) => Math.round(q.top))).size > 1 && w <= room) { broken = m[0]; break; }
+      }
+    }
+    add('tooltip', 'words', broken ? `"${broken.slice(0, 24)}" broken over lines` : 'whole', el);
+    // A key/value line is one line, two where a value wraps: never taller.
+    const lines = [...tip.querySelectorAll('.nowrap')].filter(visible).map((n) => Math.round(box(n).height / parseFloat(getComputedStyle(n).lineHeight)));
+    if (lines.length) add('tooltip', 'lines', Math.max(...lines) <= 2 ? '<= 2' : `${Math.max(...lines)} lines`, el);
   };
   for (const el of all('[data-tooltip]').slice(0, 3)) {
     el.dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));
@@ -612,11 +688,105 @@ function collect(cfg) {
     add('tooltip', 'gap', px(t.bottom <= r.top + 0.5 ? r.top - t.bottom : t.top - r.bottom), el);
     el.dispatchEvent(new MouseEvent('mouseout', {bubbles: true}));
   }
+  // A key/value list in a tooltip, as 30_network.js puts the DHCPv6
+  // statistics in an upstream box (ui.itemlist inside a .cbi-tooltip), is
+  // built in the overview's first upstream box when the device has none
+  // (the lab has no DHCPv6 upstream) and taken out after the read.
+  const host = cfg.modal ? null : scope.querySelector('.network-status-table .ifacebox-body');
+  let probe = null;
+  if (host && !host.querySelector('.cbi-tooltip-container .cbi-tooltip .nowrap')) {
+    const list = (pairs) => {
+      const sp = document.createElement('span');
+      pairs.forEach(([k, v], i) => {
+        const n = Object.assign(document.createElement('span'), {className: 'nowrap'});
+        const st = document.createElement('strong');
+        st.textContent = `${k}: `;
+        n.append(st, v);
+        if (i) sp.append(document.createElement('br'));
+        sp.append(n);
+      });
+      return sp;
+    };
+    const tip = Object.assign(document.createElement('span'), {className: 'cbi-tooltip'});
+    tip.append(list(['solicit', 'advertise', 'request', 'renew', 'reply', 'information_request', 'discarded_packets'].map((k, i) => [`DHCPv6 ${k}`, `${i * 7} pkts`])));
+    const c = Object.assign(document.createElement('span'), {className: 'cbi-tooltip-container'});
+    c.append('📊', tip);
+    probe = list([['DHCPv6 Statistics', c]]);
+    host.append(probe);
+  }
   for (const tip of scope.querySelectorAll('.cbi-tooltip-container > .cbi-tooltip:not(:empty, [style])')) {
     if ((!cfg.modal && tip.closest('#modal_overlay')) || tip.closest(APP_OWN) || !visible(tip.parentElement)) continue;
-    tip.setAttribute('style', '');
+    tip.setAttribute('style', 'transition: none'); // shown at once, not fading in from opacity 0
     if (visible(tip)) tipRead(tip, tip.parentElement);
     tip.removeAttribute('style');
+  }
+  probe?.remove();
+
+  // Headings: every title is one of Astryx's Heading sizes the theme
+  // uses (1, 2, 3, 4), and an <abbr> in it carries no dotted rule.
+  const probe2 = document.body.appendChild(document.createElement('div'));
+  const levels = [1, 2, 3, 4].map((n) => { probe2.style.fontSize = `var(--text-heading-${n}-size)`; return px(getComputedStyle(probe2).fontSize); });
+  probe2.remove();
+  for (const h of scope.querySelectorAll('h1, h2, h3, h4, h5, h6, legend')) {
+    if (!visible(h) || h.closest(APP_OWN) || (!cfg.modal && h.closest('#modal_overlay')) || !ownText(h)) continue;
+    const f = px(getComputedStyle(h).fontSize);
+    add('heading', 'level', levels.includes(f) ? 'astryx' : `${f}px`, h);
+    for (const ab of h.querySelectorAll('abbr')) add('heading', 'abbr', getComputedStyle(ab).textDecorationLine, ab);
+  }
+
+  // Tabs: one pane of a group shows, the active one (Astryx TabPanel).
+  const groups = new Map();
+  for (const p of scope.querySelectorAll('[data-tab-title]')) {
+    if ((!cfg.modal && p.closest('#modal_overlay')) || p.closest(APP_OWN) || !visible(p.parentElement)) continue;
+    groups.set(p.parentElement, (groups.get(p.parentElement) ?? 0) + (visible(p) ? 1 : 0));
+  }
+  for (const [g, n] of groups) add('tabs.pane', 'shown', n === 1 ? 'one' : `${n} panes`, g); // a string, as table.actions
+
+  // Frames: no frame inside a frame (Astryx Card: "Don't nest cards inside
+  // other cards"; layout/structure: no Cards inside Cards). A frame draws
+  // its own edge: a border on all four sides, a shadow, or a rounded fill
+  // of its own. What Astryx puts in a card by design is not a frame here
+  // (FRAME_OK): controls (Field, Select, Button, the dynlist's value
+  // tokens), Badge and Token chips, ProgressBar, code, Banner, Tooltip,
+  // Menu, and a tab's hover fill. A dialog is a frame over the page.
+  const FRAME_OK = [
+    'input', 'select', 'textarea', 'button', '.btn', '.cbi-button', '.cbi-dropdown', '.cbi-dropdown *', '.cbi-dynlist > .item',
+    '.label', '.zonebadge', '.ifacebadge', '.cbi-progressbar', '.cbi-progressbar *', 'code', 'kbd', 'pre', 'samp',
+    '.alert-message', '.cbi-tooltip', '.cbi-tooltip *', '.cbi-tabmenu > li > a', 'img', 'svg', 'canvas',
+  ].join(', ');
+  const edgeOf = new Map();
+  const edge = (el) => {
+    if (edgeOf.has(el)) return edgeOf.get(el);
+    let k = null;
+    const s = getComputedStyle(el);
+    if (!el.matches(FRAME_OK) && !/^(contents|inline)$/.test(s.display)) {
+      const seen = (c) => rgba(c)[3] > 0.04;
+      const shadows = s.boxShadow === 'none' ? [] : s.boxShadow.match(/(?:rgba?|oklch|oklab|color)\([^)]*\)/g) ?? [];
+      if (['Top', 'Right', 'Bottom', 'Left'].every((d) => parseFloat(s[`border${d}Width`]) > 0 && s[`border${d}Style`] !== 'none' && seen(s[`border${d}Color`]))) k = 'border';
+      else if (shadows.some(seen)) k = 'shadow';
+      else if (seen(s.backgroundColor) && parseFloat(s.borderTopLeftRadius) > 0) {
+        const under = behind(el, false).bg, mine = over(rgba(s.backgroundColor), under);
+        if ([0, 1, 2].some((i) => Math.abs(mine[i] - under[i]) > 3)) k = 'fill';
+      }
+    }
+    edgeOf.set(el, k);
+    return k;
+  };
+  for (const el of all('*')) {
+    if (!edge(el)) continue;
+    for (let a = el.parentElement; a && (scope.contains(a)); a = a.parentElement) {
+      if (edge(a)) { add('frame', 'nested', `${edge(el)} in ${edge(a)}: ${where(a)}`, el); break; }
+    }
+  }
+
+  // Dialog: a tall one stops at Astryx Dialog's height, so its footer is
+  // in the window. Under it, the scrim covers the save bar.
+  if (cfg.modal && !scope.matches('.alert-message')) add('dialog', 'fits', box(scope).bottom <= innerHeight + 0.5 ? 'yes' : `${px(box(scope).bottom - innerHeight)}px past the window`, scope);
+  const under = cfg.modal ? [...document.querySelectorAll('.cbi-page-actions')].find(visible) : null;
+  if (under) {
+    const b = box(under);
+    const hit = document.elementFromPoint(Math.min(b.right - 2, innerWidth - 2), Math.min(b.bottom, innerHeight) - 2);
+    add('dialog', 'scrim', hit?.closest('#modal_overlay') ? 'over the save bar' : `under ${hit ? where(hit) : 'nothing'}`, scope);
   }
 
   // Banner and status dialog: the icon (::before) stands the Banner's gap
@@ -647,6 +817,17 @@ function collect(cfg) {
     const inText = /(^|\s)[▲▼]\s/.test(t) && !el.closest('.cbi-tooltip');
     if ((!/^(▾|⇒|∗|\+|×|···|▲|▼)$/.test(t) && !inText) || (!cfg.modal && el.closest('#modal_overlay')) || el.closest(APP_OWN) || !visible(el)) continue;
     if (inText || parseFloat(getComputedStyle(el).fontSize) > 0) add('glyph', 'raw', inText ? t.match(/[▲▼]/)[0] : t, el);
+  }
+  // LuCI's device images (resources/icons/*.svg) are drawn as Heroicons,
+  // the image hidden (tooltips keep theirs); a showing one is listed. A
+  // zone's inline colour is mapped to palette tokens, never shown as is.
+  for (const im of scope.querySelectorAll('img[src*="/icons/"]')) {
+    if (visible(im) && !im.closest('.cbi-tooltip, ' + APP_OWN) && (cfg.modal || !im.closest('#modal_overlay'))) add('icon', 'legacy', im.getAttribute('src').replace(/.*\//, ''), im);
+  }
+  for (const z of scope.querySelectorAll('.zonebadge[style*="--zone-color-rgb"]')) {
+    if (!visible(z) || z.closest('.cbi-tooltip') || (!cfg.modal && z.closest('#modal_overlay'))) continue;
+    const inline = `rgb(${z.style.getPropertyValue('--zone-color-rgb').trim().split(/\s*,\s*/).join(', ')})`;
+    add('zone', 'fill', getComputedStyle(z).backgroundColor === inline ? `inline ${inline}` : 'token', z);
   }
 
   // The save bar is the layout's footer: on a wide screen it sits under

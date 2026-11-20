@@ -30,6 +30,19 @@
   --button-fg: var(--color-text-primary);
   --button-divider: var(--color-border);
 }
+/* One primary per group (Astryx ButtonGroup), by meaning, not by LuCI's
+   class: a form row's own action (Sync with browser, Generate archive,
+   Flash image), a toolbar's (Software's OK, Update lists, Upload
+   Package), a view switch (Enable DNS lookups) and the save bar's Save
+   beside Save & Apply are secondary; save, apply and confirm stay
+   primary. */
+:is(.cbi-value-field, .controls .control-group, .cbi-page-actions:has(.cbi-dropdown) > *) :is(.cbi-button-positive, .cbi-button-apply, .cbi-button-save, .cbi-button-action, .cbi-button-primary, .btn.primary, .btn.important):not(.cbi-dropdown),
+.cbi-page-actions:has(.cbi-dropdown) > .cbi-button-save,
+.toggle-lookups {
+  --button-bg: var(--color-neutral);
+  --button-fg: var(--color-text-primary);
+  --button-divider: var(--color-border);
+}
 /* Destructive (.cbi-button-negative, .cbi-button-remove): secondary on a
    page or row; red only where it confirms (a dialog's action takes the
    error fill, a destructive ComboButton's items the error ink). */
@@ -70,7 +83,7 @@
    interface editor's CIDR switch) sits 8 after it, as in a control group. */
 .cbi-value-field div:not(.control-group, .cbi-value-field, .cbi-dropdown) > :is(input, select) + :is(.btn, .cbi-button, button) { margin-inline-start: var(--spacing-2); }
 /* luci-mod-statistics pairs a select with its button in a span. */
-.shell-content .nowrap:not(.td, .th) { display: inline-flex; align-items: center; gap: var(--spacing-2); }
+.shell-content .nowrap:not(.td, .th, .cbi-tooltip *) { display: inline-flex; align-items: center; gap: var(--spacing-2); }
 
 /* ── Spacing [ported] ────────────────────────────────────────── */
 
@@ -81,10 +94,10 @@
    count); form rows abut (each pads 8 above and below); controls on one
    line keep their line. The html weight puts it over an app's own
    margins (Software's <style>). */
-html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([class]), form, .cbi-map, .cbi-section, .cbi-section-node, .cbi-tabcontainer, [data-tab]:not(li), :has(> [data-tab]:not(li)), #content_syslog, .nft-table, .nft-chains, .cbi-section > div:has(> :is(h3, h4, table, .table)), .cbi-value:has(> :is(h3, h4))) {
+html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([class]), form, .cbi-map, .cbi-section, .cbi-section-node, .cbi-tabcontainer, [data-tab]:not(li), :has(> [data-tab]:not(li)), :has(> .cbi-tabmenu + div > [data-tab]), #content_syslog, .nft-table, .nft-chains, .cbi-section > div:has(> :is(h3, h4, table, .table)), .cbi-value:has(> :is(h3, h4))) {
   & > * { margin-block: 0; }
   & > * + * { margin-block-start: var(--aster-space-region); }
-  & > :nth-child(1 of :not(script, style, template, noscript, [hidden], input[type="hidden"], :empty, [style*="display: none"], [style*="display:none"], [data-tab-active="false"])),
+  & > :nth-child(1 of :not(script, style, template, noscript, [hidden], input[type="hidden"], :empty, [style*="display: none"], [style*="display:none"], [data-tab-active="false"], [data-tab-title]:not([data-tab-active="true"]))),
   & > :is(.cbi-value + .cbi-value, .includes),
   & > :is(button, .btn, .cbi-button, input, select, label) + :is(button, .btn, .cbi-button, input, select, label) { margin-block-start: 0; }
   /* Page level: the title 4 over its description, 24 from what follows
@@ -173,6 +186,22 @@ html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([cl
 /* A notification (ui.addNotification) writes display:flex inline: the
    message, then its Dismiss button at the end. */
 .alert-message.fade-in > div:last-child { align-self: flex-end; margin-inline-start: var(--spacing-4); }
+/* The 404 page (luci-base's error404.ut: title, two lines, the path) is
+   Astryx's EmptyState: centred, 32 above and below, its words 360 wide,
+   the title in the large size, the rest secondary; an empty message
+   line holds no space. */
+html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+  padding: var(--spacing-8) var(--spacing-6);
+  & > * { margin-block: 0; max-inline-size: min(100%, var(--aster-empty-max-w)); }
+  & > h2 { font-size: var(--text-large-size); font-weight: var(--text-large-weight); line-height: var(--text-large-leading); color: var(--color-text-primary); }
+  & > :is(p, tt) { font-size: var(--text-body-size); line-height: var(--text-body-leading); color: var(--color-text-secondary); overflow-wrap: anywhere; }
+  & > p:empty { display: none; }
+}
 
 /* ── Modal [ported] ─────────────────────────────────────────── */
 
@@ -312,10 +341,12 @@ html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([cl
 /* ── Tables [ported] ────────────────────────────────────────── */
 
 /* Buttons a cell holds in a wrapper (Processes' Hang Up, Terminate,
-   Kill): one row 8 apart, with no whitespace between them. */
+   Kill; a section's Edit, Delete): one line 8 apart, never wrapped
+   (doona ActionGroup; theme-aster.js moves all but the first into a
+   "more" menu where a table's lines do not fit). */
 .td > div:has(> :is(.btn, .cbi-button)):not(:has(> :not(.btn, .cbi-button, button))) {
   display: inline-flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--aster-space-row);
   & > * { margin: 0; }
 }
@@ -325,6 +356,10 @@ html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([cl
 @container aster-page (min-width: 48.0625rem) {
   #view .td.cbi-section-actions > div { flex-wrap: nowrap; white-space: nowrap; }
 }
+/* A row's actions that do not fit (theme-aster.js data-collapsed): the
+   first, then the "more" button; the rest are its menu's rows. */
+:is(.td, td) > div[data-collapsed] > :not(.drag-handle, .aster-more) ~ :not(.aster-more),
+:is(.td, td) > div:not([data-collapsed]) > .aster-more { display: none; }
 /* The diagnostics page lays three tools out as three cells of one row. */
 .table:has(.diag-action) { table-layout: fixed; }
 .td > input + .diag-action { display: block; margin: var(--spacing-2) 0 0; }
@@ -368,7 +403,10 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
   padding-inline: var(--card-bleed);
 }
 /* A table with no card around it makes up the card's border only. */
-.shell-inner .table:not(.cbi-section *) { margin-inline: var(--border-width); }
+/* A table that is the card itself (#view > .table) keeps its full width:
+   the inset made WireGuard's peer table overflow #view by 2, which drew a
+   scrollbar under it. */
+.shell-inner .table:not(.cbi-section *, #view > *, #view > .cbi-map > *) { margin-inline: var(--border-width); }
 /* An interface row: cells to the top, the box column as narrow as the box,
    the status column the rest. */
 .tr:has(> .td > .ifacebox) > .td {
@@ -390,7 +428,7 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
 .shell-content .ifacebox { min-inline-size: 8rem; }
 /* Network > Interfaces: the interface cell is no Card (none in a card): a
    StatusDot (success, or neutral when LuCI's icon is _disabled) before the
-   name, the inline zone colour as an 8 square after it; under it the
+   name, its zone as a Badge after it; under it the
    device's 16 icon (details on hover) and name in supporting text. */
 [data-page="admin-network-network"] #view .ifacebox {
   --card-border-width: 0;
@@ -411,7 +449,19 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     & > strong { font-weight: inherit; }
     &::before, &::after { content: ""; flex: none; inline-size: var(--spacing-2); block-size: var(--spacing-2); }
     &::before { margin-inline: var(--spacing-1); border-radius: var(--radius-full); background: var(--color-icon-success); }
-    &::after { background: rgb(var(--zone-color-rgb)); box-shadow: inset 0 0 0 var(--border-width) var(--color-border-emphasized); }
+    /* The zone, in words (LuCI's title: "Part of zone lan"), as its Badge. */
+    &::after {
+      content: attr(title);
+      inline-size: auto;
+      block-size: auto;
+      padding: 0 var(--spacing-2);
+      border-radius: var(--radius-full);
+      background: var(--zone-bg);
+      color: var(--zone-fg);
+      font-size: var(--text-supporting-size);
+      font-weight: var(--font-weight-medium);
+      line-height: var(--text-supporting-leading);
+    }
   }
   &:has(img[src*="_disabled"]) > .ifacebox-head::before { background: var(--color-icon-secondary); }
   & > .ifacebox-body {
@@ -458,15 +508,32 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
 }
 /* The editor's Status: icon, then the list. */
 .ifacebadge.large:not(.cbi-tooltip) { --badge-bg: transparent; display: flex; align-items: flex-start; justify-content: start; gap: var(--spacing-3); padding: 0; white-space: normal; }
-/* The zone colour firewall.getZoneColorStyle() writes inline is the
-   administrator's data: kept, toned down, with dark text on it. */
-.zonebadge[style*="background"] { --badge-fg: var(--color-on-light); color: var(--color-on-light); filter: saturate(0.5); }
+/* A zone's colour (firewall.js writes it inline, the administrator's
+   data) as palette tokens: LuCI's lan green and wan red are the muted
+   success and error fills, "no zone" the neutral, any other colour mixed
+   30 % into the card; each with its own ink, light and dark. */
+[style*="--zone-color-rgb"] { --zone-bg: color-mix(in oklab, rgb(var(--zone-color-rgb)) 30%, var(--color-background-card)); --zone-fg: var(--color-text-primary); }
+[style*="144, 240, 144"] { --zone-bg: var(--color-success-muted); --zone-fg: var(--color-on-success-muted); }
+[style*="240, 144, 144"] { --zone-bg: var(--color-error-muted); --zone-fg: var(--color-on-error-muted); }
+[style*="238, 238, 238"] { --zone-bg: var(--color-neutral); }
+.zonebadge[style*="--zone-color-rgb"]:not(.cbi-tooltip *) { --badge-bg: var(--zone-bg); --badge-fg: var(--zone-fg); }
+.zonebadge[style*="--zone-color-rgb"] { background-color: var(--badge-bg) !important; /* inline zone fill */ }
 /* A device that is down: LuCI fades its name to half opacity inline
    (2.2:1 on the badge); the secondary text colour says the same at 4.5:1. */
 .ifacebadge > span[style*="opacity"] {
   opacity: 1 !important; /* inline opacity:.5 */
   color: var(--color-text-secondary);
 }
+/* WireGuard status: the instance chip's image is written 32 inline, a
+   Badge's icon is 16; a key in a chip is the chip's words, not a chip of
+   its own (one 8 inset, the Badge's size); the instance line's key
+   wraps anywhere (base64 has no break), each line keeping its inset. */
+.ifacebadge > img[style*="width"] {
+  inline-size: var(--aster-icon-sm) !important; /* inline width:32px */
+  block-size: var(--aster-icon-sm) !important; /* inline height:32px */
+}
+.ifacebadge > code { padding: 0; background: none; font-size: inherit; line-height: inherit; }
+#view > p:has(> .ifacebadge) code { overflow-wrap: anywhere; box-decoration-break: clone; }
 .ifacebox-body > div > .ifacebadge { display: flex; }
 .ifacebox-body > div > .ifacebadge + .ifacebadge { margin-block-start: var(--spacing-2); }
 .network-status-table { display: flex; flex-wrap: wrap; gap: var(--spacing-3); }
@@ -478,6 +545,9 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
    sit at the line's top (on the baseline they pushed it down 1-5 px). */
 .nft-rules .td > .ifacebadge { margin: var(--spacing-0-5) var(--spacing-1) var(--spacing-0-5) 0; vertical-align: top; }
 .nft-comment { --badge-bg: transparent; cursor: help; }
+/* nftables.js's own style pads a badge's tooltip .5em on every side; it
+   keeps the Tooltip's 4 / 8. */
+.nft-rules .ifacebadge.cbi-tooltip-container .cbi-tooltip { padding: var(--spacing-1) var(--spacing-2); }
 
 /* ── The login form [ported] ────────────────────────────────── */
 
@@ -714,8 +784,8 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     overflow-wrap: break-word;
     & > :is(span, div), & > div > .ifacebadge, & > div > .ifacebadge > span { display: contents; }
     & > div > .ifacebadge::before { content: none; }
-    & br { display: none; }
-    & .nowrap {
+    & br:not(.cbi-tooltip *) { display: none; }
+    & .nowrap:not(.cbi-tooltip *) {
       display: grid;
       grid-column: 1 / -1;
       grid-template-columns: subgrid;
@@ -839,19 +909,19 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     inline-size: auto !important; /* inline width */
   }
   /* Network > Interfaces has no header row, so the Table fold skips it: the
-     box, its status and the actions stack, the actions wrap (layout). */
+     box, its status and the actions stack (layout). */
   #view .tr:has(> .td > .ifacebox) {
     display: flex;
     flex-direction: column;
     & > .td { display: block; inline-size: auto; white-space: normal; }
     & > .td:not(:last-child) { border: 0; }
-    & > .td.cbi-section-actions > * { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
+    & > .td.cbi-section-actions > * { display: flex; gap: var(--spacing-2); }
   }
   /* The table is a block here; a row group left as a table shrinks to its
      content and the rules stop short of the card edge (layout). */
   #view .tbody:has(> .tr > .td > .ifacebox) { display: block; }
-  /* Actions that wrap (here and in the Table fold) are spaced by the gap
-     alone, not also by the button-after-button margin. */
+  /* Actions on a footer line (here and in the Table fold) are spaced by
+     the gap alone, not also by the button-after-button margin. */
   #view .tr:has(> .td > .ifacebox) > .td.cbi-section-actions > * > *,
   #view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions > div > * { margin-inline-start: 0; }
   /* Under the stack the actions start where the stacked text does. */
