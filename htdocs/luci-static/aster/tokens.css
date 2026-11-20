@@ -170,7 +170,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-text-secondary: light-dark(#69657F, #938FAC);
   --color-text-success: light-dark(#3E6B73, #74A1B3);
   --color-text-warning: light-dark(#8C5E1F, #F6C177);
-  --color-warning: light-dark(#EA9D34, #F6C177);
   --color-warning-muted: light-dark(#EA9D3433, #F6C1773F);
   --focus-outline-color: light-dark(#286983, #9CCFD8);
 }
@@ -199,7 +198,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-success-muted: light-dark(#0B991F33, #0B991F3F);
   --color-error: light-dark(#E3193B, #F5394F);
   --color-error-muted: light-dark(#E3193B33, #F5394F3F);
-  --color-warning: light-dark(#E9AF08, #F2C00B);
   --color-warning-muted: light-dark(#E2A40033, #E2A4003F);
   --color-text-success: var(--color-text-green);
   --color-text-warning: var(--color-text-yellow);
@@ -260,7 +258,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-text-secondary: light-dark(#515F74, #AFBACB);
   --color-text-success: light-dark(#246445, #99D2AF);
   --color-text-warning: light-dark(#80500E, #EDC588);
-  --color-warning: light-dark(#BE852E, #D3A258);
   --color-warning-muted: light-dark(#BE852E33, #D3A2583F);
   --focus-outline-color: light-dark(#315FD3, #87A9FA);
 }
@@ -301,7 +298,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-text-secondary: light-dark(#50645F, #A9BDB5);
   --color-text-success: light-dark(#44622E, #BDDA9E);
   --color-text-warning: light-dark(#785017, #E7C697);
-  --color-warning: light-dark(#BA863E, #CEA468);
   --color-warning-muted: light-dark(#BA863E33, #CEA4683F);
   --focus-outline-color: light-dark(#246B69, #7DC8BC);
 }
@@ -342,7 +338,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-text-secondary: light-dark(#695E66, #C3B6BD);
   --color-text-success: light-dark(#4C6134, #C5D4A0);
   --color-text-warning: light-dark(#805017, #EBC492);
-  --color-warning: light-dark(#BF873D, #CFA163);
   --color-warning-muted: light-dark(#BF873D33, #CFA1633F);
   --focus-outline-color: light-dark(#785378, #C9A2C5);
 }
@@ -368,8 +363,10 @@ html[data-theme="dark"] { color-scheme: dark; }
   --aster-topbar-h-phone: 52px;
   --aster-drawer-w: 320px;
 
-  /* Icon sizes: sm in the side nav, the top bar, the indicators and table
-     chips; md on a port, radio or device (the reference's Icon md). */
+  /* Icon sizes: xs a Token's remove mark (Icon xsm); sm in the side nav,
+     the top bar, the indicators and table chips; md on a port, radio or
+     device (the reference's Icon md). */
+  --aster-icon-xs: 12px;
   --aster-icon-sm: 16px;
   --aster-icon-md: 20px;
 

@@ -208,6 +208,19 @@ expect uniform 1 "zone fill" "zone chips in LuCI's inline colours" -- "$url" "$p
 expect uniform 1 "frame nested" "a form row framed inside its card" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=.cbi-value { box-shadow: 0 0 0 1px var(--color-border) !important }'
 
+# A dynlist value as a padded full-width row again (the router's 4/36/4/12
+# box), not a Token; a graph's black frame back inside its card; a card's
+# own save bar keeping its divider and fill on a phone (Startup).
+printf 'admin/system/system tab=timesync\n' >"$tmp/timesync.txt"
+expect uniform 1 "frame nested" "dynlist value as a filled row" -- "$url" "$password" --pages "$tmp/timesync.txt" \
+	--debug-css 'admin/system/system=html .cbi-dynlist > .item { display: block !important; block-size: auto !important; min-block-size: 32px !important; padding: 4px 36px 4px 12px !important }'
+printf 'admin/status/realtime/load\n' >"$tmp/load.txt"
+expect uniform 1 "frame nested" "graph framed inside its card" -- "$url" "$password" --pages "$tmp/load.txt" \
+	--debug-css 'admin/status/realtime/load=#view#view#view div[style*="border:1px solid #000"] { border-color: rgb(0, 0, 0) !important }'
+printf 'admin/system/startup tab=rc\n' >"$tmp/startup-rc.txt"
+expect uniform 1 "frame nested" "card's save bar a band on a phone" -- "$url" "$password" --pages "$tmp/startup-rc.txt" --viewports phone \
+	--debug-css 'admin/system/startup=.cbi-section .cbi-page-actions { border-block-start: 1px solid rgb(0, 0, 0) !important }'
+
 # Dialog: a tall one runs past the window; the save bar over the scrim.
 expect uniform 1 "dialog fits" "dialog taller than the window" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
 	--debug-css 'admin/network/network=#modal_overlay > .modal { max-block-size: none !important }'

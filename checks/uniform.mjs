@@ -746,21 +746,38 @@ function collect(cfg) {
   // other cards"; layout/structure: no Cards inside Cards). A frame draws
   // its own edge: a border on all four sides, a shadow, or a rounded fill
   // of its own. What Astryx puts in a card by design is not a frame here
-  // (FRAME_OK): controls (Field, Select, Button, the dynlist's value
-  // tokens), Badge and Token chips, ProgressBar, code, Banner, Tooltip,
-  // Menu, and a tab's hover fill. A dialog is a frame over the page.
+  // (FRAME_OK): controls (Field, Select, Button), Badge and Token chips,
+  // ProgressBar, code, Banner, Tooltip, Menu, and a tab's hover fill. A
+  // dynlist's value is a Token only while it is one: no block padding and
+  // a Token's height (md - 8); a padded row is a filled box in the card
+  // (router measure 2026-11-21, 4/36/4/12). A save bar in the page's flow
+  // (a phone) that keeps its divider or its fill is a band: inside a card
+  // it is a second frame (Startup, Backup); fixed under the column it is
+  // the layout's footer, not in the card. A dialog is a frame over the page.
   const FRAME_OK = [
-    'input', 'select', 'textarea', 'button', '.btn', '.cbi-button', '.cbi-dropdown', '.cbi-dropdown *', '.cbi-dynlist > .item',
+    'input', 'select', 'textarea', 'button', '.btn', '.cbi-button', '.cbi-dropdown', '.cbi-dropdown *',
     '.label', '.zonebadge', '.ifacebadge', '.cbi-progressbar', '.cbi-progressbar *', 'code', 'kbd', 'pre', 'samp',
     '.alert-message', '.cbi-tooltip', '.cbi-tooltip *', '.cbi-tabmenu > li > a', 'img', 'svg', 'canvas',
   ].join(', ');
+  const tokenH = (() => {
+    const d = document.body.appendChild(document.createElement('div'));
+    d.style.blockSize = 'calc(var(--size-element-md) - var(--spacing-2))';
+    const h = d.getBoundingClientRect().height;
+    d.remove();
+    return h;
+  })();
+  const isToken = (el, s) => el.matches('.cbi-dynlist > .item') && parseFloat(s.paddingTop) === 0 && parseFloat(s.paddingBottom) === 0 && box(el).height <= tokenH + 0.5;
   const edgeOf = new Map();
   const edge = (el) => {
     if (edgeOf.has(el)) return edgeOf.get(el);
     let k = null;
     const s = getComputedStyle(el);
-    if (!el.matches(FRAME_OK) && !/^(contents|inline)$/.test(s.display)) {
-      const seen = (c) => rgba(c)[3] > 0.04;
+    const seen = (c) => rgba(c)[3] > 0.04;
+    if (el.matches('.cbi-page-actions') && !['fixed', 'absolute'].includes(s.position)) {
+      const under = behind(el, false).bg, mine = over(rgba(s.backgroundColor), under);
+      const rule = ['Top', 'Right', 'Bottom', 'Left'].some((d) => parseFloat(s[`border${d}Width`]) > 0 && s[`border${d}Style`] !== 'none' && seen(s[`border${d}Color`]));
+      if (rule || [0, 1, 2].some((i) => Math.abs(mine[i] - under[i]) > 3)) k = 'band';
+    } else if (!el.matches(FRAME_OK) && !isToken(el, s) && !/^(contents|inline)$/.test(s.display)) {
       const shadows = s.boxShadow === 'none' ? [] : s.boxShadow.match(/(?:rgba?|oklch|oklab|color)\([^)]*\)/g) ?? [];
       if (['Top', 'Right', 'Bottom', 'Left'].every((d) => parseFloat(s[`border${d}Width`]) > 0 && s[`border${d}Style`] !== 'none' && seen(s[`border${d}Color`]))) k = 'border';
       else if (shadows.some(seen)) k = 'shadow';

@@ -239,6 +239,17 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
   :root[data-rail] .cbi-page-actions { inset-inline-start: var(--aster-rail-w); }
   body:not([data-page="admin-system-flash"]:has([data-tab="actions" i][data-tab-active="true"])) .shell:has(.cbi-page-actions:not([hidden])) > .shell-main { margin-block-end: calc(var(--size-element-md) + 2 * var(--spacing-3) + var(--border-width)); }
 }
+/* A card's own save bar (Startup's Local Startup, Backup's Configuration)
+   in a phone's flow is the card's last button row, 24 under its content as
+   any bar in the flow: no divider, no fill, no padding, or it is a frame
+   inside the card. */
+@media (max-width: 48rem) {
+  .cbi-section .cbi-page-actions {
+    padding-block: 0;
+    border-block-start: 0;
+    background: none;
+  }
+}
 /* Backup / Flash Firmware: only its Configuration tab has anything to
    save; on the Actions tab the bar would hold a lone Save. */
 [data-page="admin-system-flash"] #view:has([data-tab="actions" i][data-tab-active="true"]) .cbi-page-actions { display: none; }
@@ -933,8 +944,9 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   background: var(--color-background-surface) !important; /* inline white fill */
   overflow: hidden;
 }
-/* Inside a card the card is the frame. */
-#view .cbi-section div[style*="border:1px solid #000"] {
+/* Inside a card the card is the frame: a section, or a tab pane drawn as
+   the card (Channel Analysis: one pane a band, its graph in it). */
+#view :is(.cbi-section, #view > div:not(.cbi-map) > div > [data-tab], #view > div:not(.cbi-map) > div:has(> .cbi-tabmenu) > div > [data-tab]) div[style*="border:1px solid #000"] {
   border-color: transparent !important; /* inline black frame */
   border-radius: 0;
 }
