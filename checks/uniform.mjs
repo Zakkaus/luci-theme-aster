@@ -444,6 +444,11 @@ function collect(cfg) {
     add('tab', 'height', px(box(el).height), el);
     if (el.matches('[data-active], .cbi-tab')) add('tab', 'indicator', indicator(el), el);
   }
+  // The strip is one line at every width (Astryx TabList scrolls).
+  for (const ul of all('.tabs, .cbi-tabmenu')) {
+    const n = new Set([...ul.children].filter(visible).map((li) => Math.round(box(li).top))).size;
+    if (n) add('tabs.list', 'lines', n === 1 ? 'one' : `${n} lines`, ul); // a string, as table.actions
+  }
 
   // Form rows: the label column and the gap to the next row.
   for (const el of all('.cbi-value')) {

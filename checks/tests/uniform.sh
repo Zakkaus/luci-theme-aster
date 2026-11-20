@@ -149,6 +149,10 @@ expect uniform 1 "tooltip words" "a tooltip at its min-content width, a letter a
 expect uniform 1 "tabs.pane shown" "every tab pane shown" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=[data-tab-title]:not([data-tab-active="true"]) { display: block !important }'
 
+# Tabs: the strip wrapping onto two lines (24.10 DHCP's 14 at 1440).
+expect uniform 1 "tabs.list lines" "the tab strip on two lines" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=.cbi-tabmenu { flex-wrap: wrap !important; max-inline-size: 240px }'
+
 # Dynlist: the + under its field (the add row wrapping).
 printf 'admin/system/system tab=timesync\n' >"$tmp/timesync.txt"
 expect uniform 1 "dynlist add" "dynlist + under its field" -- "$url" "$password" --pages "$tmp/timesync.txt" \

@@ -94,7 +94,7 @@
    count); form rows abut (each pads 8 above and below); controls on one
    line keep their line. The html weight puts it over an app's own
    margins (Software's <style>). */
-html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([class]), form, .cbi-map, .cbi-section, .cbi-section-node, .cbi-tabcontainer, [data-tab]:not(li), :has(> [data-tab]:not(li)), #content_syslog, .nft-table, .nft-chains, .cbi-section > div:has(> :is(h3, h4, table, .table)), .cbi-value:has(> :is(h3, h4))) {
+html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([class]), form, .cbi-map, .cbi-section, .cbi-section-node, .cbi-tabcontainer, [data-tab]:not(li), :has(> [data-tab]:not(li)), :has(> .cbi-tabmenu + div > [data-tab]), #content_syslog, .nft-table, .nft-chains, .cbi-section > div:has(> :is(h3, h4, table, .table)), .cbi-value:has(> :is(h3, h4))) {
   & > * { margin-block: 0; }
   & > * + * { margin-block-start: var(--aster-space-region); }
   & > :nth-child(1 of :not(script, style, template, noscript, [hidden], input[type="hidden"], :empty, [style*="display: none"], [style*="display:none"], [data-tab-active="false"], [data-tab-title]:not([data-tab-active="true"]))),

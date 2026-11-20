@@ -59,6 +59,7 @@
     "button.primary": {"_source": "Astryx ButtonGroup: at most one primary (filled) Button in a group: the save bar, a dialog footer, a table cell, a section", "perGroup": "one"},
     "table.actions": {"_source": "doona ActionGroup (owner 2026-11-21): a row's action buttons share one line, never stacked; where they do not fit, the first and a more menu (desktop and the phone fold's footer line)", "lines": "one"},
     "dynlist": {"_source": "Dynlist (the SSH-keys page's add row, owner 2026-11-21): the + on its field's line, never under it", "add": "beside"},
+    "tabs.list": {"_source": "Astryx TabList overflow auto (always scrolls): one line of tabs at every width, scrolled sideways with edge fades (owner 2026-11-21: Channel Analysis)", "lines": "one"},
     "tabs.pane": {"_source": "Astryx Tabs: one TabPanel shows, the selected tab's (panes of one group under one parent)", "shown": "one"},
     "frame": {"_source": "Astryx Card: don't nest cards inside other cards; layout/structure: no Cards inside Cards. Only a frame inside a frame is listed (outside the components Astryx puts in a card)", "nested": "none"},
     "dialog": {"_source": "Astryx Dialog: maxHeight 75dvh, the body scrolls between the title and the footer; the scrim covers the page, the save bar too", "fits": "yes", "scrim": "over the save bar"},

@@ -84,7 +84,8 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
   row's buttons on one line (the rest in its "more" menu). `button.field
   variant`: a form row's own action is the secondary Button;
   `button.primary perGroup`: at most one filled Button in a save bar,
-  dialog, table cell or section.
+  dialog, table cell or section. `tabs.list lines`: a tab strip on one
+  line (it scrolls).
 - `heading level`: every title at one of the Heading sizes the tokens give
   (1-4); `heading abbr`: an `<abbr>` in a title without its dotted rule.
   `icon legacy`: a showing LuCI device image (`resources/icons/*.svg`,

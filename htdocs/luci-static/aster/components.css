@@ -733,7 +733,7 @@ html :where(.control-group:not(.cbi-dynlist > .add-item)) { display: flex; flex-
 @property --card-radius { syntax: "*"; inherits: false; }
 @property --card-shadow { syntax: "*"; inherits: false; }
 
-html :where(.cbi-section, .cbi-section-node, .ifacebox, #view > :is(table, .table), #view > .cbi-map > :is(table, .table), #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], .nft-chain) {
+html :where(.cbi-section, .cbi-section-node, .ifacebox, #view > :is(table, .table), #view > .cbi-map > :is(table, .table), #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], #view > div:not(.cbi-map) > div:has(> .cbi-tabmenu) > div > [data-tab], .nft-chain) {
   --card-pad: calc(var(--aster-space-region) - var(--border-width));
   --card-bleed: var(--card-pad);
   box-sizing: border-box;
@@ -969,16 +969,13 @@ html :where(.cbi-section .table:not(:has(.th)) > .tr > .td:first-child) {
    secondary at regular weight, selected primary at semibold. The list
    has 4 under the tabs and a 1 rule; the indicator is a 2 accent pill
    under the label (12 in from each end) whose bottom edge sits on the
-   list's. Hover and press lay the overlay over the tab. */
+   list's. Hover and press lay the overlay over an unselected tab. */
 
 html :where(.tabs, .cbi-tabmenu) {
   display: flex;
-  flex-wrap: wrap;
   gap: var(--spacing-0-5);
   margin: 0;
-  padding: 0 0 var(--spacing-1);
   list-style: none;
-  border-block-end: var(--border-width) solid var(--color-border);
 }
 html :where(.tabs > li, .cbi-tabmenu > li) { display: inline-flex; align-items: center; }
 html :where(.tab, .cbi-tabmenu > li > a) {
@@ -998,10 +995,13 @@ html :where(.tab, .cbi-tabmenu > li > a) {
   html :where(.tab, .cbi-tabmenu > li > a):hover { background-color: var(--color-overlay-hover); }
 }
 html :where(.tab, .cbi-tabmenu > li > a):active { background-color: var(--color-overlay-pressed); }
+/* The selected tab is its words and the indicator only: no fill under the
+   pointer either (owner 2026-11-21). */
 html :where(.tab[data-active], .cbi-tabmenu > .cbi-tab > a) {
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semibold);
 }
+html :where(.tab[data-active], .cbi-tabmenu > .cbi-tab > a):is(:hover, :active) { background-color: transparent; }
 html :where(.tab[data-active], .cbi-tabmenu > .cbi-tab > a)::before {
   content: "";
   position: absolute;
@@ -1022,30 +1022,28 @@ html :where(.tab[data-errors], .cbi-tabmenu > li[data-errors])::after {
 /* A pane shows only while it is the active one: luci-base marks the active
    pane "true" and leaves the others "false" or unset (form.js's JS tabs). */
 html :where([data-tab-active="false"], [data-tab-title]:not([data-tab-active="true"])) { display: none; }
-/* Narrow: one line that scrolls sideways, as Astryx Tabs do; the selected
-   tab is the list's initial scroll target where the browser has
-   scroll-initial-target. The list's rule is painted inside its padding so
-   the scroll box does not clip the indicator that sits on it. */
-@media (max-width: 48rem) {
-  html :where(.tabs, .cbi-tabmenu) {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    padding-block-end: calc(var(--spacing-1) + var(--border-width));
-    border-block-end: 0;
-    background: linear-gradient(var(--color-border) 0 0) bottom / 100% var(--border-width) no-repeat;
-  }
-  html :where(.tabs > li, .cbi-tabmenu > li) { flex: none; }
-  html :where(.tab[data-active], .cbi-tabmenu > .cbi-tab) { scroll-initial-target: nearest; }
-  /* A list that scrolls fades out 32 at the end that has more (both ends
-     in the middle), so a tab cut at the edge reads as more to scroll. A
-     scroll timeline runs only while the list overflows. */
-  html :where(.tabs, .cbi-tabmenu) {
-    mask: linear-gradient(to right, transparent, black var(--tabs-fade-s) calc(100% - var(--tabs-fade-e)), transparent);
-    animation: aster-tabs-fade linear both;
-    animation-timeline: scroll(self inline);
-  }
+/* One line that scrolls sideways at every width, as Astryx TabList does
+   (overflow auto: it always scrolls); the selected tab is the list's
+   initial scroll target where the browser has scroll-initial-target. The
+   list's 1 rule is painted inside its padding, 4 under the tabs, so the
+   scroll box does not clip the indicator that sits on it. */
+html :where(.tabs, .cbi-tabmenu) {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  padding: 0 0 calc(var(--spacing-1) + var(--border-width));
+  background: linear-gradient(var(--color-border) 0 0) bottom / 100% var(--border-width) no-repeat;
+}
+html :where(.tabs > li, .cbi-tabmenu > li) { flex: none; }
+html :where(.tab[data-active], .cbi-tabmenu > .cbi-tab) { scroll-initial-target: nearest; }
+/* A list that scrolls fades out 32 at the end that has more (both ends
+   in the middle), so a tab cut at the edge reads as more to scroll. A
+   scroll timeline runs only while the list overflows. */
+html :where(.tabs, .cbi-tabmenu) {
+  mask: linear-gradient(to right, transparent, black var(--tabs-fade-s) calc(100% - var(--tabs-fade-e)), transparent);
+  animation: aster-tabs-fade linear both;
+  animation-timeline: scroll(self inline);
 }
 @property --tabs-fade-s { syntax: "<length>"; inherits: false; initial-value: 0; }
 @property --tabs-fade-e { syntax: "<length>"; inherits: false; initial-value: 0; }
