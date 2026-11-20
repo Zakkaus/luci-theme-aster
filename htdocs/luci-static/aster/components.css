@@ -281,7 +281,7 @@ html :where(.cbi-input-invalid, .cbi-input-invalid:is(:hover, :focus, [open]), [
    A native <select> is the Field with the browser's arrow. LuCI's
    .cbi-dropdown is a <div> list that opens a Menu: the Field box (above),
    the chosen item 12 in, the 16 chevron in the secondary icon colour 13
-   from the end. */
+   from the end (Astryx Select's caret inset). */
 
 html :where(.cbi-dropdown:not(.btn, .cbi-button)) {
   display: inline-flex;
@@ -325,15 +325,15 @@ html :where(:is(.cbi-dropdown:not(.btn, .cbi-button)) > ul > li[placeholder]) { 
 html :where(.cbi-dropdown[multiple] > ul) { gap: var(--spacing-1); padding-inline-start: var(--spacing-2); }
 html :where(.cbi-dropdown[multiple] > ul > li[display]) { flex: none; padding: 0; }
 html :where(.cbi-dropdown > ul > li img) { block-size: var(--aster-icon-sm); inline-size: var(--aster-icon-sm); }
-/* The chevron segment: centred; a Select's is 32 wide in the secondary
-   icon colour (a ComboButton's is the button's own, above). */
+/* The chevron segment: a Select's ends 12 inside the border, in the
+   secondary icon colour (a ComboButton's is the button's own, above). */
 html :where(.cbi-dropdown > :is(.open, .more)) {
   flex: none;
   align-items: center;
   justify-content: center;
 }
 html :where(.cbi-dropdown:not(.btn, .cbi-button) > :is(.open, .more)) {
-  inline-size: var(--size-element-sm);
+  padding-inline-end: var(--spacing-3);
   color: var(--color-icon-secondary);
 }
 /* An empty multi-select shows its placeholder (.more, "unspecified") in
