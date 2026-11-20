@@ -1,22 +1,12 @@
 'use strict';
 'require baseclass';
 
-/* The theme switch, on its own so both shells can use it: the admin pages get
- * it through menu-aster.js, and the login page — which renders with
- * blank_page and therefore has no top bar and no menu module — gets it through
- * its own view.
- *
- * The head script in header.ut has already applied the stored choice before
- * the first stylesheet. This module only reflects the current state onto the
- * buttons and writes a new choice.
- *
- * Two layers, and the difference matters:
- *   - the device default, from which of the three media paths served the page.
- *     It is on the body as data-theme-default and an administrator sets it in
- *     System - Language and Interface.
- *   - this browser's override, in localStorage.
- * "Auto" means drop the override and fall back to the device default, which is
- * why it has to be one of the three choices rather than the absence of one.
+/* The appearance control and the page marks, on their own so both shells
+ * can use them: the admin pages get this through menu-aster.js, and the login
+ * page — which renders with blank_page and therefore has no menu module —
+ * through its own view. The head script in header.ut has already applied the
+ * stored choices before the first stylesheet; bind() reflects them and writes
+ * new ones.
  */
 return baseclass.extend({
 	__init__() {
@@ -85,7 +75,8 @@ return baseclass.extend({
 	 * component (components.css): no arrow, so the "▲ " or "▼ " it writes
 	 * before the text goes, and it sits --tooltip-gap above its trigger,
 	 * centred, kept --tooltip-inset inside the window; below the trigger
-	 * when there is no room above. */
+	 * when there is no room above. A side nav row's sits at its end side,
+	 * centred on it, as Astryx's collapsed SideNav places it. */
 	tooltip() {
 		document.addEventListener('tooltip-open', (ev) => {
 			const tip = ev.target;
@@ -109,8 +100,9 @@ return baseclass.extend({
 			const r = target.getBoundingClientRect();
 			const w = tip.offsetWidth;
 			const h = tip.offsetHeight;
-			const x = Math.max(inset, Math.min(r.left + (r.width - w) / 2, document.documentElement.clientWidth - inset - w));
-			const y = (r.top - gap - h >= inset) ? r.top - gap - h : r.bottom + gap;
+			const side = target.closest('#sidebar');
+			const x = side ? r.right + gap : Math.max(inset, Math.min(r.left + (r.width - w) / 2, document.documentElement.clientWidth - inset - w));
+			const y = side ? r.top + (r.height - h) / 2 : (r.top - gap - h >= inset) ? r.top - gap - h : r.bottom + gap;
 
 			tip.style.left = `${x + window.pageXOffset}px`;
 			tip.style.top = `${y + window.pageYOffset}px`;
@@ -162,16 +154,31 @@ return baseclass.extend({
 		document.querySelectorAll('form > .cbi-map').forEach((m) => observer.observe(m, { childList: true, subtree: true }));
 	},
 
+	/* The appearance control (header.ut): one button, the scheme in force
+	 * on it, and one Menu with a Theme section (Auto, Light, Dark) and a
+	 * Palette section, in the top bar and in the login page's corner. Menu
+	 * pattern: the button opens the list (Enter, Space or a click) and
+	 * focuses the checked row of the first section; arrows, Home and End
+	 * move, Enter or Space picks, Escape or Tab closes, a click outside
+	 * closes; a pick closes and puts the focus back on the button.
+	 *
+	 * Two layers for the scheme, and the difference matters:
+	 *   - the device default, from which of the three media paths served the
+	 *     page, on the body as data-theme-default (System - Language and
+	 *     Style);
+	 *   - this browser's override, localStorage "aster-theme". "Auto" drops
+	 *     the override and follows the device default, which is why it is
+	 *     one of the three choices rather than the absence of one.
+	 * The palette is localStorage "aster-palette"; Rosé Pine, the default, is
+	 * the absence of data-palette. The head script in header.ut applied both
+	 * before the first stylesheet; this reflects them and writes new ones. */
 	bind() {
-		/* Two copies: the top bar's, and the drawer's on a phone. One state. */
-		const opts = document.querySelectorAll('.theme-switch [role="radio"][value]');
+		const menus = document.querySelectorAll('.palette-menu');
 		const root = document.documentElement;
 
-		/* The choice is held here first and persisted second. A browser with
+		/* The choice is held here first and persisted second: a browser with
 		   site data blocked throws on both read and write, and reading the
-		   store back to decide what is checked meant the radio reported Auto
-		   immediately after the reader picked Dark — the page was dark and the
-		   control said otherwise. */
+		   store back meant the menu reported Auto right after Dark. */
 		let override = null;
 
 		try {
@@ -182,7 +189,10 @@ return baseclass.extend({
 		}
 		catch (e) { /* private window: this session keeps its choice in memory */ }
 
-		const current = () => override || document.body.getAttribute('data-theme-default') || 'auto';
+		const now = {
+			scheme: () => override || document.body.getAttribute('data-theme-default') || 'auto',
+			palette: () => root.getAttribute('data-palette') || 'rose-pine',
+		};
 
 		/* The phone paints its chrome from these, and in auto mode there are
 		   two because the answer depends on the device. An explicit choice
@@ -205,40 +215,113 @@ return baseclass.extend({
 		};
 
 		const reflect = () => {
-			const now = current();
-
-			opts.forEach((o) => o.setAttribute('aria-checked', String(o.value === now)));
+			root.setAttribute('data-scheme', now.scheme());
+			menus.forEach((m) => m.querySelectorAll('[role="menuitemradio"]').forEach((r) =>
+				r.setAttribute('aria-checked', String(r.dataset.value === now[r.dataset.group]()))));
 		};
 
-		opts.forEach((o) => {
-			o.addEventListener('click', () => {
-				override = o.value;
+		const set = {
+			scheme(v) {
+				const dflt = document.body.getAttribute('data-theme-default');
+				const t = (v === 'auto') ? dflt : v;
 
-				try { localStorage.setItem('aster-theme', o.value); }
+				override = v;
+
+				if (t === 'light' || t === 'dark')
+					root.setAttribute('data-theme', t);
+				else
+					root.removeAttribute('data-theme');
+
+				try { localStorage.setItem('aster-theme', v); }
 				catch (e) { /* private window: the choice lasts this page only */ }
+			},
+			palette(v) {
+				if (v === 'rose-pine')
+					root.removeAttribute('data-palette');
+				else
+					root.setAttribute('data-palette', v);
 
-				if (o.value === 'auto') {
-					const dflt = document.body.getAttribute('data-theme-default');
+				try { localStorage.setItem('aster-palette', v); }
+				catch (e) { /* private window: the choice lasts this page only */ }
+			},
+		};
 
-					if (dflt === 'light' || dflt === 'dark')
-						root.setAttribute('data-theme', dflt);
-					else
-						root.removeAttribute('data-theme');
-				}
-				else {
-					root.setAttribute('data-theme', o.value);
-				}
+		/* The button's tooltip gives way to the open menu. */
+		const close = (m, refocus) => {
+			const btn = m.querySelector('button');
 
-				bar();
+			if (!m.hasAttribute('open'))
+				return;
 
-				reflect();
+			m.removeAttribute('open');
+			m.querySelector('[role="menu"]').hidden = true;
+			btn.setAttribute('aria-expanded', 'false');
+			btn.setAttribute('data-tooltip', btn.getAttribute('aria-label'));
+
+			if (refocus)
+				btn.focus();
+		};
+
+		const pick = (m, r) => {
+			set[r.dataset.group](r.dataset.value);
+			reflect();
+			bar();
+			close(m, true);
+		};
+
+		menus.forEach((m) => {
+			const btn = m.querySelector('button');
+			const list = m.querySelector('[role="menu"]');
+			const rows = Array.from(list.querySelectorAll('[role="menuitemradio"]'));
+
+			btn.addEventListener('click', () => {
+				if (m.hasAttribute('open'))
+					return close(m, false);
+
+				menus.forEach((o) => close(o, false));
+				btn.removeAttribute('data-tooltip');
+				window.L?.hideTooltip?.({});
+				m.setAttribute('open', '');
+				list.hidden = false;
+				btn.setAttribute('aria-expanded', 'true');
+				(rows.find((r) => r.getAttribute('aria-checked') === 'true') || rows[0]).focus();
+			});
+
+			list.addEventListener('click', (ev) => {
+				const r = ev.target.closest('[role="menuitemradio"]');
+
+				if (r)
+					pick(m, r);
+			});
+
+			list.addEventListener('keydown', (ev) => {
+				const i = rows.indexOf(document.activeElement);
+				const go = { ArrowDown: i + 1, ArrowUp: i - 1, Home: 0, End: rows.length - 1 }[ev.key];
+
+				if (go !== undefined)
+					rows[(go + rows.length) % rows.length].focus();
+				else if ((ev.key === 'Enter' || ev.key === ' ') && i >= 0)
+					pick(m, rows[i]);
+				else if (ev.key === 'Escape')
+					close(m, true);
+				else if (ev.key === 'Tab')
+					close(m, false);
+				else
+					return;
+
+				if (ev.key !== 'Tab')
+					ev.preventDefault();
 			});
 		});
+
+		document.addEventListener('click', (ev) => menus.forEach((m) => {
+			if (!m.contains(ev.target))
+				close(m, false);
+		}));
 
 		reflect();
 		this.icon();
 		matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => this.icon());
-		this.palettes(bar);
 	},
 
 	/* The tab icon: logo.svg's mark redrawn in the accent the page resolves
@@ -259,96 +342,5 @@ return baseclass.extend({
 		const q = [0, 60, 120, 180, 240, 300].map((a) => `<use href="#q" transform="rotate(${a} 12 12)"/>`).join('');
 
 		link.href = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${c}"><defs><path id="q" d="M10.1 8.8C8.4 6.1 10.2 3 13.6 1.2C15.3 4.5 14.5 7.7 13.1 9.3Z"/></defs>${q}</svg>`);
-	},
-
-	/* The palette menus: the top bar's, and the drawer's on a phone. Menu
-	 * pattern: the button opens the list (Enter, Space or a click) and
-	 * focuses the checked row; arrows, Home and End move, Enter or Space
-	 * picks, Escape or Tab closes, a click outside closes. The choice goes to
-	 * localStorage "aster-palette"; Rosé Pine, the default, is the absence
-	 * of data-palette. */
-	palettes(bar) {
-		const menus = document.querySelectorAll('.palette-menu');
-		const root = document.documentElement;
-		const current = () => root.getAttribute('data-palette') || 'rose-pine';
-
-		const reflect = () => menus.forEach((m) => m.querySelectorAll('[role="menuitemradio"]').forEach((r) =>
-			r.setAttribute('aria-checked', String(r.dataset.value === current()))));
-
-		const close = (m, refocus) => {
-			if (!m.hasAttribute('open'))
-				return;
-
-			m.removeAttribute('open');
-			m.querySelector('[role="menu"]').hidden = true;
-			m.querySelector('button').setAttribute('aria-expanded', 'false');
-
-			if (refocus)
-				m.querySelector('button').focus();
-		};
-
-		const pick = (m, value) => {
-			if (value === 'rose-pine')
-				root.removeAttribute('data-palette');
-			else
-				root.setAttribute('data-palette', value);
-
-			try { localStorage.setItem('aster-palette', value); }
-			catch (e) { /* private window: the choice lasts this page only */ }
-
-			reflect();
-			bar();
-			close(m, true);
-		};
-
-		menus.forEach((m) => {
-			const btn = m.querySelector('button');
-			const list = m.querySelector('[role="menu"]');
-			const rows = Array.from(list.querySelectorAll('[role="menuitemradio"]'));
-
-			btn.addEventListener('click', () => {
-				if (m.hasAttribute('open'))
-					return close(m, false);
-
-				menus.forEach((o) => close(o, false));
-				m.setAttribute('open', '');
-				list.hidden = false;
-				btn.setAttribute('aria-expanded', 'true');
-				(rows.find((r) => r.getAttribute('aria-checked') === 'true') || rows[0]).focus();
-			});
-
-			list.addEventListener('click', (ev) => {
-				const r = ev.target.closest('[role="menuitemradio"]');
-
-				if (r)
-					pick(m, r.dataset.value);
-			});
-
-			list.addEventListener('keydown', (ev) => {
-				const i = rows.indexOf(document.activeElement);
-				const go = { ArrowDown: i + 1, ArrowUp: i - 1, Home: 0, End: rows.length - 1 }[ev.key];
-
-				if (go !== undefined)
-					rows[(go + rows.length) % rows.length].focus();
-				else if ((ev.key === 'Enter' || ev.key === ' ') && i >= 0)
-					pick(m, rows[i].dataset.value);
-				else if (ev.key === 'Escape')
-					close(m, true);
-				else if (ev.key === 'Tab')
-					close(m, false);
-				else
-					return;
-
-				if (ev.key !== 'Tab')
-					ev.preventDefault();
-			});
-		});
-
-		document.addEventListener('click', (ev) => menus.forEach((m) => {
-			if (!m.contains(ev.target))
-				close(m, false);
-		}));
-
-		reflect();
 	},
 });
