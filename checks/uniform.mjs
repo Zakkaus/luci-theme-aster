@@ -488,12 +488,15 @@ function collect(cfg) {
   }
 
   // Raw glyphs: an element whose own words are only a character LuCI draws
-  // as an icon (▾ ⇒ ∗ + × ···) shows it; the theme draws the Heroicon
-  // and hides the character (font-size 0). Only showing ones are listed.
+  // as an icon (▾ ⇒ ∗ + × ··· ▲ ▼) shows it; the theme draws the Heroicon
+  // and hides the character (font-size 0). A ▲ or ▼ still in running text
+  // ("▲ 1.5 GiB": theme-aster.js did not take it out) is raw as well. Only
+  // showing ones are listed.
   for (const el of scope.querySelectorAll('*')) {
     const t = ownText(el).trim();
-    if (!/^(▾|⇒|∗|\+|×|···)$/.test(t) || (!cfg.modal && el.closest('#modal_overlay')) || el.closest(APP_OWN) || !visible(el)) continue;
-    if (parseFloat(getComputedStyle(el).fontSize) > 0) add('glyph', 'raw', t, el);
+    const inText = /(^|\s)[▲▼]\s/.test(t) && !el.closest('.cbi-tooltip');
+    if ((!/^(▾|⇒|∗|\+|×|···|▲|▼)$/.test(t) && !inText) || (!cfg.modal && el.closest('#modal_overlay')) || el.closest(APP_OWN) || !visible(el)) continue;
+    if (inText || parseFloat(getComputedStyle(el).fontSize) > 0) add('glyph', 'raw', inText ? t.match(/[▲▼]/)[0] : t, el);
   }
 
   // The save bar is the layout's footer: on a wide screen it sits under

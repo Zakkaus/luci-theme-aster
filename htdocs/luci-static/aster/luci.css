@@ -467,7 +467,6 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     --card-radius: 0;
     --card-bg: transparent;
   }
-  & > .cbi-section:has(img[src*="/port_"]) > :is(.cbi-title, h3) { margin-block-end: var(--spacing-6); }
   /* 29_ports.js writes a 70 px grid and box sizes inline (!important to
      override); the reference's Grid: 160 a tile, 16 apart, five a row at
      most, so one port is a tile and not a banner. */
@@ -515,6 +514,7 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
       inset-block-start: calc(var(--spacing-4) - var(--border-width));
       inset-inline-end: calc(var(--spacing-4) - var(--border-width));
       block-size: calc(var(--text-heading-3-size) * var(--text-heading-3-leading));
+      align-items: center;
       gap: var(--spacing-1);
     }
     & > .ifacebox-head > .zonebadge {
@@ -522,12 +522,14 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
       inline-size: var(--spacing-2);
       block-size: var(--spacing-2) !important;
       min-inline-size: 0;
+      min-block-size: 0; /* the Badge's 20; a StatusDot is 8 round */
       padding: 0;
       border-radius: var(--radius-full);
       background-image: none;
     }
-    /* Traffic: "▲ sent", "▼ received", two supporting lines 4 apart. The arrows
-       are characters in LuCI's text and stay; the 80 % size is inline. */
+    /* Traffic: "▲ sent", "▼ received", two supporting lines 4 apart; the
+       arrows are ArrowUp / ArrowDown icons (.aster-glyph, Icon glyphs); the
+       80 % size is inline. */
     & > .ifacebox-body > .cbi-tooltip-container {
       color: var(--color-text-secondary);
       font-size: var(--text-supporting-size) !important;

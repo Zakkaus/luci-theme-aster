@@ -69,6 +69,11 @@ expect uniform 1 "card lastRule" "rule under a card's last row" "(want none)" --
 printf 'admin/system/system\n' >"$tmp/system.txt"
 expect uniform 1 "glyph raw" "raw ▾ glyph shown" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=.cbi-dropdown > .open { font-size: 15px !important }'
+# Raw glyphs: the overview's ▲ / ▼ traffic arrows shown as characters
+# again instead of the ArrowUp / ArrowDown icons.
+printf 'admin/status/overview\n' >"$tmp/overview.txt"
+expect uniform 1 "glyph raw" "raw ▲ glyph shown" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=.aster-glyph { font-size: 13px !important }'
 # The save bar over the page again: the main column runs under it.
 expect uniform 1 "footer overlap" "save bar covering the page" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=.shell-main { margin-block-end: 0 !important }'

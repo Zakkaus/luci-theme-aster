@@ -23,6 +23,52 @@ return baseclass.extend({
 		this.bind();
 		this.lua();
 		this.tooltip();
+		this.marks();
+	},
+
+	/* Marks for what LuCI says only in its words, kept as views re-render:
+	 *  - a ▲ or ▼ before a traffic count (the overview's ports) goes into a
+	 *    .aster-glyph span, which components.css draws as the ArrowUp or
+	 *    ArrowDown icon (Icon glyphs);
+	 *  - an interface's Error entry (interfaces.js render_status: a
+	 *    "<strong>Error:</strong> text" item) gets .aster-error, set in the
+	 *    error ink (luci.css, Network pages). */
+	marks() {
+		const roots = ['view', 'modal_overlay'].map((id) => document.getElementById(id)).filter(Boolean);
+		const error = _('Error');
+		const glyph = (s) => {
+			const g = document.createElement('span');
+
+			g.className = 'aster-glyph';
+			g.dataset.glyph = (s === '▲') ? 'up' : 'down';
+			g.textContent = s;
+
+			return g;
+		};
+		const run = () => roots.forEach((root) => {
+			const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+				acceptNode: (n) => (/[▲▼]/.test(n.data) && !n.parentNode.closest('.aster-glyph, .cbi-tooltip')) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
+			});
+			const hits = [];
+
+			while (walk.nextNode())
+				hits.push(walk.currentNode);
+
+			hits.forEach((n) => n.replaceWith(...n.data.split(/([▲▼])/).filter(Boolean).map((s) => /^[▲▼]$/.test(s) ? glyph(s) : s)));
+
+			root.querySelectorAll('span:not(.aster-error) > strong:first-child').forEach((s) => {
+				if (s.textContent.trim().replace(/[:：]$/, '') === error)
+					s.parentNode.classList.add('aster-error');
+			});
+		});
+		let queued = false;
+		const observer = new MutationObserver(() => {
+			if (!queued)
+				queued = requestAnimationFrame(() => { queued = false; run(); });
+		});
+
+		run();
+		roots.forEach((root) => observer.observe(root, { childList: true, subtree: true, characterData: true }));
 	},
 
 	/* ui.js's tooltip (one node it fills and moves on hover) is the Tooltip
