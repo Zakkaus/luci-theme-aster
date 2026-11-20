@@ -38,6 +38,8 @@
   /* Menu: the widest it opens. Tooltip: Astryx's text box, 300 at most. */
   --aster-menu-max-w: 384px;
   --aster-tooltip-max-w: 300px;
+  /* EmptyState: its words 360 wide at most (Astryx EmptyState). */
+  --aster-empty-max-w: 360px;
 
   /* Spacing contract (lab spacing audit, 2026-11-20): a container owns the
      space between its children. Two stack steps: 16 inside a page region
