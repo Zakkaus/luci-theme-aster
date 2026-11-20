@@ -62,6 +62,16 @@ expect uniform 1 "overflow excess" "interfaces table wider than its card" -- "$u
 expect uniform 1 "nav.item gap" "side nav rows with no gap" "0px (want 2px)" -- "$url" "$password" --pages "$tmp/reboot.txt" \
 	--debug-css 'admin/system/reboot=.nav, .nav-group { gap: 0 !important }'
 
+# Tooltip: words wider than the box (a route's JSON ran out of it). Needs a
+# tooltip on the overview: 25.12's lease rows carry one, 24.10 draws none.
+node "$root/checks/uniform.mjs" "$url" "$password" --pages "$tmp/overview.txt" --viewports desktop --modes light --json "$tmp/tip.json" >/dev/null 2>&1 || true
+if node -e 'const r = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")); process.exit(Object.keys(r.distributions).some((k) => k.startsWith("tooltip overflow")) ? 0 : 1)' "$tmp/tip.json" 2>/dev/null; then
+	expect uniform 1 "tooltip overflow" "tooltip text runs out of its box" -- "$url" "$password" --pages "$tmp/overview.txt" \
+		--debug-css 'admin/status/overview=.cbi-tooltip { max-inline-size: 40px !important; overflow-wrap: normal !important }'
+else
+	echo "skip tooltip text runs out of its box: no tooltip on the overview"
+fi
+
 # Lua CBI map (APPS=1: a box with OpenClash, as apps-install.sh leaves it).
 # A header table in a Lua map folds on a phone like a JS view's, and the
 # gate reads it as a fold; a row drawn as a flex column instead of the

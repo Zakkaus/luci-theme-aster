@@ -49,6 +49,10 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
   `SCROLLS` and skipped.
 - `uniform.mjs` reads the side nav's row gap (`nav.item gap`), so a
   hovered row never touches the selected one.
+- It opens ui.js's tooltip on up to three `[data-tooltip]` triggers a page
+  and shows each `.cbi-tooltip` in markup: `tooltip overflow` is text wider
+  than the box, `tooltip arrow` a ▲/▼ glyph before the text, `tooltip gap`
+  the space to the trigger.
 - `uniform.json` holds one canonical value per component class and
   property. Values with a source in `lab/new-theme/astryx-ref/spec.json`
   are written out; `null` means "the majority of the run", and the report
@@ -81,7 +85,8 @@ missing or does not render, a page with no samples, or a required class
 with no sample. Neither writes to the device: light and dark are chosen
 through the theme's browser setting, and the only clicks are an interface's
 Edit button (the dialog is measured, never saved) and the Close button of
-the attended-sysupgrade dialog on 25.12.
+the attended-sysupgrade dialog on 25.12; tooltips are opened in the page,
+without a request.
 
 The report is a text table and a JSON file, page by page, so the page that
 breaks a rule and the element that does it are both named.

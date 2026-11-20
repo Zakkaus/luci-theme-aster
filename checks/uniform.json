@@ -52,6 +52,7 @@
     "form.row": {"_source": "Astryx Field layout: a form row spans its card's (or dialog's) content box (fill 0)", "gap": null, "fill": 0},
 
     "nav.item": {"_source": "Astryx 0.7.16 SideNavSection items: flex column, gap --spacing-0-5; the theme keeps it inside a group too, so a hovered row never touches the selected one", "gap": 2},
+    "tooltip": {"_source": "Astryx 0.7.16 Tooltip, measured: text padding 4px 8px, radius 16 (container), 15px body, no arrow, 4 from the anchor; its words fit the box (scrollWidth - clientWidth)", "overflow": 0, "padding": [4, 8, 4, 8], "radius": 16, "fontSize": 15, "arrow": "none", "gap": 4},
 
     "overflow": {"_source": "No card, table or scroll box inside a card or dialog is wider than it (scrollWidth - clientWidth); the Field and the phone Tabs list scroll by design and are skipped (uniform.mjs SCROLLS)", "excess": 0},
 

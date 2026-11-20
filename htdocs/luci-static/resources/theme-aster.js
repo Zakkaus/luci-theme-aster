@@ -22,6 +22,43 @@ return baseclass.extend({
 	__init__() {
 		this.bind();
 		this.lua();
+		this.tooltip();
+	},
+
+	/* ui.js's tooltip (one node it fills and moves on hover) is the Tooltip
+	 * component (components.css): no arrow, so the "▲ " or "▼ " it writes
+	 * before the text goes, and it sits --tooltip-gap above its trigger,
+	 * centred, kept --tooltip-inset inside the window; below the trigger
+	 * when there is no room above. */
+	tooltip() {
+		document.addEventListener('tooltip-open', (ev) => {
+			const tip = ev.target;
+			const target = ev.detail && ev.detail.target;
+			const text = tip.firstChild;
+
+			if (!target || !tip.classList || !tip.classList.contains('cbi-tooltip'))
+				return;
+
+			if (text && text.nodeType === 3)
+				text.data = text.data.replace(/^[\u25B2\u25BC] /, '');
+
+			/* The spacing tokens are rem; a custom property computes to them as written. */
+			const css = getComputedStyle(tip);
+			const px = (name) => {
+				const v = css.getPropertyValue(name).trim();
+				return (parseFloat(v) || 0) * (v.endsWith('rem') ? parseFloat(getComputedStyle(document.documentElement).fontSize) : 1);
+			};
+			const gap = px('--tooltip-gap');
+			const inset = px('--tooltip-inset');
+			const r = target.getBoundingClientRect();
+			const w = tip.offsetWidth;
+			const h = tip.offsetHeight;
+			const x = Math.max(inset, Math.min(r.left + (r.width - w) / 2, document.documentElement.clientWidth - inset - w));
+			const y = (r.top - gap - h >= inset) ? r.top - gap - h : r.bottom + gap;
+
+			tip.style.left = `${x + window.pageXOffset}px`;
+			tip.style.top = `${y + window.pageYOffset}px`;
+		});
 	},
 
 	/* Lua CBI pages (a <form> around the .cbi-map) are in the document by

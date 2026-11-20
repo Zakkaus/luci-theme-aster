@@ -993,10 +993,11 @@ html :where([data-page="admin-status-overview"] #view :is(.ifacebox-body > div, 
    ui.js removes it when the .fade-out transition ends, so that transition
    always runs. */
 
+html :where(.alert-message, .td > [data-tooltip]) { --icon-info: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='m11.25%2011.25.041-.02a.75.75%200%200%201%201.063.852l-.708%202.836a.75.75%200%200%200%201.063.853l.041-.021M21%2012a9%209%200%201%201-18%200%209%209%200%200%201%2018%200Zm-9-3.75h.008v.008H12V8.25Z'/></svg>"); }
 html :where(.alert-message) {
   --banner-bg: var(--color-info-muted);
   --banner-fg: var(--color-on-info-muted);
-  --banner-mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='m11.25%2011.25.041-.02a.75.75%200%200%201%201.063.852l-.708%202.836a.75.75%200%200%200%201.063.853l.041-.021M21%2012a9%209%200%201%201-18%200%209%209%200%200%201%2018%200Zm-9-3.75h.008v.008H12V8.25Z'/></svg>");
+  --banner-mask: var(--icon-info);
   position: relative;
   box-sizing: border-box;
   margin-block-end: var(--spacing-4);
@@ -1117,20 +1118,25 @@ html :where(#modal_overlay > .alert-message.spinning)::after {
 }
 
 /* ── Tooltip ─────────────────────────────────────────────────────
-   The inverted fill (text colour behind, surface colour in front), 4 / 8 inside, container radius, body text. Two kinds:
+   The inverted fill (text colour behind, surface colour in front), 4 / 8 inside, container radius, body text, no arrow. Two kinds:
    markup in a .cbi-tooltip-container shown on hover, and one node ui.js
-   moves around and shows by writing an inline style. */
+   moves around and shows by writing an inline style; theme-aster.js drops
+   the arrow glyph ui.js writes before its text and places it 4 above its
+   trigger, centred, 16 clear of the window (--tooltip-gap, --tooltip-inset).
+   Long unbroken text (a route's JSON) wraps inside the box. */
 
 html :where(.cbi-tooltip-container) { position: relative; cursor: help; }
 html :where(.cbi-tooltip-container:is(:hover, :focus-within)) { z-index: 120; }
 html :where(.cbi-tooltip) {
+  --tooltip-gap: var(--spacing-1);
+  --tooltip-inset: var(--spacing-4);
   position: absolute;
   inset-block-start: 0;
   inset-inline-start: 0;
   z-index: 110;
   box-sizing: border-box;
   inline-size: max-content;
-  max-inline-size: min(var(--aster-menu-max-w), calc(100vw - var(--spacing-8)));
+  max-inline-size: min(var(--aster-menu-max-w), calc(100vw - var(--tooltip-inset) * 2));
   padding: var(--spacing-1) var(--spacing-2);
   border-radius: var(--radius-container);
   background: var(--color-text-primary);
@@ -1139,6 +1145,7 @@ html :where(.cbi-tooltip) {
   font-weight: var(--text-body-weight);
   line-height: var(--text-body-leading);
   white-space: pre-line;
+  overflow-wrap: anywhere;
   /* Hidden, a tooltip takes no box: laid out at max-content it would widen
      its card's scroll area (a phone could swipe the card sideways). */
   display: none;
@@ -1161,23 +1168,25 @@ html :where(.cbi-tooltip) :is(.ifacebadge, .zonebadge, .ifacebox, .ifacebox-head
   --card-border: color-mix(in srgb, currentColor 24%, transparent);
   color: inherit;
 }
-/* A cell's "#" with a data-tooltip (more detail behind a row) is an info
-   mark: a 20 ring with an "i"; the character stays for screen readers. */
+/* A cell's "#" with a data-tooltip (more detail behind a row) is an
+   InfoTip: the 16 info icon (the Banner's) in a 20 box; the character
+   stays for screen readers. */
 html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button)) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   inline-size: var(--spacing-5);
   block-size: var(--spacing-5);
-  border: var(--border-width) solid var(--color-border-emphasized);
-  border-radius: var(--radius-full);
-  color: var(--color-text-secondary);
+  color: var(--color-icon-secondary);
   font-size: 0;
   cursor: help;
 }
 html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button))::after {
-  content: "i";
-  font: var(--font-weight-semibold) var(--text-supporting-size) / 1 var(--font-family-code);
+  content: "";
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
+  background: currentColor;
+  mask: var(--icon-info) center / contain no-repeat;
 }
 
 /* ── Change list ─────────────────────────────────────────────────

@@ -16,8 +16,8 @@
  * On each page and each viewport and mode it reads computed styles per
  * component class (buttons by variant and size, fields, checkboxes, table
  * rows and cells, the phone fold, cards, headings, tabs, form rows, font
- * family, the side nav's row gap) and layout (a field filling its row, a
- * row its card, content no wider than its card) and compares every sample with the canonical value:
+ * family, tooltips, the side nav's row gap) and layout (a field filling
+ * its row, a row its card, content no wider than its card) and compares every sample with the canonical value:
  * px values within --tolerance, strings (colours, borders, font family,
  * font weight, display) exactly. A canonical null means "the majority of
  * this run at that viewport and mode", and the report prints the
@@ -416,6 +416,37 @@ function collect(cfg) {
       if (rows[i].closest('.nav > .nav-group:last-child:has(> .nav-item:only-child)')) continue;
       add('nav.item', 'gap', px(box(rows[i]).top - box(rows[i - 1]).bottom), rows[i]);
     }
+  }
+
+  // Tooltips. ui.js's (a [data-tooltip] trigger; one node it fills and
+  // places on mouseover) is opened on up to three triggers: its words must
+  // fit its box, with no arrow glyph before them, and it stands the
+  // Tooltip's gap from its trigger. A .cbi-tooltip in markup is shown the
+  // way ui.js shows one (an inline style) and its words must fit it.
+  const tipRead = (tip, el) => {
+    const s = getComputedStyle(tip);
+    add('tooltip', 'overflow', px(Math.max(0, tip.scrollWidth - tip.clientWidth)), el);
+    add('tooltip', 'padding', [px(s.paddingTop), px(s.paddingRight), px(s.paddingBottom), px(s.paddingLeft)], el);
+    // As declared: a one-line tooltip is as high as twice its radius, which
+    // the pill rule would read as 9999.
+    add('tooltip', 'radius', px(s.borderTopLeftRadius), el);
+    add('tooltip', 'fontSize', px(s.fontSize), el);
+  };
+  for (const el of all('[data-tooltip]').slice(0, 3)) {
+    el.dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));
+    const tip = [...document.body.children].find((c) => c.matches('.cbi-tooltip[style]'));
+    if (!tip) continue;
+    tipRead(tip, el);
+    add('tooltip', 'arrow', /^\s*[▲▼]/.test(tip.textContent) ? 'glyph' : 'none', el);
+    const t = box(tip), r = box(el);
+    add('tooltip', 'gap', px(t.bottom <= r.top + 0.5 ? r.top - t.bottom : t.top - r.bottom), el);
+    el.dispatchEvent(new MouseEvent('mouseout', {bubbles: true}));
+  }
+  for (const tip of scope.querySelectorAll('.cbi-tooltip-container > .cbi-tooltip:not(:empty, [style])')) {
+    if ((!cfg.modal && tip.closest('#modal_overlay')) || tip.closest(APP_OWN) || !visible(tip.parentElement)) continue;
+    tip.setAttribute('style', '');
+    if (visible(tip)) tipRead(tip, tip.parentElement);
+    tip.removeAttribute('style');
   }
 
   // Font family of every element with its own words, and of every control.
