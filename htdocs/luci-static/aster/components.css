@@ -760,59 +760,56 @@ html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -
    straight in the table, a Lua CBI table (a <form>'s .cbi-map) in the
    parser's <tbody>; all are reached. */
 @media (max-width: 48rem) {
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th)) { display: block; overflow: visible; }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) > :is(.thead, .tbody, .tfoot, thead, tbody, tfoot)) { display: contents; }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr:has(> .th)) { display: none; }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr.placeholder) { display: block; }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr:not(:has(> .th), .placeholder)) {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    padding-block: var(--spacing-1);
-    border-block-end: var(--border-width) solid var(--color-border);
-  }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr:last-child) { border-block-end: 0; }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td)) {
+  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th)) {
     display: block;
-    grid-column: 1;
-    padding: 0 var(--spacing-2) 0 var(--spacing-4);
-    border: 0;
-    color: var(--color-text-secondary);
-    font-size: var(--text-supporting-size);
-    line-height: var(--text-supporting-leading);
-    overflow-wrap: anywhere;
-    text-align: start;
+    overflow: visible;
+    /* Nested rules keep the parent's one element of weight (& is :is()). */
+    & > :where(.thead, .tbody, .tfoot, thead, tbody, tfoot) { display: contents; }
+    & :where(.tr:has(> .th)) { display: none; }
+    & :where(.tr.placeholder) { display: block; }
+    & :where(.tr:not(:has(> .th), .placeholder)) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      padding-block: var(--spacing-1);
+      border-block-end: var(--border-width) solid var(--color-border);
+    }
+    & :where(.tr:last-child) { border-block-end: 0; }
+    & :where(.tr > :is(.td, td)) {
+      display: block;
+      grid-column: 1;
+      padding: 0 var(--spacing-2) 0 var(--spacing-4);
+      border: 0;
+      color: var(--color-text-secondary);
+      font-size: var(--text-supporting-size);
+      line-height: var(--text-supporting-leading);
+      overflow-wrap: anywhere;
+      text-align: start;
+    }
+    & :where(.tr > :is(.td, td):first-child, .tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child) + :is(.td, td)) {
+      color: var(--color-text-primary);
+      font-size: var(--text-body-size);
+      line-height: var(--text-body-leading);
+    }
+    & :where(.tr > :is(.td, td)[data-title]:not(:first-child, .cbi-section-actions))::before {
+      content: attr(data-title);
+      margin-inline-end: var(--spacing-2);
+      font-weight: var(--font-weight-medium);
+    }
+    & :where(.tr > :is(.td, td):has(> :is(input:not([type="checkbox"]), select, .cbi-dropdown, .cbi-dynlist)))::before { display: block; }
+    /* A row that opens with a lone selection checkbox (PassWall's node
+       list): the checkbox sits before the title, which is the cell after it;
+       the rest stack under the title. */
+    & :where(.tr:has(> :is(.td, td):first-child > input[type="checkbox"]:only-child)) { grid-template-columns: auto minmax(0, 1fr); }
+    & :where(.tr:has(> :is(.td, td):first-child > input[type="checkbox"]:only-child) > :is(.td, td)) { grid-column: 2; }
+    & :where(.tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child)) { grid-column: 1; grid-row: 1; padding-inline-end: 0; }
+    & :where(.tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child) + :is(.td, td))::before { content: none; }
+    /* The actions take a line of their own under the stack, so the data
+       keeps the row's full width (a column beside it left long values a
+       narrow one); several wrap, 8 apart. */
+    & :where(.tr > :is(.td, td).cbi-section-actions) { padding: var(--spacing-2) var(--spacing-4) 0; }
+    & :where(.tr > :is(.td, td).cbi-section-actions > div) { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
   }
   html #view .nft-rules tr > td { padding-block: 0 !important; } /* nftables' <style>, as above */
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td):first-child) {
-    color: var(--color-text-primary);
-    font-size: var(--text-body-size);
-    line-height: var(--text-body-leading);
-  }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td)[data-title]:not(:first-child, .cbi-section-actions))::before {
-    content: attr(data-title);
-    margin-inline-end: var(--spacing-2);
-    font-weight: var(--font-weight-medium);
-  }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td):has(> :is(input:not([type="checkbox"]), select, .cbi-dropdown, .cbi-dynlist)))::before { display: block; }
-  /* A row that opens with a lone selection checkbox (PassWall's node
-     list): the checkbox sits before the title, which is the cell after it;
-     the rest stack under the title. */
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr:has(> :is(.td, td):first-child > input[type="checkbox"]:only-child)) { grid-template-columns: auto minmax(0, 1fr); }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr:has(> :is(.td, td):first-child > input[type="checkbox"]:only-child) > :is(.td, td)) { grid-column: 2; }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child)) { grid-column: 1; grid-row: 1; padding-inline-end: 0; }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child) + :is(.td, td)) {
-    color: var(--color-text-primary);
-    font-size: var(--text-body-size);
-    line-height: var(--text-body-leading);
-  }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child) + :is(.td, td))::before { content: none; }
-  /* The actions take a line of their own under the stack, so the data
-     keeps the row's full width (a column beside it left long values a
-     narrow one); several wrap, 8 apart. */
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td).cbi-section-actions) {
-    padding: var(--spacing-2) var(--spacing-4) 0;
-  }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td).cbi-section-actions > div) { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
   /* A Lua button table (one action per cell, Commit and Apply) stacks
      its buttons 8 apart: the cell, or the option's div in it, which may
      carry the button's script beside it (OpenClash's Create). (:has()

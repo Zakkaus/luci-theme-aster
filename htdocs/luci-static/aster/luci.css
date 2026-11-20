@@ -223,49 +223,32 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
 
 /* ── The login form [ported] ────────────────────────────────── */
 
-/* sysauth.ut reuses LuCI's form markup so authentication plugins can add
-   their fields to it, and the two-column layout leaves 110px for the input
-   inside a 24rem panel. */
-.login-panel .cbi-map,
-.login-panel .cbi-section,
-.login-panel .cbi-section-node {
-  border: 0;
-  background: none;
-  box-shadow: none;
-  padding: 0;
-  margin: 0;
-}
-/* M4 restyles the login page; until then it keeps its first look: a
-   label over its field, 8 apart, pairs 24 apart, 40-high controls. */
-.login-panel .cbi-value { gap: var(--spacing-2); padding: 0; border-block-end: 0; }
-.login-panel .cbi-value + .cbi-value { margin-block-start: var(--spacing-6); }
-.login-panel .cbi-value-title { min-block-size: 0; }
-.login-panel .cbi-value-field { display: block; }
-.login-panel .cbi-value-field input { inline-size: 100%; block-size: var(--size-element-lg); }
-.login-panel form > button { inline-size: 100%; min-block-size: var(--size-element-lg); margin-block-start: var(--spacing-6); }
+/* The sign-in card's one action keeps the 40-high, 24-down look the login
+   page was approved with (theme.css .login-submit sets the rest). */
+.login-panel form > button { min-block-size: var(--size-element-lg); margin-block-start: var(--spacing-6); }
 
 /* ── Status overview [ported] ───────────────────────────────── */
 
-/* The reference lays the overview out as bands of cards: the title, then
-   the cards in a grid of at most two tracks (each at least 320, 16 apart),
-   and anything holding a wide table, a row of interface boxes or a long list
-   across the full width. Every include is its own .cbi-section, a direct
-   child of #view. Two cards in one row stretch to the row, as the
-   reference's Grid does: System and Memory end on the same line. */
-[data-page="admin-status-overview"] #view:has(> .cbi-section) {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(max(min(100%, var(--aster-card-min)), calc((100% - var(--spacing-4)) / 2)), 1fr));
-  gap: var(--spacing-4);
-  align-items: stretch;
-}
-/* A card collapsed with Hide keeps only its title row; stretched, it would
-   be an empty box as tall as its neighbour. luci-mod-status hides the
-   content by writing display: none on its container. */
-[data-page="admin-status-overview"] #view > .cbi-section:has(> div[style*="display: none"]) { align-self: start; }
-[data-page="admin-status-overview"] #view > :not(.cbi-section) { grid-column: 1 / -1; }
-[data-page="admin-status-overview"] #view > .cbi-section { margin: 0; min-inline-size: 0; }
-[data-page="admin-status-overview"] #view > .cbi-section:has(.tr > .td:nth-child(3), .th, .ifacebox, .network-status-table, .tr:nth-child(7) > .td > .cbi-progressbar) {
-  grid-column: 1 / -1;
+[data-page="admin-status-overview"] #view {
+  /* The reference lays the overview out as bands of cards: the title, then
+     the cards in a grid of at most two tracks (each at least 320, 16 apart),
+     and anything holding a wide table, a row of interface boxes or a long list
+     across the full width. Every include is its own .cbi-section, a direct
+     child of #view. Two cards in one row stretch to the row, as the
+     reference's Grid does: System and Memory end on the same line. */
+  &:has(> .cbi-section) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(max(min(100%, var(--aster-card-min)), calc((100% - var(--spacing-4)) / 2)), 1fr));
+    gap: var(--spacing-4);
+    align-items: stretch;
+  }
+  /* A card collapsed with Hide keeps only its title row; stretched, it would
+     be an empty box as tall as its neighbour. luci-mod-status hides the
+     content by writing display: none on its container. */
+  & > .cbi-section:has(> div[style*="display: none"]) { align-self: start; }
+  & > :not(.cbi-section) { grid-column: 1 / -1; }
+  & > .cbi-section { margin: 0; min-inline-size: 0; }
+  & > .cbi-section:has(.tr > .td:nth-child(3), .th, .ifacebox, .network-status-table, .tr:nth-child(7) > .td > .cbi-progressbar) { grid-column: 1 / -1; }
 }
 
 /* A row holding a progress bar is the reference's ProgressBar with its
@@ -274,6 +257,7 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
   display: block;
   padding-block: var(--spacing-2);
 }
+
 /* The first one starts its text where a key/value row does (4 in), so the
    first lines of Memory and System sit level, as the reference's do. */
 [data-page="admin-status-overview"] .table .tr:first-child:has(> .td > .cbi-progressbar) { padding-block-start: var(--spacing-1); }
@@ -283,6 +267,7 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
   padding: 0;
   border: 0;
 }
+
 /* The name and the value text share a line. The value ("218.81 GiB /
    648.51 GiB (33%)", at most about fourteen supporting-size em) keeps its
    room; a longer name ends in an ellipsis instead of running into it. */
@@ -297,231 +282,227 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
 [data-page="admin-status-overview"] .table .tr:has(> .td > .cbi-progressbar) > .td:has(> .cbi-progressbar) {
   margin-block-start: calc(var(--text-body-size) * var(--text-body-leading) * -1);
 }
-
-/* Interface boxes. luci-mod-status draws three kinds with one class: the
-   port boxes (29_ports.js), the upstream boxes of the Network card
-   (30_network.js) and one box per radio (60_wifi.js). Each becomes one of
-   the reference's Cards: a 16 inset, a 1 border, radius 16, a Heading 3 row
-   and supporting text under it. Which kind a box is shows only in the image
-   LuCI puts in it (icons/port_*, icons/signal-*), so the selectors key on
-   that. The images are hidden and the reference's icons take their place as
-   masks coloured by tokens: Heroicons 2.2.0 outline (MIT,
-   LICENSES/heroicons-MIT.txt), path data verbatim, ServerStack for a port or
-   a wired device, Wifi for a radio or a wireless device. The box itself is
-   the Card variant of the interface box (components.css). */
-/* The Network and Wireless cards put their boxes in a .network-status-table:
-   the reference's Grid of radio cards, at most two a row, each at least 320. */
-[data-page="admin-status-overview"] #view .network-status-table {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(max(min(100%, var(--aster-card-min)), calc((100% - var(--spacing-4)) / 2)), 1fr));
-  gap: var(--spacing-4);
+[data-page="admin-status-overview"] #view {
+  /* Interface boxes. luci-mod-status draws three kinds with one class: the
+     port boxes (29_ports.js), the upstream boxes of the Network card
+     (30_network.js) and one box per radio (60_wifi.js). Each becomes one of
+     the reference's Cards: a 16 inset, a 1 border, radius 16, a Heading 3 row
+     and supporting text under it. Which kind a box is shows only in the image
+     LuCI puts in it (icons/port_*, icons/signal-*), so the selectors key on
+     that. The images are hidden and the reference's icons take their place as
+     masks coloured by tokens: Heroicons 2.2.0 outline (MIT,
+     LICENSES/heroicons-MIT.txt), path data verbatim, ServerStack for a port or
+     a wired device, Wifi for a radio or a wireless device. The box itself is
+     the Card variant of the interface box (components.css). */
+  /* The Network and Wireless cards put their boxes in a .network-status-table:
+     the reference's Grid of radio cards, at most two a row, each at least 320. */
+  & .network-status-table {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(max(min(100%, var(--aster-card-min)), calc((100% - var(--spacing-4)) / 2)), 1fr));
+    gap: var(--spacing-4);
+  }
+  /* Icon slots: the port and radio heads, the device and SSID chips inside a
+     box (.ifacebox-body > div > .ifacebadge) and the chips in the station
+     table (.td > .ifacebadge). The chips in tooltips keep LuCI's images. */
+  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head:first-child::before,
+  & .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head::before,
+  & .ifacebox-body > div > .ifacebadge:has(> img)::before,
+  & .td > .ifacebadge:has(> img)::before {
+    content: "";
+    flex: none;
+    inline-size: var(--aster-icon-md);
+    block-size: var(--aster-icon-md);
+    background-color: var(--color-icon-secondary);
+  }
+  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head:first-child::before,
+  & .ifacebox-body > div > .ifacebadge:has(> img:not([src*="/signal-"], [src*="/wifi"]))::before,
+  & .td > .ifacebadge:has(> img:not([src*="/signal-"], [src*="/wifi"]))::before {
+    mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M5.25%2014.25h13.5m-13.5%200a3%203%200%200%201-3-3m3%203a3%203%200%201%200%200%206h13.5a3%203%200%201%200%200-6m-16.5-3a3%203%200%200%201%203-3h13.5a3%203%200%200%201%203%203m-19.5%200a4.5%204.5%200%200%201%20.9-2.7L5.737%205.1a3.375%203.375%200%200%201%202.7-1.35h7.126c1.062%200%202.062.5%202.7%201.35l2.587%203.45a4.5%204.5%200%200%201%20.9%202.7m0%200a3%203%200%200%201-3%203m0%203h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3%206h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z'/></svg>") center / contain no-repeat;
+  }
+  & .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head::before,
+  & .ifacebox-body > div > .ifacebadge:has(> img[src*="/wifi"])::before,
+  & .td > .ifacebadge:has(> img[src*="/wifi"])::before {
+    mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M8.288%2015.038a5.25%205.25%200%200%201%207.424%200M5.106%2011.856c3.807-3.808%209.98-3.808%2013.788%200M1.924%208.674c5.565-5.565%2014.587-5.565%2020.152%200M12.53%2018.22l-.53.53-.53-.53a.75.75%200%200%201%201.06%200Z'/></svg>") center / contain no-repeat;
+  }
+  & .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head::before { background-color: var(--color-icon-accent); }
+  & .td > .ifacebadge:has(> img)::before {
+    inline-size: var(--aster-icon-sm);
+    block-size: var(--aster-icon-sm);
+  }
+  /* Signal quality is the reference's StatusDot: 8 round, green from 50 %,
+     amber below, grey with no signal. LuCI grades it in the image's name. */
+  & .ifacebox-body > div > .ifacebadge:has(> img[src*="/signal-"])::before,
+  & .td > .ifacebadge:has(> img[src*="/signal-"])::before {
+    inline-size: var(--spacing-2);
+    block-size: var(--spacing-2);
+    border-radius: var(--radius-full);
+    background-color: var(--color-icon-success);
+  }
+  & .ifacebox-body > div > .ifacebadge:has(> img:is([src*="/signal-025-"], [src*="/signal-000-025"]))::before,
+  & .td > .ifacebadge:has(> img:is([src*="/signal-025-"], [src*="/signal-000-025"]))::before { background-color: var(--color-icon-warning); }
+  & .ifacebox-body > div > .ifacebadge:has(> img:is([src*="/signal-000-000"], [src*="/signal-none"]))::before,
+  & .td > .ifacebadge:has(> img:is([src*="/signal-000-000"], [src*="/signal-none"]))::before { background-color: var(--color-icon-secondary); }
+  & .ifacebox > .ifacebox-body > img,
+  & .ifacebox-body > div > .ifacebadge > img,
+  & .td > .ifacebadge > img { display: none; }
+  /* Port tiles, the reference's port band. The Port status card is the reference's section: its title over a grid of
+     port tiles with no card around them. */
+  & > .cbi-section:has(img[src*="/port_"]) {
+    --card-pad: 0;
+    --card-border-width: 0;
+    --card-radius: 0;
+    --card-bg: transparent;
+  }
+  & > .cbi-section:has(img[src*="/port_"]) > :is(.cbi-title, h3) { margin-block-end: var(--spacing-6); }
+  /* 29_ports.js writes the grid inline: repeat(auto-fit, minmax(70px, 1fr))
+     and a 1em bottom margin, and each box margin .25em, min-width 70 and
+     max-width 100, sized for its 32-pixel image. The reference's Grid takes
+     160 a tile and 16 between them. The tiles also stop at five a row, the
+     row the reference's five ports fill, so a single port is a tile and not a
+     banner across the page. Inline values yield only to !important. */
+  & div[style*="grid-template-columns"]:has(> .ifacebox) {
+    grid-template-columns: repeat(auto-fill, minmax(max(var(--aster-port-min), (100% - 4 * var(--spacing-4)) / 5), 1fr)) !important;
+    gap: var(--spacing-4);
+    margin: 0 !important;
+  }
+  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) {
+    position: relative;
+    min-inline-size: 0 !important;
+    max-inline-size: none !important;
+    margin: 0 !important;
+  }
+  /* A port with no carrier is the reference's muted Card: the sunken fill, no
+     edge, muted text. LuCI says so only in the image: port_down, port_pse_down. */
+  & .ifacebox:has(> .ifacebox-body > img[src*="_down."]) {
+    --card-border: transparent;
+    --card-bg: var(--color-background-muted);
+  }
+  /* The name row: the icon, green with a link, then the name. Its bold is
+     inline; the heading weight is 600. The end stays free for the zone dots. */
+  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head:first-child {
+    padding-inline-end: var(--spacing-6);
+    font-weight: var(--text-heading-3-weight) !important;
+  }
+  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head:first-child::before { background-color: var(--color-icon-success); }
+  & .ifacebox:has(> .ifacebox-body > img[src*="_down."]) > .ifacebox-head:first-child::before { background-color: var(--color-icon-secondary); }
+  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-body { text-align: start; }
+  /* The speed ("10 GbE", "no link"): body text on one line, muted without a
+     link. The <br> after the hidden image would leave an empty line. */
+  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-body:nth-child(2) {
+    --ifacebox-body-fg: var(--color-text-primary);
+    --ifacebox-body-size: var(--text-body-size);
+    --ifacebox-body-leading: var(--text-body-leading);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-body:nth-child(2) > br { display: none; }
+  & .ifacebox:has(> .ifacebox-body > img[src*="_down."]) > .ifacebox-body:nth-child(2) { --ifacebox-body-fg: var(--color-text-secondary); }
+  /* The zone row: one 3-pixel bar per firewall zone, full width, in the zone's
+     colour (flex: 1 and height inline). The reference ends the name row with
+     the port's role; the zones go there, as 8 dots in the colours LuCI wrote,
+     which are data and stay. Hovering them still opens the network tooltip. */
+  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head.cbi-tooltip-container {
+    position: absolute;
+    inset-block-start: calc(var(--spacing-4) - var(--border-width));
+    inset-inline-end: calc(var(--spacing-4) - var(--border-width));
+    block-size: calc(var(--text-heading-3-size) * var(--text-heading-3-leading));
+    gap: var(--spacing-1);
+  }
+  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head > .zonebadge {
+    flex: none !important;
+    inline-size: var(--spacing-2);
+    block-size: var(--spacing-2) !important;
+    min-inline-size: 0;
+    padding: 0;
+    border-radius: var(--radius-full);
+    background-image: none;
+  }
+  /* Traffic: "▲ sent", "▼ received", two supporting lines 4 apart. The arrows
+     are characters in LuCI's text and stay; the 80 % size is inline. */
+  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-body > .cbi-tooltip-container {
+    color: var(--color-text-secondary);
+    font-size: var(--text-supporting-size) !important;
+    font-variant-numeric: tabular-nums;
+    line-height: calc(var(--text-supporting-size) * var(--text-supporting-leading) + var(--spacing-1));
+  }
+  /* PoE: inline black, grey and red, picked for a white page; black on a dark
+     card cannot be read. */
+  & .ifacebox [style*="color:#000"] { color: var(--color-text-primary) !important; }
+  & .ifacebox [style*="color:#888"] { color: var(--color-text-secondary) !important; }
+  & .ifacebox [style*="color:#d9534f"] { color: var(--color-text-error) !important; }
+  /* Network and radio boxes. Their bodies are LuCI item lists: "<strong>Label:</strong> value" spans
+     between <br>s. In a Network box (an upstream) they are the reference's
+     MetadataList: the 112 label column, secondary, 500, then the value; the
+     text after the <strong> is the grid's second item. */
+  & .network-status-table > .ifacebox:not(:has(img[src*="/signal-"])) > .ifacebox-body {
+    --ifacebox-body-fg: var(--color-text-primary);
+    --ifacebox-body-size: var(--text-body-size);
+    --ifacebox-body-leading: var(--text-body-leading);
+  }
+  & .network-status-table > .ifacebox > .ifacebox-body > span:first-child > br,
+  & .ifacebox-body > div > .ifacebadge > span > br { display: none; }
+  & .network-status-table > .ifacebox:not(:has(img[src*="/signal-"])) .nowrap {
+    display: grid;
+    grid-template-columns: var(--aster-label-w) minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: var(--spacing-4);
+    padding-block: var(--spacing-1);
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  & .network-status-table > .ifacebox:not(:has(img[src*="/signal-"])) .nowrap > strong {
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-medium);
+  }
+  /* A chip in a box (the upstream's device, a radio's SSID) is the plain
+     Badge as a group under the box's own lines, apart by a divider. */
+  & .ifacebox-body > div > .ifacebadge {
+    align-items: flex-start;
+    gap: var(--spacing-3);
+    margin-block-start: var(--spacing-2);
+    padding-block-start: var(--spacing-3);
+    border-block-start: var(--border-width) solid var(--color-border);
+  }
+  & .ifacebox-body > div > .ifacebadge::before {
+    margin-block-start: calc(var(--text-body-size) * var(--text-body-leading) / 2 + var(--spacing-1) - var(--aster-icon-md) / 2);
+  }
+  & .ifacebox-body > div > .ifacebadge > span { flex: 1; min-inline-size: 0; }
+  /* A radio box is the reference's radio card: the Wifi icon in the accent,
+     the radio's name, and at the end a dot, green while the radio is up (LuCI
+     marks the head .active). Under it the radio's facts and one group per
+     SSID, aligned with the name. */
+  & .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head::after {
+    content: "";
+    flex: none;
+    margin-inline-start: auto;
+    inline-size: var(--spacing-2);
+    block-size: var(--spacing-2);
+    border-radius: var(--radius-full);
+    background-color: var(--color-icon-secondary);
+  }
+  & .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head.active::after { background-color: var(--color-icon-success); }
+  & .ifacebox:has(img[src*="/signal-"]) > .ifacebox-body { padding-inline-start: calc(var(--aster-icon-md) + var(--spacing-2)); }
+  /* The facts are the reference's muted detail line: one run that wraps, the
+     items a gap apart. */
+  & .ifacebox:has(img[src*="/signal-"]) > .ifacebox-body > span:first-child,
+  & .ifacebox:has(img[src*="/signal-"]) .ifacebadge > span {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: var(--spacing-3);
+  }
+  & .ifacebox:has(img[src*="/signal-"]) .nowrap > strong { font-weight: inherit; }
+  /* The SSID leads its group as the reference's SSID does: body text, 600. */
+  & .ifacebox:has(img[src*="/signal-"]) .ifacebadge > span > .nowrap:first-child {
+    flex-basis: 100%;
+    color: var(--color-text-primary);
+    font-size: var(--text-body-size);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--text-body-leading);
+  }
+  & .ifacebox:has(img[src*="/signal-"]) .ifacebadge { gap: var(--spacing-2); }
+  & .td > .ifacebadge small { color: var(--color-text-secondary); }
 }
-
-/* Icon slots: the port and radio heads, the device and SSID chips inside a
-   box (.ifacebox-body > div > .ifacebadge) and the chips in the station
-   table (.td > .ifacebadge). The chips in tooltips keep LuCI's images. */
-[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head:first-child::before,
-[data-page="admin-status-overview"] #view .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head::before,
-[data-page="admin-status-overview"] #view .ifacebox-body > div > .ifacebadge:has(> img)::before,
-[data-page="admin-status-overview"] #view .td > .ifacebadge:has(> img)::before {
-  content: "";
-  flex: none;
-  inline-size: var(--aster-icon-md);
-  block-size: var(--aster-icon-md);
-  background-color: var(--color-icon-secondary);
-}
-[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head:first-child::before,
-[data-page="admin-status-overview"] #view .ifacebox-body > div > .ifacebadge:has(> img:not([src*="/signal-"], [src*="/wifi"]))::before,
-[data-page="admin-status-overview"] #view .td > .ifacebadge:has(> img:not([src*="/signal-"], [src*="/wifi"]))::before {
-  mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M5.25%2014.25h13.5m-13.5%200a3%203%200%200%201-3-3m3%203a3%203%200%201%200%200%206h13.5a3%203%200%201%200%200-6m-16.5-3a3%203%200%200%201%203-3h13.5a3%203%200%200%201%203%203m-19.5%200a4.5%204.5%200%200%201%20.9-2.7L5.737%205.1a3.375%203.375%200%200%201%202.7-1.35h7.126c1.062%200%202.062.5%202.7%201.35l2.587%203.45a4.5%204.5%200%200%201%20.9%202.7m0%200a3%203%200%200%201-3%203m0%203h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3%206h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z'/></svg>") center / contain no-repeat;
-}
-[data-page="admin-status-overview"] #view .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head::before,
-[data-page="admin-status-overview"] #view .ifacebox-body > div > .ifacebadge:has(> img[src*="/wifi"])::before,
-[data-page="admin-status-overview"] #view .td > .ifacebadge:has(> img[src*="/wifi"])::before {
-  mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M8.288%2015.038a5.25%205.25%200%200%201%207.424%200M5.106%2011.856c3.807-3.808%209.98-3.808%2013.788%200M1.924%208.674c5.565-5.565%2014.587-5.565%2020.152%200M12.53%2018.22l-.53.53-.53-.53a.75.75%200%200%201%201.06%200Z'/></svg>") center / contain no-repeat;
-}
-[data-page="admin-status-overview"] #view .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head::before { background-color: var(--color-icon-accent); }
-[data-page="admin-status-overview"] #view .td > .ifacebadge:has(> img)::before {
-  inline-size: var(--aster-icon-sm);
-  block-size: var(--aster-icon-sm);
-}
-/* Signal quality is the reference's StatusDot: 8 round, green from 50 %,
-   amber below, grey with no signal. LuCI grades it in the image's name. */
-[data-page="admin-status-overview"] #view .ifacebox-body > div > .ifacebadge:has(> img[src*="/signal-"])::before,
-[data-page="admin-status-overview"] #view .td > .ifacebadge:has(> img[src*="/signal-"])::before {
-  inline-size: var(--spacing-2);
-  block-size: var(--spacing-2);
-  border-radius: var(--radius-full);
-  background-color: var(--color-icon-success);
-}
-[data-page="admin-status-overview"] #view .ifacebox-body > div > .ifacebadge:has(> img:is([src*="/signal-025-"], [src*="/signal-000-025"]))::before,
-[data-page="admin-status-overview"] #view .td > .ifacebadge:has(> img:is([src*="/signal-025-"], [src*="/signal-000-025"]))::before { background-color: var(--color-icon-warning); }
-[data-page="admin-status-overview"] #view .ifacebox-body > div > .ifacebadge:has(> img:is([src*="/signal-000-000"], [src*="/signal-none"]))::before,
-[data-page="admin-status-overview"] #view .td > .ifacebadge:has(> img:is([src*="/signal-000-000"], [src*="/signal-none"]))::before { background-color: var(--color-icon-secondary); }
-[data-page="admin-status-overview"] #view .ifacebox > .ifacebox-body > img,
-[data-page="admin-status-overview"] #view .ifacebox-body > div > .ifacebadge > img,
-[data-page="admin-status-overview"] #view .td > .ifacebadge > img { display: none; }
-
-/* Port tiles, the reference's port band. The Port status card is the reference's section: its title over a grid of
-   port tiles with no card around them. */
-[data-page="admin-status-overview"] #view > .cbi-section:has(img[src*="/port_"]) {
-  --card-pad: 0;
-  --card-border-width: 0;
-  --card-radius: 0;
-  --card-bg: transparent;
-}
-[data-page="admin-status-overview"] #view > .cbi-section:has(img[src*="/port_"]) > :is(.cbi-title, h3) { margin-block-end: var(--spacing-6); }
-/* 29_ports.js writes the grid inline: repeat(auto-fit, minmax(70px, 1fr))
-   and a 1em bottom margin, and each box margin .25em, min-width 70 and
-   max-width 100, sized for its 32-pixel image. The reference's Grid takes
-   160 a tile and 16 between them. The tiles also stop at five a row, the
-   row the reference's five ports fill, so a single port is a tile and not a
-   banner across the page. Inline values yield only to !important. */
-[data-page="admin-status-overview"] #view div[style*="grid-template-columns"]:has(> .ifacebox) {
-  grid-template-columns: repeat(auto-fill, minmax(max(var(--aster-port-min), (100% - 4 * var(--spacing-4)) / 5), 1fr)) !important;
-  gap: var(--spacing-4);
-  margin: 0 !important;
-}
-[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) {
-  position: relative;
-  min-inline-size: 0 !important;
-  max-inline-size: none !important;
-  margin: 0 !important;
-}
-/* A port with no carrier is the reference's muted Card: the sunken fill, no
-   edge, muted text. LuCI says so only in the image: port_down, port_pse_down. */
-[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="_down."]) {
-  --card-border: transparent;
-  --card-bg: var(--color-background-muted);
-}
-/* The name row: the icon, green with a link, then the name. Its bold is
-   inline; the heading weight is 600. The end stays free for the zone dots. */
-[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head:first-child {
-  padding-inline-end: var(--spacing-6);
-  font-weight: var(--text-heading-3-weight) !important;
-}
-[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head:first-child::before { background-color: var(--color-icon-success); }
-[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="_down."]) > .ifacebox-head:first-child::before { background-color: var(--color-icon-secondary); }
-[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-body { text-align: start; }
-/* The speed ("10 GbE", "no link"): body text on one line, muted without a
-   link. The <br> after the hidden image would leave an empty line. */
-[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-body:nth-child(2) {
-  --ifacebox-body-fg: var(--color-text-primary);
-  --ifacebox-body-size: var(--text-body-size);
-  --ifacebox-body-leading: var(--text-body-leading);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-body:nth-child(2) > br { display: none; }
-[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="_down."]) > .ifacebox-body:nth-child(2) { --ifacebox-body-fg: var(--color-text-secondary); }
-/* The zone row: one 3-pixel bar per firewall zone, full width, in the zone's
-   colour (flex: 1 and height inline). The reference ends the name row with
-   the port's role; the zones go there, as 8 dots in the colours LuCI wrote,
-   which are data and stay. Hovering them still opens the network tooltip. */
-[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head.cbi-tooltip-container {
-  position: absolute;
-  inset-block-start: calc(var(--spacing-4) - var(--border-width));
-  inset-inline-end: calc(var(--spacing-4) - var(--border-width));
-  block-size: calc(var(--text-heading-3-size) * var(--text-heading-3-leading));
-  gap: var(--spacing-1);
-}
-[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head > .zonebadge {
-  flex: none !important;
-  inline-size: var(--spacing-2);
-  block-size: var(--spacing-2) !important;
-  min-inline-size: 0;
-  padding: 0;
-  border-radius: var(--radius-full);
-  background-image: none;
-}
-/* Traffic: "▲ sent", "▼ received", two supporting lines 4 apart. The arrows
-   are characters in LuCI's text and stay; the 80 % size is inline. */
-[data-page="admin-status-overview"] #view .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-body > .cbi-tooltip-container {
-  color: var(--color-text-secondary);
-  font-size: var(--text-supporting-size) !important;
-  font-variant-numeric: tabular-nums;
-  line-height: calc(var(--text-supporting-size) * var(--text-supporting-leading) + var(--spacing-1));
-}
-/* PoE: inline black, grey and red, picked for a white page; black on a dark
-   card cannot be read. */
-[data-page="admin-status-overview"] #view .ifacebox [style*="color:#000"] { color: var(--color-text-primary) !important; }
-[data-page="admin-status-overview"] #view .ifacebox [style*="color:#888"] { color: var(--color-text-secondary) !important; }
-[data-page="admin-status-overview"] #view .ifacebox [style*="color:#d9534f"] { color: var(--color-text-error) !important; }
-
-/* Network and radio boxes. Their bodies are LuCI item lists: "<strong>Label:</strong> value" spans
-   between <br>s. In a Network box (an upstream) they are the reference's
-   MetadataList: the 112 label column, secondary, 500, then the value; the
-   text after the <strong> is the grid's second item. */
-[data-page="admin-status-overview"] #view .network-status-table > .ifacebox:not(:has(img[src*="/signal-"])) > .ifacebox-body {
-  --ifacebox-body-fg: var(--color-text-primary);
-  --ifacebox-body-size: var(--text-body-size);
-  --ifacebox-body-leading: var(--text-body-leading);
-}
-[data-page="admin-status-overview"] #view .network-status-table > .ifacebox > .ifacebox-body > span:first-child > br,
-[data-page="admin-status-overview"] #view .ifacebox-body > div > .ifacebadge > span > br { display: none; }
-[data-page="admin-status-overview"] #view .network-status-table > .ifacebox:not(:has(img[src*="/signal-"])) .nowrap {
-  display: grid;
-  grid-template-columns: var(--aster-label-w) minmax(0, 1fr);
-  align-items: baseline;
-  column-gap: var(--spacing-4);
-  padding-block: var(--spacing-1);
-  overflow-wrap: anywhere;
-  white-space: normal;
-}
-[data-page="admin-status-overview"] #view .network-status-table > .ifacebox:not(:has(img[src*="/signal-"])) .nowrap > strong {
-  color: var(--color-text-secondary);
-  font-weight: var(--font-weight-medium);
-}
-/* A chip in a box (the upstream's device, a radio's SSID) is the plain
-   Badge as a group under the box's own lines, apart by a divider. */
-[data-page="admin-status-overview"] #view .ifacebox-body > div > .ifacebadge {
-  align-items: flex-start;
-  gap: var(--spacing-3);
-  margin-block-start: var(--spacing-2);
-  padding-block-start: var(--spacing-3);
-  border-block-start: var(--border-width) solid var(--color-border);
-}
-[data-page="admin-status-overview"] #view .ifacebox-body > div > .ifacebadge::before {
-  margin-block-start: calc(var(--text-body-size) * var(--text-body-leading) / 2 + var(--spacing-1) - var(--aster-icon-md) / 2);
-}
-[data-page="admin-status-overview"] #view .ifacebox-body > div > .ifacebadge > span { flex: 1; min-inline-size: 0; }
-
-/* A radio box is the reference's radio card: the Wifi icon in the accent,
-   the radio's name, and at the end a dot, green while the radio is up (LuCI
-   marks the head .active). Under it the radio's facts and one group per
-   SSID, aligned with the name. */
-[data-page="admin-status-overview"] #view .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head::after {
-  content: "";
-  flex: none;
-  margin-inline-start: auto;
-  inline-size: var(--spacing-2);
-  block-size: var(--spacing-2);
-  border-radius: var(--radius-full);
-  background-color: var(--color-icon-secondary);
-}
-[data-page="admin-status-overview"] #view .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head.active::after { background-color: var(--color-icon-success); }
-[data-page="admin-status-overview"] #view .ifacebox:has(img[src*="/signal-"]) > .ifacebox-body { padding-inline-start: calc(var(--aster-icon-md) + var(--spacing-2)); }
-/* The facts are the reference's muted detail line: one run that wraps, the
-   items a gap apart. */
-[data-page="admin-status-overview"] #view .ifacebox:has(img[src*="/signal-"]) > .ifacebox-body > span:first-child,
-[data-page="admin-status-overview"] #view .ifacebox:has(img[src*="/signal-"]) .ifacebadge > span {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: var(--spacing-3);
-}
-[data-page="admin-status-overview"] #view .ifacebox:has(img[src*="/signal-"]) .nowrap > strong { font-weight: inherit; }
-/* The SSID leads its group as the reference's SSID does: body text, 600. */
-[data-page="admin-status-overview"] #view .ifacebox:has(img[src*="/signal-"]) .ifacebadge > span > .nowrap:first-child {
-  flex-basis: 100%;
-  color: var(--color-text-primary);
-  font-size: var(--text-body-size);
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--text-body-leading);
-}
-[data-page="admin-status-overview"] #view .ifacebox:has(img[src*="/signal-"]) .ifacebadge { gap: var(--spacing-2); }
-
-[data-page="admin-status-overview"] #view .td > .ifacebadge small { color: var(--color-text-secondary); }
 
 /* ── Indicators [ported] ────────────────────────────────────── */
 
@@ -626,105 +607,105 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
   color: var(--color-text-success) !important; /* inline color:green */
 }
 
-/* OpenClash (body[data-page^="admin-services-openclash"]) styles its own
-   markup inside .oc from ~135 custom properties (oc-common.css, loaded
-   after the theme; html[data-darkmode=true] .oc for dark). Its surfaces,
-   inks, accent and radii take the theme's tokens; one more element of
-   weight than its dark block. */
-html body[data-page^="admin-services-openclash"] .oc {
-  --bg-white: var(--color-background-card);
-  --bg-light: var(--color-background-muted);
-  --bg-gray: var(--color-background-muted);
-  --card-bg-start: var(--color-background-card);
-  --editor-bg: var(--color-background-muted);
-  --text-primary: var(--color-text-primary);
-  --text-title: var(--color-text-primary);
-  --text-secondary: var(--color-text-secondary);
-  --primary-color: var(--color-accent);
-  --info-color: var(--color-accent);
-  --btn-primary-hover: var(--color-accent);
-  --card-btn-bg: var(--color-accent);
-  --text-on-primary: var(--color-on-accent);
-  --primary-a5: color-mix(in srgb, var(--color-accent) 5%, transparent);
-  --primary-a10: color-mix(in srgb, var(--color-accent) 10%, transparent);
-  --primary-a20: color-mix(in srgb, var(--color-accent) 20%, transparent);
-  --primary-a30: color-mix(in srgb, var(--color-accent) 30%, transparent);
-  --success-color: var(--color-text-success);
-  --error-color: var(--color-text-error);
-  --tip-color: var(--color-text-warning);
-  --border-color: var(--color-border-emphasized);
-  --border-light: var(--color-border);
-  --divider: var(--color-border);
-  --hover-bg: var(--color-overlay-hover);
-  --switch-off-bg: var(--color-border-emphasized);
-  --radius-sm: var(--radius-element);
-  --radius-md: var(--radius-element);
-  --radius-lg: var(--radius-container);
-  font-family: var(--font-family-body);
+html body[data-page^="admin-services-openclash"] {
+  /* OpenClash (body[data-page^="admin-services-openclash"]) styles its own
+     markup inside .oc from ~135 custom properties (oc-common.css, loaded
+     after the theme; html[data-darkmode=true] .oc for dark). Its surfaces,
+     inks, accent and radii take the theme's tokens; one more element of
+     weight than its dark block. */
+  & .oc {
+    --bg-white: var(--color-background-card);
+    --bg-light: var(--color-background-muted);
+    --bg-gray: var(--color-background-muted);
+    --card-bg-start: var(--color-background-card);
+    --editor-bg: var(--color-background-muted);
+    --text-primary: var(--color-text-primary);
+    --text-title: var(--color-text-primary);
+    --text-secondary: var(--color-text-secondary);
+    --primary-color: var(--color-accent);
+    --info-color: var(--color-accent);
+    --btn-primary-hover: var(--color-accent);
+    --card-btn-bg: var(--color-accent);
+    --text-on-primary: var(--color-on-accent);
+    --primary-a5: color-mix(in srgb, var(--color-accent) 5%, transparent);
+    --primary-a10: color-mix(in srgb, var(--color-accent) 10%, transparent);
+    --primary-a20: color-mix(in srgb, var(--color-accent) 20%, transparent);
+    --primary-a30: color-mix(in srgb, var(--color-accent) 30%, transparent);
+    --success-color: var(--color-text-success);
+    --error-color: var(--color-text-error);
+    --tip-color: var(--color-text-warning);
+    --border-color: var(--color-border-emphasized);
+    --border-light: var(--color-border);
+    --divider: var(--color-border);
+    --hover-bg: var(--color-overlay-hover);
+    --switch-off-bg: var(--color-border-emphasized);
+    --radius-sm: var(--radius-element);
+    --radius-md: var(--radius-element);
+    --radius-lg: var(--radius-container);
+    font-family: var(--font-family-body);
+  }
+  /* OpenClash's script adds .oc to its action buttons (Commit, Apply, the
+     file lists' Refresh/Create/Delete); they join the Button rule, and the
+     fill its sheet forces (!important, from --primary-color) follows the
+     Button variant. */
+  & .oc.cbi-button { --primary-color: var(--button-bg, var(--color-neutral)); }
+  /* OpenClash's sheet sizes every .cbi-input-select to its content; in a
+     form row the select takes the Field width like any other. */
+  & .cbi-value-field .cbi-input-select {
+    inline-size: var(--field-w) !important; /* oc-common.css width:auto !important */
+  }
+  /* OpenClash draws its fields with --border-light (the card's faint rule)
+     and its buttons with --radius-sm/md/lg: on a field the border is the
+     Field's, on a button the radius is the Button's pill, and an icon chip
+     (.icon-btn, --icon-btn-size) is as high as the Button where it sits. */
+  & .oc :is(input:not([type="checkbox"], [type="radio"], [type="button"], [type="submit"], [type="reset"]), select, textarea) { --border-light: var(--field-border, var(--color-border-emphasized)); }
+  & .oc :is(button, .btn, .cbi-button) {
+    --radius-sm: var(--radius-full);
+    --radius-md: var(--radius-full);
+    --radius-lg: var(--radius-full);
+  }
+  & .oc .icon-btn { --icon-btn-size: var(--button-h, var(--size-element-md)); }
+  /* Running Status: the state and its switch, then the Restart and Overwrite
+     chips, wrap onto a second line when they do not fit (layout); at the
+     chips' 32 they overran oc-client.css's 120 cap on a phone and were cut. */
+  & .oc .core-main-controls { flex-wrap: wrap; }
+  & .oc .core-status-toggle { flex: 1 1 auto; }
+  & .oc .core-control-buttons { max-inline-size: none; }
+  /* Its log highlighter's level, timestamp and category inks (oc-common.css
+     --teal, --magenta, --orange and the rest, on a 15% tint of themselves)
+     become the theme's text inks; an accent-tinted chip (a version, the
+     edited file's name) is inked in the theme's blue text, not the accent. */
+  & .oc {
+    --teal: var(--color-on-info-muted);
+    --azure: var(--color-text-accent);
+    --magenta: var(--color-text-secondary);
+    --orange: var(--color-text-warning);
+    --amber: var(--color-text-warning);
+    --red: var(--color-text-error);
+    --warning-color: var(--color-text-warning);
+    --black: var(--color-text-primary);
+    --teal-a15: color-mix(in srgb, var(--teal) 12%, transparent);
+    --azure-a15: color-mix(in srgb, var(--azure) 12%, transparent);
+    --magenta-a15: color-mix(in srgb, var(--magenta) 12%, transparent);
+    --orange-a15: color-mix(in srgb, var(--orange) 12%, transparent);
+    --amber-a15: color-mix(in srgb, var(--amber) 12%, transparent);
+    --red-a15: color-mix(in srgb, var(--red) 12%, transparent);
+    --magenta-bright-a15: color-mix(in srgb, var(--color-text-warning) 12%, transparent);
+  }
+  & .oc :is(.addr-row .ver-link, .config-editor-title .config-file-name) { --primary-color: var(--color-on-info-muted); }
+  /* OpenClash's good/bad notes outside .oc (a map's description) keep its
+     literal fallbacks; they take the status inks. */
+  & .oc-txt-good { color: var(--color-text-success); }
+  & .oc-txt-bad { color: var(--color-text-error); }
+  /* OpenClash's CodeMirror editors (config, logs) are the Field's code
+     variant: the code font over oc-cm6.css's own stack (!important there). */
+  & .cm-editor :is(.cm-scroller, .cm-content) {
+    font-family: var(--font-family-code) !important; /* oc-cm6.css .oc .cm-content !important */
+  }
+  /* CodeMirror's own light theme greys its line numbers under 4.5:1; they
+     take the supporting ink. */
+  & .cm-editor .cm-gutters { color: var(--color-text-secondary); }
 }
-/* OpenClash's script adds .oc to its action buttons (Commit, Apply, the
-   file lists' Refresh/Create/Delete); they join the Button rule, and the
-   fill its sheet forces (!important, from --primary-color) follows the
-   Button variant. */
-html body[data-page^="admin-services-openclash"] .oc.cbi-button { --primary-color: var(--button-bg, var(--color-neutral)); }
-/* OpenClash's sheet sizes every .cbi-input-select to its content; in a
-   form row the select takes the Field width like any other. */
-html body[data-page^="admin-services-openclash"] .cbi-value-field .cbi-input-select {
-  inline-size: var(--field-w) !important; /* oc-common.css width:auto !important */
-}
-/* OpenClash draws its fields with --border-light (the card's faint rule)
-   and its buttons with --radius-sm/md/lg: on a field the border is the
-   Field's, on a button the radius is the Button's pill, and an icon chip
-   (.icon-btn, --icon-btn-size) is as high as the Button where it sits. */
-html body[data-page^="admin-services-openclash"] .oc :is(input:not([type="checkbox"], [type="radio"], [type="button"], [type="submit"], [type="reset"]), select, textarea) {
-  --border-light: var(--field-border, var(--color-border-emphasized));
-}
-html body[data-page^="admin-services-openclash"] .oc :is(button, .btn, .cbi-button) {
-  --radius-sm: var(--radius-full);
-  --radius-md: var(--radius-full);
-  --radius-lg: var(--radius-full);
-}
-html body[data-page^="admin-services-openclash"] .oc .icon-btn { --icon-btn-size: var(--button-h, var(--size-element-md)); }
-/* Running Status: the state and its switch, then the Restart and Overwrite
-   chips, wrap onto a second line when they do not fit (layout); at the
-   chips' 32 they overran oc-client.css's 120 cap on a phone and were cut. */
-html body[data-page^="admin-services-openclash"] .oc .core-main-controls { flex-wrap: wrap; }
-html body[data-page^="admin-services-openclash"] .oc .core-status-toggle { flex: 1 1 auto; }
-html body[data-page^="admin-services-openclash"] .oc .core-control-buttons { max-inline-size: none; }
-/* Its log highlighter's level, timestamp and category inks (oc-common.css
-   --teal, --magenta, --orange and the rest, on a 15% tint of themselves)
-   become the theme's text inks; an accent-tinted chip (a version, the
-   edited file's name) is inked in the theme's blue text, not the accent. */
-html body[data-page^="admin-services-openclash"] .oc {
-  --teal: var(--color-on-info-muted);
-  --azure: var(--color-text-accent);
-  --magenta: var(--color-text-secondary);
-  --orange: var(--color-text-warning);
-  --amber: var(--color-text-warning);
-  --red: var(--color-text-error);
-  --warning-color: var(--color-text-warning);
-  --black: var(--color-text-primary);
-  --teal-a15: color-mix(in srgb, var(--teal) 12%, transparent);
-  --azure-a15: color-mix(in srgb, var(--azure) 12%, transparent);
-  --magenta-a15: color-mix(in srgb, var(--magenta) 12%, transparent);
-  --orange-a15: color-mix(in srgb, var(--orange) 12%, transparent);
-  --amber-a15: color-mix(in srgb, var(--amber) 12%, transparent);
-  --red-a15: color-mix(in srgb, var(--red) 12%, transparent);
-  --magenta-bright-a15: color-mix(in srgb, var(--color-text-warning) 12%, transparent);
-}
-html body[data-page^="admin-services-openclash"] .oc :is(.addr-row .ver-link, .config-editor-title .config-file-name) { --primary-color: var(--color-on-info-muted); }
-/* OpenClash's good/bad notes outside .oc (a map's description) keep its
-   literal fallbacks; they take the status inks. */
-html body[data-page^="admin-services-openclash"] .oc-txt-good { color: var(--color-text-success); }
-html body[data-page^="admin-services-openclash"] .oc-txt-bad { color: var(--color-text-error); }
-/* OpenClash's CodeMirror editors (config, logs) are the Field's code
-   variant: the code font over oc-cm6.css's own stack (!important there). */
-html body[data-page^="admin-services-openclash"] .cm-editor :is(.cm-scroller, .cm-content) {
-  font-family: var(--font-family-code) !important; /* oc-cm6.css .oc .cm-content !important */
-}
-/* CodeMirror's own light theme greys its line numbers under 4.5:1; they
-   take the supporting ink. */
-html body[data-page^="admin-services-openclash"] .cm-editor .cm-gutters { color: var(--color-text-secondary); }
 
 /* PassWall (body[data-page^="admin-services-passwall"]): a node row's
    actions sit 8 apart and wrap, like every table's actions (node_list.htm
