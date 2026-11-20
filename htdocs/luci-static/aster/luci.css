@@ -326,6 +326,9 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     font-weight: var(--text-label-weight);
     line-height: var(--text-supporting-leading);
   }
+  /* The Error entry (.aster-error, theme-aster.js): label and words in the
+     error ink. */
+  & > .aster-error, & > .aster-error > strong { color: var(--color-text-error); }
 }
 /* The editor's Status: icon, then the list. */
 .ifacebadge.large:not(.cbi-tooltip) { --badge-bg: transparent; display: flex; align-items: flex-start; justify-content: start; gap: var(--spacing-3); padding: 0; white-space: normal; }
