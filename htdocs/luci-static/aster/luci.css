@@ -175,8 +175,10 @@
   & > :is(select, input:not([type="checkbox"])) { flex: 1 1 var(--aster-label-w); }
 }
 /* Software: the disk-space value shares the label's line (the bar's value
-   text sits a line above the track); the pager's arrows 8 off its text. */
-#disk-space-label + .cbi-progressbar { margin-block-start: var(--spacing-1); }
+   text sits a line above the track) where the line holds both: the value
+   is about 400 wide, so from 64rem; under that it keeps its own line. The
+   pager's arrows 8 off its text. */
+@media (min-width: 64rem) { #disk-space-label + .cbi-progressbar { margin-block-start: var(--spacing-1); } }
 #view .pager { gap: var(--spacing-2); }
 
 /* ── Dropdown, dynlist, filebrowser [ported] ────────────────── */
