@@ -217,7 +217,8 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
 
 /* ── Tabs written by luci-base [ported] ─────────────────────── */
 
-/* The theme's tab row above the page title, a form's above its fields. */
+/* The theme's tab row under the page title (menu-aster.js moves it
+   there), a form's above its fields. */
 #tabmenu:not([hidden]) { margin-block-end: var(--spacing-6); }
 .cbi-tabmenu { margin-block-end: var(--spacing-4); }
 

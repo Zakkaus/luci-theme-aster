@@ -934,6 +934,20 @@ html :where([data-tab-active="false"]) { display: none; }
   }
   html :where(.tabs > li, .cbi-tabmenu > li) { flex: none; }
   html :where(.tab[data-active], .cbi-tabmenu > .cbi-tab) { scroll-initial-target: nearest; }
+  /* A list that scrolls fades out 32 at the end that has more (both ends
+     in the middle), so a tab cut at the edge reads as more to scroll. A
+     scroll timeline runs only while the list overflows. */
+  html :where(.tabs, .cbi-tabmenu) {
+    mask: linear-gradient(to right, transparent, black var(--tabs-fade-s) calc(100% - var(--tabs-fade-e)), transparent);
+    animation: aster-tabs-fade linear both;
+    animation-timeline: scroll(self inline);
+  }
+}
+@property --tabs-fade-s { syntax: "<length>"; inherits: false; initial-value: 0; }
+@property --tabs-fade-e { syntax: "<length>"; inherits: false; initial-value: 0; }
+@keyframes aster-tabs-fade {
+  from { --tabs-fade-s: 0; --tabs-fade-e: var(--spacing-8); }
+  to { --tabs-fade-s: var(--spacing-8); --tabs-fade-e: 0; }
 }
 
 /* ── ProgressBar ─────────────────────────────────────────────────

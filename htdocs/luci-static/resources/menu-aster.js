@@ -236,6 +236,35 @@ return baseclass.extend({
 
 		if (activeNode)
 			this.renderTabMenu(activeNode, url + '/' + activeNode.name, depth + 1);
+
+		if (!depth)
+			this.placeTabMenu(container);
+	},
+
+	/* One page header everywhere (Astryx PageHeader): the title, its
+	 * description, then the tabs. The tab row is rendered before the view,
+	 * whose title the view writes later; once it is there the row moves
+	 * under it (and its description), and back if a re-render drops it. */
+	placeTabMenu(tabs) {
+		const view = document.querySelector('#view');
+
+		if (!view)
+			return;
+
+		const place = () => {
+			const title = view.querySelector('h2:not(.cbi-section *, .cbi-tabmenu *)');
+
+			if (!title || title.closest('#modal_overlay'))
+				return;
+
+			const after = title.nextElementSibling?.matches('.cbi-map-descr') ? title.nextElementSibling : title;
+
+			if (after.nextElementSibling !== tabs)
+				after.after(tabs);
+		};
+
+		place();
+		new MutationObserver(place).observe(view, { childList: true, subtree: true });
 	},
 
 	/* The mode row only earns its place when there is more than one mode,
