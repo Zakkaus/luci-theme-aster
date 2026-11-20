@@ -859,9 +859,6 @@ html :where(th, .th) {
   line-height: var(--text-heading-5-leading);
   white-space: nowrap;
 }
-@media (hover: hover) {
-  html :where(.table .tr:has(> .td):not(.placeholder)):hover { background-color: var(--color-overlay-hover); }
-}
 html :where(.tr.placeholder) { display: table-caption; caption-side: bottom; }
 /* A form section (form.js) puts the message row in a tbody of its own,
    where a caption cannot sit: the tbody becomes the caption. */

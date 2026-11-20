@@ -136,6 +136,22 @@ html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([cl
 /* A notification (ui.addNotification) writes display:flex inline: the
    message, then its Dismiss button at the end. */
 .alert-message.fade-in > div:last-child { align-self: flex-end; margin-inline-start: var(--spacing-4); }
+/* The 404 page (luci-base's error404.ut: title, two lines, the path) is
+   Astryx's EmptyState: centred, 32 above and below, its words 360 wide,
+   the title in the large size, the rest secondary; an empty message
+   line holds no space. */
+html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+  padding: var(--spacing-8) var(--spacing-6);
+  & > * { margin-block: 0; max-inline-size: min(100%, var(--aster-empty-max-w)); }
+  & > h2 { font-size: var(--text-large-size); font-weight: var(--text-large-weight); line-height: var(--text-large-leading); color: var(--color-text-primary); }
+  & > :is(p, tt) { font-size: var(--text-body-size); line-height: var(--text-body-leading); color: var(--color-text-secondary); overflow-wrap: anywhere; }
+  & > p:empty { display: none; }
+}
 
 /* ── Modal [ported] ─────────────────────────────────────────── */
 
