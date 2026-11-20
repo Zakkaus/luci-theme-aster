@@ -30,6 +30,19 @@
   --button-fg: var(--color-text-primary);
   --button-divider: var(--color-border);
 }
+/* One primary per group (Astryx ButtonGroup), by meaning, not by LuCI's
+   class: a form row's own action (Sync with browser, Generate archive,
+   Flash image), a toolbar's (Software's OK, Update lists, Upload
+   Package), a view switch (Enable DNS lookups) and the save bar's Save
+   beside Save & Apply are secondary; save, apply and confirm stay
+   primary. */
+:is(.cbi-value-field, .controls .control-group, .cbi-page-actions:has(.cbi-dropdown) > *) :is(.cbi-button-positive, .cbi-button-apply, .cbi-button-save, .cbi-button-action, .cbi-button-primary, .btn.primary, .btn.important):not(.cbi-dropdown),
+.cbi-page-actions:has(.cbi-dropdown) > .cbi-button-save,
+.toggle-lookups {
+  --button-bg: var(--color-neutral);
+  --button-fg: var(--color-text-primary);
+  --button-divider: var(--color-border);
+}
 /* Destructive (.cbi-button-negative, .cbi-button-remove): secondary on a
    page or row; red only where it confirms (a dialog's action takes the
    error fill, a destructive ComboButton's items the error ink). */

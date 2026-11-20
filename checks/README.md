@@ -81,7 +81,10 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
   Banner, Tooltip, Menu); only offenders are listed. `dialog fits`: a
   dialog ends inside the window; `dialog scrim`: the scrim covers the save
   bar. `dynlist add`: the + on its field's line. `table.actions lines`: a
-  row's buttons on one line (the rest in its "more" menu).
+  row's buttons on one line (the rest in its "more" menu). `button.field
+  variant`: a form row's own action is the secondary Button;
+  `button.primary perGroup`: at most one filled Button in a save bar,
+  dialog, table cell or section.
 - `heading level`: every title at one of the Heading sizes the tokens give
   (1-4); `heading abbr`: an `<abbr>` in a title without its dotted rule.
   `icon legacy`: a showing LuCI device image (`resources/icons/*.svg`,

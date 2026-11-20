@@ -154,6 +154,13 @@ printf 'admin/system/system tab=timesync\n' >"$tmp/timesync.txt"
 expect uniform 1 "dynlist add" "dynlist + under its field" -- "$url" "$password" --pages "$tmp/timesync.txt" \
 	--debug-css 'admin/system/system=.cbi-dynlist > .add-item { flex-wrap: wrap !important } .cbi-dynlist > .add-item > input { flex: 0 0 100% !important }'
 
+# Button variants by meaning: Sync with browser filled; Save filled beside Save & Apply.
+printf 'admin/system/system\n' >"$tmp/system-only.txt"
+expect uniform 1 "button.field variant" "a form row's action filled" -- "$url" "$password" --pages "$tmp/system-only.txt" \
+	--debug-css 'admin/system/system=.cbi-value-field .cbi-button-apply:first-child { --button-bg: var(--color-accent) !important }'
+expect uniform 1 "button.primary perGroup" "Save filled beside Save & Apply" -- "$url" "$password" --pages "$tmp/system-only.txt" \
+	--debug-css 'admin/system/system=.cbi-page-actions > .cbi-button-save { --button-bg: var(--color-accent) !important }'
+
 # Row actions: a row's buttons stacked (Interfaces' Restart, Stop, Edit, Delete).
 printf 'admin/status/processes\n' >"$tmp/processes.txt"
 expect uniform 1 "table.actions lines" "a row's actions on two lines" -- "$url" "$password" --pages "$tmp/processes.txt" \

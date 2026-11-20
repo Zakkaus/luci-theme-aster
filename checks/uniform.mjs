@@ -170,6 +170,26 @@ function collect(cfg) {
     add(cls, 'paddingInline', el.matches('.cbi-dropdown') ? [px(pad.paddingLeft), px(pad.paddingRight)] : [px(s.paddingLeft), px(s.paddingRight)], el);
   }
 
+  // One primary per group, by meaning (Astryx ButtonGroup): a form row's
+  // own action is secondary; a save bar, dialog footer, cell or section
+  // holds at most one filled button. Filled = the accent fill.
+  {
+    const probe = document.body.appendChild(document.createElement('i'));
+    probe.style.background = 'var(--color-accent)';
+    const accent = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    const per = new Map();
+    for (const el of all(BTN)) {
+      if (!visible(el) || el.parentElement?.closest(BTN) || el.parentElement?.closest('.cbi-dropdown')) continue;
+      const filled = getComputedStyle(el).backgroundColor === accent;
+      if (el.closest('.cbi-value-field') && !el.matches('.cbi-dropdown')) add('button.field', 'variant', filled ? 'primary' : 'secondary', el);
+      if (!filled) continue;
+      const g = el.closest('.cbi-page-actions, .modal, td, .td, .cbi-section, #view') ?? document.body;
+      per.set(g, (per.get(g) ?? 0) + 1);
+    }
+    for (const [g, n] of per) add('button.primary', 'perGroup', n === 1 ? 'one' : `${n}`, g); // a string, as table.actions
+  }
+
   // Single-line fields: text inputs, selects and luci-base's dropdown widget.
   for (const el of all(FIELD)) {
     if (el.parentElement?.closest('.cbi-dropdown')) continue;
