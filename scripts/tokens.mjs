@@ -366,7 +366,9 @@ function closure(tokensCss, sheets, layoutCss) {
   const problems = [];
   // A component's own parameters (--button-h, --card-pad, ...) are declared
   // in the stylesheet that defines the component; they count as defined.
-  const defined = new Set([...declared(tokensCss), ...Object.values(sheets).flatMap((c) => [...declared(c)])]);
+  // LuCI writes some properties inline (firewall.getZoneColorStyle()'s
+  // --zone-color-rgb); they are defined by the markup.
+  const defined = new Set(['--zone-color-rgb', ...declared(tokensCss), ...Object.values(sheets).flatMap((c) => [...declared(c)])]);
   const all = {'tokens.css': tokensCss, ...sheets};
   const missing = new Map();
   for (const [file, css] of Object.entries(all)) {
