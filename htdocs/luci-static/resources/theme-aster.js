@@ -71,8 +71,7 @@ return baseclass.extend({
 	/* Marks for what LuCI says only in its words, kept as views re-render:
 	 *  - a ▲ or ▼ before a traffic count (the overview's ports) goes into a
 	 *    .aster-glyph span, which components.css draws as the ArrowUp or
-	 *    ArrowDown icon (Icon glyphs); a port with no link that counted
-	 *    0 B both ways gets .aster-idle (luci.css hides the counts);
+	 *    ArrowDown icon (Icon glyphs);
 	 *  - a view that draws no title (Interfaces, nftables) gets an h2 with
 	 *    its menu entry's name, as every other page has one;
 	 *  - an interface's Error entry (interfaces.js render_status: a
@@ -80,7 +79,9 @@ return baseclass.extend({
 	 *    error ink (luci.css, Network pages);
 	 *  - a key in an interface's list ("<strong>Protocol:</strong>": the
 	 *    overview's boxes, Interfaces' status) loses LuCI's colon: both are
-	 *    drawn as a MetadataList, whose labels carry no colons. */
+	 *    drawn as a MetadataList, whose labels carry no colons; the
+	 *    overview's upstreams share one label column, as wide as their
+	 *    longest label (--aster-kv-w; luci.css caps it). */
 	marks() {
 		const roots = ['view', 'modal_overlay'].map((id) => document.getElementById(id)).filter(Boolean);
 		const error = _('Error');
@@ -103,12 +104,6 @@ return baseclass.extend({
 				hits.push(walk.currentNode);
 
 			hits.forEach((n) => n.replaceWith(...n.data.split(/([▲▼])/).filter(Boolean).map((s) => /^[▲▼]$/.test(s) ? glyph(s) : s)));
-
-			root.querySelectorAll('.ifacebox:has(img[src*="_down."]) .cbi-tooltip-container').forEach((c) => {
-				const t = [...c.childNodes].filter((n) => !n.classList?.contains('cbi-tooltip')).map((n) => n.textContent).join('');
-
-				c.classList.toggle('aster-idle', /^(\s*[▲▼]\s*0 B){2}\s*$/.test(t));
-			});
 
 			const v = document.getElementById('view');
 			const cur = [...document.querySelectorAll('#mainmenu [aria-current="page"]')].pop();
@@ -133,6 +128,14 @@ return baseclass.extend({
 
 				if (t !== s.textContent)
 					s.textContent = t;
+			});
+
+			root.querySelectorAll('.network-status-table').forEach((n) => {
+				n.style.removeProperty('--aster-kv-w');
+				const w = Math.max(...[...n.querySelectorAll('.nowrap > strong:first-child')].map((s) => s.getBoundingClientRect().width));
+
+				if (w > 0)
+					n.style.setProperty('--aster-kv-w', `${Math.ceil(w)}px`);
 			});
 		});
 		let queued = false;

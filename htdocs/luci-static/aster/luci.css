@@ -780,9 +780,10 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   & .ifacebox [style*="color:#d9534f"] { color: var(--color-text-error) !important; }
   /* Network and radio boxes: "<strong>Label:</strong> value" spans between
      <br>s. An upstream's are one Astryx MetadataList (single column): the
-     label column one width in every group of the card (--aster-label-w;
-     the IPv4 and IPv6 groups started their values at different x, owner
-     2026-11-21; a longer label wraps), labels secondary, 500, values 16
+     label column as wide as the longest label, at most the form's label
+     column, and one width in every group of the card (theme-aster.js
+     --aster-kv-w: the IPv4 and IPv6 groups started their values at
+     different x, owner 2026-11-21), labels secondary, 500, values 16
      after them (the rows' subgrids keep the gap), rows 8 apart, its device and MAC rows in the same list (the
      chip's wrappers dissolve into it), so every value of the group starts
      on one line. theme-aster.js drops LuCI's colons, as the list has none. */
@@ -791,7 +792,7 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     --ifacebox-body-size: var(--text-body-size);
     --ifacebox-body-leading: var(--text-body-leading);
     display: grid;
-    grid-template-columns: var(--aster-label-w) minmax(0, 1fr);
+    grid-template-columns: fit-content(var(--aster-form-label-w)) minmax(0, 1fr);
     align-items: baseline;
     gap: var(--spacing-2) var(--spacing-4);
     overflow-wrap: break-word;
@@ -810,6 +811,9 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
         font-weight: var(--font-weight-medium);
       }
     }
+  }
+  & .network-status-table[style*="--aster-kv-w"] > .ifacebox:not(:has(img[src*="/signal-"])) > .ifacebox-body {
+    grid-template-columns: min(var(--aster-kv-w), var(--aster-form-label-w)) minmax(0, 1fr);
   }
   & .network-status-table > .ifacebox > .ifacebox-body > span:first-child > br,
   & .ifacebox-body > div > .ifacebadge > span > br { display: none; }
