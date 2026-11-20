@@ -724,8 +724,10 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     & > .ifacebox-body { text-align: start; }
     /* The link state: a StatusDot (8, success with a carrier, neutral
        without) and LuCI's words ("10 GbE", "no link"), supporting text on
-       one line; state is never the colour alone. The <br> after the hidden
-       image would leave an empty line. */
+       one line; state is never the colour alone. The dot and the traffic
+       arrows sit centred in the head icon's slot, so every line's text
+       starts where the name does. The <br> after the hidden image would
+       leave an empty line. */
     & > .ifacebox-body:nth-child(2) {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -736,7 +738,7 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
         display: inline-block;
         inline-size: var(--spacing-2);
         block-size: var(--spacing-2);
-        margin-inline-end: var(--spacing-2);
+        margin-inline: calc((var(--aster-icon-md) - var(--spacing-2)) / 2) calc((var(--aster-icon-md) - var(--spacing-2)) / 2 + var(--spacing-2));
         border-radius: var(--radius-full);
         background-color: var(--color-icon-success);
         vertical-align: middle;
@@ -756,16 +758,16 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
        4 apart; the arrows (.aster-glyph, ArrowUp / ArrowDown) at text size,
        centred on the digits (cap height 0.7 em: the icon's middle 0.35 em
        above the baseline; the glyph's own size is 0). The 80 % size is inline. A port with no link
-       and nothing counted (theme-aster.js: .aster-idle) shows no traffic. */
+       shows its counts too (0 B), in secondary ink: a stat tile always has
+       its value, and the tiles of a row stay one height with no hole. */
     & > .ifacebox-body > .cbi-tooltip-container {
       color: var(--color-text-primary);
       font-size: var(--text-body-size) !important;
       font-variant-numeric: tabular-nums;
       line-height: calc(var(--text-body-size) * var(--text-body-leading) + var(--spacing-1));
-      & > .aster-glyph { margin-inline-end: var(--spacing-1); vertical-align: calc(var(--text-body-size) * -0.15); }
+      & > .aster-glyph { margin-inline: calc((var(--aster-icon-md) - var(--text-body-size)) / 2) calc((var(--aster-icon-md) - var(--text-body-size)) / 2 + var(--spacing-2) - var(--text-body-size) * 0.2); vertical-align: calc(var(--text-body-size) * -0.15); }
       & > .aster-glyph::before { inline-size: var(--text-body-size); block-size: var(--text-body-size); }
     }
-    & > .ifacebox-body:has(> .aster-idle) { display: none; }
   }
   /* PoE: inline black, grey and red, picked for a white page; black on a dark
      card cannot be read. */
