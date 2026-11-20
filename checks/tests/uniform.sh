@@ -114,9 +114,11 @@ expect uniform 1 "space.tabs.item gap" "tabs 8 apart" -- "$url" "$password" --pa
 expect uniform 1 "space.block gap" "a Remove row 24 over its section" -- "$url" "$password" --pages "$tmp/dropbear.txt" \
 	--debug-css 'admin/system/admin/dropbear=.cbi-section-remove { margin-block-end: 24px !important }'
 expect uniform 1 "space.card.pad padding" "card content 8 lower" -- "$url" "$password" --pages "$tmp/overview.txt" \
-	--debug-css 'admin/status/overview=.cbi-title { margin-block-start: 8px !important }'
-expect uniform 1 "space.heading.content gap" "card title keeps its margin inside the title row" -- "$url" "$password" --pages "$tmp/overview.txt" \
-	--debug-css 'admin/status/overview=.cbi-title > h3 { margin-block-end: 16px !important }'
+	--debug-css 'admin/status/overview=#view > .cbi-section > :first-child { margin-block-start: 8px !important }'
+# 25.12 puts the card's h3 in a title row (24 inside it), 24.10 not (24
+# under it, over the content's 16).
+expect uniform 1 "space.heading.content gap" "card title keeps a margin" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=#view > .cbi-section > .cbi-title > h3, #view > .cbi-section > h3 { margin-block-end: 24px !important }'
 expect uniform 1 "space.descr.content gap" "section description 24 over its content" -- "$url" "$password" --pages "$tmp/flash.txt" \
 	--debug-css 'admin/system/flash=.cbi-section .cbi-section-descr { margin-block-end: 24px !important }'
 expect uniform 1 "space.formrow.pad padding" "form rows pad 12" -- "$url" "$password" --pages "$tmp/system.txt" \
