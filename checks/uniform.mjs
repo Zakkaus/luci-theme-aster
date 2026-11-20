@@ -65,7 +65,18 @@ function collect(cfg) {
     const t = ownText(el).slice(0, 24);
     out.push([cls, prop, v, t ? `${where(el)} "${t}"` : where(el)]);
   };
-  const all = (sel) => [...scope.querySelectorAll(sel)].filter((el) => (cfg.modal || !el.closest('#modal_overlay')) && visible(el));
+  // Widgets an app draws that are none of the theme's components: the
+  // theme maps their colours and radii (luci.css, Third-party apps) but
+  // they are not read as a component, nor their overflow.
+  const APP_OWN = [
+    '.oc .oc-usage-help-float', // OpenClash's floating action buttons (Astryx has no FAB)
+    '.oc .icon-pill, .oc .mode-tabs', // OpenClash's segmented controls (statistics view, config editor's original/runtime switch)
+    '.oc [id^="tab-header-"] > .cbi-tabmenu', // OpenClash tblsection's group filter: a segmented control on .cbi-tabmenu markup
+    '.oix-pwd-toggle', // OpenClash's password reveal, an adornment inside the field
+    '#announcement-banner', // OpenClash's announcement marquee: its text scrolls by design
+    '.oc .addr-list-scroll', // OpenClash's address list: a scroller by design
+  ].join(', ');
+  const all = (sel) => [...scope.querySelectorAll(sel)].filter((el) => (cfg.modal || !el.closest('#modal_overlay')) && !el.closest(APP_OWN) && visible(el));
   const px = (v) => Math.round(parseFloat(v) * 100) / 100;
   const col = (s) => {
     const c = rgba(s);
@@ -133,7 +144,9 @@ function collect(cfg) {
   for (const el of all(BTN)) {
     if (el.parentElement?.closest(BTN) || el.parentElement?.closest('.cbi-dropdown')) continue;
     const s = getComputedStyle(el);
-    const text = (el.matches('input') ? el.value : el.textContent).trim();
+    // Words set at size 0 are not drawn (OpenClash hides an icon button's
+    // label that way): such a button shows only its icon.
+    const text = parseFloat(s.fontSize) > 0 ? (el.matches('input') ? el.value : el.textContent).trim() : '';
     const variant = el.matches('.cbi-dropdown') ? 'dropdown'
       : el.matches('.cbi-button-link') ? 'link'
       : el.matches('.cbi-button-negative, .cbi-button-remove') ? 'danger'
@@ -147,7 +160,9 @@ function collect(cfg) {
     add(cls, 'height', px(box(el).height), el);
     if (icon) add(cls, 'width', px(box(el).width), el);
     add(cls, 'radius', radius(el, s), el);
-    add(cls, 'fontSize', px(s.fontSize), el);
+    // An icon button with no words draws an image (an SVG): it has no
+    // label size to read.
+    if (text) add(cls, 'fontSize', px(s.fontSize), el);
     // A split button's label is its chosen item, which holds the inline
     // padding; the button's own box has none, the chevron segment ends it.
     const pad = el.matches('.cbi-dropdown') ? getComputedStyle(el.querySelector(':scope > ul > li[display]') ?? el) : s;
@@ -272,7 +287,7 @@ function collect(cfg) {
     if (wrapped) add('table.kv.row.wrap', 'display', getComputedStyle(row).display, row);
     if (isHeader(row)) add(`${base}.header`, 'height', rowH(), row);
     else if (!progress && !wrapped && cells.every((c) => lines(c) <= 1)) {
-      const kind = row.querySelector('input:not([type="hidden"]), select, textarea, .cbi-dropdown') ? 'control' : row.querySelector(BTN) ? 'button' : 'text';
+      const kind = row.querySelector('input:not([type="hidden"], [type="button"], [type="submit"], [type="reset"], [type="image"]), select, textarea, .cbi-dropdown') ? 'control' : row.querySelector(BTN) ? 'button' : 'text';
       add(`${base}.row.${kind}`, 'height', rowH(), row);
     }
     for (const c of cells) {
@@ -335,7 +350,7 @@ function collect(cfg) {
     const wide = [f, ...f.querySelectorAll('*')].filter((e) => e === f || e.matches('table, .table') || !['visible', 'clip'].includes(getComputedStyle(e).overflowX));
     let worst = f, most = -1;
     for (const e of wide) {
-      if (e.closest(SCROLLS) || !visible(e)) continue;
+      if (e.closest(SCROLLS) || e.closest(APP_OWN) || !visible(e)) continue;
       const x = excess(e);
       if (x > most) { most = x; worst = e; }
     }
@@ -396,7 +411,7 @@ function collect(cfg) {
   const fam = (f) => f.replace(/["']/g, '').split(',').map((x) => x.trim()).join(', ');
   for (const el of scope.querySelectorAll('*')) {
     if (!el.matches('input, select, textarea, button') && !ownText(el)) continue;
-    if (el.matches('option, script, style') || (!cfg.modal && el.closest('#modal_overlay')) || !visible(el)) continue;
+    if (el.matches('option, script, style') || (!cfg.modal && el.closest('#modal_overlay')) || el.closest(APP_OWN) || !visible(el)) continue;
     // A textarea is the Field's code variant (logs, keys, crontab, rc.local);
     // so is a CodeMirror editor (.cm-editor) an app puts in its place.
     add(el.closest('pre, code, kbd, samp, tt, textarea, .cm-editor') ? 'font.code' : 'font.body', 'fontFamily', fam(getComputedStyle(el).fontFamily), el);
