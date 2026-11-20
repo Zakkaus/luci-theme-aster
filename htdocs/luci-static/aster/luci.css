@@ -686,6 +686,9 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   border-radius: 0;
 }
 #view svg line { stroke: var(--color-border) !important; } /* inline stroke:black */
+/* The legend under a graph: each name and value on one line, from the
+   start (luci-mod-status sets .right on the names). */
+[data-page^="admin-status-realtime"] #view .table:not(:has(.th)) .td { white-space: nowrap; text-align: start; }
 #view svg text {
   fill: var(--color-text-secondary) !important; /* inline fill:#eee */
   text-shadow: none !important; /* inline dark shadow */
