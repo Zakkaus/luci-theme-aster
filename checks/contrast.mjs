@@ -161,6 +161,8 @@ function readFocus(count) {
     if (!el) continue;
     el.focus({focusVisible: true, preventScroll: true});
     if (document.activeElement !== el) continue;
+    // The ring as it settles: a Field eases its ring in (a transition).
+    el.getAnimations().forEach((a) => a.finish());
     const s = getComputedStyle(el);
     let ring = null;
     if (s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0) ring = s.outlineColor;
