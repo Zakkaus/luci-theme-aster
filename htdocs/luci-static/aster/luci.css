@@ -40,8 +40,8 @@
 }
 .cbi-dropdown:is(.cbi-button-negative, .cbi-button-remove) { --menu-item-fg: var(--color-text-error); }
 .cbi-button-link { --button-bg: transparent; --button-decoration: underline; }
-/* Small: the overview's Hide/Show. */
-.cbi-section .label[data-style] { --button-h: var(--size-element-sm); }
+/* The overview's Hide/Show: a small ghost chevron IconButton. */
+.cbi-section .label[data-style] { --button-h: var(--size-element-sm); --button-bg: transparent; }
 
 /* A row of buttons: 8 apart, wrapping; LuCI's own margins go. On a table
    cell .right only aligns the cell's text: the cell stays a cell. */
@@ -91,7 +91,7 @@
   gap: var(--spacing-2);
   margin-block-end: var(--spacing-4);
 }
-.cbi-title > :is(h2, h3) { flex: 1; margin-block-end: 0; }
+.cbi-title > :is(h2, h3) { flex: 1; align-items: center; margin-block-end: 0; }
 
 /* ── Cards [ported] ──────────────────────────────────────────── */
 
