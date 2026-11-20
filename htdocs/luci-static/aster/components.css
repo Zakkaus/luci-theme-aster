@@ -524,9 +524,11 @@ html :where(.cbi-dropdown[open]:not([multiple]) > ul.dropdown > li[selected], .p
 html :where(.cbi-dropdown[open] > ul.dropdown > li[unselectable]) { opacity: 0.5; }
 html :where(.palette-menu[open] > [role="menu"] > li, #aster-more-menu > li) { cursor: pointer; outline-offset: calc(var(--focus-outline-width) * -1); }
 /* A row's "more" menu (theme-aster.js actions(): doona ActionGroup's
-   MoreMenu) lies in the top layer, under its IconButton, end-aligned;
+   MoreMenu) lies in the top layer, anchored under its IconButton, end-aligned,
+   flipped above at the viewport edge;
    a destructive row in the error ink, a disabled one half opaque. */
-html :where(#aster-more-menu:popover-open) { position: fixed; inset: auto; min-inline-size: 0; margin: 0; border: 0; }
+html :where(#aster-more-menu:popover-open) { position: fixed; inset: auto; position-anchor: --aster-more; position-area: block-end span-inline-start; position-try-fallbacks: flip-block; min-inline-size: 0; margin: var(--spacing-1) 0; border: 0; transform: none; }
+html :where(.aster-more[aria-expanded="true"]) { anchor-name: --aster-more; }
 html :where(#aster-more-menu > li.negative) { --menu-item-fg: var(--color-text-error); }
 html :where(#aster-more-menu > li[aria-disabled="true"]) { opacity: 0.5; cursor: default; }
 html :where(.palette-menu [role="menu"] small) { color: var(--color-text-secondary); font-size: var(--text-supporting-size); }
