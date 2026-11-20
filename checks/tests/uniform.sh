@@ -118,6 +118,9 @@ expect uniform 1 "space.card.pad padding" "card content 8 lower" -- "$url" "$pas
 # A row of cards (Memory and Storage) is read at its tallest card's end.
 expect uniform 1 "space.card.pad padding" "paired cards 16 more under their content" -- "$url" "$password" --pages "$tmp/overview.txt" \
 	--debug-css 'admin/status/overview=#view > .cbi-section:has(.cbi-progressbar) > :last-child { margin-block-end: 16px !important }'
+# A card alone on its row (System) is not stretched: its own bottom counts.
+expect uniform 1 "space.card.pad padding" "lone card 16 more under its content" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=#view > .cbi-section:first-of-type > :last-child { margin-block-end: 16px !important }'
 # A bare <p> under the title (Routing) is the page's description.
 printf 'admin/status/routes\n' >"$tmp/routes.txt"
 expect uniform 1 "space.title.desc gap" "Routing's description 12 under the title" -- "$url" "$password" --pages "$tmp/routes.txt" \
