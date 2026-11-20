@@ -5,9 +5,20 @@
 | `literals.sh` | Colour and px literals live only in `tokens.css` and unported sections | `tests/literals.sh` |
 | `uniform.mjs` | Every page draws each component with the same size, spacing and type as the M2 overview | `tests/uniform.sh` |
 | `contrast.mjs` | WCAG AA on every page, light and dark; dark separators stay faint | `tests/contrast.sh` |
+| `shell.mjs` | The top bar and the side nav are in the first frame and stand still across page loads (no move, no layout shift, open groups kept, stored scheme and palette before the first paint, view-transition names); the appearance menu works by keyboard in the top bar and on the login page; the collapsed rail shows its labels as tooltips | `tests/shell.sh` |
 | `budget.sh` | The five stylesheets as shipped (comments stripped by `scripts/strip-css-comments.pl`, as the package build does) total <= 150,000 B; the three theme scripts <= 35,000 B | `tests/budget.sh` |
 
 `scripts/measure.mjs` compares the overview itself with the reference page.
+
+## shell
+
+Desktop and light, against a device with the theme installed; the side nav
+pages are opened by clicking their links on a throttled connection.
+
+```sh
+node checks/shell.mjs http://127.0.0.1:18025 <password> --json shell.json
+bash checks/tests/shell.sh http://127.0.0.1:18025 <password>
+```
 
 ## uniform and contrast
 
