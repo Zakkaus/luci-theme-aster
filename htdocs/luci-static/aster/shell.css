@@ -21,8 +21,6 @@
   overflow: hidden;
   background: var(--color-background-body);
   color: var(--color-text-primary);
-  scrollbar-color: var(--color-border-emphasized) transparent;
-  scrollbar-width: thin;
 }
 @supports (block-size: 100dvh) { .shell { block-size: 100dvh; } }
 
@@ -249,7 +247,7 @@
   flex-direction: column;
   min-inline-size: 0;
   min-block-size: 0;
-  overflow-y: auto;
+  overflow-y: scroll; /* always shown: the column keeps one width, short page or long */
 }
 /* LayoutContent: 24 on every side, no maximum width. */
 .shell-content { flex: 1; padding: var(--spacing-6); }

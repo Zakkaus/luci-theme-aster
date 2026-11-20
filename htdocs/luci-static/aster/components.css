@@ -89,6 +89,10 @@ html :where(:focus-visible) {
   outline-offset: var(--focus-outline-offset);
 }
 
+/* Scrollbars: thin, a quiet thumb (the emphasized border) on no track,
+   on every scroller, apps' included. */
+html, html :where(*) { scrollbar-width: thin; scrollbar-color: var(--color-border-emphasized) transparent; }
+
 html ::selection { background: var(--color-accent-muted); }
 
 html input[type="range"], html progress { accent-color: var(--color-accent); }
