@@ -162,6 +162,21 @@ printf 'admin/system/startup\n' >"$tmp/startup.txt"
 expect uniform 1 "table.actions lines" "phone: Startup's five wrapped, no more menu" -- "$url" "$password" --pages "$tmp/startup.txt" --viewports phone \
 	--debug-css 'admin/system/startup=#view .cbi-section-actions > div { flex-wrap: wrap !important } #view .cbi-section-actions > div > * { display: inline-flex !important } #view .aster-more { display: none !important }'
 
+# Headings: a size outside Astryx's levels; an <abbr>'s dotted rule.
+printf 'admin/status/nftables\n' >"$tmp/nftables.txt"
+printf 'admin/system/leds\n' >"$tmp/leds.txt"
+expect uniform 1 "heading level" "a chain title at 17" -- "$url" "$password" --pages "$tmp/nftables.txt" \
+	--debug-css 'admin/status/nftables=.nft-chain h4 { font-size: 17px !important }'
+expect uniform 1 "heading abbr" "a dotted <abbr> in the LED title" -- "$url" "$password" --pages "$tmp/leds.txt" \
+	--debug-css 'admin/system/leds=h2 abbr { text-decoration: underline dotted !important }'
+
+# Icons: LuCI's device image showing; a zone's inline colour.
+expect uniform 1 "icon legacy" "the editor's Status image" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
+	--debug-css 'admin/network/network=#modal_overlay .ifacebadge.large > img { display: inline !important }'
+printf 'admin/network/firewall/zones\n' >"$tmp/zones.txt"
+expect uniform 1 "zone fill" "zone chips in LuCI's inline colours" -- "$url" "$password" --pages "$tmp/zones.txt" \
+	--debug-css 'admin/network/firewall/zones=html .zonebadge[style] { background-color: rgb(var(--zone-color-rgb)) !important }'
+
 # Frames: a form row framed inside its card.
 expect uniform 1 "frame nested" "a form row framed inside its card" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=.cbi-value { box-shadow: 0 0 0 1px var(--color-border) !important }'

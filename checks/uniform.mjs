@@ -686,6 +686,18 @@ function collect(cfg) {
   }
   probe?.remove();
 
+  // Headings: every title is one of Astryx's Heading sizes the theme
+  // uses (1, 2, 3, 4), and an <abbr> in it carries no dotted rule.
+  const probe2 = document.body.appendChild(document.createElement('div'));
+  const levels = [1, 2, 3, 4].map((n) => { probe2.style.fontSize = `var(--text-heading-${n}-size)`; return px(getComputedStyle(probe2).fontSize); });
+  probe2.remove();
+  for (const h of scope.querySelectorAll('h1, h2, h3, h4, h5, h6, legend')) {
+    if (!visible(h) || h.closest(APP_OWN) || (!cfg.modal && h.closest('#modal_overlay')) || !ownText(h)) continue;
+    const f = px(getComputedStyle(h).fontSize);
+    add('heading', 'level', levels.includes(f) ? 'astryx' : `${f}px`, h);
+    for (const ab of h.querySelectorAll('abbr')) add('heading', 'abbr', getComputedStyle(ab).textDecorationLine, ab);
+  }
+
   // Tabs: one pane of a group shows, the active one (Astryx TabPanel).
   const groups = new Map();
   for (const p of scope.querySelectorAll('[data-tab-title]')) {
@@ -769,6 +781,17 @@ function collect(cfg) {
     const inText = /(^|\s)[▲▼]\s/.test(t) && !el.closest('.cbi-tooltip');
     if ((!/^(▾|⇒|∗|\+|×|···|▲|▼)$/.test(t) && !inText) || (!cfg.modal && el.closest('#modal_overlay')) || el.closest(APP_OWN) || !visible(el)) continue;
     if (inText || parseFloat(getComputedStyle(el).fontSize) > 0) add('glyph', 'raw', inText ? t.match(/[▲▼]/)[0] : t, el);
+  }
+  // LuCI's device images (resources/icons/*.svg) are drawn as Heroicons,
+  // the image hidden (tooltips keep theirs); a showing one is listed. A
+  // zone's inline colour is mapped to palette tokens, never shown as is.
+  for (const im of scope.querySelectorAll('img[src*="/icons/"]')) {
+    if (visible(im) && !im.closest('.cbi-tooltip, ' + APP_OWN) && (cfg.modal || !im.closest('#modal_overlay'))) add('icon', 'legacy', im.getAttribute('src').replace(/.*\//, ''), im);
+  }
+  for (const z of scope.querySelectorAll('.zonebadge[style*="--zone-color-rgb"]')) {
+    if (!visible(z) || z.closest('.cbi-tooltip') || (!cfg.modal && z.closest('#modal_overlay'))) continue;
+    const inline = `rgb(${z.style.getPropertyValue('--zone-color-rgb').trim().split(/\s*,\s*/).join(', ')})`;
+    add('zone', 'fill', getComputedStyle(z).backgroundColor === inline ? `inline ${inline}` : 'token', z);
   }
 
   // The save bar is the layout's footer: on a wide screen it sits under

@@ -142,6 +142,9 @@ html :where(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div:not(.cbi-t
   font-weight: var(--text-heading-4-weight);
   line-height: var(--text-heading-4-leading);
 }
+/* An <abbr> in a title (LED Configuration) reads as the title: no dotted
+   rule; its expansion stays in the title attribute. */
+html :where(:is(h1, h2, h3, h4, h5, h6, legend) abbr) { text-decoration: none; }
 /* Heading 1: the page title, which LuCI writes as an <h2>. */
 html :where(h1, .shell-content h2:not(.cbi-section *)) {
   font-size: var(--text-heading-1-size);
@@ -392,6 +395,22 @@ html :where(:is(.cbi-dropdown:not(.btn, .cbi-button)) > ul > li[placeholder]) { 
 html :where(.cbi-dropdown[multiple] > ul) { gap: var(--spacing-1); padding-inline-start: var(--spacing-2); }
 html :where(.cbi-dropdown[multiple] > ul > li[display]) { flex: none; padding: 0; }
 html :where(.cbi-dropdown > ul > li img) { block-size: var(--aster-icon-sm); inline-size: var(--aster-icon-sm); }
+/* LuCI's device images (resources/icons/*.svg, a bitmap look, grey
+   squares in dark) in a list row, a device chip (Devices) and the
+   editor's Status: the Heroicons ServerStack, Wifi for a radio (luci.css
+   --icon-*), 16 in the secondary icon colour; 20 beside the Status. */
+html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip)):has(> img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"]))::before {
+  content: "";
+  display: block;
+  flex: none;
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
+  background-color: var(--color-icon-secondary);
+  mask: var(--icon-server) center / contain no-repeat;
+}
+html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip)):has(> img[src*="/wifi"])::before { mask-image: var(--icon-wifi); }
+html :where(.ifacebadge.large:not(.cbi-tooltip))::before { inline-size: var(--aster-icon-md); block-size: var(--aster-icon-md); }
+html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip)) > img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"]) { display: none; }
 /* The chevron segment: a Select's ends 12 inside the border, in the
    secondary icon colour (a ComboButton's is the button's own, above). */
 html :where(.cbi-dropdown > :is(.open, .more)) {

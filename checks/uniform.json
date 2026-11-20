@@ -45,6 +45,7 @@
     "heading.card": {"_source": "Astryx settings and dashboard templates: a section title is Heading 3 (layout/SPEC.md; was spec Heading h2, 22)", "fontSize": 18, "fontWeight": "600"},
     "heading.inner": {"_source": "Heading 4 under a Heading 3 card title (dashboard template card titles; layout/SPEC.md)", "fontSize": 16, "fontWeight": "600"},
     "heading.sub": {"fontSize": null, "fontWeight": null},
+    "heading": {"_source": "Astryx Heading levels (qa2 #11): a title is Heading 1, 2, 3 or 4 as the tokens size them; an <abbr> in it has no dotted rule", "level": "astryx", "abbr": "none"},
     "heading.modal": {"fontSize": null, "fontWeight": null},
 
     "tab": {"_source": "Astryx 0.7.16 Tabs md, measured in M3 (STATE.md, M3 port): 36 high, the selected tab marked by a 2 px accent pill", "height": 36, "indicator": {"light": "bar 2px rgb(34, 91, 255)", "dark": "bar 2px rgb(61, 135, 255)"}},
@@ -61,6 +62,8 @@
     "dialog": {"_source": "Astryx Dialog: maxHeight 75dvh, the body scrolls between the title and the footer; the scrim covers the page, the save bar too", "fits": "yes", "scrim": "over the save bar"},
     "banner.icon": {"_source": "Astryx 0.7.16 Banner: gap icon -> text 8; a status dialog (ui.js displayStatus) keeps it", "gap": 8},
 
+    "icon": {"_source": "qa2 #10: LuCI's device images (resources/icons/*.svg, bitmap look) are drawn as Heroicons; a showing one is listed", "legacy": "none"},
+    "zone": {"_source": "qa2 #10: a firewall zone's inline colour as palette tokens (success, error, neutral, or mixed into the card), light and dark", "fill": "token"},
     "glyph": {"_source": "Astryx draws icons (Heroicons), not characters: LuCI's ▾ ⇒ ∗ + × ··· are hidden and drawn as the icon; a showing one is listed", "raw": "none"},
     "footer": {"_source": "Astryx LayoutFooter: the save bar is a region under the main column on a wide screen, so it covers no content (px of the main column under the bar)", "overlap": 0},
     "space.page.inset": {"_source": "lab spacing audit 2026-11-20, contract approved by the owner; Astryx Stack/Card/Dialog: the container owns the gap: page inset 24 (LayoutContent) on top and both sides; bottom to the save bar where the page outgrows the column; the last block to an in-flow save bar (phone)", "padding": 24},

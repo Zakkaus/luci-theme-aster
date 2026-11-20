@@ -82,6 +82,11 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
   dialog ends inside the window; `dialog scrim`: the scrim covers the save
   bar. `dynlist add`: the + on its field's line. `table.actions lines`: a
   row's buttons on one line (the rest in its "more" menu).
+- `heading level`: every title at one of the Heading sizes the tokens give
+  (1-4); `heading abbr`: an `<abbr>` in a title without its dotted rule.
+  `icon legacy`: a showing LuCI device image (`resources/icons/*.svg`,
+  outside tooltips); `zone fill`: a zone chip in LuCI's inline colour
+  instead of the palette's.
 - It reads a Banner's or status dialog's icon (`banner.icon gap`: from the
   icon to the first words, never negative). The `status-*` modals in
   `pages.txt` open ui.js's status dialogs (applying, reverted, a failed
