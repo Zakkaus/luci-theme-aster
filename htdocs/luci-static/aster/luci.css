@@ -30,11 +30,9 @@
   --button-fg: var(--color-text-primary);
   --button-divider: var(--color-border);
 }
-/* Destructive (.cbi-button-negative, .cbi-button-remove): on a page or in
-   a table row an ordinary secondary button, as Terminate and Kill are in
-   Processes. Red only where it confirms: the dialog's action takes Astryx's
-   destructive fill, and a destructive ComboButton's menu items the error
-   ink. */
+/* Destructive (.cbi-button-negative, .cbi-button-remove): secondary on a
+   page or row; red only where it confirms (a dialog's action takes the
+   error fill, a destructive ComboButton's items the error ink). */
 #modal_overlay :is(.cbi-button-negative, .cbi-button-remove) {
   --button-bg: var(--color-error);
   --button-fg: var(--color-on-error);
@@ -121,11 +119,9 @@
 
 /* ── Form [ported] ──────────────────────────────────────────── */
 
-/* The save bar is the layout's footer (Astryx LayoutFooter with its
-   divider): on the page's own background, 12 above and below its buttons.
-   On a wide screen it is fixed under the main column, which ends above
-   it, so the bar stays in reach and never covers the content; on a phone
-   it closes the page. */
+/* The save bar is Astryx's LayoutFooter (divider, page background, 12
+   around the buttons): fixed under the main column on a wide screen, the
+   column ending above it so it covers nothing; on a phone it ends the page. */
 .cbi-page-actions {
   justify-content: flex-end;
   margin-block-start: var(--spacing-4);
@@ -228,12 +224,10 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
    ServerStack for a wired device or a port, Wifi for a radio. */
 html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z'/></svg>"); --icon-wifi: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z'/></svg>"); }
 .shell-content .ifacebox { min-inline-size: 8rem; }
-/* Network > Interfaces: each interface's box is a small Card in Astryx's
-   look, not LuCI's tile. The head is the name on the muted strip led by
-   the zone as an 8 StatusDot (the colour LuCI writes inline is the
-   administrator's data; its fill would be a white or green slab); the body
-   draws the device as the 16 icon instead of LuCI's picture. 8 above and
-   below, so the box does not touch the row's rules. */
+/* Network > Interfaces: each box a small Card. The head: the name on the
+   muted strip (an inset shadow over the zone fill LuCI writes inline) led
+   by the zone colour as an 8 StatusDot; the body: the 16 device icon for
+   LuCI's picture; 8 clear of the row rules. */
 [data-page="admin-network-network"] #view .ifacebox {
   margin-block: var(--spacing-2);
   & > .ifacebox-head[style*="--zone-color-rgb"] {
@@ -241,7 +235,7 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     align-items: center;
     justify-content: center;
     gap: var(--spacing-2);
-    background: var(--color-background-muted) !important; /* inline zone fill */
+    box-shadow: inset 0 0 0 100vmax var(--color-background-muted);
     color: var(--color-text-primary);
     filter: none;
     &::before {
@@ -250,7 +244,7 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
       inline-size: var(--spacing-2);
       block-size: var(--spacing-2);
       border-radius: var(--radius-full);
-      background: rgb(var(--zone-color-rgb));
+      background: inherit;
       box-shadow: inset 0 0 0 var(--border-width) var(--color-border-emphasized);
     }
   }
@@ -299,12 +293,9 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
 /* ── Status overview [ported] ───────────────────────────────── */
 
 [data-page="admin-status-overview"] #view {
-  /* The reference lays the overview out as bands of cards: the title, then
-     the cards in a grid of at most two tracks (each at least 320, 16 apart),
-     and anything holding a wide table, a row of interface boxes or a long list
-     across the full width. Every include is its own .cbi-section, a direct
-     child of #view. Two cards in one row stretch to the row, as the
-     reference's Grid does: System and Memory end on the same line. */
+  /* Bands of cards, as the reference: a grid of at most two tracks (320
+     at least, 16 apart), a wide table, interface boxes or a long list
+     across it; two cards in a row stretch to it. */
   &:has(> .cbi-section) {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(max(min(100%, var(--aster-card-min)), calc((100% - var(--spacing-4)) / 2)), 1fr));
@@ -352,17 +343,10 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   margin-block-start: calc(var(--text-body-size) * var(--text-body-leading) * -1);
 }
 [data-page="admin-status-overview"] #view {
-  /* Interface boxes. luci-mod-status draws three kinds with one class: the
-     port boxes (29_ports.js), the upstream boxes of the Network card
-     (30_network.js) and one box per radio (60_wifi.js). Each becomes one of
-     the reference's Cards: a 16 inset, a 1 border, radius 16, a Heading 3 row
-     and supporting text under it. Which kind a box is shows only in the image
-     LuCI puts in it (icons/port_*, icons/signal-*), so the selectors key on
-     that. The images are hidden and the reference's icons take their place as
-     masks coloured by tokens: Heroicons 2.2.0 outline (MIT,
-     LICENSES/heroicons-MIT.txt), path data verbatim, ServerStack for a port or
-     a wired device, Wifi for a radio or a wireless device. The box itself is
-     the Card variant of the interface box (components.css). */
+  /* Interface boxes: ports (29_ports.js), upstreams (30_network.js) and
+     radios (60_wifi.js), each the Card variant of the box (components.css).
+     Only LuCI's image tells the kinds apart (icons/port_*, signal-*); it is
+     hidden and the reference's icon (--icon-server, --icon-wifi) drawn. */
   /* The Network and Wireless cards put their boxes in a .network-status-table:
      the reference's Grid of radio cards, at most two a row, each at least 320. */
   & .network-status-table {
@@ -423,12 +407,9 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     --card-bg: transparent;
   }
   & > .cbi-section:has(img[src*="/port_"]) > :is(.cbi-title, h3) { margin-block-end: var(--spacing-6); }
-  /* 29_ports.js writes the grid inline: repeat(auto-fit, minmax(70px, 1fr))
-     and a 1em bottom margin, and each box margin .25em, min-width 70 and
-     max-width 100, sized for its 32-pixel image. The reference's Grid takes
-     160 a tile and 16 between them. The tiles also stop at five a row, the
-     row the reference's five ports fill, so a single port is a tile and not a
-     banner across the page. Inline values yield only to !important. */
+  /* 29_ports.js writes a 70 px grid and box sizes inline (!important to
+     override); the reference's Grid: 160 a tile, 16 apart, five a row at
+     most, so one port is a tile and not a banner. */
   & div[style*="grid-template-columns"]:has(> .ifacebox) {
     grid-template-columns: repeat(auto-fill, minmax(max(var(--aster-port-min), (100% - 4 * var(--spacing-4)) / 5), 1fr)) !important;
     gap: var(--spacing-4);
@@ -467,10 +448,8 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   }
   & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-body:nth-child(2) > br { display: none; }
   & .ifacebox:has(> .ifacebox-body > img[src*="_down."]) > .ifacebox-body:nth-child(2) { --ifacebox-body-fg: var(--color-text-secondary); }
-  /* The zone row: one 3-pixel bar per firewall zone, full width, in the zone's
-     colour (flex: 1 and height inline). The reference ends the name row with
-     the port's role; the zones go there, as 8 dots in the colours LuCI wrote,
-     which are data and stay. Hovering them still opens the network tooltip. */
+  /* The zone bars (inline flex: 1 and height) become 8 dots in LuCI's
+     colours at the name row's end, where the reference puts the role. */
   & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head.cbi-tooltip-container {
     position: absolute;
     inset-block-start: calc(var(--spacing-4) - var(--border-width));
@@ -500,10 +479,9 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   & .ifacebox [style*="color:#000"] { color: var(--color-text-primary) !important; }
   & .ifacebox [style*="color:#888"] { color: var(--color-text-secondary) !important; }
   & .ifacebox [style*="color:#d9534f"] { color: var(--color-text-error) !important; }
-  /* Network and radio boxes. Their bodies are LuCI item lists: "<strong>Label:</strong> value" spans
-     between <br>s. In a Network box (an upstream) they are the reference's
-     MetadataList: the 112 label column, secondary, 500, then the value; the
-     text after the <strong> is the grid's second item. */
+  /* Network and radio boxes: "<strong>Label:</strong> value" spans between
+     <br>s; an upstream's are the reference's MetadataList (112 label
+     column, secondary, 500). */
   & .network-status-table > .ifacebox:not(:has(img[src*="/signal-"])) > .ifacebox-body {
     --ifacebox-body-fg: var(--color-text-primary);
     --ifacebox-body-size: var(--text-body-size);
@@ -676,11 +654,9 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
 }
 
 html body[data-page^="admin-services-openclash"] {
-  /* OpenClash (body[data-page^="admin-services-openclash"]) styles its own
-     markup inside .oc from ~135 custom properties (oc-common.css, loaded
-     after the theme; html[data-darkmode=true] .oc for dark). Its surfaces,
-     inks, accent and radii take the theme's tokens; one more element of
-     weight than its dark block. */
+  /* OpenClash styles .oc from ~135 custom properties (oc-common.css, after
+     the theme; dark under html[data-darkmode=true]): surfaces, inks, accent
+     and radii take the theme's tokens, one element heavier. */
   & .oc {
     --bg-white: var(--color-background-card);
     --bg-light: var(--color-background-muted);
@@ -722,10 +698,8 @@ html body[data-page^="admin-services-openclash"] {
   & .cbi-value-field .cbi-input-select {
     inline-size: var(--field-w) !important; /* oc-common.css width:auto !important */
   }
-  /* OpenClash draws its fields with --border-light (the card's faint rule)
-     and its buttons with --radius-sm/md/lg: on a field the border is the
-     Field's, on a button the radius is the Button's pill, and an icon chip
-     (.icon-btn, --icon-btn-size) is as high as the Button where it sits. */
+  /* OpenClash's --border-light on a field is the Field's border, its
+     --radius-* on a button the pill, and an .icon-btn the Button's height. */
   & .oc :is(input:not([type="checkbox"], [type="radio"], [type="button"], [type="submit"], [type="reset"]), select, textarea) { --border-light: var(--field-border, var(--color-border-emphasized)); }
   & .oc :is(button, .btn, .cbi-button) {
     --radius-sm: var(--radius-full);

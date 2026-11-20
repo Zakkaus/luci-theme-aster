@@ -6,50 +6,44 @@
    LuCI's markup onto these, by setting those properties or by layout; it
    does not restate a component's box or colours.
 
-   Component     Astryx         LuCI selectors
-   ------------  -------------  ----------------------------------------------
-   Text roles    Heading/Text   page title (.shell-content h2), card title
-                                (.cbi-section legend/h2/h3), .cbi-map-descr,
-                                .cbi-section-descr, .cbi-value-description
-   Button        Button         button, input[type=button|submit|reset], .btn,
-                                .cbi-button (and OpenClash's .oc.cbi-button,
-                                which its sheet restyles at 0,3,0 after the
-                                theme), the overview's Hide/Show label,
-                                #indicators items (variant/size: --button-*);
-                                ComboButton: .cbi-dropdown.btn; IconButton:
-                                .pager arrows, .drag-handle, a dynlist's add,
-                                .cbi-button-neutral[aria-label] in a field,
-                                a Lua table's ∧/∨ move buttons
-   Field         TextField      input (text-like), textarea (--field-*)
-   Select        Select         select, .cbi-dropdown (not a ComboButton)
-   Menu          Menu           .cbi-dropdown[open] > ul.dropdown, the
-                                palette menu (.palette-menu, rows with a
-                                .palette-swatch); item ink --menu-item-fg
-   Checkbox      Checkbox/Radio input[type=checkbox|radio], .cbi-checkbox
-   Dynlist       TextField list .cbi-dynlist (.item, .add-item)
-   Form row      Field layout   .cbi-value, .cbi-value-title, .cbi-value-field,
-                                .cbi-value-error, .control-group,
-                                .aster-same-label (theme-aster.js)
-   Card          Card           .cbi-section, .cbi-section-node, .ifacebox
-                                (+ .ifacebox-head/-body),
-                                a table straight in the view, #content_syslog,
-                                a tab pane straight in a view, .nft-chain
-                                (24.10 writes these without .cbi-section)
-                                (--card-*); Card variant of .ifacebox: the
-                                overview's boxes (--ifacebox-body-*)
-   MetadataList  MetadataList   .cbi-section .table without a header row
-   Table         Table          table, .table, .tr, .th, .td
-   Tabs          Tabs           .tabs > li > .tab, .cbi-tabmenu > li > a
-   ProgressBar   ProgressBar    .cbi-progressbar, .spinning (indeterminate)
-   Badge         Badge          .label, .badge, .zonebadge, .ifacebadge, tab
-                                error count (--badge-*); plain variant: the
-                                overview's chips in a box or a table cell
-   Banner        Banner/Toast   .alert-message (.success .info .notice
-                                .warning .error .danger), notifications
-                                (--banner-*)
-   Dialog        Dialog         #modal_overlay and the node inside it
-   Tooltip       Tooltip        .cbi-tooltip, a cell's [data-tooltip] mark
-   Change list   (diff rows)    .uci-change-list ins/del (changes dialog)
+   Component (Astryx): LuCI selectors
+   Text roles (Heading/Text): page title (.shell-content h2), card title
+     (.cbi-section legend/h2/h3), .cbi-map-descr, .cbi-section-descr,
+     .cbi-value-description
+   Button: button, input[type=button|submit|reset], .btn, .cbi-button (and
+     OpenClash's .oc.cbi-button, which its sheet restyles at 0,3,0 after
+     the theme), the overview's Hide/Show label, #indicators items
+     (variant/size: --button-*); ComboButton: .cbi-dropdown.btn;
+     IconButton: .pager arrows, .drag-handle, a dynlist's add,
+     .cbi-button-neutral[aria-label] in a field, a Lua table's ∧/∨ move
+     buttons
+   Field (TextField): input (text-like), textarea (--field-*)
+   Select: select, .cbi-dropdown (not a ComboButton)
+   Icon (Heroicons): LuCI's glyphs (a dropdown's ▾, a dynlist's +, the
+     password reveal, the zone list's ⇒), drawn from --icon
+   Menu: .cbi-dropdown[open] > ul.dropdown, the palette menu
+     (.palette-menu, rows with a .palette-swatch); item ink --menu-item-fg
+   Checkbox (Checkbox/Radio): input[type=checkbox|radio], .cbi-checkbox
+   Dynlist (TextField list): .cbi-dynlist (.item, .add-item)
+   Form row (Field layout): .cbi-value, .cbi-value-title, .cbi-value-field,
+     .cbi-value-error, .control-group, .aster-same-label (theme-aster.js)
+   Card: .cbi-section, .cbi-section-node, .ifacebox (+
+     .ifacebox-head/-body), a table straight in the view, #content_syslog,
+     a tab pane straight in a view, .nft-chain (24.10 writes these without
+     .cbi-section) (--card-*); Card variant of .ifacebox: the overview's
+     boxes (--ifacebox-body-*)
+   MetadataList: .cbi-section .table without a header row
+   Table: table, .table, .tr, .th, .td
+   Tabs: .tabs > li > .tab, .cbi-tabmenu > li > a
+   ProgressBar: .cbi-progressbar, .spinning (indeterminate)
+   Badge: .label, .badge, .zonebadge, .ifacebadge, tab error count
+     (--badge-*); plain variant: the overview's chips in a box or a table
+     cell
+   Banner (Banner/Toast): .alert-message (.success .info .notice .warning
+     .error .danger), notifications (--banner-*)
+   Dialog: #modal_overlay and the node inside it
+   Tooltip: .cbi-tooltip, a cell's [data-tooltip] mark
+   Change list ((diff rows)): .uci-change-list ins/del (changes dialog)
 
    Selectors sit in :where( behind one type selector, `html :where(...)`:
    one element of weight, so a mapping in luci.css (a later sheet) wins at
@@ -192,11 +186,9 @@ html :where(button, input[type="button"], input[type="submit"], input[type="rese
   }
   &:is(:disabled, [disabled], [aria-disabled="true"]) { opacity: 0.5; cursor: default; }
 }
-/* IconButton: a button that draws one glyph instead of words (a pager's
-   arrows, the drag handle, a dynlist's add, a field's reveal and CIDR
-   switch, which carry an aria-label; a Lua table's move buttons labelled
-   ∧ and ∨, as OpenClash's are) is square, as wide as it is high, with no
-   inline padding, and never stretched (Astryx Button isIconOnly). */
+/* IconButton (Astryx isIconOnly): a button drawing one glyph (pager
+   arrows, drag handle, dynlist add, a field's reveal or CIDR switch, a Lua
+   table's ∧/∨) is square, unpadded and never stretched. */
 html :where(.pager > :is(.btn, button), .drag-handle, .add-item > .cbi-button-add, .cbi-value-field .cbi-button-neutral[aria-label], .cbi-button-up[value="∧"], .cbi-button-down[value="∨"]) {
   --button-px: 0;
   inline-size: var(--button-h, var(--size-element-md));
@@ -205,10 +197,9 @@ html :where(.pager > :is(.btn, button), .drag-handle, .add-item > .cbi-button-ad
 /* Busy (.spinning): unavailable, not moving. */
 html :where(:is(.btn, .cbi-button, button).spinning) { opacity: 0.65; cursor: progress; }
 /* ComboButton (.cbi-dropdown.btn: Save & Apply, Diagnostics' tools): an
-   Astryx ButtonGroup of the Button (the chosen item) and a square
-   IconButton (the chevron). The group's outer corners take the element
-   radius; a 1 rule divides the halves, the border colour on the neutral
-   fill and --button-divider on a solid one (on-accent). */
+   Astryx ButtonGroup of the Button and a square chevron IconButton, outer
+   corners at the element radius, halves divided by a 1 rule
+   (--button-divider on a solid fill). */
 html :where(.cbi-dropdown:is(.btn, .cbi-button)) { --button-px: 0; --button-radius: var(--radius-element); position: relative; align-items: stretch; }
 html :where(:is(.cbi-dropdown:is(.btn, .cbi-button)) > ul:not(.dropdown) > li[display]) { padding-inline: var(--spacing-3); }
 html :where(:is(.cbi-dropdown:is(.btn, .cbi-button)) > .open) {
@@ -451,11 +442,9 @@ html :where(.cbi-dropdown[open] > ul.dropdown > li > input.create-item-input) { 
 }
 
 /* ── Checkbox and Radio ──────────────────────────────────────────
-   md: a 24 box (inner radius) or circle, 1 border on the surface in the
-   secondary icon colour (Astryx's emphasized border is 1.5:1, under the
-   3:1 a control's boundary needs; the field border keeps it, see Field); checked fills with the accent and draws a 14 tick or a 10 dot
-   in the on-accent colour. Hover lays the overlay over the box; disabled
-   is half opaque. */
+   md: a 24 box (inner radius) or circle, 1 border in the secondary icon
+   colour (3:1; Astryx's emphasized border is 1.5:1); checked: the accent
+   fill and a 14 tick or 10 dot in on-accent. Hover: the overlay. */
 
 html :where(input[type="checkbox"], input[type="radio"]) {
   appearance: none;
@@ -688,12 +677,9 @@ html :where(.ifacebox-body) {
   text-align: center;
 }
 
-/* Card variant: the box as a full Card (16 in, the container radius, 8
-   between its rows), the head a Heading 3 row with a leading icon slot, the
-   body supporting text in secondary, both start-aligned. Overflow stays
-   visible: the port and statistics tooltips hang inside. The overview's
-   port, upstream and radio boxes; --ifacebox-body-* switch a body to body
-   text. */
+/* Card variant (the overview's boxes): a full Card, rows 8 apart, the
+   head a Heading 3 row with an icon slot, the body secondary supporting
+   text (--ifacebox-body-*); overflow visible for the tooltips inside. */
 html :where([data-page="admin-status-overview"] .shell-content .ifacebox) {
   --card-pad: calc(var(--spacing-4) - var(--border-width));
   --card-radius: var(--radius-container);
@@ -784,12 +770,10 @@ html :where(.dragging) { opacity: 0.5; }
 html :where(.drag-over-above) { box-shadow: inset 0 calc(var(--border-width) * 2) 0 var(--color-accent); }
 html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -2) 0 var(--color-accent); }
 /* Collapsible: below 768 a table with a header row folds each row into a
-   stack, as the reference's lease table does. The first cell in primary
-   text; the others under it in supporting text, each with its column name
-   (LuCI's data-title); the action cell at the end. A form section's table
-   (form.js) keeps its rows in thead and tbody, a status table (ui.Table)
-   straight in the table, a Lua CBI table (a <form>'s .cbi-map) in the
-   parser's <tbody>; all are reached. */
+   stack (the reference's lease table): the first cell primary, the rest
+   supporting text under it with their column names (data-title), the
+   actions last. Rows in thead/tbody (form.js), straight in the table
+   (ui.Table) or in a Lua table's <tbody> are all reached. */
 @media (max-width: 48rem) {
   html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th)) {
     display: block;
@@ -1035,11 +1019,8 @@ html :where(.ifacebadge) { --badge-bg: var(--color-background-muted); border-rad
 html :where(.ifacebadge img) { inline-size: var(--aster-icon-sm); block-size: var(--aster-icon-sm); }
 html :where(.ifacebadge) :is(var, strong, a) { font-style: normal; }
 html :where(.ifacebadge var) { color: var(--color-text-secondary); }
-/* Plain variant: a chip in a card's list or a table cell is an icon and its
-   text, as the reference's signal cell is a StatusDot and the value: no
-   fill, no pill, the surrounding text's size and face (luci-base sets the
-   chip's labels in monospace). The overview's device, SSID and station
-   chips. */
+/* Plain variant (the overview's device, SSID and station chips): an icon
+   and its text in the surrounding size and face, no fill, no pill. */
 html :where([data-page="admin-status-overview"] #view :is(.ifacebox-body > div, .td) > .ifacebadge) {
   --badge-bg: transparent;
   gap: var(--spacing-2);
