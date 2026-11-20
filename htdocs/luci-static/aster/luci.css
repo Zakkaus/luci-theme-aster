@@ -111,6 +111,9 @@ html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([cl
   gap: var(--aster-space-row);
 }
 .cbi-title > * { margin: 0; }
+/* Hide/Show is an sm icon button: its glyph box, not its 32 hit area,
+   ends on the content edge, where the card's text ends. */
+.cbi-title .label[data-style] { margin-inline-end: calc((var(--aster-icon-sm) - var(--size-element-sm)) / 2); }
 .cbi-title > :is(h2, h3) { flex: 1; align-items: center; }
 
 /* "Loading view…" (luci-base's placeholder for the whole view, the view's
@@ -235,6 +238,19 @@ html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([cl
   & > * { font-size: var(--text-label-size); }
   & > #invertSeverity { margin-inline-end: calc(var(--aster-space-row) * -1) !important; } /* the row's margin: 0 !important */
 }
+/* System Log's two filter rows share their columns (a subgrid of the
+   card): the second row's field and Max rows start where the selects
+   above them do. */
+@media (min-width: 48.0625rem) {
+  #content_syslog:has(#logTextFilter) {
+    display: grid;
+    grid-template-columns: repeat(2, auto auto auto minmax(0, 1fr));
+    column-gap: var(--spacing-2);
+    & > * { grid-column: 1 / -1; }
+    & > div:has(> [id^="invert"]) { display: grid; grid-template-columns: subgrid; }
+    & #logTextFilter + label { grid-column: span 3; }
+  }
+}
 /* A phone: each control on a line of its own, 4 under its label, the next
    label 16 under it. */
 @media (max-width: 48rem) {
@@ -300,6 +316,12 @@ html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([cl
   flex-wrap: wrap;
   gap: var(--aster-space-row);
   & > * { margin: 0; }
+}
+/* A row's actions keep one line: form.js sizes the cell to the widest
+   row's buttons, and a fraction of a pixel short wrapped Delete under the
+   rest (Traffic Rules). The Table fold wraps them (components.css). */
+@container aster-page (min-width: 48.0625rem) {
+  #view .td.cbi-section-actions > div { flex-wrap: nowrap; white-space: nowrap; }
 }
 /* The diagnostics page lays three tools out as three cells of one row. */
 .table:has(.diag-action) { table-layout: fixed; }
@@ -535,7 +557,7 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
      most, 24 apart like the template's column groups. */
   & .network-status-table {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(max(min(100%, var(--aster-card-min)), calc((100% - var(--aster-space-page)) / 2)), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(max(min(100%, var(--aster-card-min)), calc((100% - var(--aster-space-page)) / 2)), 1fr));
     gap: var(--aster-space-page);
   }
   & .network-status-table > .ifacebox {
