@@ -426,7 +426,7 @@ html :where(.cbi-dropdown[open]:not([multiple]) > ul.dropdown > li[selected], .p
   mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='m4.5 12.75 6 6 9-13.5'/></svg>") center / contain no-repeat;
 }
 html :where(.cbi-dropdown[open] > ul.dropdown > li[unselectable]) { opacity: 0.5; }
-html :where(.palette-menu[open] > [role="menu"] > li) { cursor: pointer; }
+html :where(.palette-menu[open] > [role="menu"] > li) { cursor: pointer; outline-offset: calc(var(--focus-outline-width) * -1); }
 html :where(.palette-menu [role="menu"] small) { color: var(--color-text-secondary); font-size: var(--text-supporting-size); }
 html :where(.palette-swatch) {
   flex: none;
