@@ -241,13 +241,19 @@ html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([cl
 /* ── Tables [ported] ────────────────────────────────────────── */
 
 /* Buttons a cell holds in a wrapper (Processes' Hang Up, Terminate,
-   Kill): one row 8 apart, with no whitespace between them. */
+   Kill; a section's Edit, Delete): one line 8 apart, never wrapped
+   (doona ActionGroup; theme-aster.js moves all but the first into a
+   "more" menu where a table's lines do not fit). */
 .td > div:has(> :is(.btn, .cbi-button)):not(:has(> :not(.btn, .cbi-button, button))) {
   display: inline-flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--aster-space-row);
   & > * { margin: 0; }
 }
+/* A row's actions that do not fit (theme-aster.js data-collapsed): the
+   first, then the "more" button; the rest are its menu's rows. */
+:is(.td, td) > div[data-collapsed] > :not(.drag-handle, .aster-more) ~ :not(.aster-more),
+:is(.td, td) > div:not([data-collapsed]) > .aster-more { display: none; }
 /* The diagnostics page lays three tools out as three cells of one row. */
 .table:has(.diag-action) { table-layout: fixed; }
 .td > input + .diag-action { display: block; margin: var(--spacing-2) 0 0; }
@@ -729,19 +735,19 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     inline-size: auto !important; /* inline width */
   }
   /* Network > Interfaces has no header row, so the Table fold skips it: the
-     box, its status and the actions stack, the actions wrap (layout). */
+     box, its status and the actions stack (layout). */
   #view .tr:has(> .td > .ifacebox) {
     display: flex;
     flex-direction: column;
     & > .td { display: block; inline-size: auto; white-space: normal; }
     & > .td:not(:last-child) { border: 0; }
-    & > .td.cbi-section-actions > * { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
+    & > .td.cbi-section-actions > * { display: flex; gap: var(--spacing-2); }
   }
   /* The table is a block here; a row group left as a table shrinks to its
      content and the rules stop short of the card edge (layout). */
   #view .tbody:has(> .tr > .td > .ifacebox) { display: block; }
-  /* Actions that wrap (here and in the Table fold) are spaced by the gap
-     alone, not also by the button-after-button margin. */
+  /* Actions on a footer line (here and in the Table fold) are spaced by
+     the gap alone, not also by the button-after-button margin. */
   #view .tr:has(> .td > .ifacebox) > .td.cbi-section-actions > * > *,
   #view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions > div > * { margin-inline-start: 0; }
   /* Under the stack the actions start where the stacked text does. */

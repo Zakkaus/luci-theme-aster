@@ -256,6 +256,14 @@ function collect(cfg) {
     // the component's selector, not how the row happens to be drawn, so a
     // fold that breaks is read as one. Row heights vary with the number of
     // columns and are not read.
+    // A row's actions share one line (doona ActionGroup), never stacked:
+    // those that do not fit are in the "more" menu (theme-aster.js).
+    for (const c of cells) {
+      const acts = [...c.querySelectorAll(':scope > :is(.btn, .cbi-button, button), :scope > div > :is(.btn, .cbi-button, button)')].filter((b) => visible(b) && !b.closest('.cbi-dropdown'));
+      if (acts.length < 2) continue;
+      const n = new Set(acts.map((b) => Math.round(box(b).top))).size; // a string: a count read as px would pass 2 within the 1px tolerance
+      add('table.actions', 'lines', n === 1 ? 'one' : `${n} lines`, c);
+    }
     if (!progress && cfg.device === 'phone' && table.matches(FOLD)) {
       add('table.fold.row', 'display', getComputedStyle(row).display, row);
       cells.forEach((c, i) => {
@@ -293,13 +301,6 @@ function collect(cfg) {
     // and it may be stacked only as the layout says (never on the desktop).
     const wrapped = base === 'table.kv' && getComputedStyle(row).display !== 'table-row';
     if (wrapped) add('table.kv.row.wrap', 'display', getComputedStyle(row).display, row);
-    // A row's actions share one line (doona ActionGroup), never stacked.
-    // Wide screens only: a phone's fold line wraps a row of five (Startup)
-    // until the actions get ActionGroup's overflow menu.
-    if (cfg.device === 'desktop') for (const c of cells) {
-      const acts = [...c.querySelectorAll(':scope > :is(.btn, .cbi-button, button), :scope > div > :is(.btn, .cbi-button, button)')].filter((b) => visible(b) && !b.closest('.cbi-dropdown'));
-      if (acts.length > 1) add('table.actions', 'lines', new Set(acts.map((b) => Math.round(box(b).top))).size, c);
-    }
     if (isHeader(row)) add(`${base}.header`, 'height', rowH(), row);
     else if (!progress && !wrapped && cells.every((c) => lines(c) <= 1)) {
       const kind = row.querySelector('input:not([type="hidden"], [type="button"], [type="submit"], [type="reset"], [type="image"]), select, textarea, .cbi-dropdown') ? 'control' : row.querySelector(BTN) ? 'button' : 'text';
@@ -691,7 +692,7 @@ function collect(cfg) {
     if ((!cfg.modal && p.closest('#modal_overlay')) || p.closest(APP_OWN) || !visible(p.parentElement)) continue;
     groups.set(p.parentElement, (groups.get(p.parentElement) ?? 0) + (visible(p) ? 1 : 0));
   }
-  for (const [g, n] of groups) add('tabs.pane', 'shown', n, g);
+  for (const [g, n] of groups) add('tabs.pane', 'shown', n === 1 ? 'one' : `${n} panes`, g); // a string, as table.actions
 
   // Frames: no frame inside a frame (Astryx Card: "Don't nest cards inside
   // other cards"; layout/structure: no Cards inside Cards). A frame draws

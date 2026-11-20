@@ -81,7 +81,7 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
   Banner, Tooltip, Menu); only offenders are listed. `dialog fits`: a
   dialog ends inside the window; `dialog scrim`: the scrim covers the save
   bar. `dynlist add`: the + on its field's line. `table.actions lines`: a
-  row's buttons on one line (desktop).
+  row's buttons on one line (the rest in its "more" menu).
 - It reads a Banner's or status dialog's icon (`banner.icon gap`: from the
   icon to the first words, never negative). The `status-*` modals in
   `pages.txt` open ui.js's status dialogs (applying, reverted, a failed

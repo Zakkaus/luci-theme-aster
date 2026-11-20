@@ -158,6 +158,9 @@ expect uniform 1 "dynlist add" "dynlist + under its field" -- "$url" "$password"
 printf 'admin/status/processes\n' >"$tmp/processes.txt"
 expect uniform 1 "table.actions lines" "a row's actions on two lines" -- "$url" "$password" --pages "$tmp/processes.txt" \
 	--debug-css 'admin/status/processes=.td > div:has(> :is(.btn, .cbi-button)) { flex-wrap: wrap !important; max-inline-size: 100px }'
+printf 'admin/system/startup\n' >"$tmp/startup.txt"
+expect uniform 1 "table.actions lines" "phone: Startup's five wrapped, no more menu" -- "$url" "$password" --pages "$tmp/startup.txt" --viewports phone \
+	--debug-css 'admin/system/startup=#view .cbi-section-actions > div { flex-wrap: wrap !important } #view .cbi-section-actions > div > * { display: inline-flex !important } #view .aster-more { display: none !important }'
 
 # Frames: a form row framed inside its card.
 expect uniform 1 "frame nested" "a form row framed inside its card" -- "$url" "$password" --pages "$tmp/system.txt" \

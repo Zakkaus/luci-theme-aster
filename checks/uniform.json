@@ -54,9 +54,9 @@
 
     "nav.item": {"_source": "Astryx 0.7.16 SideNavSection items: flex column, gap --spacing-0-5; the theme keeps it inside a group too, so a hovered row never touches the selected one", "gap": 2},
     "tooltip": {"_source": "Astryx 0.7.16 Tooltip, measured: text padding 4px 8px, radius 16 (container), 15px body, no arrow, 4 from the anchor; its words fit the box (scrollWidth - clientWidth); every word inside in its ink (AA against the fill); a key/value line at most two lines; as wide as its words up to max-width 300, so no word that fits a line breaks", "overflow": 0, "padding": [4, 8, 4, 8], "radius": 16, "fontSize": 15, "arrow": "none", "gap": 4, "ink": "AA", "lines": "<= 2", "words": "whole"},
-    "table.actions": {"_source": "doona ActionGroup (owner 2026-11-21): a row's action buttons share one line, never stacked (desktop; the phone fold's footer line wraps until the overflow menu exists)", "lines": 1},
+    "table.actions": {"_source": "doona ActionGroup (owner 2026-11-21): a row's action buttons share one line, never stacked; where they do not fit, the first and a more menu (desktop and the phone fold's footer line)", "lines": "one"},
     "dynlist": {"_source": "Dynlist (the SSH-keys page's add row, owner 2026-11-21): the + on its field's line, never under it", "add": "beside"},
-    "tabs.pane": {"_source": "Astryx Tabs: one TabPanel shows, the selected tab's (panes of one group under one parent)", "shown": 1},
+    "tabs.pane": {"_source": "Astryx Tabs: one TabPanel shows, the selected tab's (panes of one group under one parent)", "shown": "one"},
     "frame": {"_source": "Astryx Card: don't nest cards inside other cards; layout/structure: no Cards inside Cards. Only a frame inside a frame is listed (outside the components Astryx puts in a card)", "nested": "none"},
     "dialog": {"_source": "Astryx Dialog: maxHeight 75dvh, the body scrolls between the title and the footer; the scrim covers the page, the save bar too", "fits": "yes", "scrim": "over the save bar"},
     "banner.icon": {"_source": "Astryx 0.7.16 Banner: gap icon -> text 8; a status dialog (ui.js displayStatus) keeps it", "gap": 8},
