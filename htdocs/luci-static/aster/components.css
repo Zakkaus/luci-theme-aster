@@ -997,26 +997,34 @@ html :where(.alert-message, .td > [data-tooltip]) { --icon-info: url("data:image
 html :where(.alert-message) {
   --banner-bg: var(--color-info-muted);
   --banner-fg: var(--color-on-info-muted);
+  --banner-pad-block: var(--spacing-3);
+  --banner-pad-inline: var(--spacing-4);
   --banner-mask: var(--icon-info);
   position: relative;
   box-sizing: border-box;
   margin-block-end: var(--spacing-4);
-  padding: var(--spacing-3) var(--spacing-4) var(--spacing-3) calc(var(--spacing-4) + var(--aster-icon-md) + var(--spacing-2));
+  padding: var(--banner-pad-block) var(--banner-pad-inline) var(--banner-pad-block) calc(var(--banner-pad-inline) + var(--aster-icon-md) + var(--spacing-2));
   border-radius: var(--radius-container);
   background: var(--banner-bg);
   color: var(--banner-fg);
   overflow-wrap: anywhere;
   transition: opacity var(--duration-fast) var(--ease-standard);
 }
+/* The icon is drawn in the padding the text leaves it. A .spinning status
+   keeps its icon: the shorthand and the resets drop the busy track's
+   gradient, motion and round ends (ProgressBar), which would otherwise show
+   through the mask. */
 html :where(.alert-message)::before {
   content: "";
   position: absolute;
-  inset-block-start: var(--spacing-3);
-  inset-inline-start: var(--spacing-4);
+  inset-block-start: var(--banner-pad-block);
+  inset-inline-start: var(--banner-pad-inline);
   inline-size: var(--aster-icon-md);
   block-size: var(--aster-icon-md);
-  background-color: currentColor;
+  border-radius: 0;
+  background: currentColor;
   mask: var(--banner-mask) center / contain no-repeat;
+  animation: none;
 }
 html :where(.alert-message.success) {
   --banner-bg: var(--color-success-muted);
@@ -1069,18 +1077,20 @@ html :where(#modal_overlay) {
   transition: opacity var(--duration-fast-max) var(--ease-standard), visibility var(--duration-fast-max);
 }
 html :where(body.modal-overlay-active #modal_overlay) { visibility: visible; opacity: 1; }
+/* A status dialog (.alert-message) keeps the Banner's padding, which leaves
+   its icon room before the text. */
 html :where(#modal_overlay > *) {
   box-sizing: border-box;
   inline-size: 100%;
   max-inline-size: var(--dialog-w, var(--aster-dialog-w));
   margin: 0;
-  padding: var(--spacing-4);
   border: 0;
   border-radius: var(--radius-container);
   background: var(--color-background-surface);
   color: var(--color-text-primary);
   box-shadow: var(--shadow-high);
 }
+html :where(#modal_overlay > :not(.alert-message)) { padding: var(--spacing-4); }
 html :where(#modal_overlay > * > h4:first-child) {
   margin-block-end: var(--spacing-4);
   font-size: var(--text-heading-2-size);
@@ -1102,9 +1112,18 @@ html :where(#modal_overlay > * > .alert-message) { --banner-bg: transparent; pad
 /* A dialog that is itself a status (ui.js displayStatus: the apply
    countdown) is the sm dialog, its progress full width under the text. */
 html :where(#modal_overlay > .alert-message) {
+  --banner-pad-block: var(--spacing-4);
   --banner-bg: var(--color-background-surface);
   --banner-fg: var(--color-text-primary);
   max-inline-size: var(--aster-dialog-sm-w);
+}
+/* Under a title (Heading 2) the icon centres on the title's first line. */
+html :where(#modal_overlay > .alert-message:has(> h4:first-child:not(:empty)))::before {
+  inset-block-start: calc(var(--banner-pad-block) + (var(--text-heading-2-size) * var(--text-heading-2-leading) - var(--aster-icon-md)) / 2);
+}
+/* Its footer rule still spans the dialog: it starts back at the edge. */
+html :where(#modal_overlay > .alert-message > :is(.right, .button-row):last-child) {
+  margin-inline-start: calc((var(--banner-pad-inline) + var(--aster-icon-md) + var(--spacing-2)) * -1);
 }
 html :where(#modal_overlay > .alert-message.spinning) { display: block; }
 html :where(#modal_overlay > .alert-message.spinning)::after {

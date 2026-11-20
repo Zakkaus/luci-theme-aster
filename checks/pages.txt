@@ -39,6 +39,10 @@ admin/system/crontab                 require=font.body,heading.page,button
 admin/system/leds                    require=font.body,heading.page,card,button,table@rows
 admin/system/flash                   require=font.body,heading.page,card,button,form.label,tab
 admin/system/reboot                  require=font.body,heading.page,button
+# ui.js's status dialogs (applying, reverted, a failed revert) over a page.
+admin/system/reboot modal=status-spinning  require=banner.icon
+admin/system/reboot modal=status-notice    require=banner.icon
+admin/system/reboot modal=status-warning   require=banner.icon
 
 # Network
 admin/network/network                require=font.body,card,button,table

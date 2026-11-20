@@ -72,6 +72,12 @@ else
 	echo "skip tooltip text runs out of its box: no tooltip on the overview"
 fi
 
+# Status dialog: its icon drawn on the first words (the revert notice).
+printf 'admin/system/reboot modal=status-notice require=banner.icon\n' >"$tmp/status.txt"
+expect uniform 0 "" "status dialog icon before its words" -- "$url" "$password" --pages "$tmp/status.txt"
+expect uniform 1 "banner.icon gap" "status dialog icon on its words" -- "$url" "$password" --pages "$tmp/status.txt" \
+	--debug-css 'admin/system/reboot=#modal_overlay > .alert-message { padding-inline-start: 16px !important }'
+
 # Lua CBI map (APPS=1: a box with OpenClash, as apps-install.sh leaves it).
 # A header table in a Lua map folds on a phone like a JS view's, and the
 # gate reads it as a fold; a row drawn as a flex column instead of the

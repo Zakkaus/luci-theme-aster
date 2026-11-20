@@ -53,6 +53,10 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
   and shows each `.cbi-tooltip` in markup: `tooltip overflow` is text wider
   than the box, `tooltip arrow` a ▲/▼ glyph before the text, `tooltip gap`
   the space to the trigger.
+- It reads a Banner's or status dialog's icon (`banner.icon gap`: from the
+  icon to the first words, never negative). The `status-*` modals in
+  `pages.txt` open ui.js's status dialogs (applying, reverted, a failed
+  revert) with `ui.changes.displayStatus`; nothing is sent.
 - `uniform.json` holds one canonical value per component class and
   property. Values with a source in `lab/new-theme/astryx-ref/spec.json`
   are written out; `null` means "the majority of the run", and the report
@@ -85,8 +89,8 @@ missing or does not render, a page with no samples, or a required class
 with no sample. Neither writes to the device: light and dark are chosen
 through the theme's browser setting, and the only clicks are an interface's
 Edit button (the dialog is measured, never saved) and the Close button of
-the attended-sysupgrade dialog on 25.12; tooltips are opened in the page,
-without a request.
+the attended-sysupgrade dialog on 25.12; the status dialogs and tooltips
+are opened in the page, without a request.
 
 The report is a text table and a JSON file, page by page, so the page that
 breaks a rule and the element that does it are both named.

@@ -8,7 +8,8 @@
  * through the theme's browser settings (localStorage "aster-theme" and
  * "aster-palette"), as a reader chooses them; the only clicks
  * are the Edit button that opens an interface dialog and the Close button of
- * a dialog luci-app-attendedsysupgrade opens on its own. Nothing is saved.
+ * a dialog luci-app-attendedsysupgrade opens on its own; ui.js's status
+ * dialogs are opened in the page, without a request. Nothing is saved.
  *
  * Playwright is not a dependency of this repository. PLAYWRIGHT points at its
  * index.mjs (default: the bare specifier "playwright"); CHROME_PATH, when set,
@@ -122,7 +123,21 @@ export const MODALS = {
     await page.waitForSelector('#modal_overlay .modal :is(.cbi-section, .cbi-map, .cbi-value)', {state: 'visible', timeout});
     return `edit dialog of interface ${row}`;
   },
+  // ui.js's status dialogs (ui.changes.displayStatus), as applying, a revert
+  // and a failed revert draw them; opened directly, so nothing is sent.
+  'status-spinning': (page, timeout) => status(page, timeout, 'notice spinning', 'Applying configuration changes… 9s'),
+  'status-notice': (page, timeout) => status(page, timeout, 'notice', 'Changes have been reverted.'),
+  'status-warning': (page, timeout) => status(page, timeout, 'warning', 'Revert request failed with status <code>500</code>'),
 };
+async function status(page, timeout, type, html) {
+  await page.waitForFunction(() => window.L && window.E, null, {timeout});
+  await page.evaluate(async ([t, h]) => {
+    const ui = await L.require('ui');
+    (L.ui ?? ui).changes.displayStatus(t, E('p', h));
+  }, [type, html]);
+  await page.waitForSelector('#modal_overlay > .alert-message', {state: 'visible', timeout});
+  return `${type} status dialog`;
+}
 
 export async function launch() {
   const {chromium} = await import(process.env.PLAYWRIGHT ?? 'playwright');

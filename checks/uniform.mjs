@@ -16,8 +16,9 @@
  * On each page and each viewport and mode it reads computed styles per
  * component class (buttons by variant and size, fields, checkboxes, table
  * rows and cells, the phone fold, cards, headings, tabs, form rows, font
- * family, tooltips, the side nav's row gap) and layout (a field filling
- * its row, a row its card, content no wider than its card) and compares every sample with the canonical value:
+ * family, tooltips, banner icons, the side nav's row gap) and layout (a
+ * field filling its row, a row its card, content no wider than its card)
+ * and compares every sample with the canonical value:
  * px values within --tolerance, strings (colours, borders, font family,
  * font weight, display) exactly. A canonical null means "the majority of
  * this run at that viewport and mode", and the report prints the
@@ -447,6 +448,24 @@ function collect(cfg) {
     tip.setAttribute('style', '');
     if (visible(tip)) tipRead(tip, tip.parentElement);
     tip.removeAttribute('style');
+  }
+
+  // Banner and status dialog: the icon (::before) stands the Banner's gap
+  // before the words, never on them. The words are the text outside buttons.
+  // A status dialog is the .alert-message itself.
+  for (const el of [scope, ...all('.alert-message')].filter((e, i) => i || e.matches('.alert-message'))) {
+    const a = getComputedStyle(el, '::before');
+    if (a.content === 'none' || a.position !== 'absolute') continue;
+    const icon = box(el).left + el.clientLeft + parseFloat(a.left) + parseFloat(a.width);
+    const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let left = Infinity;
+    for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+      if (!n.data.trim() || n.parentElement.closest('button, .btn, .cbi-button, .right, .button-row')) continue;
+      const rg = document.createRange();
+      rg.selectNodeContents(n);
+      for (const q of rg.getClientRects()) if (q.width > 0) left = Math.min(left, q.left);
+    }
+    if (left < Infinity) add('banner.icon', 'gap', px(left - icon), el);
   }
 
   // Font family of every element with its own words, and of every control.
