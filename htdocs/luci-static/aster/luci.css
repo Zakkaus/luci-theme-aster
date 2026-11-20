@@ -540,6 +540,8 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
      One line, so a long value cannot widen the column past the row. */
   .cbi-value { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
   .cbi-value > .cbi-value-title { flex-basis: auto; min-block-size: 0; margin-block-end: var(--spacing-1); }
+  /* A label kept for screen readers only leaves no empty line (layout). */
+  .cbi-value.aster-same-label > .cbi-value-title { position: absolute; }
   .cbi-value-field { --field-w: 100%; flex-basis: auto; }
   /* CBI wraps a widget in a bare div, which must span the row too. */
   .cbi-value-field > :not(button, .btn, .cbi-button, .cbi-checkbox) { flex-basis: 100%; }

@@ -28,7 +28,8 @@
    Checkbox      Checkbox/Radio input[type=checkbox|radio], .cbi-checkbox
    Dynlist       TextField list .cbi-dynlist (.item, .add-item)
    Form row      Field layout   .cbi-value, .cbi-value-title, .cbi-value-field,
-                                .cbi-value-error, .control-group
+                                .cbi-value-error, .control-group,
+                                .aster-same-label (theme-aster.js)
    Card          Card           .cbi-section, .cbi-section-node, .ifacebox
                                 (+ .ifacebox-head/-body), .cbi-page-actions,
                                 a table straight in the view, #content_syslog,
@@ -548,6 +549,10 @@ html :where(.cbi-value > .cbi-value-field) {
   min-block-size: var(--size-element-md);
 }
 html :where(.cbi-value > .cbi-value-field > *) { min-inline-size: 0; }
+/* A Button option whose label repeats the button's words (theme-aster.js
+   marks the row): the label is read, not drawn, and the button keeps the
+   field column. */
+html :where(.cbi-value.aster-same-label > .cbi-value-title) { clip-path: inset(50%); }
 /* A line break between a field and its buttons (System's Local Time) is
    an empty flex item that doubles the gap; the row wraps on its own. */
 html :where(.cbi-value > .cbi-value-field > br) { display: none; }

@@ -26,12 +26,25 @@ return baseclass.extend({
 
 	/* Lua CBI pages (a <form> around the .cbi-map) are in the document by
 	 * the time this runs; form.js views render later and need none of it.
+	 *  - A Button option whose label repeats the button's words (PassWall's
+	 *    "Delete All Subscribe Node" over the same button) is marked
+	 *    .aster-same-label: the label is kept for screen readers and not
+	 *    drawn, so the row shows the button once (components.css, Form row).
 	 *  - A table cell with no data-title takes its column header's own words,
 	 *    which the phone fold prints before it, as form.js tables carry;
 	 *    again when the page's own script moves rows (PassWall's node
 	 *    groups). */
 	lua() {
 		const words = (el) => Array.from(el.childNodes).filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim();
+
+		document.querySelectorAll('form > .cbi-map .cbi-value').forEach((row) => {
+			const label = row.querySelector(':scope > .cbi-value-title');
+			const ctl = row.querySelectorAll(':scope > .cbi-value-field :is(input:not([type="hidden"]), select, textarea, button)');
+
+			if (label && ctl.length === 1 && ctl[0].matches('input[type="submit"], input[type="button"], button') &&
+			    (ctl[0].value || ctl[0].textContent).trim() === label.textContent.trim())
+				row.classList.add('aster-same-label');
+		});
 
 		const titles = () => document.querySelectorAll('form > .cbi-map :is(table, .table)').forEach((t) => {
 			const head = Array.from(t.querySelectorAll(':scope > .tr, :scope > :is(.thead, thead, tbody) > .tr')).find((r) => r.querySelector(':scope > .th'));
