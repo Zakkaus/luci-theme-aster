@@ -70,7 +70,7 @@
    interface editor's CIDR switch) sits 8 after it, as in a control group. */
 .cbi-value-field div:not(.control-group, .cbi-value-field, .cbi-dropdown) > :is(input, select) + :is(.btn, .cbi-button, button) { margin-inline-start: var(--spacing-2); }
 /* luci-mod-statistics pairs a select with its button in a span. */
-.shell-content .nowrap:not(.td, .th) { display: inline-flex; align-items: center; gap: var(--spacing-2); }
+.shell-content .nowrap:not(.td, .th, .cbi-tooltip *) { display: inline-flex; align-items: center; gap: var(--spacing-2); }
 
 /* ── Spacing [ported] ────────────────────────────────────────── */
 
@@ -399,6 +399,9 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
    sit at the line's top (on the baseline they pushed it down 1-5 px). */
 .nft-rules .td > .ifacebadge { margin: var(--spacing-0-5) var(--spacing-1) var(--spacing-0-5) 0; vertical-align: top; }
 .nft-comment { --badge-bg: transparent; cursor: help; }
+/* nftables.js's own style pads a badge's tooltip .5em on every side; it
+   keeps the Tooltip's 4 / 8. */
+.nft-rules .ifacebadge.cbi-tooltip-container .cbi-tooltip { padding: var(--spacing-1) var(--spacing-2); }
 
 /* ── The login form [ported] ────────────────────────────────── */
 
@@ -619,8 +622,8 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     overflow-wrap: break-word;
     & > :is(span, div), & > div > .ifacebadge, & > div > .ifacebadge > span { display: contents; }
     & > div > .ifacebadge::before { content: none; }
-    & br { display: none; }
-    & .nowrap {
+    & br:not(.cbi-tooltip *) { display: none; }
+    & .nowrap:not(.cbi-tooltip *) {
       display: grid;
       grid-column: 1 / -1;
       grid-template-columns: subgrid;

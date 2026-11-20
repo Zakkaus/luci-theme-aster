@@ -898,7 +898,8 @@ html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -
     & :where(.tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child) + :is(.td, td))::before { content: none; }
     /* The actions take a line of their own under the stack, so the data
        keeps the row's full width (a column beside it left long values a
-       narrow one); several wrap, 8 apart. */
+       narrow one); 8 apart, wrapping only where the line is too short
+       (Startup's five). */
     & :where(.tr > :is(.td, td).cbi-section-actions) { padding: var(--spacing-2) var(--spacing-4) 0; }
     & :where(.tr > :is(.td, td).cbi-section-actions > div) { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
   }
@@ -1317,8 +1318,11 @@ html :where(.cbi-tooltip) {
   inset-inline-start: 0;
   z-index: 110;
   box-sizing: border-box;
+  /* As wide as its words, up to Astryx's 300; never narrower than they are
+     (a parent's width must not squeeze it to a letter a line). */
   inline-size: max-content;
-  max-inline-size: min(var(--aster-menu-max-w), calc(100vw - var(--tooltip-inset) * 2));
+  min-inline-size: min(max-content, var(--aster-tooltip-max-w), calc(100vw - var(--tooltip-inset) * 2));
+  max-inline-size: min(var(--aster-tooltip-max-w), calc(100vw - var(--tooltip-inset) * 2));
   padding: var(--spacing-1) var(--spacing-2);
   border-radius: var(--radius-container);
   background: var(--color-text-primary);
@@ -1341,6 +1345,21 @@ html :where(.cbi-tooltip[style]) { display: block; opacity: 1; }
 }
 @starting-style {
   html :where(.cbi-tooltip[style], .cbi-tooltip-container:hover > .cbi-tooltip) { opacity: 0; }
+}
+/* A key/value list inside (ui.itemlist: "<strong>Key:</strong> value"
+   lines between <br>s, as the overview's DHCPv6 statistics) is a tight
+   two-column table: keys on one line at medium weight, values beside
+   them, one line a row, all in the tooltip's ink. No page rule reaches in
+   (luci.css keeps its key/value and form-row rules out of .cbi-tooltip). */
+html :where(.cbi-tooltip :has(> .nowrap > strong:first-child)) { display: table; border-spacing: 0; }
+html :where(.cbi-tooltip :has(> .nowrap > strong:first-child) > br) { display: none; }
+html :where(.cbi-tooltip .nowrap:has(> strong:first-child)) { display: table-row; color: inherit; }
+html :where(.cbi-tooltip .nowrap > strong:first-child) {
+  display: table-cell;
+  padding-inline-end: var(--spacing-2);
+  color: inherit;
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
 }
 /* Chips inside take the tooltip's colours. */
 html :where(.cbi-tooltip) :is(.ifacebadge, .zonebadge, .ifacebox, .ifacebox-head, .label) {
