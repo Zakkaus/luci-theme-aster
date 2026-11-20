@@ -367,8 +367,9 @@ function closure(tokensCss, sheets, layoutCss) {
   // A component's own parameters (--button-h, --card-pad, ...) are declared
   // in the stylesheet that defines the component; they count as defined.
   // LuCI writes some properties inline (firewall.getZoneColorStyle()'s
-  // --zone-color-rgb); they are defined by the markup.
-  const defined = new Set(['--zone-color-rgb', ...declared(tokensCss), ...Object.values(sheets).flatMap((c) => [...declared(c)])]);
+  // --zone-color-rgb); they are defined by the markup, as is the overview's
+  // label width theme-aster.js measures (--aster-kv-w).
+  const defined = new Set(['--zone-color-rgb', '--aster-kv-w', ...declared(tokensCss), ...Object.values(sheets).flatMap((c) => [...declared(c)])]);
   const all = {'tokens.css': tokensCss, ...sheets};
   const missing = new Map();
   for (const [file, css] of Object.entries(all)) {
