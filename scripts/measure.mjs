@@ -76,11 +76,12 @@ const FIELDS = [
   {name: 'section gap', from: ['frame', 'Page VStack (band gap)', 'gap'], measure: 'sectionGap'},
   {name: 'card gap', from: ['frame', 'Grid: 系統 + 記憶體 cards', 'gap'], sel: '#view', prop: 'gap'},
   // A card ends 16 under its content (the spacing contract, owner
-  // 2026-11-20): the reference stretches the cards of a grid row to one
-  // height (系統 and 記憶體與儲存 ended level, the shorter one 56 empty at
-  // its foot); the contract keeps every card's padding 16, so the largest
-  // content-to-bottom inset of the overview's cards is read instead.
+  // 2026-11-20) and the cards of a row are one height (Astryx's dashboard
+  // template stretches a Grid row, layout/SPEC.md, 2026-11-21): in each row
+  // the tallest card ends 16 under its content; the largest such inset of
+  // the overview's rows is read.
   {name: 'card content end', from: ['frame', 'Grid: 系統 + 記憶體 cards', 'height'], want: '16px', devices: ['desktop'], measure: 'contentEnd'},
+  {name: 'same-row card bottoms', from: ['frame', 'Grid: 系統 + 記憶體 cards', 'height'], want: '0px', devices: ['desktop'], measure: 'rowSpread', edge: 'bottom'},
   // ... and start their first line of content level (型號 and 可用記憶體).
   {name: 'same-row first line', from: ['frame', 'Grid: 系統 + 記憶體 cards', 'height'], want: '0px', devices: ['desktop'], measure: 'rowSpread', edge: 'firstLine'},
   // Cards.
@@ -90,7 +91,9 @@ const FIELDS = [
   // Type.
   {name: 'h1 size', from: ['components', 'Heading h1 (概覽)', 'fontSize'], sel: '.shell-inner > h2, #view > h2', prop: 'fontSize'},
   {name: 'h1 weight', from: ['components', 'Heading h1 (概覽)', 'weight'], sel: '.shell-inner > h2, #view > h2', prop: 'weight', exact: true},
-  {name: 'card title size', from: ['components', 'Heading h2 (section)', 'fontSize'], sel: '#view > .cbi-section :is(h2, h3)', prop: 'fontSize'},
+  // Heading 3, not the reference's h2: Astryx's dashboard and settings
+  // templates title a section with Heading 3 (layout/SPEC.md, 2026-11-21).
+  {name: 'card title size', from: ['components', 'Heading h2 (section)', 'fontSize'], want: '18px', sel: '#view > .cbi-section :is(h2, h3)', prop: 'fontSize'},
   {name: 'base text size', from: ['components', 'Table body cell', 'fontSize'], sel: '#view .td', prop: 'fontSize'},
   // Controls.
   {name: 'button height', from: ['components', 'Button secondary md (top bar)', 'height'], sel: '#indicators > *', prop: 'height'},
@@ -166,10 +169,15 @@ function readAll(fields) {
       continue;
     }
     if (f.measure === 'contentEnd') {
-      const ends = [...document.querySelectorAll('#view > .cbi-section')].filter(shown).map((c) => {
+      const rows = new Map();
+      for (const c of [...document.querySelectorAll('#view > .cbi-section')].filter(shown)) {
         const kids = [...c.children].filter(shown);
-        return kids.length ? c.getBoundingClientRect().bottom - Math.max(...kids.map((k) => k.getBoundingClientRect().bottom)) : NaN;
-      }).filter((v) => !Number.isNaN(v));
+        if (!kids.length) continue;
+        const top = Math.round(c.getBoundingClientRect().top);
+        const inset = c.getBoundingClientRect().bottom - Math.max(...kids.map((k) => k.getBoundingClientRect().bottom));
+        rows.set(top, Math.min(rows.get(top) ?? Infinity, inset));
+      }
+      const ends = [...rows.values()];
       out[f.name] = ends.length ? {value: px(Math.max(...ends)), count: ends.length} : {value: null, count: 0};
       continue;
     }

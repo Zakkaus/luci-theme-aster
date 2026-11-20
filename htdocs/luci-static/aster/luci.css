@@ -409,18 +409,25 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
 /* ── Status overview [ported] ───────────────────────────────── */
 
 [data-page="admin-status-overview"] #view {
-  /* Bands of cards, as the reference: a grid of at most two tracks (320
-     at least, 16 apart), a wide table, interface boxes or a long list
-     across it; a card is as tall as its content. */
+  /* Astryx's dashboard template (layout/SPEC.md): bands of cards 16 apart,
+     at most two a row (each at least 320) and stretched to one height; a
+     card alone on its row fills it, as an auto-fit Grid band does, so no
+     row keeps an empty half. A wide table, interface boxes or a long list
+     take the whole row. */
   &:has(> .cbi-section) {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(max(min(100%, var(--aster-card-min)), calc((100% - var(--spacing-4)) / 2)), 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
     gap: var(--spacing-4);
-    align-items: start; /* a card ends 16 under its content, never stretched empty */
   }
-  & > :not(.cbi-section) { grid-column: 1 / -1; }
-  & > .cbi-section { margin: 0; min-inline-size: 0; }
-  & > .cbi-section:has(.tr > .td:nth-child(3), .th, .ifacebox, .network-status-table, .tr:nth-child(7) > .td > .cbi-progressbar) { grid-column: 1 / -1; }
+  & > * { flex: 1 1 100%; }
+  & > .cbi-section { margin: 0; min-inline-size: min(100%, var(--aster-card-min)); }
+  /* Only the bar cards (Memory, Storage) pair up, at one height: System's
+     key/value list keeps the row, so its long values (firmware, local time)
+     stay on one line, and no short card stands beside a tall one. A wide
+     table, interface boxes or a long list take the row as well. */
+  & > .cbi-section:has(.tr > .td > .cbi-progressbar) { flex-basis: calc((100% - var(--spacing-4)) / 2); }
+  & > .cbi-section:has(.tr > .td:nth-child(3), .th, .ifacebox, .network-status-table, .tr:nth-child(7) > .td > .cbi-progressbar) { flex-basis: 100%; }
 }
 
 /* A row holding a progress bar is the reference's ProgressBar with its
@@ -460,11 +467,18 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
      Only LuCI's image tells the kinds apart (icons/port_*, signal-*); it is
      hidden and the reference's icon (--icon-server, --icon-wifi) drawn. */
   /* The Network and Wireless cards put their boxes in a .network-status-table:
-     the reference's Grid of radio cards, at most two a row, each at least 320. */
+     groups of the card, not cards in it (no frame, no fill), two a row at
+     most, 24 apart like the template's column groups. */
   & .network-status-table {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(max(min(100%, var(--aster-card-min)), calc((100% - var(--spacing-4)) / 2)), 1fr));
-    gap: var(--spacing-4);
+    grid-template-columns: repeat(auto-fill, minmax(max(min(100%, var(--aster-card-min)), calc((100% - var(--aster-space-page)) / 2)), 1fr));
+    gap: var(--aster-space-page);
+  }
+  & .network-status-table > .ifacebox {
+    --card-pad: 0;
+    --card-border-width: 0;
+    --card-radius: 0;
+    --card-bg: transparent;
   }
   /* Icon slots: the port and radio heads, the device and SSID chips inside a
      box (.ifacebox-body > div > .ifacebadge) and the chips in the station
@@ -514,10 +528,10 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     --card-bg: transparent;
   }
   /* 29_ports.js writes a 70 px grid and box sizes inline (!important to
-     override); the reference's Grid: 160 a tile, 16 apart, five a row at
-     most, so one port is a tile and not a banner. */
+     override); the dashboard template's tile Grid (auto-fit): at least 160
+     a tile, 16 apart, five a row at most, the tiles of a row filling it. */
   & div[style*="grid-template-columns"]:has(> .ifacebox) {
-    grid-template-columns: repeat(auto-fill, minmax(max(var(--aster-port-min), (100% - 4 * var(--spacing-4)) / 5), 1fr)) !important;
+    grid-template-columns: repeat(auto-fit, minmax(max(var(--aster-port-min), (100% - 4 * var(--spacing-4)) / 5), 1fr)) !important;
     gap: var(--spacing-4);
     margin: 0 !important;
   }
@@ -589,31 +603,40 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   & .ifacebox [style*="color:#888"] { color: var(--color-text-secondary) !important; }
   & .ifacebox [style*="color:#d9534f"] { color: var(--color-text-error) !important; }
   /* Network and radio boxes: "<strong>Label:</strong> value" spans between
-     <br>s; an upstream's are the reference's MetadataList (112 label
-     column, secondary, 500). */
+     <br>s. An upstream's are one Astryx MetadataList (single column): the
+     label column as wide as its widest label (secondary, 500), values 16
+     after it, rows 8 apart, its device and MAC rows in the same list (the
+     chip's wrappers dissolve into it), so every value of the group starts
+     on one line. theme-aster.js drops LuCI's colons, as the list has none. */
   & .network-status-table > .ifacebox:not(:has(img[src*="/signal-"])) > .ifacebox-body {
     --ifacebox-body-fg: var(--color-text-primary);
     --ifacebox-body-size: var(--text-body-size);
     --ifacebox-body-leading: var(--text-body-leading);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    gap: var(--spacing-2) var(--spacing-4);
+    overflow-wrap: break-word;
+    & > :is(span, div), & > div > .ifacebadge, & > div > .ifacebadge > span { display: contents; }
+    & > div > .ifacebadge::before { content: none; }
+    & br { display: none; }
+    & .nowrap {
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid;
+      align-items: baseline;
+      white-space: normal;
+      & > strong {
+        color: var(--color-text-secondary);
+        font-weight: var(--font-weight-medium);
+      }
+    }
   }
   & .network-status-table > .ifacebox > .ifacebox-body > span:first-child > br,
   & .ifacebox-body > div > .ifacebadge > span > br { display: none; }
-  & .network-status-table > .ifacebox:not(:has(img[src*="/signal-"])) .nowrap {
-    display: grid;
-    grid-template-columns: var(--aster-label-w) minmax(0, 1fr);
-    align-items: baseline;
-    column-gap: var(--spacing-4);
-    padding-block: var(--spacing-1);
-    overflow-wrap: anywhere;
-    white-space: normal;
-    & > strong {
-      color: var(--color-text-secondary);
-      font-weight: var(--font-weight-medium);
-    }
-  }
-  /* A chip in a box (the upstream's device, a radio's SSID) is the plain
-     Badge as a group under the box's own lines, apart by a divider. */
-  & .ifacebox-body > div > .ifacebadge {
+  /* A chip in a radio box (its SSID) is the plain Badge as a group under the
+     box's own lines, apart by a divider. */
+  & .ifacebox:has(img[src*="/signal-"]) .ifacebox-body > div > .ifacebadge {
     align-items: flex-start;
     gap: var(--spacing-3);
     margin-block-start: var(--spacing-2);

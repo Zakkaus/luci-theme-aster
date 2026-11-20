@@ -42,8 +42,8 @@
     },
 
     "heading.page": {"_source": "spec Heading h1", "fontSize": 26, "fontWeight": "600"},
-    "heading.card": {"_source": "spec Heading h2 (section)", "fontSize": 22, "fontWeight": "600"},
-    "heading.inner": {"_source": "spec Heading h3: a heading inside a card under its title (M2 overview leases and stations)", "fontSize": 18, "fontWeight": "600"},
+    "heading.card": {"_source": "Astryx settings and dashboard templates: a section title is Heading 3 (layout/SPEC.md; was spec Heading h2, 22)", "fontSize": 18, "fontWeight": "600"},
+    "heading.inner": {"_source": "Heading 4 under a Heading 3 card title (dashboard template card titles; layout/SPEC.md)", "fontSize": 16, "fontWeight": "600"},
     "heading.sub": {"fontSize": null, "fontWeight": null},
     "heading.modal": {"fontSize": null, "fontWeight": null},
 

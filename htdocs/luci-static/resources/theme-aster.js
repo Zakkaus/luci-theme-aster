@@ -32,7 +32,10 @@ return baseclass.extend({
 	 *    ArrowDown icon (Icon glyphs);
 	 *  - an interface's Error entry (interfaces.js render_status: a
 	 *    "<strong>Error:</strong> text" item) gets .aster-error, set in the
-	 *    error ink (luci.css, Network pages). */
+	 *    error ink (luci.css, Network pages);
+	 *  - a key in an interface's list ("<strong>Protocol:</strong>": the
+	 *    overview's boxes, Interfaces' status) loses LuCI's colon: both are
+	 *    drawn as a MetadataList, whose labels carry no colons. */
 	marks() {
 		const roots = ['view', 'modal_overlay'].map((id) => document.getElementById(id)).filter(Boolean);
 		const error = _('Error');
@@ -59,6 +62,13 @@ return baseclass.extend({
 			root.querySelectorAll('span:not(.aster-error) > strong:first-child').forEach((s) => {
 				if (s.textContent.trim().replace(/[:：]$/, '') === error)
 					s.parentNode.classList.add('aster-error');
+			});
+
+			root.querySelectorAll('.ifacebox-body .nowrap > strong:first-child, [id$="-ifc-description"] > .nowrap > strong:first-child, .ifacebadge.large > span > .nowrap > strong:first-child').forEach((s) => {
+				const t = s.textContent.replace(/\s*[:：]\s*$/, '');
+
+				if (t !== s.textContent)
+					s.textContent = t;
 			});
 		});
 		let queued = false;

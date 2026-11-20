@@ -120,21 +120,27 @@ html :where(h4, h5, h6) {
   font-weight: var(--text-heading-4-weight);
   line-height: var(--text-heading-4-leading);
 }
-/* Heading 2: a card's title. */
-html :where(h2, .cbi-section :is(h2, h3), .cbi-section > legend) {
+html :where(h2) {
   font-size: var(--text-heading-2-size);
   font-weight: var(--text-heading-2-weight);
   line-height: var(--text-heading-2-leading);
 }
-/* Heading 3: a heading inside a card's content, under the card's title
+/* Heading 3: a card's or section's title, as Astryx's settings and
+   dashboard templates title their sections (layout/SPEC.md). */
+html :where(.cbi-section :is(h2, h3), .cbi-section > legend) {
+  font-size: var(--text-heading-3-size);
+  font-weight: var(--text-heading-3-weight);
+  line-height: var(--text-heading-3-leading);
+}
+/* Heading 4: a heading inside a card's content, under the card's title
    (the overview's Active DHCPv4 Leases, Associated Stations). Where the
    card has no title of its own (24.10's leases), its first heading is the
    title and only the ones after it are Heading 3. A heading a field writes
    (.cbi-value > h4: DHCP's Active DHCPv4 Leases) is one too. */
 html :where(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div:not(.cbi-title) > h3, .cbi-section > div:not(.cbi-title) > h3 ~ h3, .cbi-value > h4) {
-  font-size: var(--text-heading-3-size);
-  font-weight: var(--text-heading-3-weight);
-  line-height: var(--text-heading-3-leading);
+  font-size: var(--text-heading-4-size);
+  font-weight: var(--text-heading-4-weight);
+  line-height: var(--text-heading-4-leading);
 }
 /* Heading 1: the page title, which LuCI writes as an <h2>. */
 html :where(h1, .shell-content h2:not(.cbi-section *)) {
@@ -764,6 +770,13 @@ html :where([data-page="admin-status-overview"] .shell-content .ifacebox-head) {
   text-align: start;
 }
 html :where([data-page="admin-status-overview"] .shell-content .ifacebox-head > strong) { font-weight: inherit; }
+/* A box that is a group of its card (an upstream, a radio) is titled as a
+   heading inside a card: Heading 4. */
+html :where([data-page="admin-status-overview"] .shell-content .network-status-table > .ifacebox > .ifacebox-head) {
+  font-size: var(--text-heading-4-size);
+  font-weight: var(--text-heading-4-weight);
+  line-height: var(--text-heading-4-leading);
+}
 html :where([data-page="admin-status-overview"] .shell-content .ifacebox-body) {
   padding: 0;
   color: var(--ifacebox-body-fg, var(--color-text-secondary));
@@ -898,15 +911,22 @@ html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -
 }
 
 /* ── MetadataList ────────────────────────────────────────────────
-   A table with no header row: key in a 112 column, secondary at label
-   weight, value in primary, no rules, 8 between rows. */
+   A table with no header row: Astryx's single-column list (auto
+   minmax(0, 1fr), 8 16 apart): the key column as wide as the widest key
+   (on a phone at most --aster-label-w, wrapping), secondary at label
+   weight, value 16 after it in primary, no rules, 8 between rows. */
 
 html :where(.cbi-section .table:not(:has(.th)) > .tr > .td) { padding-block: var(--spacing-1); border-block-end: 0; }
 html :where(.cbi-section .table:not(:has(.th)) > .tr > .td:first-child) {
-  inline-size: var(--aster-label-w);
-  padding-inline-start: 0;
+  inline-size: 1%;
+  padding-inline: 0 var(--spacing-4);
+  white-space: nowrap;
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-medium);
+}
+html :where(.cbi-section .table:not(:has(.th)) > .tr > .td:first-child + .td) { padding-inline-start: 0; }
+@media (max-width: 48rem) {
+  html :where(.cbi-section .table:not(:has(.th)) > .tr > .td:first-child) { inline-size: var(--aster-label-w); white-space: normal; }
 }
 
 /* ── Tabs ────────────────────────────────────────────────────────
