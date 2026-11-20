@@ -69,6 +69,19 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
   and shows each `.cbi-tooltip` in markup: `tooltip overflow` is text wider
   than the box, `tooltip arrow` a ▲/▼ glyph before the text, `tooltip gap`
   the space to the trigger.
+- Tooltip contents: every word in the tooltip's ink against its fill
+  (`tooltip ink`, AA), a key/value line at most two lines (`tooltip
+  lines`), and no word that fits a line broken over two (`tooltip words`:
+  the box shrunk to its min-content). On the overview the gate builds a
+  ui.itemlist tooltip in the first upstream box, as 30_network.js does for
+  the DHCPv6 statistics, and takes it out after the read.
+- `tabs.pane shown`: one pane of a tab group shows. `frame nested`: a frame
+  (four-sided border, shadow, or a rounded fill of its own) inside another,
+  outside what Astryx puts in a card (controls, chips, progress, code,
+  Banner, Tooltip, Menu); only offenders are listed. `dialog fits`: a
+  dialog ends inside the window; `dialog scrim`: the scrim covers the save
+  bar. `dynlist add`: the + on its field's line. `table.actions lines`: a
+  row's buttons on one line (desktop).
 - It reads a Banner's or status dialog's icon (`banner.icon gap`: from the
   icon to the first words, never negative). The `status-*` modals in
   `pages.txt` open ui.js's status dialogs (applying, reverted, a failed

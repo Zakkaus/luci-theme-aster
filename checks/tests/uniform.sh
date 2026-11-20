@@ -134,6 +134,41 @@ expect uniform 1 "space.control.row gap" "save bar buttons 16 apart" -- "$url" "
 expect uniform 1 "space.dialog gap" "dialog footer 8 under the form" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
 	--debug-css 'admin/network/network=#modal_overlay .button-row { margin-block-start: 8px !important }'
 
+# Tooltip contents: a key/value list (the DHCPv6 statistics; the gate
+# builds one in the overview's upstream box) in the tooltip's ink, a line
+# at most two lines high.
+expect uniform 1 "tooltip ink" "a page key colour inside a tooltip" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=.cbi-tooltip strong { color: var(--color-text-secondary) !important }'
+expect uniform 1 "tooltip lines" "a tooltip line three lines high" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=.cbi-tooltip .nowrap { display: block !important; padding-block: 24px !important }'
+
+expect uniform 1 "tooltip words" "a tooltip at its min-content width, a letter a line" -- "$url" "$password" --pages "$tmp/rules.txt" \
+	--debug-css 'admin/network/firewall/rules=.cbi-tooltip { inline-size: min-content !important; min-inline-size: 0 !important }'
+
+# Tabs: only the active pane shows (the JS tab panes stacked on first load).
+expect uniform 1 "tabs.pane shown" "every tab pane shown" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=[data-tab-title]:not([data-tab-active="true"]) { display: block !important }'
+
+# Dynlist: the + under its field (the add row wrapping).
+printf 'admin/system/system tab=timesync\n' >"$tmp/timesync.txt"
+expect uniform 1 "dynlist add" "dynlist + under its field" -- "$url" "$password" --pages "$tmp/timesync.txt" \
+	--debug-css 'admin/system/system=.cbi-dynlist > .add-item { flex-wrap: wrap !important } .cbi-dynlist > .add-item > input { flex: 0 0 100% !important }'
+
+# Row actions: a row's buttons stacked (Interfaces' Restart, Stop, Edit, Delete).
+printf 'admin/status/processes\n' >"$tmp/processes.txt"
+expect uniform 1 "table.actions lines" "a row's actions on two lines" -- "$url" "$password" --pages "$tmp/processes.txt" \
+	--debug-css 'admin/status/processes=.td > div:has(> :is(.btn, .cbi-button)) { flex-wrap: wrap !important; max-inline-size: 100px }'
+
+# Frames: a form row framed inside its card.
+expect uniform 1 "frame nested" "a form row framed inside its card" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=.cbi-value { box-shadow: 0 0 0 1px var(--color-border) !important }'
+
+# Dialog: a tall one runs past the window; the save bar over the scrim.
+expect uniform 1 "dialog fits" "dialog taller than the window" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
+	--debug-css 'admin/network/network=#modal_overlay > .modal { max-block-size: none !important }'
+expect uniform 1 "dialog scrim" "save bar over the dialog's scrim" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
+	--debug-css 'admin/network/network=.cbi-page-actions { z-index: 200 !important }'
+
 # Lua CBI map (APPS=1: a box with OpenClash, as apps-install.sh leaves it).
 # A header table in a Lua map folds on a phone like a JS view's, and the
 # gate reads it as a fold; a row drawn as a flex column instead of the
