@@ -219,7 +219,7 @@ expect uniform 1 "frame nested" "graph framed inside its card" -- "$url" "$passw
 	--debug-css 'admin/status/realtime/load=#view#view#view div[style*="border:1px solid #000"] { border-color: rgb(0, 0, 0) !important }'
 printf 'admin/system/startup tab=rc\n' >"$tmp/startup-rc.txt"
 expect uniform 1 "frame nested" "card's save bar a band on a phone" -- "$url" "$password" --pages "$tmp/startup-rc.txt" --viewports phone \
-	--debug-css 'admin/system/startup=.cbi-section .cbi-page-actions { border-block-start: 1px solid rgb(0, 0, 0) !important }'
+	--debug-css 'admin/system/startup=#view .cbi-page-actions { border-block-start: 1px solid rgb(0, 0, 0) !important }'
 
 # Dialog: a tall one runs past the window; the save bar over the scrim.
 expect uniform 1 "dialog fits" "dialog taller than the window" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
