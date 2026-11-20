@@ -44,6 +44,10 @@ copy rgb
 sed -i 's|^\(/\* ── Tables \[ported\].*\)$|\1\n.literals-test { background: rgb(0 0 0 / 10%); }|' "$tmp/rgb/luci.css"
 expect 1 "FAIL luci.css Tables [ported]: 1 literal(s): background: rgb(" "rgb() in a ported luci.css section" "$tmp/rgb"
 
+copy rgbvar
+sed -i 's|^\(/\* ── Tables \[ported\].*\)$|\1\n.literals-test { background: rgb(var(--zone-color-rgb)); }|' "$tmp/rgbvar/luci.css"
+expect 0 "ok   luci.css Tables [ported]: 0" "rgb() over one custom property" "$tmp/rgbvar"
+
 copy todo
 printf '\n/* ── Literals test ─── */\n.literals-test { margin: 5px; }\n' >> "$tmp/todo/luci.css"
 expect 0 "remaining literals outside ported sections: $((base + 1))" "px in a section not yet ported is counted" "$tmp/todo"

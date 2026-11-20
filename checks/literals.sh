@@ -10,7 +10,9 @@
 # Comments are ignored. Only declaration values are scanned, so a selector
 # such as #view or an attribute selector naming a colour is not counted.
 # A literal is a hex colour, an rgb()/rgba()/hsl()/hsla()/hwb()/lab()/lch()/
-# oklab()/oklch()/color() call, or a number with the px unit.
+# oklab()/oklch()/color() call, or a number with the px unit. A call whose
+# channels are one custom property (rgb(var(--zone-color-rgb)), a colour
+# LuCI writes inline) holds no literal.
 set -euo pipefail
 dir=${1:-htdocs/luci-static/aster}
 
@@ -21,6 +23,7 @@ count() {  # stdin: CSS; prints "<n>\t<first literals>"
 		while (/(?<![-\w])([-\w]+)\s*:\s*([^;{}]+?)\s*(?=[;}])/g) {
 			my ($p, $v) = ($1, $2);
 			$v =~ s{url\([^)]*\)}{url()}g;   # data: URIs carry their own SVG attributes
+			$v =~ s{\b[a-z]+\(var\(--[-\w]+\)\)}{var()}g;
 			push @hits, "$p: $1" while $v =~ /(#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(|(?<![-\w.])-?\d*\.?\d+px\b)/g;
 		}
 		printf "%d\t%s\n", scalar @hits, join(" | ", @hits[0 .. ($#hits < 2 ? $#hits : 2)]);
