@@ -337,6 +337,9 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
 
 /* A chip inside a sentence keeps the spaces around it. */
 :is(.td, .cbi-value-field) :is(.zonebadge, .label:not([data-style])) { margin: var(--spacing-0-5) var(--spacing-1); }
+/* A zone's chip that opens its cell (Firewall Zones' "lan => wan") starts
+   on the column's text edge, under the column's heading. */
+.td .zone-forwards > .zone-src:first-child > .zonebadge:first-child { margin-inline-start: 0; }
 
 /* ── Tables [ported] ────────────────────────────────────────── */
 
@@ -381,7 +384,8 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
    table in a group (Realtime Connections') fell back to its own width. */
 .cbi-section > .table:is(:has(.th), .cbi-section-table):not(.cbi-value *),
 .cbi-section > .cbi-section-node > .table:is(:has(.th), .cbi-section-table):not(.cbi-value *),
-:is(.cbi-section, .cbi-section-node) > div:not(.cbi-value, .cbi-section-node):has(> .table .th) > .table {
+:is(.cbi-section, .cbi-section-node) > div:not(.cbi-value, .cbi-section-node):has(> .table .th) > .table,
+[data-tab]:not(.cbi-section *) > .table:has(.th) {
   inline-size: calc(100% + 2 * var(--card-bleed));
   margin-inline: calc(var(--card-bleed) * -1);
 }
@@ -406,7 +410,7 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
 /* A table that is the card itself (#view > .table) keeps its full width:
    the inset made WireGuard's peer table overflow #view by 2, which drew a
    scrollbar under it. */
-.shell-inner .table:not(.cbi-section *, #view > *, #view > .cbi-map > *) { margin-inline: var(--border-width); }
+.shell-inner .table:not(.cbi-section *, #view > *, #view > .cbi-map > *, [data-tab] > :has(.th)) { margin-inline: var(--border-width); }
 /* Leases and associated stations are rows of identifiers (addresses, MACs,
    DUIDs, rates): a line is never broken, so a column is as wide as its
    longest line and every row of one kind is one height. A station's host
