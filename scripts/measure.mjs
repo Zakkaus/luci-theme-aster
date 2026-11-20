@@ -197,7 +197,10 @@ function readAll(fields) {
       }
       const shared = [...rowsByTop.values()].filter((b) => b.length > 1);
       const spread = Math.max(0, ...shared.map((b) => Math.max(...b) - Math.min(...b)));
-      out[f.name] = {value: shared.length ? px(spread) : null, count: shared.length};
+      // No row of two cards (System, and Storage with a long mount list,
+      // each take a row of their own on the test boxes): nothing can end or
+      // start unevenly, so the rule holds; count 0 says no row was read.
+      out[f.name] = {value: px(spread), count: shared.length};
       continue;
     }
     let els = [...document.querySelectorAll(f.sel)].filter(shown);

@@ -919,12 +919,11 @@ html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -
 html :where(.cbi-section .table:not(:has(.th)) > .tr > .td) { padding-block: var(--spacing-1); border-block-end: 0; }
 html :where(.cbi-section .table:not(:has(.th)) > .tr > .td:first-child) {
   inline-size: 1%;
-  padding-inline: 0 var(--spacing-4);
+  padding-inline-start: 0;
   white-space: nowrap;
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-medium);
 }
-html :where(.cbi-section .table:not(:has(.th)) > .tr > .td:first-child + .td) { padding-inline-start: 0; }
 @media (max-width: 48rem) {
   html :where(.cbi-section .table:not(:has(.th)) > .tr > .td:first-child) { inline-size: var(--aster-label-w); white-space: normal; }
 }
