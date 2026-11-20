@@ -104,16 +104,17 @@ const PLUM = {
    Official colours moved toward black (Dawn) or white (Main), each by the
    smallest step that passes; ratios against the worst background the text
    sits on (the surface, the muted well, its own muted fill, the neutral
-   button fill, or the hover overlay):
+   button fill, or the hover overlay; a status ink on its own fill as a
+   Banner draws it on the page, outside a card: the fill over the body):
      text-secondary  Dawn subtle #797593 -> #69657F   3.7 -> 4.6 on overlay
                      Main subtle #908CAA -> #938FAC   4.5 -> 4.6 under hover
-     text-success    Dawn foam   #56949F -> #3E6B73   2.7 -> 4.6 on its fill
+     text-success    Dawn foam   #56949F -> #3C6870   2.6 -> 4.6 on its fill
                      Main pine   #31748F -> #74A1B3   2.5 -> 4.6 on its fill
-     text-warning    Dawn gold   #EA9D34 -> #8C5E1F   1.9 -> 4.7 on its fill
-     text-error      Dawn love   #B4637A -> #8F4F61   3.2 -> 4.6 on its fill
+     text-warning    Dawn gold   #EA9D34 -> #895C1E   1.8 -> 4.6 on its fill
+     text-error      Dawn love   #B4637A -> #894C5D   3.0 -> 4.6 on its fill
                      Main love   #EB6F92 -> #F19DB5   3.3 -> 4.6 on the
                                                       neutral button (Delete)
-     text-info       Dawn iris   #907AA9 -> #6D5D80   2.9 -> 4.6 on its fill
+     text-info       Dawn iris   #907AA9 -> #6A5A7C   2.8 -> 4.6 on its fill
      error (fill)    Dawn love   #B4637A -> #AA5E73   white on it 4.2 -> 4.6
      border          Main highlightMed #403D52 -> #373447: the dark
                      separator cap is 1.5:1; 1.69 -> 1.47 on base
@@ -131,13 +132,13 @@ const ROSE_PINE = {
   '--color-border': ['#DFDAD9', '#373447'],
   '--color-border-emphasized': ['#CECACD', '#524F67'],
   '--color-success': ['#56949F', '#31748F'],
-  '--color-text-success': ['#3E6B73', '#74A1B3'],
+  '--color-text-success': ['#3C6870', '#74A1B3'],
   '--color-warning': ['#EA9D34', '#F6C177'],
-  '--color-text-warning': ['#8C5E1F', '#F6C177'],
+  '--color-text-warning': ['#895C1E', '#F6C177'],
   '--color-error': ['#AA5E73', '#EB6F92'],
-  '--color-text-error': ['#8F4F61', '#F19DB5'],
+  '--color-text-error': ['#894C5D', '#F19DB5'],
   '--color-info': ['#907AA9', '#C4A7E7'],
-  '--color-text-info': ['#6D5D80', '#C4A7E7'],
+  '--color-text-info': ['#6A5A7C', '#C4A7E7'],
   '--focus-outline-color': ['#286983', '#9CCFD8'],
 };
 

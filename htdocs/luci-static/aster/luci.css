@@ -530,9 +530,11 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
 .zonebadge[style*="--zone-color-rgb"]:not(.cbi-tooltip *) { --badge-bg: var(--zone-bg); --badge-fg: var(--zone-fg); }
 .zonebadge[style*="--zone-color-rgb"] { background-color: var(--badge-bg) !important; /* inline zone fill */ }
 /* A device that is down: LuCI fades its name to half opacity inline
-   (2.2:1 on the badge); the secondary text colour says the same at 4.5:1. */
-.ifacebadge > span[style*="opacity"] {
-  opacity: 1 !important; /* inline opacity:.5 */
+   (2.2:1 on the badge), WireGuard its instance line's port and key to 80 %
+   (4.2:1, the key 3.9:1 on its fill); the secondary text colour says the
+   same at 4.5:1. */
+:is(.ifacebadge, #view > p:has(> .ifacebadge)) > span[style*="opacity"] {
+  opacity: 1 !important; /* inline opacity:.5, WireGuard's .8 */
   color: var(--color-text-secondary);
 }
 /* WireGuard status: the instance chip's image is written 32 inline, a

@@ -18,6 +18,9 @@
 # Status
 admin/status/overview                require=font.body,heading.page,heading.card,card,table.kv
 admin/status/routes                  require=font.body,heading.page,card,table
+# Banners, WireGuard's faded instance line and inline code, which the lab
+# boxes never draw (checks/lib/gate.mjs FIXTURES).
+admin/status/routes fixture=notices  require=font.body,banner.icon
 admin/status/nftables                require=font.body,card,table
 admin/status/logs/syslog             require=font.body,heading.page,card,button,field.input,tab
 admin/status/logs/dmesg              require=font.body,heading.page,card,button,field.input,tab
