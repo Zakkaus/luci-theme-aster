@@ -845,12 +845,14 @@ html :where(td, .td) :where(.btn, .cbi-button, button) { --button-h: var(--size-
 html :where(.dragging) { opacity: 0.5; }
 html :where(.drag-over-above) { box-shadow: inset 0 calc(var(--border-width) * 2) 0 var(--color-accent); }
 html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -2) 0 var(--color-accent); }
-/* Collapsible: below 768 a table with a header row folds each row into a
-   stack (the reference's lease table): the first cell primary, the rest
-   supporting text under it with their column names (data-title), the
-   actions last. Rows in thead/tbody (form.js), straight in the table
-   (ui.Table) or in a Lua table's <tbody> are all reached. */
-@media (max-width: 48rem) {
+/* Collapsible: in a page under 768 wide (the aster-page container,
+   luci.css: a phone, or a narrow window beside the side nav) a table with
+   a header row folds each row into a stack (the reference's lease table):
+   the first cell primary, the rest supporting text under it with their
+   column names (data-title), the actions last. Rows in thead/tbody
+   (form.js), straight in the table (ui.Table) or in a Lua table's <tbody>
+   are all reached. */
+@container aster-page (max-width: 48rem) {
   html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th)) {
     display: block;
     overflow: visible;

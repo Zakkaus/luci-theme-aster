@@ -90,9 +90,9 @@ html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([cl
   /* Page level: the title 4 over its description, 24 from what follows
      (tabs or the first block); the last block 24 above a save bar in the
      page's flow (a phone). */
-  & > h2:not(.cbi-section *) + :is(.cbi-map-descr, .cbi-section-descr) { margin-block-start: var(--aster-space-tight); }
-  & > h2:not(.cbi-section *) + :not(.cbi-map-descr, .cbi-section-descr),
-  & > h2:not(.cbi-section *) + :is(.cbi-map-descr, .cbi-section-descr) + * { margin-block-start: var(--aster-space-page); }
+  & > h2:not(.cbi-section *) + :is(.cbi-map-descr, .cbi-section-descr, p) { margin-block-start: var(--aster-space-tight); }
+  & > h2:not(.cbi-section *) + :not(.cbi-map-descr, .cbi-section-descr, p),
+  & > h2:not(.cbi-section *) + :is(.cbi-map-descr, .cbi-section-descr, p) + * { margin-block-start: var(--aster-space-page); }
   & > * + .cbi-page-actions { margin-block-start: var(--aster-space-page); }
   /* A line break between blocks would add an empty line; a textarea on a
      line of its own is a block, with no descender space under it. */
@@ -117,6 +117,51 @@ html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([cl
    one div; its script follows) stands in the region the view fills:
    centred in it, 48 under the title (layout). */
 #view > div.spinning:only-of-type { justify-content: center; padding-block: var(--spacing-12); }
+
+/* ── Page layouts [ported] ──────────────────────────────────── */
+
+/* nftables titles each table with a card holding only its heading: the
+   heading of the chains under it, no card (settings template: a section
+   title, no frame). */
+.nft-table > .cbi-section:has(> h3:only-child) {
+  --card-pad: 0;
+  --card-border-width: 0;
+  --card-radius: 0;
+  --card-bg: transparent;
+}
+
+/* A page title with page-level actions (Channel Analysis' Refresh
+   Channels: .cbi-title-section) is Astryx's PageHeader: the title at the
+   start, the actions at the end of its line, centred on it; 24 to what
+   follows, as under any page title. */
+.cbi-title-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--aster-space-row) var(--aster-space-region);
+  & > h2 { margin: 0; }
+  & > .cbi-title-buttons { display: flex; flex-wrap: wrap; gap: var(--aster-space-row); }
+  & > .cbi-title-buttons > * { margin: 0; }
+}
+#view > .cbi-title-section + *, #view > div > .cbi-title-section + * { margin-block-start: var(--aster-space-page); }
+
+/* A page's description written as a bare <p> under its title (Routing)
+   is the map description: supporting size, secondary ink. */
+#view > h2 + p, #view > div > h2 + p {
+  color: var(--color-text-secondary);
+  font-size: var(--text-supporting-size);
+  line-height: var(--text-supporting-leading);
+}
+/* The log views (tools/views.js LogreadBox) write 12 px inline: the log is
+   code at the size of every other code block (13). */
+#syslog { font-size: var(--text-supporting-size) !important; }
+
+/* The page is the container its tables fold in (components.css, Table):
+   a page under 768 wide, on a phone or in a narrow window beside the side
+   nav, where a lease table's columns no longer fit (owner 2026-11-21:
+   br-lan broke inside its cell at about 470 of content). */
+#view, .shell-inner > form { container: aster-page / inline-size; }
 
 /* ── Feedback [ported] ──────────────────────────────────────── */
 
@@ -204,6 +249,14 @@ html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([cl
    is about 400 wide, so from 64rem; under that it keeps its own line. The
    pager's arrows 8 off its text. */
 @media (min-width: 64rem) { #disk-space-label + .cbi-progressbar { margin-block-start: 0; } }
+/* On a phone the value (about 340 wide in English) wraps onto a second
+   line over the track instead of losing its end to an ellipsis. */
+@media (max-width: 30rem) {
+  #disk-space-label + .cbi-progressbar {
+    margin-block-start: calc(2 * var(--text-supporting-size) * var(--text-supporting-leading) + var(--spacing-1));
+    &::before { line-height: var(--text-supporting-leading); text-align: start; white-space: normal; }
+  }
+}
 /* Software's toolbar: its own <style> pads each group (.controls > *);
    the toolbar owns the gaps here (id weight beats it). Groups 16 apart, a
    label 4 over its control. */
@@ -264,12 +317,14 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
 /* A data table (a header row, or a form section's table: Interfaces
    leaves the header out) runs to the card's frame; its cells give the
    distance back, so the rules span the card as in the reference's Table in
-   a Card. */
+   a Card. The bleed is the outermost card's pad (--card-bleed): a group's
+   --card-pad is a unitless 0, which calc() cannot add to 100%, and the
+   table in a group (Realtime Connections') fell back to its own width. */
 .cbi-section > .table:is(:has(.th), .cbi-section-table):not(.cbi-value *),
 .cbi-section > .cbi-section-node > .table:is(:has(.th), .cbi-section-table):not(.cbi-value *),
 :is(.cbi-section, .cbi-section-node) > div:not(.cbi-value, .cbi-section-node):has(> .table .th) > .table {
-  inline-size: calc(100% + 2 * var(--card-pad, var(--spacing-0)));
-  margin-inline: calc(var(--card-pad, var(--spacing-0)) * -1);
+  inline-size: calc(100% + 2 * var(--card-bleed));
+  margin-inline: calc(var(--card-bleed) * -1);
 }
 /* A table under a field sits in a group (no pad of its own): it bleeds by
    the outer card's pad, so its first column lines up with the text above.
@@ -285,8 +340,8 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
 }
 .cbi-value > .cbi-section.cbi-tblsection { padding-inline: var(--card-bleed); }
 :is(.cbi-section, .cbi-section-node) > div:not(.cbi-value, .cbi-section-node):has(> .table .th) {
-  margin-inline: calc(var(--card-pad, var(--spacing-0)) * -1);
-  padding-inline: var(--card-pad, var(--spacing-0));
+  margin-inline: calc(var(--card-bleed) * -1);
+  padding-inline: var(--card-bleed);
 }
 /* A table with no card around it makes up the card's border only. */
 .shell-inner .table:not(.cbi-section *) { margin-inline: var(--border-width); }
@@ -428,6 +483,15 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
      table, interface boxes or a long list take the row as well. */
   & > .cbi-section:has(.tr > .td > .cbi-progressbar) { flex-basis: calc((100% - var(--spacing-4)) / 2); }
   & > .cbi-section:has(.tr > .td:nth-child(3), .th, .ifacebox, .network-status-table, .tr:nth-child(7) > .td > .cbi-progressbar) { flex-basis: 100%; }
+}
+
+/* Lease tables: addresses, MACs, DUIDs, times and interface names never
+   break inside (br-lan broke into "br-" and "lan", owner 2026-11-21); the
+   host name (first or, after Interface, second) wraps at its spaces and
+   hyphens only. A table that does not fit folds (Table) or scrolls. */
+[data-page="admin-status-overview"] .table:is(.leases, .leases6) .td {
+  white-space: nowrap;
+  &:nth-child(-n+2) { white-space: normal; overflow-wrap: normal; }
 }
 
 /* A row holding a progress bar is the reference's ProgressBar with its
@@ -608,8 +672,10 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   & .ifacebox [style*="color:#d9534f"] { color: var(--color-text-error) !important; }
   /* Network and radio boxes: "<strong>Label:</strong> value" spans between
      <br>s. An upstream's are one Astryx MetadataList (single column): the
-     label column as wide as its widest label (secondary, 500), values 16
-     after it, rows 8 apart, its device and MAC rows in the same list (the
+     label column one width in every group of the card (--aster-label-w;
+     the IPv4 and IPv6 groups started their values at different x, owner
+     2026-11-21; a longer label wraps), labels secondary, 500, values 16
+     after them (the rows' subgrids keep the gap), rows 8 apart, its device and MAC rows in the same list (the
      chip's wrappers dissolve into it), so every value of the group starts
      on one line. theme-aster.js drops LuCI's colons, as the list has none. */
   & .network-status-table > .ifacebox:not(:has(img[src*="/signal-"])) > .ifacebox-body {
@@ -617,7 +683,7 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     --ifacebox-body-size: var(--text-body-size);
     --ifacebox-body-leading: var(--text-body-leading);
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: var(--aster-label-w) minmax(0, 1fr);
     align-items: baseline;
     gap: var(--spacing-2) var(--spacing-4);
     overflow-wrap: break-word;
@@ -629,6 +695,7 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
       grid-column: 1 / -1;
       grid-template-columns: subgrid;
       align-items: baseline;
+      column-gap: var(--spacing-4);
       white-space: normal;
       & > strong {
         color: var(--color-text-secondary);
@@ -718,11 +785,28 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   .cbi-value-field { --field-w: 100%; flex-basis: auto; }
   /* CBI wraps a widget in a bare div, which must span the row too. */
   .cbi-value-field > :not(button, .btn, .cbi-button, .cbi-checkbox) { flex-basis: 100%; }
+  /* A wide table without a header row scrolls inside its card. */
+  .table:not(:has(> .tr > .th, > .thead > .tr > .th)) { display: block; overflow-x: auto; }
+  /* A dialog fits the screen. */
+  #modal_overlay { padding: var(--spacing-4); }
+  /* An interface's status reads as the Table fold's rows (components.css):
+     one column, each label before its value, supporting text. */
+  [id$="-ifc-description"] {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0;
+    color: var(--color-text-secondary);
+    font-size: var(--text-supporting-size);
+    line-height: var(--text-supporting-leading);
+    & > .nowrap > strong { display: inline; margin-inline-end: var(--spacing-2); font-weight: var(--font-weight-medium); }
+  }
+}
+
+/* The page's tables fold where the page is narrow, not only on a phone
+   (the Table fold, components.css): rows that complete it. */
+@container aster-page (max-width: 48rem) {
   /* The diagnostics tools stack instead of sharing a row (layout). */
   .table:has(.diag-action) > .tr { display: flex; flex-direction: column; gap: var(--spacing-4); }
   .table:has(.diag-action) > .tr > .td { display: block; padding-inline: 0; border: 0; }
-  /* A wide table without a header row scrolls inside its card. */
-  .table:not(:has(> .tr > .th, > .thead > .tr > .th)) { display: block; overflow-x: auto; }
   /* form.js writes the widest row's measured width inline on every actions
      cell; on a phone the cell takes the width its row gives it. */
   #view .cbi-section-actions[style*="width"] {
@@ -755,8 +839,6 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
      cells too wide for a phone; the pairs stack, value beside label (layout). */
   [data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr { display: grid; grid-template-columns: auto minmax(0, 1fr); }
   [data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr > .td { display: block; }
-  /* A dialog fits the screen. */
-  #modal_overlay { padding: var(--spacing-4); }
 }
 
 /* ── Realtime graphs [ported] ───────────────────────────────── */

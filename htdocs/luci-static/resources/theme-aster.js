@@ -31,6 +31,8 @@ return baseclass.extend({
 	 *    .aster-glyph span, which components.css draws as the ArrowUp or
 	 *    ArrowDown icon (Icon glyphs); a port with no link that counted
 	 *    0 B both ways gets .aster-idle (luci.css hides the counts);
+	 *  - a view that draws no title (Interfaces, nftables) gets an h2 with
+	 *    its menu entry's name, as every other page has one;
 	 *  - an interface's Error entry (interfaces.js render_status: a
 	 *    "<strong>Error:</strong> text" item) gets .aster-error, set in the
 	 *    error ink (luci.css, Network pages);
@@ -65,6 +67,19 @@ return baseclass.extend({
 
 				c.classList.toggle('aster-idle', /^(\s*[▲▼]\s*0 B){2}\s*$/.test(t));
 			});
+
+			const v = document.getElementById('view');
+			const cur = [...document.querySelectorAll('#mainmenu [aria-current="page"]')].pop();
+
+			if (root === v && document.querySelector('.shell-inner h2:not(.aster-title)'))
+				v.querySelectorAll(':scope > .aster-title').forEach((h) => h.remove());
+			else if (root === v && cur && v.firstElementChild && !document.querySelector('.aster-title, #view .spinning')) {
+				const h = document.createElement('h2');
+
+				h.className = 'aster-title';
+				h.textContent = cur.textContent.trim();
+				v.prepend(h);
+			}
 
 			root.querySelectorAll('span:not(.aster-error) > strong:first-child').forEach((s) => {
 				if (s.textContent.trim().replace(/[:：]$/, '') === error)
