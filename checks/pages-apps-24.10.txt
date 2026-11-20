@@ -1,4 +1,5 @@
-# Third-party app pages (M3c): OpenClash 0.48.002 and PassWall 26.11.11-r1,
+# Third-party app pages (M3c): OpenClash 0.48.002, PassWall 26.11.11-r1 and
+# the apps below them (SmartDNS, AdGuard Home, honk and dae on 25.12),
 # installed by lab/new-theme/hostscripts/apps-install.sh on OpenWrt 24.10.
 # Same format as pages.txt; tab=<name> selects a tab of the page's first
 # tab group (the entry without tab= is the page's first tab). Use alone:
@@ -67,3 +68,18 @@ admin/services/passwall/rule_list tab=chnroute_list        require=font.body,tab
 admin/services/passwall/acl                                require=font.body
 admin/services/passwall/log                                require=font.body
 admin/services/passwall/server                             require=font.body
+
+# SmartDNS (luci-app-smartdns 1.2023.42, stock feed; smartdns stopped)
+admin/services/smartdns                                    require=font.body,tab
+admin/services/smartdns tab=advanced                       require=font.body,tab
+admin/services/smartdns tab=seconddns                      require=font.body,tab
+admin/services/smartdns tab=dns64                          require=font.body,tab
+admin/services/smartdns tab=files                          require=font.body,tab
+admin/services/smartdns tab=proxy                          require=font.body,tab
+admin/services/smartdns tab=custom                         require=font.body,tab
+
+# AdGuard Home: the legacy Lua app luci-app-adguardhome 1.8-11 (no LuCI
+# app in 24.10's feeds; no AdGuardHome binary, which it downloads itself).
+admin/services/AdGuardHome/base                            require=font.body
+admin/services/AdGuardHome/log                             require=font.body
+admin/services/AdGuardHome/manual                          require=font.body
