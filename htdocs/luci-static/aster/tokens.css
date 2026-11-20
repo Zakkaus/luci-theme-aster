@@ -144,33 +144,32 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-background-surface: light-dark(#FFFAF3, #1F1D2E);
   --color-border: light-dark(#DFDAD9, #373447);
   --color-border-emphasized: light-dark(#CECACD, #524F67);
-  --color-border-error: light-dark(#8F4F61, #F19DB5);
+  --color-border-error: light-dark(#894C5D, #F19DB5);
   --color-error: light-dark(#AA5E73, #EB6F92);
   --color-error-muted: light-dark(#AA5E7333, #EB6F923F);
   --color-icon-accent: light-dark(#286983, #9CCFD8);
   --color-icon-primary: light-dark(#575279, #E0DEF4);
   --color-icon-secondary: light-dark(#69657F, #938FAC);
-  --color-icon-success: light-dark(#3E6B73, #74A1B3);
-  --color-icon-warning: light-dark(#8C5E1F, #F6C177);
+  --color-icon-success: light-dark(#3C6870, #74A1B3);
+  --color-icon-warning: light-dark(#895C1E, #F6C177);
   --color-info-muted: light-dark(#907AA933, #C4A7E73F);
   --color-neutral: light-dark(#5752791A, #E0DEF433);
   --color-on-accent: light-dark(#FFFAF3, #191724);
   --color-on-error: light-dark(#FFFFFF, #191724);
-  --color-on-error-muted: light-dark(#8F4F61, #F19DB5);
-  --color-on-info-muted: light-dark(#6D5D80, #C4A7E7);
-  --color-on-success-muted: light-dark(#3E6B73, #74A1B3);
-  --color-on-warning-muted: light-dark(#8C5E1F, #F6C177);
+  --color-on-error-muted: light-dark(#894C5D, #F19DB5);
+  --color-on-info-muted: light-dark(#6A5A7C, #C4A7E7);
+  --color-on-success-muted: light-dark(#3C6870, #74A1B3);
+  --color-on-warning-muted: light-dark(#895C1E, #F6C177);
   --color-overlay: light-dark(#57527966, #19172499);
   --color-overlay-hover: light-dark(#5752790C, #FFFFFF0C);
   --color-overlay-pressed: light-dark(#57527919, #FFFFFF19);
   --color-success-muted: light-dark(#56949F33, #31748F3F);
   --color-text-accent: light-dark(#286983, #9CCFD8);
-  --color-text-error: light-dark(#8F4F61, #F19DB5);
+  --color-text-error: light-dark(#894C5D, #F19DB5);
   --color-text-primary: light-dark(#575279, #E0DEF4);
   --color-text-secondary: light-dark(#69657F, #938FAC);
-  --color-text-success: light-dark(#3E6B73, #74A1B3);
-  --color-text-warning: light-dark(#8C5E1F, #F6C177);
-  --color-warning: light-dark(#EA9D34, #F6C177);
+  --color-text-success: light-dark(#3C6870, #74A1B3);
+  --color-text-warning: light-dark(#895C1E, #F6C177);
   --color-warning-muted: light-dark(#EA9D3433, #F6C1773F);
   --focus-outline-color: light-dark(#286983, #9CCFD8);
 }
@@ -199,7 +198,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-success-muted: light-dark(#0B991F33, #0B991F3F);
   --color-error: light-dark(#E3193B, #F5394F);
   --color-error-muted: light-dark(#E3193B33, #F5394F3F);
-  --color-warning: light-dark(#E9AF08, #F2C00B);
   --color-warning-muted: light-dark(#E2A40033, #E2A4003F);
   --color-text-success: var(--color-text-green);
   --color-text-warning: var(--color-text-yellow);
@@ -260,7 +258,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-text-secondary: light-dark(#515F74, #AFBACB);
   --color-text-success: light-dark(#246445, #99D2AF);
   --color-text-warning: light-dark(#80500E, #EDC588);
-  --color-warning: light-dark(#BE852E, #D3A258);
   --color-warning-muted: light-dark(#BE852E33, #D3A2583F);
   --focus-outline-color: light-dark(#315FD3, #87A9FA);
 }
@@ -301,7 +298,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-text-secondary: light-dark(#50645F, #A9BDB5);
   --color-text-success: light-dark(#44622E, #BDDA9E);
   --color-text-warning: light-dark(#785017, #E7C697);
-  --color-warning: light-dark(#BA863E, #CEA468);
   --color-warning-muted: light-dark(#BA863E33, #CEA4683F);
   --focus-outline-color: light-dark(#246B69, #7DC8BC);
 }
@@ -342,7 +338,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-text-secondary: light-dark(#695E66, #C3B6BD);
   --color-text-success: light-dark(#4C6134, #C5D4A0);
   --color-text-warning: light-dark(#805017, #EBC492);
-  --color-warning: light-dark(#BF873D, #CFA163);
   --color-warning-muted: light-dark(#BF873D33, #CFA1633F);
   --focus-outline-color: light-dark(#785378, #C9A2C5);
 }
@@ -368,8 +363,10 @@ html[data-theme="dark"] { color-scheme: dark; }
   --aster-topbar-h-phone: 52px;
   --aster-drawer-w: 320px;
 
-  /* Icon sizes: sm in the side nav, the top bar, the indicators and table
-     chips; md on a port, radio or device (the reference's Icon md). */
+  /* Icon sizes: xs a Token's remove mark (Icon xsm); sm in the side nav,
+     the top bar, the indicators and table chips; md on a port, radio or
+     device (the reference's Icon md). */
+  --aster-icon-xs: 12px;
   --aster-icon-sm: 16px;
   --aster-icon-md: 20px;
 

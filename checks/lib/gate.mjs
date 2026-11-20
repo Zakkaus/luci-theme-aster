@@ -58,7 +58,7 @@ export function die(msg) {
   process.exit(1);
 }
 
-/* One entry a line:  <path> [modal=<name>] [tab=<name>] [require=<class>,<class>...]
+/* One entry a line:  <path> [modal=<name>] [tab=<name>] [fixture=<name>] [require=<class>,<class>...]
  * A class in require= must have at least one sample on that page at every
  * viewport and mode. `<class>@desktop` asks for it on the desktop only;
  * `<class>@rows` on the desktop, and at any other viewport whenever the
@@ -70,7 +70,9 @@ export function die(msg) {
  * tab= selects a tab of the page's first tab group with that data-tab name
  * (a Lua CBI page's tabs, a JS view's tabs) before measuring; tab=a/b then
  * selects b in the tab group shown inside a (DHCP's nested tabs). The entry
- * is its own page ("<path> #<tab>"). */
+ * is its own page ("<path> #<tab>"). fixture= adds markup LuCI writes on
+ * pages the lab boxes lack (FIXTURES); the entry is its own page
+ * ("<path> +<fixture>"). */
 const QUALIFIERS = ['desktop', 'rows'];
 export function readPages(files) {
   const pages = [];
@@ -80,20 +82,22 @@ export function readPages(files) {
       const line = raw.replace(/#.*/, '').trim();
       if (!line) return;
       const [p, ...rest] = line.split(/\s+/);
-      const e = {path: p.replace(/^\/+/, ''), modal: null, tab: null, require: [], src: `${path.basename(file)}:${i + 1}`};
+      const e = {path: p.replace(/^\/+/, ''), modal: null, tab: null, fixture: null, require: [], src: `${path.basename(file)}:${i + 1}`};
       for (const r of rest) {
         const [k, v] = r.split('=');
         if (k === 'modal') e.modal = v;
         else if (k === 'tab') e.tab = v;
+        else if (k === 'fixture') e.fixture = v;
         else if (k === 'require') e.require = v.split(',').filter(Boolean);
         else die(`${e.src}: unknown field ${r}`);
       }
       if (e.modal && !MODALS[e.modal]) die(`${e.src}: unknown modal ${e.modal}`);
+      if (e.fixture && !FIXTURES[e.fixture]) die(`${e.src}: unknown fixture ${e.fixture}`);
       for (const req of e.require) {
         const q = req.split('@')[1];
         if (q !== undefined && !QUALIFIERS.includes(q)) die(`${e.src}: unknown qualifier @${q} (${QUALIFIERS.join(', ')})`);
       }
-      e.id = (e.modal ? `${e.path} [${e.modal}]` : e.path) + (e.tab ? ` #${e.tab}` : '');
+      e.id = (e.modal ? `${e.path} [${e.modal}]` : e.path) + (e.tab ? ` #${e.tab}` : '') + (e.fixture ? ` +${e.fixture}` : '');
       const first = pages.find((x) => x.id === e.id);
       if (first) first.require.push(...e.require.filter((r) => !first.require.includes(r)));
       else pages.push(e);
@@ -132,6 +136,34 @@ export const MODALS = {
   'status-spinning': (page, timeout) => status(page, timeout, 'notice spinning', 'Applying configuration changes… 9s'),
   'status-notice': (page, timeout) => status(page, timeout, 'notice', 'Changes have been reverted.'),
   'status-warning': (page, timeout) => status(page, timeout, 'warning', 'Revert request failed with status <code>500</code>'),
+};
+/* Markup LuCI writes on pages the lab boxes do not have, added to a page
+ * with LuCI's own calls so its classes and nesting are the real ones. Each
+ * returns a description of what it added, or throws. */
+export const FIXTURES = {
+  // ui.addNotification's banners (luci-app-nlbw's notice, routesj's error
+  // pre, a warning and a success), WireGuard's instance line (luci-proto-wireguard status.js: a
+  // chip, then port and key faded by an inline opacity) and inline code
+  // in a paragraph.
+  notices: async (page, timeout) => {
+    await page.waitForFunction(() => window.L && window.E, null, {timeout});
+    await page.evaluate(async () => {
+      const ui = await L.require('ui');
+      (L.ui ?? ui).addNotification(null, E('div', 'The nlbwmon daemon is not running.'));
+      (L.ui ?? ui).addNotification(null, E('pre', 'Unable to execute ip: Connection refused'), 'danger');
+      (L.ui ?? ui).addNotification(null, E('p', 'Device is running a release candidate.'), 'warning');
+      (L.ui ?? ui).addNotification(null, E('p', 'Configuration has been applied.'), 'success');
+      document.querySelector('#view').append(
+        E('h3', 'Instance "wg0"'),
+        E('p', {style: 'cursor:pointer'}, [
+          E('span', {class: 'ifacebadge'}, [E('img', {src: L.resource('icons', 'wireguard.svg'), style: 'width:32px;height:32px'}), '\xa0', 'wg0']),
+          E('span', {style: 'opacity:.8'}, [' · ', 'Port 51820', ' · ', E('code', {click: ''}, ['bW9kZSBvZiB0aGUgZml4dHVyZSBrZXkgYmFzZTY0PQ=='])]),
+        ]),
+        E('p', ['Run ', E('code', 'wg show'), ' on the device for the handshakes.']));
+    });
+    await page.waitForSelector('#maincontent > .alert-message.danger pre', {state: 'visible', timeout});
+    return 'notice, error, warning and success banners, a WireGuard instance line, inline code';
+  },
 };
 async function status(page, timeout, type, html) {
   await page.waitForFunction(() => window.L && window.E, null, {timeout});
@@ -225,6 +257,15 @@ export async function openPage(ctx, opt, entry, mode, debugCss) {
       note = await MODALS[entry.modal](page, opt.timeout);
     } catch (e) {
       return fail(`modal ${entry.modal}: ${String(e.message).split('\n')[0]}`);
+    }
+    await page.waitForTimeout(opt.settle);
+  }
+  if (entry.fixture) {
+    try {
+      const added = await FIXTURES[entry.fixture](page, opt.timeout);
+      note = note ? `${note}, ${added}` : added;
+    } catch (e) {
+      return fail(`fixture ${entry.fixture}: ${String(e.message).split('\n')[0]}`);
     }
     await page.waitForTimeout(opt.settle);
   }

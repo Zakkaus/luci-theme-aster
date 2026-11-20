@@ -77,6 +77,12 @@ expect uniform 1 "glyph raw" "raw ▲ glyph shown" -- "$url" "$password" --pages
 # The save bar over the page again: the main column runs under it.
 expect uniform 1 "footer overlap" "save bar covering the page" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=.shell-main { margin-block-end: 0 !important }'
+# The last line 9 above the save bar: the footer's bottom padding cut (the
+# router measure's 9-9.6 was a viewport artifact, normal and read-only
+# sessions alike; this is the fault it would be). The margin keeps the
+# column scrolling, so the check applies.
+expect uniform 1 "space.page.bar gap" "last block 9 above the save bar" "(want 24px)" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=.shell-footer { padding-block-end: 9px !important; margin-block-start: 1000px !important }'
 
 # Side nav: rows set flush again (the hovered row touched the selected one).
 expect uniform 1 "nav.item gap" "side nav rows with no gap" "0px (want 2px)" -- "$url" "$password" --pages "$tmp/reboot.txt" \
@@ -201,6 +207,19 @@ expect uniform 1 "zone fill" "zone chips in LuCI's inline colours" -- "$url" "$p
 # Frames: a form row framed inside its card.
 expect uniform 1 "frame nested" "a form row framed inside its card" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=.cbi-value { box-shadow: 0 0 0 1px var(--color-border) !important }'
+
+# A dynlist value as a padded full-width row again (the router's 4/36/4/12
+# box), not a Token; a graph's black frame back inside its card; a card's
+# own save bar keeping its divider and fill on a phone (Startup).
+printf 'admin/system/system tab=timesync\n' >"$tmp/timesync.txt"
+expect uniform 1 "frame nested" "dynlist value as a filled row" -- "$url" "$password" --pages "$tmp/timesync.txt" \
+	--debug-css 'admin/system/system=html .cbi-dynlist > .item { display: block !important; block-size: auto !important; min-block-size: 32px !important; padding: 4px 36px 4px 12px !important }'
+printf 'admin/status/realtime/load\n' >"$tmp/load.txt"
+expect uniform 1 "frame nested" "graph framed inside its card" -- "$url" "$password" --pages "$tmp/load.txt" \
+	--debug-css 'admin/status/realtime/load=#view#view#view div[style*="border:1px solid #000"] { border-color: rgb(0, 0, 0) !important }'
+printf 'admin/system/startup tab=rc\n' >"$tmp/startup-rc.txt"
+expect uniform 1 "frame nested" "card's save bar a band on a phone" -- "$url" "$password" --pages "$tmp/startup-rc.txt" --viewports phone \
+	--debug-css 'admin/system/startup=#view .cbi-page-actions { border-block-start: 1px solid rgb(0, 0, 0) !important }'
 
 # Dialog: a tall one runs past the window; the save bar over the scrim.
 expect uniform 1 "dialog fits" "dialog taller than the window" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
