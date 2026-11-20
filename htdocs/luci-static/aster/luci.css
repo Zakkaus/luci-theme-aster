@@ -666,6 +666,41 @@ html body[data-page^="admin-services-openclash"] .oc.cbi-button { --primary-colo
 html body[data-page^="admin-services-openclash"] .cbi-value-field .cbi-input-select {
   inline-size: var(--field-w) !important; /* oc-common.css width:auto !important */
 }
+/* OpenClash draws its fields with --border-light (the card's faint rule)
+   and its buttons with --radius-sm/md/lg: on a field the border is the
+   Field's, on a button the radius is the Button's pill, and an icon chip
+   (.icon-btn, --icon-btn-size) is as high as the Button where it sits. */
+html body[data-page^="admin-services-openclash"] .oc :is(input:not([type="checkbox"], [type="radio"], [type="button"], [type="submit"], [type="reset"]), select, textarea) {
+  --border-light: var(--field-border, var(--color-border-emphasized));
+}
+html body[data-page^="admin-services-openclash"] .oc :is(button, .btn, .cbi-button) {
+  --radius-sm: var(--radius-full);
+  --radius-md: var(--radius-full);
+  --radius-lg: var(--radius-full);
+}
+html body[data-page^="admin-services-openclash"] .oc .icon-btn { --icon-btn-size: var(--button-h, var(--size-element-md)); }
+/* Its log highlighter's level, timestamp and category inks (oc-common.css
+   --teal, --magenta, --orange and the rest, on a 15% tint of themselves)
+   become the theme's text inks; an accent-tinted chip (a version, the
+   edited file's name) is inked in the theme's blue text, not the accent. */
+html body[data-page^="admin-services-openclash"] .oc {
+  --teal: var(--color-text-blue);
+  --azure: var(--color-text-accent);
+  --magenta: var(--color-text-secondary);
+  --orange: var(--color-text-warning);
+  --amber: var(--color-text-warning);
+  --red: var(--color-text-error);
+  --warning-color: var(--color-text-warning);
+  --black: var(--color-text-primary);
+  --teal-a15: color-mix(in srgb, var(--teal) 12%, transparent);
+  --azure-a15: color-mix(in srgb, var(--azure) 12%, transparent);
+  --magenta-a15: color-mix(in srgb, var(--magenta) 12%, transparent);
+  --orange-a15: color-mix(in srgb, var(--orange) 12%, transparent);
+  --amber-a15: color-mix(in srgb, var(--amber) 12%, transparent);
+  --red-a15: color-mix(in srgb, var(--red) 12%, transparent);
+  --magenta-bright-a15: color-mix(in srgb, var(--warning-color) 12%, transparent);
+}
+html body[data-page^="admin-services-openclash"] .oc :is(.addr-row .ver-link, .config-editor-title .config-file-name) { --primary-color: var(--color-text-blue); }
 /* OpenClash's good/bad notes outside .oc (a map's description) keep its
    literal fallbacks; they take the status inks. */
 html body[data-page^="admin-services-openclash"] .oc-txt-good { color: var(--color-text-success); }
@@ -675,6 +710,9 @@ html body[data-page^="admin-services-openclash"] .oc-txt-bad { color: var(--colo
 html body[data-page^="admin-services-openclash"] .cm-editor :is(.cm-scroller, .cm-content) {
   font-family: var(--font-family-code) !important; /* oc-cm6.css .oc .cm-content !important */
 }
+/* CodeMirror's own light theme greys its line numbers under 4.5:1; they
+   take the supporting ink. */
+html body[data-page^="admin-services-openclash"] .cm-editor .cm-gutters { color: var(--color-text-secondary); }
 
 /* PassWall (body[data-page^="admin-services-passwall"]): a node row's
    actions sit 8 apart and wrap, like every table's actions (node_list.htm
@@ -683,9 +721,22 @@ html body[data-page^="admin-services-passwall"] .pw-actions > .node-wrapper { fl
 /* Running Status tiles: the label and the state words in the theme's
    inks (status.htm's own greys and oranges are under 3:1 on the card). */
 html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .block h4 { color: var(--color-text-secondary) !important; } /* status.htm color:#8898aa!important */
+/* App Update: each version under its name at the label's ink, not
+   app_version.htm's 70% opacity (under 4.5:1). */
+html body[data-page^="admin-services-passwall"] #app_version .app-version-sub { opacity: 1; color: var(--color-text-secondary); }
 html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .green { color: var(--color-text-success); }
 html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .red { color: var(--color-text-error); }
 html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .yellow { color: var(--color-text-warning); }
+/* On a phone the node table folds like every other table: node_list.htm
+   draws its rows as flex rows under 1152 (layout), and pads the actions
+   cell 5 a side (!important there) where the fold insets it 16. */
+@media (max-width: 48rem) {
+  html body[data-page^="admin-services-passwall"] .table:has(> :is(.thead, thead, tbody) > .tr > .th) .tr.cbi-section-table-row { display: grid; }
+  html body[data-page^="admin-services-passwall"] .table .tr > .pw-actions { padding-inline: var(--spacing-4) !important; } /* node_list.htm padding 5px !important */
+  /* app_version.htm centres its rows' items; the label spans the stacked
+     row like every form row's (layout). */
+  html body[data-page^="admin-services-passwall"] #app_version > .cbi-value { align-items: stretch; }
+}
 /* The Running Status tiles go one a row on a narrow phone: two a row
    (status.htm's own) leave a tile narrower than its icon and label. */
 @media (max-width: 30rem) {

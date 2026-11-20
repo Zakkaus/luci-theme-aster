@@ -746,7 +746,7 @@ html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -
     padding-block: var(--spacing-1);
     border-block-end: var(--border-width) solid var(--color-border);
   }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > .td) {
+  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td)) {
     display: block;
     grid-column: 1;
     padding: 0 var(--spacing-2) 0 var(--spacing-4);
@@ -758,29 +758,29 @@ html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -
     text-align: start;
   }
   html #view .nft-rules tr > td { padding-block: 0 !important; } /* nftables' <style>, as above */
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > .td:first-child) {
+  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td):first-child) {
     color: var(--color-text-primary);
     font-size: var(--text-body-size);
     line-height: var(--text-body-leading);
   }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > .td[data-title]:not(:first-child, .cbi-section-actions))::before {
+  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td)[data-title]:not(:first-child, .cbi-section-actions))::before {
     content: attr(data-title);
     margin-inline-end: var(--spacing-2);
     font-weight: var(--font-weight-medium);
   }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > .td:has(> :is(input:not([type="checkbox"]), select, .cbi-dropdown, .cbi-dynlist)))::before { display: block; }
+  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td):has(> :is(input:not([type="checkbox"]), select, .cbi-dropdown, .cbi-dynlist)))::before { display: block; }
   /* The actions take a line of their own under the stack, so the data
      keeps the row's full width (a column beside it left long values a
      narrow one); several wrap, 8 apart. */
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > .td.cbi-section-actions) {
+  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td).cbi-section-actions) {
     padding: var(--spacing-2) var(--spacing-4) 0;
   }
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > .td.cbi-section-actions > div) { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
+  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td).cbi-section-actions > div) { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
   /* A Lua button table (one action per cell, Commit and Apply) stacks
      its buttons 8 apart: the cell, or the option's div in it, which may
      carry the button's script beside it (OpenClash's Create). (:has()
      does not nest, hence the div is the box.) */
-  html :where(form > .cbi-map .table .tr > .td:has(> :is(.btn, .cbi-button):only-child), form > .cbi-map .table .tr > .td > div:only-child:has(> :is(.btn, .cbi-button)):not(:has(> :not(script, .btn, .cbi-button)))) {
+  html :where(form > .cbi-map .table .tr > :is(.td, td):has(> :is(.btn, .cbi-button):only-child), form > .cbi-map .table .tr > :is(.td, td) > div:only-child:has(> :is(.btn, .cbi-button)):not(:has(> :not(script, .btn, .cbi-button)))) {
     padding-block: var(--spacing-1);
   }
 }
