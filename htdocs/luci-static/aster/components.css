@@ -309,10 +309,29 @@ html :where(.cbi-input-invalid, .cbi-input-invalid:is(:hover, :focus, [open]), [
 }
 
 /* ── Select ──────────────────────────────────────────────────────
-   A native <select> is the Field with the browser's arrow. LuCI's
-   .cbi-dropdown is a <div> list that opens a Menu: the Field box (above),
-   the chosen item 12 in, the 16 chevron in the secondary icon colour 13
-   from the end (Astryx Select's caret inset). */
+   LuCI's .cbi-dropdown is a <div> list that opens a Menu: the Field box
+   (above), the chosen item 12 in, the 16 chevron in the secondary icon
+   colour 13 from the end (Astryx Select's caret inset). A native <select>
+   draws the same chevron in the same place: the browser's arrow is turned
+   off and the ChevronDown's two strokes (1.5 on 24, a 10 x 5 V in the 16
+   box) are two diagonal gradient lines in the icon colour. A <select> has
+   no pseudo-elements to mask and a data: SVG cannot take a palette
+   colour; appearance: base-select would also replace the option list
+   with a picker to restyle, and only in Chromium. */
+html :where(select:not([multiple])) {
+  --select-chevron: calc(var(--aster-icon-sm) * 5 / 16);
+  --select-stroke: calc(var(--border-width) * 0.75);
+  appearance: none;
+  padding-inline-end: calc(var(--aster-icon-sm) + var(--spacing-3) + var(--spacing-2));
+  background-image:
+    linear-gradient(45deg, transparent calc(50% - var(--select-stroke)), var(--color-icon-secondary) 0 calc(50% + var(--select-stroke)), transparent 0),
+    linear-gradient(-45deg, transparent calc(50% - var(--select-stroke)), var(--color-icon-secondary) 0 calc(50% + var(--select-stroke)), transparent 0);
+  background-position:
+    right calc(var(--spacing-3) + var(--border-width) + var(--aster-icon-sm) * 3 / 16 + var(--select-chevron)) center,
+    right calc(var(--spacing-3) + var(--border-width) + var(--aster-icon-sm) * 3 / 16) center;
+  background-size: var(--select-chevron) var(--select-chevron);
+  background-repeat: no-repeat;
+}
 
 html :where(.cbi-dropdown:not(.btn, .cbi-button)) {
   display: inline-flex;
