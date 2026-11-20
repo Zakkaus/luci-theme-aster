@@ -96,8 +96,9 @@ function collect(cfg) {
   const FRAME = `${CARD}, #view > :is(table, .table), #view > .cbi-map > :is(table, .table)`;
   const BTN = 'button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button';
   // The Table component folds a table with a header row on a phone
-  // (components.css, Table: Collapsible).
-  const FOLD = '#view .table:has(> .tr > .th, > .thead > .tr > .th)';
+  // (components.css, Table: Collapsible), in a JS view and in a Lua CBI
+  // map (form > .cbi-map), whose parser writes real <thead>/<tbody>.
+  const FOLD = ':is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th)';
   // The card a node is drawn in: its outermost frame; in a dialog, the dialog.
   const frameOf = (el) => {
     if (cfg.modal) return scope;
@@ -396,8 +397,9 @@ function collect(cfg) {
   for (const el of scope.querySelectorAll('*')) {
     if (!el.matches('input, select, textarea, button') && !ownText(el)) continue;
     if (el.matches('option, script, style') || (!cfg.modal && el.closest('#modal_overlay')) || !visible(el)) continue;
-    // A textarea is the Field's code variant (logs, keys, crontab, rc.local).
-    add(el.closest('pre, code, kbd, samp, tt, textarea') ? 'font.code' : 'font.body', 'fontFamily', fam(getComputedStyle(el).fontFamily), el);
+    // A textarea is the Field's code variant (logs, keys, crontab, rc.local);
+    // so is a CodeMirror editor (.cm-editor) an app puts in its place.
+    add(el.closest('pre, code, kbd, samp, tt, textarea, .cm-editor') ? 'font.code' : 'font.body', 'fontFamily', fam(getComputedStyle(el).fontFamily), el);
   }
   return out;
 }

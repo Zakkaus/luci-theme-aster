@@ -57,4 +57,15 @@ expect uniform 1 "card background" "dark card fill changed" -- "$url" "$password
 # not overflow, so only the overflow rule sees it.
 expect uniform 1 "overflow excess" "interfaces table wider than its card" -- "$url" "$password" --pages "$tmp/network.txt" \
 	--debug-css 'admin/network/network=.table:has([style*="min-width"]) { min-inline-size: max-content; }'
+
+# Lua CBI map (APPS=1: a box with OpenClash, as apps-install.sh leaves it).
+# A header table in a Lua map folds on a phone like a JS view's, and the
+# gate reads it as a fold; a row drawn as a flex column instead of the
+# fold's grid looks the same but is not the component.
+if [[ ${APPS:-0} = 1 ]]; then
+	printf 'admin/services/openclash/proxy-providers-file-manage require=table@rows\n' >"$tmp/lua.txt"
+	expect uniform 0 "" "Lua tables fold on a phone" -- "$url" "$password" --pages "$tmp/lua.txt" --viewports phone
+	expect uniform 1 "table.fold.row display" "Lua table row not the fold's grid" -- "$url" "$password" --pages "$tmp/lua.txt" --viewports phone \
+		--debug-css 'admin/services/openclash/proxy-providers-file-manage=form > .cbi-map .table .tr:has(> .td) { display: flex !important; flex-direction: column }'
+fi
 finish
