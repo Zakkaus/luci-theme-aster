@@ -171,7 +171,8 @@ const both = (f) => [f(0), f(1)];
  *    white at 5% / 10% in dark; the dialog scrim is the ink at 40% in
  *    light and the body at 60% in dark;
  *  - on-error is white or the light-mode ink, whichever reads better on the
- *    error fill; on-light (ink on a light inline zone colour) stays black.
+ *    error fill, or the dark body when neither reaches 4.5:1 (Rosé Pine's
+ *    dark Love); on-light (ink on a light inline zone colour) stays black.
  */
 export function derive(tokens) {
   const t = (name, m) => tokens[name][m];
@@ -195,7 +196,8 @@ export function derive(tokens) {
   out['--color-overlay-pressed'] = both((m) => (m ? '#FFFFFF19' : ink(m) + '19'));
   out['--color-on-error'] = both((m) => {
     const fill = t('--color-error', m);
-    return ratio('#FFFFFF', fill) >= ratio(ink(0), fill) ? '#FFFFFF' : ink(0);
+    const best = ratio('#FFFFFF', fill) >= ratio(ink(0), fill) ? '#FFFFFF' : ink(0);
+    return ratio(best, fill) >= 4.5 ? best : t('--color-background-body', 1);
   });
   out['--color-on-light'] = ['#000000', '#000000'];
   return out;

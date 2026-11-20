@@ -21,11 +21,9 @@
   --button-bg: var(--color-accent);
   --button-fg: var(--color-on-accent);
 }
-/* Destructive: error text on the neutral fill; the confirm inside a
-   dialog, the only red on screen there, takes the error fill. */
+/* Destructive (Astryx Button destructive): the error fill, on-error text. */
 .cbi-button-negative,
-.cbi-button-remove { --button-fg: var(--color-text-error); }
-#modal_overlay :is(.cbi-button-negative, .cbi-button-remove) {
+.cbi-button-remove {
   --button-bg: var(--color-error);
   --button-fg: var(--color-on-error);
 }
