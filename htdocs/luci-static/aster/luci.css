@@ -324,7 +324,10 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
   padding-inline: var(--card-pad, var(--spacing-0));
 }
 /* A table with no card around it makes up the card's border only. */
-.shell-inner .table:not(.cbi-section *) { margin-inline: var(--border-width); }
+/* A table that is the card itself (#view > .table) keeps its full width:
+   the inset made WireGuard's peer table overflow #view by 2, which drew a
+   scrollbar under it. */
+.shell-inner .table:not(.cbi-section *, #view > *, #view > .cbi-map > *) { margin-inline: var(--border-width); }
 /* An interface row: cells to the top, the box column as narrow as the box,
    the status column the rest. */
 .tr:has(> .td > .ifacebox) > .td {
@@ -442,6 +445,16 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   opacity: 1 !important; /* inline opacity:.5 */
   color: var(--color-text-secondary);
 }
+/* WireGuard status: the instance chip's image is written 32 inline, a
+   Badge's icon is 16; a key in a chip is the chip's words, not a chip of
+   its own (one 8 inset, the Badge's size); the instance line's key
+   wraps anywhere (base64 has no break), each line keeping its inset. */
+.ifacebadge > img[style*="width"] {
+  inline-size: var(--aster-icon-sm) !important; /* inline width:32px */
+  block-size: var(--aster-icon-sm) !important; /* inline height:32px */
+}
+.ifacebadge > code { padding: 0; background: none; font-size: inherit; line-height: inherit; }
+#view > p:has(> .ifacebadge) code { overflow-wrap: anywhere; box-decoration-break: clone; }
 .ifacebox-body > div > .ifacebadge { display: flex; }
 .ifacebox-body > div > .ifacebadge + .ifacebadge { margin-block-start: var(--spacing-2); }
 .network-status-table { display: flex; flex-wrap: wrap; gap: var(--spacing-3); }
