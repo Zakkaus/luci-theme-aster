@@ -308,6 +308,24 @@ function collect(cfg) {
   // One with neither a border nor a fill is not a card: a frameless band
   // (the overview's port status) or a table not framed yet. Dialog sections
   // are the dialog's, not cards.
+  // A card has no rule under its last row (Astryx Card; Table drops the
+  // last body row's divider): a bottom border, or an <hr>, inside the card
+  // with nothing drawn below it. A box framed on both sides (a field, a
+  // button, an interface box) is not a rule. The rule's border, or none
+  // (a string, so a 1px rule is not within --tolerance of none).
+  const lastRule = (card) => {
+    const els = [...card.querySelectorAll('*')].filter((e) => !e.closest(APP_OWN) && visible(e));
+    const bottom = Math.max(...els.map((e) => box(e).bottom));
+    for (const e of els) {
+      const s = getComputedStyle(e);
+      const side = e.matches('hr') ? 'Top' : 'Bottom';
+      const bw = parseFloat(s[`border${side}Width`]);
+      if (!bw || s[`border${side}Style`] === 'none' || rgba(s[`border${side}Color`])[3] === 0) continue;
+      if (parseFloat(s.borderLeftWidth) && parseFloat(s.borderRightWidth)) continue;
+      if (box(e).bottom >= bottom - 0.5) return add('card', 'lastRule', `${px(bw)}px ${s[`border${side}Style`]} ${col(s[`border${side}Color`])}`, e);
+    }
+    add('card', 'lastRule', 'none', card);
+  };
   const framed = new Set();
   if (!cfg.modal) {
     const cards = all(FRAME).filter((el) => !el.parentElement.closest(CARD));
@@ -319,6 +337,7 @@ function collect(cfg) {
       add('card', 'padding', [px(s.paddingTop), px(s.paddingRight), px(s.paddingBottom), px(s.paddingLeft)], el);
       add('card', 'background', col(s.backgroundColor), el);
       add('card', 'border', border(s), el);
+      lastRule(el);
     }
     // The gap to the next card under the same parent: across when it sits on
     // the same row, else down from the bottom of the row this card ends.

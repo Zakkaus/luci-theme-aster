@@ -20,6 +20,7 @@
 .btn.important {
   --button-bg: var(--color-accent);
   --button-fg: var(--color-on-accent);
+  --button-divider: var(--color-on-accent);
 }
 /* Destructive (.cbi-button-negative, .cbi-button-remove): on a page or in
    a table row an ordinary secondary button, as Terminate and Kill are in
@@ -29,6 +30,7 @@
 #modal_overlay :is(.cbi-button-negative, .cbi-button-remove) {
   --button-bg: var(--color-error);
   --button-fg: var(--color-on-error);
+  --button-divider: var(--color-on-accent);
 }
 .cbi-dropdown:is(.cbi-button-negative, .cbi-button-remove) { --menu-item-fg: var(--color-text-error); }
 .cbi-button-link { --button-bg: transparent; --button-decoration: underline; }

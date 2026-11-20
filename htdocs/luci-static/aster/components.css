@@ -168,7 +168,7 @@ html body[data-page^="admin-services-openclash"] .oc.cbi-button.cbi-button {
   margin: 0;
   padding: 0 var(--button-px, var(--spacing-3));
   border: 0;
-  border-radius: var(--radius-full);
+  border-radius: var(--button-radius, var(--radius-full));
   background-color: var(--button-bg, var(--color-neutral));
   color: var(--button-fg, var(--color-text-primary));
   font: inherit;
@@ -205,13 +205,17 @@ html :where(.pager > :is(.btn, button), .drag-handle, .add-item > .cbi-button-ad
 }
 /* Busy (.spinning): unavailable, not moving. */
 html :where(:is(.btn, .cbi-button, button).spinning) { opacity: 0.65; cursor: progress; }
-/* ComboButton (.cbi-dropdown.btn, Save & Apply): the Button whose label is
-   the dropdown's chosen item and whose chevron segment is divided off. */
-html :where(.cbi-dropdown:is(.btn, .cbi-button)) { --button-px: 0; position: relative; align-items: stretch; }
+/* ComboButton (.cbi-dropdown.btn: Save & Apply, Diagnostics' tools): an
+   Astryx ButtonGroup of the Button (the chosen item) and a square
+   IconButton (the chevron). The group's outer corners take the element
+   radius; a 1 rule divides the halves, the border colour on the neutral
+   fill and --button-divider on a solid one (on-accent). */
+html :where(.cbi-dropdown:is(.btn, .cbi-button)) { --button-px: 0; --button-radius: var(--radius-element); position: relative; align-items: stretch; }
 html :where(:is(.cbi-dropdown:is(.btn, .cbi-button)) > ul:not(.dropdown) > li[display]) { padding-inline: var(--spacing-3); }
 html :where(:is(.cbi-dropdown:is(.btn, .cbi-button)) > .open) {
-  inline-size: var(--size-element-md);
-  border-inline-start: var(--border-width) solid color-mix(in srgb, currentColor 30%, transparent);
+  box-sizing: border-box;
+  inline-size: var(--button-h, var(--size-element-md));
+  border-inline-start: var(--border-width) solid var(--button-divider, var(--color-border));
   color: inherit;
 }
 
@@ -335,7 +339,16 @@ html :where(.cbi-dropdown:not(.btn, .cbi-button) > :is(.open, .more)) {
   inline-size: var(--size-element-sm);
   color: var(--color-icon-secondary);
 }
-html :where(.cbi-dropdown > .open) { display: flex; }
+html :where(.cbi-dropdown > .open) { display: flex; font-size: 0; }
+/* LuCI writes the chevron as a ▾ glyph; it draws the 16 ChevronDown icon
+   (Heroicons 2.2.0, MIT) in the segment's colour instead. */
+html :where(.cbi-dropdown > .open)::before {
+  content: "";
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
+  background-color: currentColor;
+  mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='m19.5%208.25-7.5%207.5-7.5-7.5'/></svg>") center / contain no-repeat;
+}
 
 /* ── Menu ────────────────────────────────────────────────────────
    The list a .cbi-dropdown opens: a popover over the control, container
@@ -698,6 +711,9 @@ html :where(th, td, .th, .td) {
   vertical-align: middle;
 }
 html :where(th, td, .th, .td):last-child { padding-inline-end: var(--spacing-4); }
+/* No rule under the last row: the card's edge closes the table (Astryx
+   TableCell drops the last body row's divider). */
+html :where(:is(tr, .tr):last-child > :is(td, .td)) { border-block-end: 0; }
 html :where(td, .td) { line-height: var(--text-body-leading); font-variant-numeric: tabular-nums; }
 /* luci-mod-status's nftables view sets its cells to .25em with !important
    in a <style> it adds after the theme; only !important, one id heavier,
@@ -752,6 +768,7 @@ html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -
     padding-block: var(--spacing-1);
     border-block-end: var(--border-width) solid var(--color-border);
   }
+  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr:last-child) { border-block-end: 0; }
   html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td)) {
     display: block;
     grid-column: 1;

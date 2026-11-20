@@ -47,6 +47,9 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
   scroll box inside a card is wider than it (`overflow excess`). Components
   that scroll by design (Field, the phone Tabs list) are named in
   `SCROLLS` and skipped.
+- `uniform.mjs` reads a rule under a card's last row (`card lastRule`): a
+  bottom border or an `<hr>` inside a card with nothing drawn below it
+  (Astryx drops the last row's divider; the card's edge closes it).
 - `uniform.mjs` reads the side nav's row gap (`nav.item gap`), so a
   hovered row never touches the selected one.
 - It opens ui.js's tooltip on up to three `[data-tooltip]` triggers a page

@@ -58,6 +58,13 @@ expect uniform 1 "card background" "dark card fill changed" -- "$url" "$password
 expect uniform 1 "overflow excess" "interfaces table wider than its card" -- "$url" "$password" --pages "$tmp/network.txt" \
 	--debug-css 'admin/network/network=.table:has([style*="min-width"]) { min-inline-size: max-content; }'
 
+# A rule under a card's last row: Diagnostics' tool cells (one row in a
+# card-framed table) drawing their row rule again.
+printf 'admin/network/diagnostics\n' >"$tmp/diagnostics.txt"
+expect uniform 0 "" "no rule under a card's last row" -- "$url" "$password" --pages "$tmp/diagnostics.txt"
+expect uniform 1 "card lastRule" "rule under a card's last row" "(want none)" -- "$url" "$password" --pages "$tmp/diagnostics.txt" \
+	--debug-css 'admin/network/diagnostics=#view .table .tr > .td { border-block-end: 1px solid rgb(0, 0, 0) !important }'
+
 # Side nav: rows set flush again (the hovered row touched the selected one).
 expect uniform 1 "nav.item gap" "side nav rows with no gap" "0px (want 2px)" -- "$url" "$password" --pages "$tmp/reboot.txt" \
 	--debug-css 'admin/system/reboot=.nav, .nav-group { gap: 0 !important }'

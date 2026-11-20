@@ -7,6 +7,7 @@
   ],
   "classes": {
     "button.*.md": {"_source": "spec Button secondary md", "height": 36, "radius": 9999, "fontSize": 15, "paddingInline": 12},
+    "button.dropdown.*": {"_source": "Astryx 0.7.16 ButtonGroup: a grouped Button's outer corners take --radius-element (Button.js groupStyles); the ComboButton is the group of its Button and chevron IconButton", "radius": 12},
     "button.*.sm": {"_source": "spec Button secondary sm", "height": 32, "radius": 9999, "fontSize": 15, "paddingInline": 12},
     "button.icon.md": {"_source": "Astryx 0.7.16 IconButton md (Button isIconOnly: height --size-element-md, aspect-ratio 1 / 1, padding 0, flex-shrink 0, the button's pill radius); label size for the glyph", "height": 36, "width": 36, "radius": 9999, "fontSize": 15, "paddingInline": 0},
     "button.icon.sm": {"_source": "Astryx 0.7.16 IconButton sm (height --size-element-sm, square, padding 0); a table cell holds the small one", "height": 32, "width": 32, "radius": 9999, "fontSize": 15, "paddingInline": 0},
@@ -34,8 +35,8 @@
     "table.progress.td": {"_source": "M2 overview Memory and Storage cards", "paddingBlock": 0, "paddingInlineStart": 0, "fontSize": null},
 
     "card": {
-      "_source": "spec Card (default); gap is the overview grid gap",
-      "radius": 16, "padding": 15, "gap": 16,
+      "_source": "spec Card (default); gap is the overview grid gap; lastRule: no rule under a card's last row (Astryx TableCell drops the last body row's divider)",
+      "radius": 16, "padding": 15, "gap": 16, "lastRule": "none",
       "background": {"light": "rgb(255, 255, 255)", "dark": "rgb(31, 31, 34)"},
       "border": {"light": "1px solid rgba(5, 54, 89, 0.098)", "dark": "1px solid rgba(242, 244, 246, 0.098)"}
     },
