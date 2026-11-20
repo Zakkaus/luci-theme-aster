@@ -95,7 +95,8 @@ const FIELDS = [
   {name: 'table row height', from: ['components', 'Table body row', 'height'], devices: ['desktop'], sel: '#view .table:has(.th) > .tr:has(> .td):not(.placeholder, :has(button, .btn))', fallback: '#view .table:not(:has(.th)) > .tr:not(:has(.cbi-progressbar))', prop: 'height'},
   // A data row holding a button (DHCP's Reserve IP, a station's Disconnect).
   {name: 'table row height (button)', from: ['components', 'Table body row with sm Button', 'height'], devices: ['desktop'], sel: '#view .table:has(.th) > .tr:has(> .td > :is(button, .btn))', prop: 'height'},
-  {name: 'icon size', from: ['components', 'Icon sm', 'width'], sel: '.shell-header .icon-btn:not([hidden]) svg, .brand .mark svg', prop: 'width', visible: true},
+  // The brand mark is the logo at its own size, not an sm icon.
+  {name: 'icon size', from: ['components', 'Icon sm', 'width'], sel: '.shell-header .icon-btn:not([hidden]) svg', prop: 'width', visible: true},
   // Port tiles (Port status): the first tile with a link.
   {name: 'port grid gap', from: ['frame', 'Grid: port tiles', 'gap'], sel: '#view div[style*="grid-template-columns"]:has(> .ifacebox)', prop: 'gap'},
   {name: 'port tile radius', from: ['components', 'Port tile (Card)', 'radius'], sel: PORT_UP, prop: 'radius'},
