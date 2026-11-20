@@ -152,6 +152,22 @@
 .td textarea { max-block-size: 8.5rem; }
 /* The SSH keys list holds whole keys: full width. */
 [data-page="admin-system-admin-sshkeys"] .cbi-dynlist { --field-w: 100%; }
+/* System Log's filter rows (layout): a wrapping toolbar, each label on its
+   control's centre line, 8 apart, the controls sharing what is left; the
+   inline 5 / 10 px margins go (only !important beats them). */
+#view div:has(> [id^="invertLog"]) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-block-end: var(--spacing-2) !important; /* inline margin-bottom:10px */
+  & > * { margin: 0 !important; } /* inline margins */
+  & > :is(select, input:not([type="checkbox"])) { flex: 1 1 var(--aster-label-w); }
+}
+/* Software: the disk-space value shares the label's line (the bar's value
+   text sits a line above the track); the pager's arrows 8 off its text. */
+#disk-space-label + .cbi-progressbar { margin-block-start: var(--spacing-1); }
+#view .pager { gap: var(--spacing-2); }
 
 /* ── Dropdown, dynlist, filebrowser [ported] ────────────────── */
 

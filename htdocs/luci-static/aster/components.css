@@ -248,6 +248,7 @@ html :where(textarea) {
   padding-block: var(--spacing-1);
   font-family: var(--font-family-code);
   font-size: var(--text-supporting-size);
+  text-overflow: clip; /* a log line scrolls; an ellipsis would cut every line */
   resize: vertical;
 }
 /* ui.Textarea writes font-family:monospace inline for a key or command
