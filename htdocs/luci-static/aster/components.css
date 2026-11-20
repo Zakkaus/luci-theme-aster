@@ -606,8 +606,10 @@ html :where(.cbi-dynlist > .item > span) { pointer-events: none; }
 html :where(.cbi-dynlist > .item code) { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--color-text-secondary); }
 html :where(.cbi-dynlist > .item.dragging) { opacity: 0.5; }
 html :where(.cbi-dynlist) > :is(.item, .add-item > *).drag-over { box-shadow: inset 0 calc(var(--border-width) * 2) 0 var(--color-accent); }
-html :where(.cbi-dynlist > .add-item) { display: flex; gap: var(--spacing-2); min-inline-size: 0; }
-html :where(.cbi-dynlist > .add-item > :is(input, .cbi-dropdown)) { --field-w: auto; flex: 1 1 auto; min-inline-size: 0; }
+/* The add row keeps its button on the field's line (a control group that
+   never wraps); the field takes what the button leaves. */
+html :where(.cbi-dynlist > .add-item) { display: flex; flex-wrap: nowrap; gap: var(--spacing-2); min-inline-size: 0; }
+html :where(.cbi-dynlist > .add-item > :is(input, .cbi-dropdown)) { --field-w: auto; flex: 1 1 0; min-inline-size: 0; }
 @media (prefers-reduced-motion: no-preference) {
   html :where(.cbi-dynlist > .item.flash) { animation: aster-flash var(--duration-medium-min) var(--ease-standard); }
 }
@@ -678,7 +680,7 @@ html :where(.cbi-value:has([data-changed="true"]) > .cbi-value-title)::after {
   background: var(--color-accent);
 }
 /* A field with its own affordance (password reveal, add button). */
-html :where(.control-group) { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); }
+html :where(.control-group:not(.cbi-dynlist > .add-item)) { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); }
 
 /* ── Card ────────────────────────────────────────────────────────
    The surface, a 1 border, the container radius and 16 from the outer
