@@ -825,8 +825,8 @@ html :where([data-page="admin-status-overview"] .shell-content .ifacebox-body) {
 
 /* ── Table ───────────────────────────────────────────────────────
    Cells 4 / 8 / 4 / 16 with a bottom rule; a body row 33, a header row
-   31; header cells secondary, semibold; the hovered row takes the
-   overlay. The empty message is the caption, so it spans the table. */
+   31; header cells secondary, semibold; no row hover (Table hasHover
+   off: no LuCI row is clickable). The empty message is the caption, so it spans the table. */
 
 html :where(table, .table) {
   display: table;
