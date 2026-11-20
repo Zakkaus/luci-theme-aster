@@ -592,7 +592,7 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     --card-border-width: 0;
     --card-radius: 0;
     --card-bg: transparent;
-    & > .cbi-title { padding-inline: var(--spacing-4); }
+    & > :is(.cbi-title, h3) { padding-inline: var(--spacing-4); } /* 24.10: a bare h3 */
   }
   /* 29_ports.js writes a 70 px grid and box sizes inline (!important to
      override). The tiles wrap 16 apart, at least 160 each, and the tiles of

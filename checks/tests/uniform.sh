@@ -115,6 +115,13 @@ expect uniform 1 "space.block gap" "a Remove row 24 over its section" -- "$url" 
 	--debug-css 'admin/system/admin/dropbear=.cbi-section-remove { margin-block-end: 24px !important }'
 expect uniform 1 "space.card.pad padding" "card content 8 lower" -- "$url" "$password" --pages "$tmp/overview.txt" \
 	--debug-css 'admin/status/overview=#view > .cbi-section > :first-child { margin-block-start: 8px !important }'
+# A row of cards (Memory and Storage) is read at its tallest card's end.
+expect uniform 1 "space.card.pad padding" "paired cards 16 more under their content" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=#view > .cbi-section:has(.cbi-progressbar) > :last-child { margin-block-end: 16px !important }'
+# A bare <p> under the title (Routing) is the page's description.
+printf 'admin/status/routes\n' >"$tmp/routes.txt"
+expect uniform 1 "space.title.desc gap" "Routing's description 12 under the title" -- "$url" "$password" --pages "$tmp/routes.txt" \
+	--debug-css 'admin/status/routes=#view > h2 + p { margin-block-start: 12px !important }'
 # 25.12 puts the card's h3 in a title row (24 inside it), 24.10 not (24
 # under it, over the content's 16).
 expect uniform 1 "space.heading.content gap" "card title keeps a margin" -- "$url" "$password" --pages "$tmp/overview.txt" \

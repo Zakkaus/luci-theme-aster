@@ -449,7 +449,8 @@ function collect(cfg) {
       return b;
     };
     const HEAD = 'h2, h3, h4, legend';
-    const DESCR = '.cbi-map-descr, .cbi-section-descr';
+    // A bare <p> right under the page title (Routing, Reboot) is its description.
+    const DESCR = '.cbi-map-descr, .cbi-section-descr, h2 + p';
     const TABS = '.cbi-tabmenu, #tabmenu';
     const CTRL = `${BTN}, ${FIELD}, input[type="checkbox"], input[type="radio"], .control-group`;
     const FOOT = ':is(.right, .button-row, div:has(> .left + .right))';
@@ -508,11 +509,20 @@ function collect(cfg) {
 
     // Card padding: the outer edge to the content, top and bottom (the
     // inline side is the card's padding, which tables bleed over).
+    // Cards side by side stretch to one height (the overview's Memory and
+    // Storage, Astryx's dashboard rows): the bottom is read per row, from
+    // the card whose content ends lowest (as measure's 'card content end').
+    const ends = new Map();
+    for (const el of framed) {
+      const kids = [...el.children].filter(shown);
+      if (kids.length) ends.set(el, box(el).bottom - Math.max(...kids.map((e) => box(e).bottom)));
+    }
+    const rowEndInset = (el) => Math.min(...[...ends.keys()].filter((o) => o.parentElement === el.parentElement && Math.abs(box(o).top - box(el).top) < 1 && Math.abs(box(o).bottom - box(el).bottom) < 1).map((o) => ends.get(o)));
     for (const el of framed) {
       if (el.matches('table, .table')) continue;
       const kids = [...el.children].filter(shown);
       if (!kids.length) continue;
-      put('space.card.pad', 'padding', [px(Math.min(...kids.map((e) => box(e).top)) - box(el).top), px(box(el).bottom - Math.max(...kids.map((e) => box(e).bottom)))], el);
+      put('space.card.pad', 'padding', [px(Math.min(...kids.map((e) => box(e).top)) - box(el).top), px(rowEndInset(el))], el);
     }
 
     // Form rows: 8 above and below (16 between two rows); the label 16
@@ -530,7 +540,8 @@ function collect(cfg) {
       const a = box(t), b = {left: box(f).left, top: box(f).top};
       const v = getComputedStyle(f, '::before');
       if (f.matches('.cbi-progressbar') && v.content !== 'none') {
-        b.top = box(f).bottom - parseFloat(v.bottom) - parseFloat(v.lineHeight);
+        // Its height: a value that wraps (Software's disk space on a phone) is two lines.
+        b.top = box(f).bottom - parseFloat(v.bottom) - (parseFloat(v.height) || parseFloat(v.lineHeight));
         if (b.top < a.bottom - 1) return;
       }
       if (b.top < a.bottom - 1) put(bar ? 'space.control.row' : 'space.label.field', bar ? 'gap' : 'inline', px(b.left - a.right), el);
