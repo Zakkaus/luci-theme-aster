@@ -95,6 +95,10 @@
 
 /* ── Cards [ported] ──────────────────────────────────────────── */
 
+/* "Loading view…" (luci-base's placeholder for the whole view) stands in
+   the region the view fills: centred in it, 48 under the title (layout). */
+#view > .spinning:only-child { justify-content: center; padding-block: var(--spacing-12); }
+
 /* Cards 16 apart; a map's last block 24 above what follows. */
 .cbi-section, .cbi-section-node, #view > :is(table, .table), #view > .cbi-map > :is(table, .table), #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], .nft-chain { margin-block-end: var(--spacing-4); }
 .cbi-section > :is(.cbi-section, .cbi-section-node):last-child { margin-block-end: 0; }
