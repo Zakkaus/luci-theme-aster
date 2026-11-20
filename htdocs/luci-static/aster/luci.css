@@ -21,12 +21,16 @@
   --button-bg: var(--color-accent);
   --button-fg: var(--color-on-accent);
 }
-/* Destructive (Astryx Button destructive): the error fill, on-error text. */
-.cbi-button-negative,
-.cbi-button-remove {
+/* Destructive (.cbi-button-negative, .cbi-button-remove): on a page or in
+   a table row an ordinary secondary button, as Terminate and Kill are in
+   Processes. Red only where it confirms: the dialog's action takes Astryx's
+   destructive fill, and a destructive ComboButton's menu items the error
+   ink. */
+#modal_overlay :is(.cbi-button-negative, .cbi-button-remove) {
   --button-bg: var(--color-error);
   --button-fg: var(--color-on-error);
 }
+.cbi-dropdown:is(.cbi-button-negative, .cbi-button-remove) { --menu-item-fg: var(--color-text-error); }
 .cbi-button-link { --button-bg: transparent; --button-decoration: underline; }
 /* Small: the overview's Hide/Show. */
 .cbi-section .label[data-style] { --button-h: var(--size-element-sm); }

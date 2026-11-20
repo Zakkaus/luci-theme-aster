@@ -24,7 +24,7 @@
    Select        Select         select, .cbi-dropdown (not a ComboButton)
    Menu          Menu           .cbi-dropdown[open] > ul.dropdown, the
                                 palette menu (.palette-menu, rows with a
-                                .palette-swatch)
+                                .palette-swatch); item ink --menu-item-fg
    Checkbox      Checkbox/Radio input[type=checkbox|radio], .cbi-checkbox
    Dynlist       TextField list .cbi-dynlist (.item, .add-item)
    Form row      Field layout   .cbi-value, .cbi-value-title, .cbi-value-field,
@@ -344,7 +344,8 @@ html :where(.cbi-dropdown > .open) { display: flex; }
    medium weight and ends with a 16 accent check (Heroicons 2.2.0 Check,
    MIT). ui.js writes the direction and height inline. The palette menu
    (header.ut) is the same list with menuitemradio rows, each led by its
-   swatch: the palette's accent dot on its shell, a hairline round it. */
+   swatch: the palette's accent dot on its shell, a hairline round it.
+   --menu-item-fg sets the rows' ink (the error ink for destructive ones). */
 
 html :where(.cbi-dropdown[open] > ul.dropdown, .palette-menu[open] > [role="menu"]) {
   display: block;
@@ -372,7 +373,7 @@ html :where(.cbi-dropdown[open] > ul.dropdown > li, .palette-menu[open] > [role=
   min-block-size: var(--size-element-md);
   padding: 0 var(--spacing-2);
   border-radius: var(--radius-element);
-  color: var(--color-text-primary);
+  color: var(--menu-item-fg, var(--color-text-primary));
   white-space: normal;
 }
 html :where(.cbi-dropdown[optional][open] > ul.dropdown > li[placeholder]) { display: flex; }
