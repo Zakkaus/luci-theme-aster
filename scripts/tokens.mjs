@@ -18,19 +18,24 @@
  *     does not define from the core defaults (`:root` rules of
  *     @astryxdesign/core/dist/astryx.css), transitively, and only those.
  *  4. Append the theme's AppShell overrides (custom properties the build sets
- *     on .astryx-app-shell, such as the shell's own --color-background-body)
- *     as a rule for pages that carry the shell, then design/layout.css, the
- *     sizes the theme has no token for.
- *  5. Append the palettes of design/palettes.mjs: for each, a
- *     `:root[data-palette="<slug>"]` block of colour tokens, each value
- *     light-dark(light, dark), then the picker's swatch of every palette
- *     (the default included) as [data-swatch="<slug>"] rules.
- *  6. Palette check: every palette block must define exactly the colour
- *     tokens (--color-*, *-color) the stylesheets read, directly or through
- *     a non-colour token of tokens.css. A gap would leave that token at the
- *     default's colour under the palette.
+ *     on .astryx-app-shell) as a rule for pages that carry the shell, then
+ *     design/layout.css, the sizes the theme has no token for. Steps 1, 3
+ *     and 4 keep only the non-colour tokens; the colours are step 5's.
+ *  5. Append the palettes of design/palettes.mjs, colour tokens only, each
+ *     value light-dark(light, dark): the default (Rosé Pine) on :root, so a
+ *     page needs no attribute and no script for it; Aster as
+ *     `:root[data-palette="aster"]`, the colours steps 1, 3 and 4 set aside
+ *     (its AppShell ones, such as the shell's own --color-background-body,
+ *     under `:has(> body > .shell)`); every other palette as
+ *     `:root[data-palette="<slug>"]`. Then the picker's swatch of every
+ *     palette as [data-swatch="<slug>"] rules.
+ *  6. Palette check: the default and every palette block must define the
+ *     colour tokens (--color-*, *-color) the stylesheets read, directly or
+ *     through a non-colour token of tokens.css; a gap would leave that
+ *     token unset under the default, or at the default's colour under the
+ *     palette. Aster also keeps the colours its own values refer to.
  *     header.ut's `palettes` list (the picker and the head script) must
- *     name the same palettes, default first, in the same order.
+ *     name the same palettes, default first, then Aster, in this order.
  *  7. Closure check over tokens.css and the other four stylesheets: every
  *     var(--x) without a fallback must be declared in tokens.css, or be a
  *     component parameter declared in one of the stylesheets. A var()
@@ -51,7 +56,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {PALETTES, DEFAULT, derive} from '../design/palettes.mjs';
+import {PALETTES, DEFAULT, ASTER, derive} from '../design/palettes.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const THEME = 'aster';
@@ -270,16 +275,42 @@ function generate(opts, sheets) {
   const defs = new Map([...fill, ...tokens, ...shell, ...customProps(parseBlocks(layoutCss).children.map((c) => c.decls).join(";"))]);
   const reads = colourReads(sheets, defs);
   const problems = [];
-  const paletteBlocks = PALETTES.map(({slug, tokens: own}) => {
-    const all = derive(own);
-    const gaps = reads.filter((n) => !all[n]);
+  const gapCheck = (slug, has) => {
+    const gaps = reads.filter((n) => !has(n));
     if (gaps.length) problems.push(`palette ${slug} lacks colour tokens the stylesheets read: ${gaps.join(' ')}`);
-    const sel = `:root[data-palette="${slug}"],\n:root[data-palette="${slug}"]:has(> body > .shell)`;
+  };
+  const paletteBlock = ({slug, tokens: own}, sel) => {
+    const all = derive(own);
+    gapCheck(slug, (n) => all[n]);
     return block(reads.filter((n) => all[n]).map((n) => [n, lightDark(all[n])]), sel);
-  });
+  };
+
+  // Aster's colours are the build's (and the core defaults it leaves
+  // unset): every one the stylesheets read, plus those its values or the
+  // :root tokens refer to (--color-text-green under --color-text-success).
+  const nonColour = (pairs) => pairs.filter(([k]) => !isColour(k));
+  const asterDefs = new Map([...tokens, ...fill].filter(([k]) => isColour(k)));
+  const asterShell = shell.filter(([k]) => isColour(k));
+  const keep = new Set();
+  const queue = [...reads, ...[...nonColour(fill), ...nonColour(tokens), ...nonColour(shell)].flatMap(([, v]) => refs(v).map((r) => r.name))];
+  while (queue.length) {
+    const name = queue.shift();
+    if (keep.has(name) || !asterDefs.has(name)) continue;
+    keep.add(name);
+    queue.push(...refs(asterDefs.get(name)).map((r) => r.name));
+  }
+  gapCheck(ASTER.slug, (n) => keep.has(n));
+  const asterSel = `:root[data-palette="${ASTER.slug}"]`;
+  const asterBlocks = [
+    block([...asterDefs].filter(([k]) => keep.has(k)), asterSel),
+    ...(asterShell.length ? [block(asterShell, `${asterSel}:has(> body > .shell)`)] : []),
+  ];
+  const paletteBlocks = PALETTES.map((p) => paletteBlock(p, `:root[data-palette="${p.slug}"]`));
+
   const themeVal = (name, pairs) => pairs.find(([k]) => k === name)?.[1];
   const swatches = [
-    [DEFAULT.slug, themeVal('--color-accent', tokens), themeVal('--color-background-body', shell)],
+    [DEFAULT.slug, lightDark(DEFAULT.tokens['--color-accent']), lightDark(DEFAULT.tokens['--color-background-body'])],
+    [ASTER.slug, themeVal('--color-accent', tokens), themeVal('--color-background-body', shell)],
     ...PALETTES.map(({slug, tokens: own}) => [slug, lightDark(own['--color-accent']), lightDark(own['--color-background-body'])]),
   ].map(([slug, accent, shellBg]) =>
     `[data-swatch="${slug}"] { --aster-swatch-accent: ${accent}; --aster-swatch-shell: ${shellBg}; }`);
@@ -293,13 +324,16 @@ function generate(opts, sheets) {
     '',
     ...schemeRules,
     '',
-    `/* Theme tokens (${THEME}). */`,
-    block(tokens),
-    ...(fill.length ? [`/* Core defaults the theme leaves unset, only those referenced. */`, block(fill)] : []),
-    `/* The theme's AppShell overrides (.astryx-app-shell in the build). */`,
-    block(shell, SHELL_SELECTOR),
-    `/* Palettes (design/palettes.mjs), chosen per browser: header.ut sets`,
-    `   data-palette from localStorage "aster-palette". Colour tokens only. */`,
+    `/* Theme tokens (${THEME}) but the colours, which the palettes set. */`,
+    block(nonColour(tokens)),
+    ...(nonColour(fill).length ? [`/* Core defaults the theme leaves unset, only those referenced. */`, block(nonColour(fill))] : []),
+    ...(nonColour(shell).length ? [`/* The theme's AppShell overrides (.astryx-app-shell in the build). */`, block(nonColour(shell), SHELL_SELECTOR)] : []),
+    `/* Palettes (design/palettes.mjs), colour tokens only. ${DEFAULT.name}, the`,
+    `   default, is :root; header.ut sets data-palette for the others from`,
+    `   localStorage "aster-palette". Aster is the theme build's colours with`,
+    `   its AppShell overrides (.astryx-app-shell). */`,
+    paletteBlock(DEFAULT, ':root'),
+    ...asterBlocks,
     ...paletteBlocks,
     `/* The palette menu's swatch of each palette: its accent on its shell. */`,
     ...swatches,
@@ -362,7 +396,7 @@ function main() {
   const header = read(path.join(ROOT, 'ucode/template/themes/aster/header.ut'));
   const listed = [...(header.match(/const palettes = \[([\s\S]*?)\];/)?.[1] ?? '').matchAll(/\[\s*'([^']+)',\s*'([^']+)'\s*\]/g)]
     .map((m) => `${m[1]}=${m[2]}`).join(' ');
-  const want = [DEFAULT, ...PALETTES].map((p) => `${p.slug}=${p.name}`).join(' ');
+  const want = [DEFAULT, ASTER, ...PALETTES].map((p) => `${p.slug}=${p.name}`).join(' ');
   if (listed !== want) problems.push(`header.ut palettes list is "${listed}", want "${want}"`);
   if (opts.check) {
     let current = null;
@@ -377,7 +411,7 @@ function main() {
     process.exit(1);
   }
   if (!opts.check) fs.writeFileSync(target, out);
-  process.stdout.write(`tokens.mjs: ${opts.check ? 'up to date' : 'wrote'} ${path.relative(ROOT, target)} (${Buffer.byteLength(out)} B), closure OK, ${PALETTES.length} palettes complete\n`);
+  process.stdout.write(`tokens.mjs: ${opts.check ? 'up to date' : 'wrote'} ${path.relative(ROOT, target)} (${Buffer.byteLength(out)} B), closure OK, ${PALETTES.length + 2} palettes complete\n`);
 }
 
 main();

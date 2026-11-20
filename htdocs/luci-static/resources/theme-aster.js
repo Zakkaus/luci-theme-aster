@@ -185,12 +185,12 @@ return baseclass.extend({
 	 * pattern: the button opens the list (Enter, Space or a click) and
 	 * focuses the checked row; arrows, Home and End move, Enter or Space
 	 * picks, Escape or Tab closes, a click outside closes. The choice goes to
-	 * localStorage "aster-palette"; Aster, the default, is the absence of
-	 * data-palette. */
+	 * localStorage "aster-palette"; Rosé Pine, the default, is the absence
+	 * of data-palette. */
 	palettes(bar) {
 		const menus = document.querySelectorAll('.palette-menu');
 		const root = document.documentElement;
-		const current = () => root.getAttribute('data-palette') || 'aster';
+		const current = () => root.getAttribute('data-palette') || 'rose-pine';
 
 		const reflect = () => menus.forEach((m) => m.querySelectorAll('[role="menuitemradio"]').forEach((r) =>
 			r.setAttribute('aria-checked', String(r.dataset.value === current()))));
@@ -208,7 +208,7 @@ return baseclass.extend({
 		};
 
 		const pick = (m, value) => {
-			if (value === 'aster')
+			if (value === 'rose-pine')
 				root.removeAttribute('data-palette');
 			else
 				root.setAttribute('data-palette', value);

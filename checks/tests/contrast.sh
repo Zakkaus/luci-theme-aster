@@ -32,10 +32,11 @@ expect contrast 1 error "wrong password" "(login): login returned 403" -- "$url"
 expect contrast 0 waived:field-border "baseline: overview and Dropbear" -- "$url" "$password" --pages "$tmp/base.txt"
 
 # Text: body text in table cells, and card titles (22px semibold is body
-# size for WCAG), each #dddddd on the white card (1.36:1).
-expect contrast 1 text,waived:field-border "low-contrast body text" "#dddddd on #ffffff" -- "$url" "$password" --pages "$tmp/base.txt" \
+# size for WCAG), each #dddddd on the default palette's card (Rosé Pine
+# Dawn's surface, 1.31:1).
+expect contrast 1 text,waived:field-border "low-contrast body text" "#dddddd on #fffaf3" -- "$url" "$password" --pages "$tmp/base.txt" \
 	--debug-css 'admin/status/overview=#view .td { color: #ddd !important }'
-expect contrast 1 text,waived:field-border "low-contrast card titles" "#dddddd on #ffffff" -- "$url" "$password" --pages "$tmp/base.txt" \
+expect contrast 1 text,waived:field-border "low-contrast card titles" "#dddddd on #fffaf3" -- "$url" "$password" --pages "$tmp/base.txt" \
 	--debug-css 'admin/status/overview=#view .cbi-section :is(h2, h3) { color: #ddd !important }'
 
 # Large text: the 26px page title at #cccccc (1.61:1, under 3). (The
@@ -64,10 +65,10 @@ expect contrast 1 separator,waived:field-border "bright separator in dark mode" 
 # is not a palette is an error, and a palette block whose ink is pale fails
 # the text rule under that palette (the secondary ink: body-size labels
 # only, where the primary would fail the large page title too).
-expect contrast 1 error "unknown palette" "data-palette is aster, want nosuch" -- "$url" "$password" --pages "$tmp/base.txt" --palette nosuch
+expect contrast 1 error "unknown palette" "data-palette is rose-pine, want nosuch" -- "$url" "$password" --pages "$tmp/base.txt" --palette nosuch
 expect contrast 0 waived:field-border "baseline: Relay Blue" -- "$url" "$password" --pages "$tmp/base.txt" --palette relay
 expect contrast 1 text,waived:field-border "palette block with a pale ink" "#dddddd on #ffffff" -- "$url" "$password" --pages "$tmp/base.txt" --palette relay \
-	--debug-css 'admin/status/overview=:root[data-palette="relay"], :root[data-palette="relay"]:has(> body > .shell) { --color-text-secondary: light-dark(#ddd, #ddd) !important }'
+	--debug-css 'admin/status/overview=:root[data-palette="relay"] { --color-text-secondary: light-dark(#ddd, #ddd) !important }'
 
 # Field border alone: waived by default (exit 0, listed as waived), and a
 # failure when enforced.

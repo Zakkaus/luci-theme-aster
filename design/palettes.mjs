@@ -1,11 +1,13 @@
 /**
- * The switchable palettes (plan decision 10). Aster, the default, is not
- * here: it is design/aster.ts, built into tokens.css's :root as before.
- * scripts/tokens.mjs writes each palette below as a
- * `:root[data-palette="<slug>"]` block of colour tokens only, every value a
- * `light-dark(light, dark)` pair, so the mode switch keeps working. A palette
- * lists the tokens it chooses; derive() fills in the rest the same way for
- * every palette, the way Astryx's core derives them from the same roles.
+ * The palettes (plan decisions 10 and 12). Rosé Pine is the default:
+ * scripts/tokens.mjs writes its colour tokens on tokens.css's :root, and
+ * each other palette below as a `:root[data-palette="<slug>"]` block of
+ * colour tokens only, every value a `light-dark(light, dark)` pair, so the
+ * mode switch keeps working. Aster is not listed here: its colours are
+ * design/aster.ts's, which tokens.mjs moves from the theme build into
+ * `:root[data-palette="aster"]`. A palette lists the tokens it chooses;
+ * derive() fills in the rest the same way for every palette, the way
+ * Astryx's core derives them from the same roles.
  *
  * Each entry is [light, dark]. The header and the picker read the slug and
  * name; header.ut, theme-aster.js and checks/lib/gate.mjs list the slugs.
@@ -134,15 +136,17 @@ const ROSE_PINE = {
   '--focus-outline-color': ['#286983', '#9CCFD8'],
 };
 
+/* The default, written on :root; the picker lists it first. */
+export const DEFAULT = {slug: 'rose-pine', name: 'Rosé Pine', tokens: ROSE_PINE};
+
+/* Aster, from the theme build; the picker lists it second. */
+export const ASTER = {slug: 'aster', name: 'Aster'};
+
 export const PALETTES = [
   {slug: 'relay', name: 'Relay Blue', tokens: RELAY},
   {slug: 'teal', name: 'Sounding Teal', tokens: TEAL},
   {slug: 'plum', name: 'Herbarium Plum', tokens: PLUM},
-  {slug: 'rose-pine', name: 'Rosé Pine', tokens: ROSE_PINE},
 ];
-
-/* The default's slug and name, for the picker. */
-export const DEFAULT = {slug: 'aster', name: 'Aster'};
 
 const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
 const lum = (h) => {

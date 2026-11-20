@@ -357,7 +357,8 @@ html :where(.cbi-dropdown > .open)::before {
    medium weight and ends with a 16 accent check (Heroicons 2.2.0 Check,
    MIT). ui.js writes the direction and height inline. The palette menu
    (header.ut) is the same list with menuitemradio rows, each led by its
-   swatch: the palette's accent dot on its shell, a hairline round it.
+   swatch: the palette's accent dot on its shell, a hairline round it;
+   the default's row says so in supporting text.
    --menu-item-fg sets the rows' ink (the error ink for destructive ones). */
 
 html :where(.cbi-dropdown[open] > ul.dropdown, .palette-menu[open] > [role="menu"]) {
@@ -409,6 +410,7 @@ html :where(.cbi-dropdown[open]:not([multiple]) > ul.dropdown > li[selected], .p
 }
 html :where(.cbi-dropdown[open] > ul.dropdown > li[unselectable]) { opacity: 0.5; }
 html :where(.palette-menu[open] > [role="menu"] > li) { cursor: pointer; }
+html :where(.palette-menu [role="menu"] small) { color: var(--color-text-secondary); font-size: var(--text-supporting-size); }
 html :where(.palette-swatch) {
   flex: none;
   inline-size: var(--aster-icon-md);

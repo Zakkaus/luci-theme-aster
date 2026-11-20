@@ -7,7 +7,7 @@
 html[data-theme="light"] { color-scheme: light; }
 html[data-theme="dark"] { color-scheme: dark; }
 
-/* Theme tokens (aster). */
+/* Theme tokens (aster) but the colours, which the palettes set. */
 :root {
   --_scaled-font-size-4xs: min(calc(0.375rem * var(--_dynamic-type-caption2, 1)), var(--_scaled-font-size-3xs));
   --font-size-4xs: var(--_scaled-font-size-4xs);
@@ -78,16 +78,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --font-family-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, var(--font-family-cjk, "Noto Sans TC Variable", "PingFang TC", "Microsoft JhengHei"), Arial, sans-serif;
   --font-family-heading: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, var(--font-family-cjk, "Noto Sans TC Variable", "PingFang TC", "Microsoft JhengHei"), Arial, sans-serif;
   --font-family-code: ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", "Liberation Mono", monospace;
-  --color-accent: light-dark(#225BFF, #3D87FF);
-  --color-text-accent: light-dark(#225BFF, #3D87FF);
-  --color-icon-accent: light-dark(#225BFF, #3D87FF);
-  --color-accent-muted: light-dark(rgba(34, 91, 255, 0.10), rgba(61, 135, 255, 0.16));
-  --color-on-accent: light-dark(#FFFFFF, #0B1020);
-  --color-background-body: light-dark(#F8F4ED, #111112);
-  --color-text-primary: light-dark(#15110C, #DFE2E5);
-  --color-icon-primary: light-dark(#15110C, #DFE2E5);
-  --color-text-secondary: light-dark(#4E606F, #B8BDC3);
-  --color-on-error: light-dark(#FFFFFF, #15110C);
   --radius-inner: 8px;
   --radius-element: 12px;
   --radius-container: 16px;
@@ -110,7 +100,6 @@ html[data-theme="dark"] { color-scheme: dark; }
   --size-element-sm: 32px;
   --size-element-md: 36px;
   --size-element-lg: 40px;
-  --color-brand: light-dark(#225BFF, #3D87FF);
   --astryx-marketing-feature-card-bg: light-dark(#E6F0FF, #1A2333);
   --nb-face-from: light-dark(#2B2B2F, #303036);
   --nb-face-to: light-dark(#1C1C1F, #222227);
@@ -126,44 +115,11 @@ html[data-theme="dark"] { color-scheme: dark; }
 /* Core defaults the theme leaves unset, only those referenced. */
 :root {
   --border-width: 1px;
-  --color-neutral: light-dark(rgba(5, 54, 89, 0.1), rgba(223, 226, 229, 0.2));
-  --color-background-surface: light-dark(#FFFFFF, #1F1F22);
-  --color-overlay: light-dark(#01122866, #11111299);
-  --color-overlay-hover: light-dark(#0536590C, #FFFFFF0C);
-  --color-overlay-pressed: light-dark(#05365919, #FFFFFF19);
-  --color-background-muted: light-dark(#0536590C, #1111127F);
-  --color-on-light: light-dark(#000000, #000000);
-  --color-icon-secondary: light-dark(#4E606F, #AAAFB5);
-  --color-background-card: light-dark(#FFFFFF, #1F1F22);
-  --color-background-popover: light-dark(#FFFFFF, #28292C);
-  --color-info-muted: light-dark(#0082FB33, #0082FB3F);
-  --color-success-muted: light-dark(#0B991F33, #0B991F3F);
-  --color-error: light-dark(#E3193B, #F5394F);
-  --color-error-muted: light-dark(#E3193B33, #F5394F3F);
-  --color-warning: light-dark(#E9AF08, #F2C00B);
-  --color-warning-muted: light-dark(#E2A40033, #E2A4003F);
-  --color-text-success: var(--color-text-green);
-  --color-text-warning: var(--color-text-yellow);
-  --color-text-error: var(--color-text-red);
-  --color-icon-success: var(--color-text-success);
-  --color-icon-warning: var(--color-text-warning);
-  --color-border-error: var(--color-text-error);
-  --color-on-info-muted: var(--color-text-blue);
-  --color-on-success-muted: var(--color-text-green);
-  --color-on-warning-muted: var(--color-text-yellow);
-  --color-on-error-muted: var(--color-text-red);
-  --color-border: light-dark(#05365919, #F2F4F619);
-  --color-border-emphasized: light-dark(#CCD3DB, #494D53);
-  --color-text-blue: light-dark(#042F97, #AFD7FF);
-  --color-text-green: light-dark(#09441F, #A5F690);
-  --color-text-red: light-dark(#7B0210, #FFB2B8);
-  --color-text-yellow: light-dark(#753F07, #FBCE03);
   --duration-fast: 175ms;
   --duration-fast-max: 230ms;
   --duration-medium-min: 310ms;
   --ease-standard: cubic-bezier(0.24, 1, 0.4, 1);
   --focus-outline-width: 2px;
-  --focus-outline-color: var(--color-accent);
   --focus-outline-offset: 3px;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
@@ -174,144 +130,11 @@ html[data-theme="dark"] { color-scheme: dark; }
   --shadow-high: 0px 2px 2px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2)), 0px 8px 24px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
 }
 
-/* The theme's AppShell overrides (.astryx-app-shell in the build). */
-:root:has(> body > .shell) {
-  --color-background-body: light-dark(#F4F4F5, #18181B);
-}
-
-/* Palettes (design/palettes.mjs), chosen per browser: header.ut sets
-   data-palette from localStorage "aster-palette". Colour tokens only. */
-:root[data-palette="relay"],
-:root[data-palette="relay"]:has(> body > .shell) {
-  --color-accent: light-dark(#315FD3, #87A9FA);
-  --color-accent-muted: light-dark(#315FD316, #87A9FA26);
-  --color-background-body: light-dark(#F3F4F7, #181A20);
-  --color-background-card: light-dark(#FFFFFF, #20232A);
-  --color-background-muted: light-dark(#E9ECF2, #15171D);
-  --color-background-popover: light-dark(#FFFFFF, #2C2F36);
-  --color-background-surface: light-dark(#FFFFFF, #20232A);
-  --color-border: light-dark(#DCE1E9, #31353E);
-  --color-border-emphasized: light-dark(#CCD3DB, #494D53);
-  --color-border-error: light-dark(#9D303D, #F2ACB3);
-  --color-error: light-dark(#BD4C56, #D97782);
-  --color-error-muted: light-dark(#BD4C5633, #D977823F);
-  --color-icon-accent: light-dark(#315FD3, #87A9FA);
-  --color-icon-primary: light-dark(#19202C, #E4E8EF);
-  --color-icon-secondary: light-dark(#515F74, #AFBACB);
-  --color-icon-success: light-dark(#246445, #99D2AF);
-  --color-icon-warning: light-dark(#80500E, #EDC588);
-  --color-info-muted: light-dark(#477FA133, #75ABCA3F);
-  --color-neutral: light-dark(#19202C1A, #E4E8EF33);
-  --color-on-accent: light-dark(#FFFFFF, #101D37);
-  --color-on-error: light-dark(#FFFFFF, #19202C);
-  --color-on-error-muted: light-dark(#9D303D, #F2ACB3);
-  --color-on-info-muted: light-dark(#31617F, #A0CBE3);
-  --color-on-light: light-dark(#000000, #000000);
-  --color-on-success-muted: light-dark(#246445, #99D2AF);
-  --color-on-warning-muted: light-dark(#80500E, #EDC588);
-  --color-overlay: light-dark(#19202C66, #181A2099);
-  --color-overlay-hover: light-dark(#19202C0C, #FFFFFF0C);
-  --color-overlay-pressed: light-dark(#19202C19, #FFFFFF19);
-  --color-success-muted: light-dark(#35856133, #65B5913F);
-  --color-text-accent: light-dark(#274EAD, #A9C2FF);
-  --color-text-error: light-dark(#9D303D, #F2ACB3);
-  --color-text-primary: light-dark(#19202C, #E4E8EF);
-  --color-text-secondary: light-dark(#515F74, #AFBACB);
-  --color-text-success: light-dark(#246445, #99D2AF);
-  --color-text-warning: light-dark(#80500E, #EDC588);
-  --color-warning: light-dark(#BE852E, #D3A258);
-  --color-warning-muted: light-dark(#BE852E33, #D3A2583F);
-  --focus-outline-color: light-dark(#315FD3, #87A9FA);
-}
-
-:root[data-palette="teal"],
-:root[data-palette="teal"]:has(> body > .shell) {
-  --color-accent: light-dark(#246B69, #7DC8BC);
-  --color-accent-muted: light-dark(#246B6919, #7DC8BC24);
-  --color-background-body: light-dark(#F1F5F3, #161D1C);
-  --color-background-card: light-dark(#FCFEFD, #1D2826);
-  --color-background-muted: light-dark(#E4ECE8, #131A19);
-  --color-background-popover: light-dark(#FCFEFD, #293432);
-  --color-background-surface: light-dark(#FCFEFD, #1D2826);
-  --color-border: light-dark(#D6E1DC, #2E3935);
-  --color-border-emphasized: light-dark(#CCD3DB, #494D53);
-  --color-border-error: light-dark(#933B37, #EFAEA9);
-  --color-error: light-dark(#B95853, #D9817B);
-  --color-error-muted: light-dark(#B9585333, #D9817B3F);
-  --color-icon-accent: light-dark(#246B69, #7DC8BC);
-  --color-icon-primary: light-dark(#172824, #E0EAE6);
-  --color-icon-secondary: light-dark(#50645F, #A9BDB5);
-  --color-icon-success: light-dark(#44622E, #BDDA9E);
-  --color-icon-warning: light-dark(#785017, #E7C697);
-  --color-info-muted: light-dark(#5984AA33, #84AACC3F);
-  --color-neutral: light-dark(#1728241A, #E0EAE633);
-  --color-on-accent: light-dark(#FFFFFF, #112D2A);
-  --color-on-error: light-dark(#FFFFFF, #172824);
-  --color-on-error-muted: light-dark(#933B37, #EFAEA9);
-  --color-on-info-muted: light-dark(#355E84, #ACCCE6);
-  --color-on-light: light-dark(#000000, #000000);
-  --color-on-success-muted: light-dark(#44622E, #BDDA9E);
-  --color-on-warning-muted: light-dark(#785017, #E7C697);
-  --color-overlay: light-dark(#17282466, #161D1C99);
-  --color-overlay-hover: light-dark(#1728240C, #FFFFFF0C);
-  --color-overlay-pressed: light-dark(#17282419, #FFFFFF19);
-  --color-success-muted: light-dark(#65824533, #9BB97B3F);
-  --color-text-accent: light-dark(#175A59, #9ADACE);
-  --color-text-error: light-dark(#933B37, #EFAEA9);
-  --color-text-primary: light-dark(#172824, #E0EAE6);
-  --color-text-secondary: light-dark(#50645F, #A9BDB5);
-  --color-text-success: light-dark(#44622E, #BDDA9E);
-  --color-text-warning: light-dark(#785017, #E7C697);
-  --color-warning: light-dark(#BA863E, #CEA468);
-  --color-warning-muted: light-dark(#BA863E33, #CEA4683F);
-  --focus-outline-color: light-dark(#246B69, #7DC8BC);
-}
-
-:root[data-palette="plum"],
-:root[data-palette="plum"]:has(> body > .shell) {
-  --color-accent: light-dark(#785378, #C9A2C5);
-  --color-accent-muted: light-dark(#78537819, #C9A2C526);
-  --color-background-body: light-dark(#F6F3F0, #201C20);
-  --color-background-card: light-dark(#FFFDFA, #292529);
-  --color-background-muted: light-dark(#ECE7E3, #1C181C);
-  --color-background-popover: light-dark(#FFFDFA, #353134);
-  --color-background-surface: light-dark(#FFFDFA, #292529);
-  --color-border: light-dark(#E2DBD7, #3D353C);
-  --color-border-emphasized: light-dark(#CCD3DB, #494D53);
-  --color-border-error: light-dark(#943F30, #EFAE9C);
-  --color-error: light-dark(#BB5A46, #D78472);
-  --color-error-muted: light-dark(#BB5A4633, #D784723F);
-  --color-icon-accent: light-dark(#785378, #C9A2C5);
-  --color-icon-primary: light-dark(#292329, #ECE5E5);
-  --color-icon-secondary: light-dark(#695E66, #C3B6BD);
-  --color-icon-success: light-dark(#4C6134, #C5D4A0);
-  --color-icon-warning: light-dark(#805017, #EBC492);
-  --color-info-muted: light-dark(#547D9C33, #7EA9C53F);
-  --color-neutral: light-dark(#2923291A, #ECE5E533);
-  --color-on-accent: light-dark(#FFFFFF, #302033);
-  --color-on-error: light-dark(#FFFFFF, #292329);
-  --color-on-error-muted: light-dark(#943F30, #EFAE9C);
-  --color-on-info-muted: light-dark(#3B627F, #ABCCE0);
-  --color-on-light: light-dark(#000000, #000000);
-  --color-on-success-muted: light-dark(#4C6134, #C5D4A0);
-  --color-on-warning-muted: light-dark(#805017, #EBC492);
-  --color-overlay: light-dark(#29232966, #201C2099);
-  --color-overlay-hover: light-dark(#2923290C, #FFFFFF0C);
-  --color-overlay-pressed: light-dark(#29232919, #FFFFFF19);
-  --color-success-muted: light-dark(#75834F33, #A6B77E3F);
-  --color-text-accent: light-dark(#69456B, #DEC0DB);
-  --color-text-error: light-dark(#943F30, #EFAE9C);
-  --color-text-primary: light-dark(#292329, #ECE5E5);
-  --color-text-secondary: light-dark(#695E66, #C3B6BD);
-  --color-text-success: light-dark(#4C6134, #C5D4A0);
-  --color-text-warning: light-dark(#805017, #EBC492);
-  --color-warning: light-dark(#BF873D, #CFA163);
-  --color-warning-muted: light-dark(#BF873D33, #CFA1633F);
-  --focus-outline-color: light-dark(#785378, #C9A2C5);
-}
-
-:root[data-palette="rose-pine"],
-:root[data-palette="rose-pine"]:has(> body > .shell) {
+/* Palettes (design/palettes.mjs), colour tokens only. Rosé Pine, the
+   default, is :root; header.ut sets data-palette for the others from
+   localStorage "aster-palette". Aster is the theme build's colours with
+   its AppShell overrides (.astryx-app-shell). */
+:root {
   --color-accent: light-dark(#286983, #9CCFD8);
   --color-accent-muted: light-dark(#28698319, #9CCFD826);
   --color-background-body: light-dark(#FAF4ED, #191724);
@@ -353,12 +176,188 @@ html[data-theme="dark"] { color-scheme: dark; }
   --focus-outline-color: light-dark(#286983, #9CCFD8);
 }
 
+:root[data-palette="aster"] {
+  --color-accent: light-dark(#225BFF, #3D87FF);
+  --color-text-accent: light-dark(#225BFF, #3D87FF);
+  --color-icon-accent: light-dark(#225BFF, #3D87FF);
+  --color-accent-muted: light-dark(rgba(34, 91, 255, 0.10), rgba(61, 135, 255, 0.16));
+  --color-on-accent: light-dark(#FFFFFF, #0B1020);
+  --color-background-body: light-dark(#F8F4ED, #111112);
+  --color-text-primary: light-dark(#15110C, #DFE2E5);
+  --color-icon-primary: light-dark(#15110C, #DFE2E5);
+  --color-text-secondary: light-dark(#4E606F, #B8BDC3);
+  --color-on-error: light-dark(#FFFFFF, #15110C);
+  --color-neutral: light-dark(rgba(5, 54, 89, 0.1), rgba(223, 226, 229, 0.2));
+  --color-background-surface: light-dark(#FFFFFF, #1F1F22);
+  --color-overlay: light-dark(#01122866, #11111299);
+  --color-overlay-hover: light-dark(#0536590C, #FFFFFF0C);
+  --color-overlay-pressed: light-dark(#05365919, #FFFFFF19);
+  --color-background-muted: light-dark(#0536590C, #1111127F);
+  --color-on-light: light-dark(#000000, #000000);
+  --color-icon-secondary: light-dark(#4E606F, #AAAFB5);
+  --color-background-card: light-dark(#FFFFFF, #1F1F22);
+  --color-background-popover: light-dark(#FFFFFF, #28292C);
+  --color-info-muted: light-dark(#0082FB33, #0082FB3F);
+  --color-success-muted: light-dark(#0B991F33, #0B991F3F);
+  --color-error: light-dark(#E3193B, #F5394F);
+  --color-error-muted: light-dark(#E3193B33, #F5394F3F);
+  --color-warning: light-dark(#E9AF08, #F2C00B);
+  --color-warning-muted: light-dark(#E2A40033, #E2A4003F);
+  --color-text-success: var(--color-text-green);
+  --color-text-warning: var(--color-text-yellow);
+  --color-text-error: var(--color-text-red);
+  --color-icon-success: var(--color-text-success);
+  --color-icon-warning: var(--color-text-warning);
+  --color-border-error: var(--color-text-error);
+  --color-on-info-muted: var(--color-text-blue);
+  --color-on-success-muted: var(--color-text-green);
+  --color-on-warning-muted: var(--color-text-yellow);
+  --color-on-error-muted: var(--color-text-red);
+  --color-border: light-dark(#05365919, #F2F4F619);
+  --color-border-emphasized: light-dark(#CCD3DB, #494D53);
+  --color-text-blue: light-dark(#042F97, #AFD7FF);
+  --color-text-green: light-dark(#09441F, #A5F690);
+  --color-text-red: light-dark(#7B0210, #FFB2B8);
+  --color-text-yellow: light-dark(#753F07, #FBCE03);
+  --focus-outline-color: var(--color-accent);
+}
+
+:root[data-palette="aster"]:has(> body > .shell) {
+  --color-background-body: light-dark(#F4F4F5, #18181B);
+}
+
+:root[data-palette="relay"] {
+  --color-accent: light-dark(#315FD3, #87A9FA);
+  --color-accent-muted: light-dark(#315FD316, #87A9FA26);
+  --color-background-body: light-dark(#F3F4F7, #181A20);
+  --color-background-card: light-dark(#FFFFFF, #20232A);
+  --color-background-muted: light-dark(#E9ECF2, #15171D);
+  --color-background-popover: light-dark(#FFFFFF, #2C2F36);
+  --color-background-surface: light-dark(#FFFFFF, #20232A);
+  --color-border: light-dark(#DCE1E9, #31353E);
+  --color-border-emphasized: light-dark(#CCD3DB, #494D53);
+  --color-border-error: light-dark(#9D303D, #F2ACB3);
+  --color-error: light-dark(#BD4C56, #D97782);
+  --color-error-muted: light-dark(#BD4C5633, #D977823F);
+  --color-icon-accent: light-dark(#315FD3, #87A9FA);
+  --color-icon-primary: light-dark(#19202C, #E4E8EF);
+  --color-icon-secondary: light-dark(#515F74, #AFBACB);
+  --color-icon-success: light-dark(#246445, #99D2AF);
+  --color-icon-warning: light-dark(#80500E, #EDC588);
+  --color-info-muted: light-dark(#477FA133, #75ABCA3F);
+  --color-neutral: light-dark(#19202C1A, #E4E8EF33);
+  --color-on-accent: light-dark(#FFFFFF, #101D37);
+  --color-on-error: light-dark(#FFFFFF, #19202C);
+  --color-on-error-muted: light-dark(#9D303D, #F2ACB3);
+  --color-on-info-muted: light-dark(#31617F, #A0CBE3);
+  --color-on-light: light-dark(#000000, #000000);
+  --color-on-success-muted: light-dark(#246445, #99D2AF);
+  --color-on-warning-muted: light-dark(#80500E, #EDC588);
+  --color-overlay: light-dark(#19202C66, #181A2099);
+  --color-overlay-hover: light-dark(#19202C0C, #FFFFFF0C);
+  --color-overlay-pressed: light-dark(#19202C19, #FFFFFF19);
+  --color-success-muted: light-dark(#35856133, #65B5913F);
+  --color-text-accent: light-dark(#274EAD, #A9C2FF);
+  --color-text-error: light-dark(#9D303D, #F2ACB3);
+  --color-text-primary: light-dark(#19202C, #E4E8EF);
+  --color-text-secondary: light-dark(#515F74, #AFBACB);
+  --color-text-success: light-dark(#246445, #99D2AF);
+  --color-text-warning: light-dark(#80500E, #EDC588);
+  --color-warning: light-dark(#BE852E, #D3A258);
+  --color-warning-muted: light-dark(#BE852E33, #D3A2583F);
+  --focus-outline-color: light-dark(#315FD3, #87A9FA);
+}
+
+:root[data-palette="teal"] {
+  --color-accent: light-dark(#246B69, #7DC8BC);
+  --color-accent-muted: light-dark(#246B6919, #7DC8BC24);
+  --color-background-body: light-dark(#F1F5F3, #161D1C);
+  --color-background-card: light-dark(#FCFEFD, #1D2826);
+  --color-background-muted: light-dark(#E4ECE8, #131A19);
+  --color-background-popover: light-dark(#FCFEFD, #293432);
+  --color-background-surface: light-dark(#FCFEFD, #1D2826);
+  --color-border: light-dark(#D6E1DC, #2E3935);
+  --color-border-emphasized: light-dark(#CCD3DB, #494D53);
+  --color-border-error: light-dark(#933B37, #EFAEA9);
+  --color-error: light-dark(#B95853, #D9817B);
+  --color-error-muted: light-dark(#B9585333, #D9817B3F);
+  --color-icon-accent: light-dark(#246B69, #7DC8BC);
+  --color-icon-primary: light-dark(#172824, #E0EAE6);
+  --color-icon-secondary: light-dark(#50645F, #A9BDB5);
+  --color-icon-success: light-dark(#44622E, #BDDA9E);
+  --color-icon-warning: light-dark(#785017, #E7C697);
+  --color-info-muted: light-dark(#5984AA33, #84AACC3F);
+  --color-neutral: light-dark(#1728241A, #E0EAE633);
+  --color-on-accent: light-dark(#FFFFFF, #112D2A);
+  --color-on-error: light-dark(#FFFFFF, #172824);
+  --color-on-error-muted: light-dark(#933B37, #EFAEA9);
+  --color-on-info-muted: light-dark(#355E84, #ACCCE6);
+  --color-on-light: light-dark(#000000, #000000);
+  --color-on-success-muted: light-dark(#44622E, #BDDA9E);
+  --color-on-warning-muted: light-dark(#785017, #E7C697);
+  --color-overlay: light-dark(#17282466, #161D1C99);
+  --color-overlay-hover: light-dark(#1728240C, #FFFFFF0C);
+  --color-overlay-pressed: light-dark(#17282419, #FFFFFF19);
+  --color-success-muted: light-dark(#65824533, #9BB97B3F);
+  --color-text-accent: light-dark(#175A59, #9ADACE);
+  --color-text-error: light-dark(#933B37, #EFAEA9);
+  --color-text-primary: light-dark(#172824, #E0EAE6);
+  --color-text-secondary: light-dark(#50645F, #A9BDB5);
+  --color-text-success: light-dark(#44622E, #BDDA9E);
+  --color-text-warning: light-dark(#785017, #E7C697);
+  --color-warning: light-dark(#BA863E, #CEA468);
+  --color-warning-muted: light-dark(#BA863E33, #CEA4683F);
+  --focus-outline-color: light-dark(#246B69, #7DC8BC);
+}
+
+:root[data-palette="plum"] {
+  --color-accent: light-dark(#785378, #C9A2C5);
+  --color-accent-muted: light-dark(#78537819, #C9A2C526);
+  --color-background-body: light-dark(#F6F3F0, #201C20);
+  --color-background-card: light-dark(#FFFDFA, #292529);
+  --color-background-muted: light-dark(#ECE7E3, #1C181C);
+  --color-background-popover: light-dark(#FFFDFA, #353134);
+  --color-background-surface: light-dark(#FFFDFA, #292529);
+  --color-border: light-dark(#E2DBD7, #3D353C);
+  --color-border-emphasized: light-dark(#CCD3DB, #494D53);
+  --color-border-error: light-dark(#943F30, #EFAE9C);
+  --color-error: light-dark(#BB5A46, #D78472);
+  --color-error-muted: light-dark(#BB5A4633, #D784723F);
+  --color-icon-accent: light-dark(#785378, #C9A2C5);
+  --color-icon-primary: light-dark(#292329, #ECE5E5);
+  --color-icon-secondary: light-dark(#695E66, #C3B6BD);
+  --color-icon-success: light-dark(#4C6134, #C5D4A0);
+  --color-icon-warning: light-dark(#805017, #EBC492);
+  --color-info-muted: light-dark(#547D9C33, #7EA9C53F);
+  --color-neutral: light-dark(#2923291A, #ECE5E533);
+  --color-on-accent: light-dark(#FFFFFF, #302033);
+  --color-on-error: light-dark(#FFFFFF, #292329);
+  --color-on-error-muted: light-dark(#943F30, #EFAE9C);
+  --color-on-info-muted: light-dark(#3B627F, #ABCCE0);
+  --color-on-light: light-dark(#000000, #000000);
+  --color-on-success-muted: light-dark(#4C6134, #C5D4A0);
+  --color-on-warning-muted: light-dark(#805017, #EBC492);
+  --color-overlay: light-dark(#29232966, #201C2099);
+  --color-overlay-hover: light-dark(#2923290C, #FFFFFF0C);
+  --color-overlay-pressed: light-dark(#29232919, #FFFFFF19);
+  --color-success-muted: light-dark(#75834F33, #A6B77E3F);
+  --color-text-accent: light-dark(#69456B, #DEC0DB);
+  --color-text-error: light-dark(#943F30, #EFAE9C);
+  --color-text-primary: light-dark(#292329, #ECE5E5);
+  --color-text-secondary: light-dark(#695E66, #C3B6BD);
+  --color-text-success: light-dark(#4C6134, #C5D4A0);
+  --color-text-warning: light-dark(#805017, #EBC492);
+  --color-warning: light-dark(#BF873D, #CFA163);
+  --color-warning-muted: light-dark(#BF873D33, #CFA1633F);
+  --focus-outline-color: light-dark(#785378, #C9A2C5);
+}
+
 /* The palette menu's swatch of each palette: its accent on its shell. */
+[data-swatch="rose-pine"] { --aster-swatch-accent: light-dark(#286983, #9CCFD8); --aster-swatch-shell: light-dark(#FAF4ED, #191724); }
 [data-swatch="aster"] { --aster-swatch-accent: light-dark(#225BFF, #3D87FF); --aster-swatch-shell: light-dark(#F4F4F5, #18181B); }
 [data-swatch="relay"] { --aster-swatch-accent: light-dark(#315FD3, #87A9FA); --aster-swatch-shell: light-dark(#F3F4F7, #181A20); }
 [data-swatch="teal"] { --aster-swatch-accent: light-dark(#246B69, #7DC8BC); --aster-swatch-shell: light-dark(#F1F5F3, #161D1C); }
 [data-swatch="plum"] { --aster-swatch-accent: light-dark(#785378, #C9A2C5); --aster-swatch-shell: light-dark(#F6F3F0, #201C20); }
-[data-swatch="rose-pine"] { --aster-swatch-accent: light-dark(#286983, #9CCFD8); --aster-swatch-shell: light-dark(#FAF4ED, #191724); }
 
 /* Layout: the sizes the shell and the component layer need that the Astryx
    theme has no token for. Values are the reference page's measurements

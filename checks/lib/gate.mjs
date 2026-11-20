@@ -4,7 +4,8 @@
  * the page (visibility, a short element path, colour parsing, compositing).
  *
  * Nothing here writes to the device. The login is the ordinary form POST;
- * light and dark, and the palette (--palette, default aster), are chosen
+ * light and dark, and the palette (--palette; each gate sets its default),
+ * are chosen
  * through the theme's browser settings (localStorage "aster-theme" and
  * "aster-palette"), as a reader chooses them; the only clicks
  * are the Edit button that opens an interface dialog and the Close button of
@@ -20,6 +21,8 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 export const CHECKS = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+/* The palette a page shows with no data-palette (design/palettes.mjs). */
+export const DEFAULT_PALETTE = 'rose-pine';
 export const VIEWPORTS = {desktop: {width: 1440, height: 900}, phone: {width: 390, height: 844}};
 
 /* Flags take one value each; repeatable flags collect into an array. */
@@ -155,7 +158,7 @@ export async function session(browser, opt, device, mode) {
       localStorage.setItem('aster-theme', m); localStorage.setItem('aster-palette', p);
       localStorage.setItem('oc_guide_done', '1'); localStorage.setItem('oc_guide_autostart', '0');
     } catch (e) {}
-  }, [mode, opt.palette ?? 'aster']);
+  }, [mode, opt.palette ?? DEFAULT_PALETTE]);
   const r = await ctx.request.post(opt.base, {form: {luci_username: opt.user, luci_password: opt.password}, maxRedirects: 0});
   const cookie = (await ctx.cookies()).some((c) => c.name.startsWith('sysauth'));
   if (r.status() !== 302 || !cookie) {
@@ -200,9 +203,9 @@ export async function openPage(ctx, opt, entry, mode, debugCss) {
   if (missing) return fail(`page error: ${missing.slice(0, 200)}`);
   const theme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
   if (theme !== mode) return fail(`data-theme is ${theme}, want ${mode} (theme not installed or not selected?)`);
-  // Aster, the default palette, is the absence of the attribute.
-  const palette = await page.evaluate(() => document.documentElement.getAttribute('data-palette') ?? 'aster');
-  if (palette !== (opt.palette ?? 'aster')) return fail(`data-palette is ${palette}, want ${opt.palette} (unknown palette, or a theme without palettes?)`);
+  // Rosé Pine, the theme's default palette, is the absence of the attribute.
+  const palette = await page.evaluate((d) => document.documentElement.getAttribute('data-palette') ?? d, DEFAULT_PALETTE);
+  if (palette !== (opt.palette ?? DEFAULT_PALETTE)) return fail(`data-palette is ${palette}, want ${opt.palette} (unknown palette, or a theme without palettes?)`);
   await page.waitForTimeout(opt.settle);
   // luci-app-attendedsysupgrade (25.12) asks on the overview whether to check
   // for upgrades. Its Close button dismisses the dialog and saves nothing.

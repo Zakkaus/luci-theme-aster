@@ -26,8 +26,8 @@ and an `.apk` from the 25.12 SDK.
 ## Palettes
 
 Five colour palettes, chosen per browser from the palette menu in the top
-bar (in the drawer on a phone): Aster (the default), Relay Blue, Sounding
-Teal, Herbarium Plum and Rosé Pine (Dawn in light mode, Main in dark). Each
+bar (in the drawer on a phone): Rosé Pine (the default; Dawn in light
+mode, Main in dark), Aster, Relay Blue, Sounding Teal and Herbarium Plum. Each
 works in light, dark and auto mode. The choice is kept in the browser's
 `localStorage` (`aster-palette`), not on the router. Only colours change
 between palettes; components and spacing stay the same.

@@ -7,7 +7,7 @@
  * 390 x 844), light and dark.
  *
  *   node scripts/measure.mjs <base url> <password> --spec <spec.json>
- *        [--user root] [--json <out file>]
+ *        [--user root] [--palette aster] [--json <out file>]
  *
  *   <base url>  the device, e.g. http://127.0.0.1:18025
  *
@@ -17,7 +17,9 @@
  * when a field finds nothing to measure. Nothing is written to the device:
  * the login is the ordinary form POST, and light and dark are chosen the way
  * a reader chooses them, through the theme's own browser setting
- * (localStorage "aster-theme"), not through UCI.
+ * (localStorage "aster-theme"), not through UCI. The palette is chosen the
+ * same way ("aster-palette"); it defaults to Aster, not the theme's default
+ * Rosé Pine, because the reference colours in spec.json are Aster's blue.
  *
  * Playwright is not a dependency of this repository. Point PLAYWRIGHT at its
  * index.mjs (default: the bare specifier "playwright"); CHROME_PATH, when set,
@@ -36,9 +38,10 @@ const opt = (name, dflt) => {
 const specPath = opt('--spec');
 const user = opt('--user', 'root');
 const jsonOut = opt('--json');
+const palette = opt('--palette', 'aster');
 const [baseArg, password] = args;
 if (!baseArg || password === undefined || !specPath) {
-  console.error('usage: measure.mjs <base url> <password> --spec <spec.json> [--user root] [--json <file>]');
+  console.error('usage: measure.mjs <base url> <password> --spec <spec.json> [--user root] [--palette aster] [--json <file>]');
   process.exit(1);
 }
 const base = `${baseArg.replace(/\/+$/, '')}/cgi-bin/luci/`;
@@ -220,7 +223,9 @@ for (const [device, viewport] of Object.entries({desktop: {width: 1440, height: 
     const ref = spec[key];
     if (!ref) { fail(`${key}: not in ${specPath}`); continue; }
     const ctx = await browser.newContext({viewport, deviceScaleFactor: 1, colorScheme: mode});
-    await ctx.addInitScript((m) => { try { localStorage.setItem('aster-theme', m); } catch (e) {} }, mode);
+    await ctx.addInitScript(([m, p]) => {
+      try { localStorage.setItem('aster-theme', m); localStorage.setItem('aster-palette', p); } catch (e) {}
+    }, [mode, palette]);
     const page = await ctx.newPage();
 
     const r = await ctx.request.post(base, {form: {luci_username: user, luci_password: password}, maxRedirects: 0});
@@ -240,6 +245,9 @@ for (const [device, viewport] of Object.entries({desktop: {width: 1440, height: 
     }
     const theme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
     if (theme !== mode) fail(`${key}: data-theme is ${theme}`);
+    // Rosé Pine, the theme's default palette, carries no attribute.
+    const pal = await page.evaluate(() => document.documentElement.getAttribute('data-palette') ?? 'rose-pine');
+    if (pal !== palette) fail(`${key}: data-palette is ${pal}, want ${palette}`);
 
     const plain = FIELDS.filter((f) => !f.drawer && (!f.devices || f.devices.includes(device)));
     const got = await page.evaluate(readAll, plain);

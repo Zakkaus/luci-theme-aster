@@ -38,7 +38,7 @@ expect 1 "undefined: --no-such (read in luci.css)" "var(--no-such) in luci.css" 
 
 copy palettegap
 printf '\n.tokens-test { color: var(--color-text-blue); }\n' >>"$tmp/palettegap/luci.css"
-expect 1 "palette relay lacks colour tokens the stylesheets read: --color-text-blue" "a colour token no palette defines" -- --styles "$tmp/palettegap"
+expect 1 "palette rose-pine lacks colour tokens the stylesheets read: --color-text-blue" "a colour token the default palette lacks" -- --styles "$tmp/palettegap"
 
 copy nofill
 expect 1 "undefined: --font-weight-semibold" "core fill disabled" -- --skip-core-fill --styles "$tmp/nofill"

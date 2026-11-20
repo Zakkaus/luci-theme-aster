@@ -5,7 +5,7 @@
  *
  *   node checks/contrast.mjs <base url> <password>
  *        [--user root] [--pages <file>]... [--viewports desktop,phone]
- *        [--modes light,dark] [--palette aster] [--text 4.5] [--large 3] [--ui 3] [--focus 3]
+ *        [--modes light,dark] [--palette rose-pine] [--text 4.5] [--large 3] [--ui 3] [--focus 3]
  *        [--separator-max 1.5] [--separator-modes dark] [--focus-limit 3]
  *        [--field-border enforce|waive]
  *        [--json <file>] [--out <file>] [--timeout 60000] [--settle 1500]
@@ -42,11 +42,11 @@
  * is written to the device.
  */
 import path from 'node:path';
-import {CHECKS, die, parseArgs, readPages, parseDebugCss, openPage, eachCombo, writeOut} from './lib/gate.mjs';
+import {CHECKS, DEFAULT_PALETTE, die, parseArgs, readPages, parseDebugCss, openPage, eachCombo, writeOut} from './lib/gate.mjs';
 
-const usage = 'usage: node checks/contrast.mjs <base url> <password> [--user root] [--pages <file>]... [--viewports desktop,phone] [--modes light,dark] [--palette aster] [--text 4.5] [--large 3] [--ui 3] [--focus 3] [--separator-max 1.5] [--separator-modes dark] [--focus-limit 3] [--field-border enforce|waive] [--json <file>] [--out <file>] [--timeout ms] [--settle ms] [--debug-css <page>=<css>]...';
+const usage = 'usage: node checks/contrast.mjs <base url> <password> [--user root] [--pages <file>]... [--viewports desktop,phone] [--modes light,dark] [--palette rose-pine] [--text 4.5] [--large 3] [--ui 3] [--focus 3] [--separator-max 1.5] [--separator-modes dark] [--focus-limit 3] [--field-border enforce|waive] [--json <file>] [--out <file>] [--timeout ms] [--settle ms] [--debug-css <page>=<css>]...';
 const opt = parseArgs(process.argv.slice(2), {
-  flags: {user: 'root', viewports: 'desktop,phone', modes: 'light,dark', palette: 'aster', text: '4.5', large: '3', ui: '3', focus: '3', 'separator-max': '1.5', 'separator-modes': 'dark', 'field-border': 'waive', 'focus-limit': '3', json: undefined, out: undefined, timeout: '60000', settle: '1500'},
+  flags: {user: 'root', viewports: 'desktop,phone', modes: 'light,dark', palette: DEFAULT_PALETTE, text: '4.5', large: '3', ui: '3', focus: '3', 'separator-max': '1.5', 'separator-modes': 'dark', 'field-border': 'waive', 'focus-limit': '3', json: undefined, out: undefined, timeout: '60000', settle: '1500'},
   repeat: ['pages', 'debug-css'],
   usage,
 });
