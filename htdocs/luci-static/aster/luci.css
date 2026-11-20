@@ -407,6 +407,16 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
    the inset made WireGuard's peer table overflow #view by 2, which drew a
    scrollbar under it. */
 .shell-inner .table:not(.cbi-section *, #view > *, #view > .cbi-map > *) { margin-inline: var(--border-width); }
+/* Leases and associated stations are rows of identifiers (addresses, MACs,
+   DUIDs, rates): a line is never broken, so a column is as wide as its
+   longest line and every row of one kind is one height. A station's host
+   puts its addresses on the line under its name, its network the
+   interface under the SSID. Where the lines do not fit the card the table
+   folds (components.css, Table) instead of breaking them. */
+@container aster-page (min-width: 72rem) {
+  #view :is(.leases, .leases6, .assoclist) .td { white-space: nowrap; }
+}
+#view .assoclist .td :is(.hide-xs, .ifacebadge small) { display: block; }
 /* An interface row: cells to the top, the box column as narrow as the box,
    the status column the rest. */
 .tr:has(> .td > .ifacebox) > .td {
