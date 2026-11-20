@@ -605,9 +605,6 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   padding-block: var(--spacing-2);
 }
 
-/* The first one starts its text where a key/value row does (4 in), so the
-   first lines of Memory and System sit level, as the reference's do. */
-[data-page="admin-status-overview"] .table .tr:first-child:has(> .td > .cbi-progressbar) { padding-block-start: var(--spacing-1); }
 [data-page="admin-status-overview"] .table .tr:has(> .td > .cbi-progressbar) > .td {
   display: block;
   inline-size: auto;
