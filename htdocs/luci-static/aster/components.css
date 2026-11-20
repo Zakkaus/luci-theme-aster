@@ -178,10 +178,10 @@ html body[data-page^="admin-services-openclash"] .oc.cbi-button.cbi-button {
 }
 html :where(button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button, .cbi-section .label[data-style], #indicators > :is(span, a)) {
   @media (hover: hover) {
-    &:hover:not(:disabled, [disabled], [aria-disabled="true"]) { background-image: linear-gradient(var(--color-overlay-hover), var(--color-overlay-hover)); }
+    &:hover:not(:disabled, [disabled], [aria-disabled="true"]) { background-image: linear-gradient(var(--color-overlay-hover) 0 0); }
   }
   &:active:not(:disabled, [disabled], [aria-disabled="true"]) {
-    background-image: linear-gradient(var(--color-overlay-pressed), var(--color-overlay-pressed));
+    background-image: linear-gradient(var(--color-overlay-pressed) 0 0);
     transform: scale(0.98);
   }
   &:is(:disabled, [disabled], [aria-disabled="true"]) { opacity: 0.5; cursor: default; }
@@ -481,7 +481,7 @@ html :where(:is(input[type="checkbox"], input[type="radio"]):checked) {
 html :where(input[type="checkbox"], input[type="radio"]):checked::before { transform: scale(1); }
 @media (hover: hover) {
   html :where(:is(input[type="checkbox"], input[type="radio"]):hover:not(:disabled)) {
-    background-image: linear-gradient(var(--color-overlay-hover), var(--color-overlay-hover));
+    background-image: linear-gradient(var(--color-overlay-hover) 0 0);
   }
 }
 html :where(:is(input[type="checkbox"], input[type="radio"]):disabled) { opacity: 0.5; cursor: default; }
@@ -914,7 +914,7 @@ html :where([data-tab-active="false"]) { display: none; }
     scrollbar-width: none;
     padding-block-end: calc(var(--spacing-1) + var(--border-width));
     border-block-end: 0;
-    background: linear-gradient(var(--color-border), var(--color-border)) bottom / 100% var(--border-width) no-repeat;
+    background: linear-gradient(var(--color-border) 0 0) bottom / 100% var(--border-width) no-repeat;
   }
   html :where(.tabs > li, .cbi-tabmenu > li) { flex: none; }
   html :where(.tab[data-active], .cbi-tabmenu > .cbi-tab) { scroll-initial-target: nearest; }
@@ -980,13 +980,14 @@ html :where(.spinning:not(.btn, .cbi-button, .cbi-dropdown, button)) {
   color: var(--color-text-secondary);
   font-size: var(--text-supporting-size);
 }
-html :where(.spinning:not(.btn, .cbi-button, .cbi-dropdown, button))::before {
+html :where(.spinning:not(.btn, .cbi-button, .cbi-dropdown, button))::before,
+html :where(#modal_overlay > .alert-message.spinning)::after {
   content: "";
   flex: none;
   inline-size: var(--spacing-10);
   block-size: var(--spacing-1);
   border-radius: var(--radius-full);
-  background: linear-gradient(var(--color-accent), var(--color-accent)) 50% 0 / 40% 100% no-repeat var(--color-background-muted);
+  background: linear-gradient(var(--color-accent) 0 0) 50% 0 / 40% 100% no-repeat var(--color-background-muted);
   animation: aster-progress 1.2s var(--ease-standard) infinite alternate;
 }
 @keyframes aster-progress { from { background-position: 0 0; } to { background-position: 100% 0; } }
@@ -1176,15 +1177,7 @@ html :where(#modal_overlay > .alert-message > :is(.right, .button-row):last-chil
   margin-inline-start: calc((var(--banner-pad-inline) + var(--aster-icon-md) + var(--spacing-2)) * -1);
 }
 html :where(#modal_overlay > .alert-message.spinning) { display: block; }
-html :where(#modal_overlay > .alert-message.spinning)::after {
-  content: "";
-  display: block;
-  block-size: var(--spacing-1);
-  margin-block-start: var(--spacing-3);
-  border-radius: var(--radius-full);
-  background: linear-gradient(var(--color-accent), var(--color-accent)) 50% 0 / 40% 100% no-repeat var(--color-background-muted);
-  animation: aster-progress 1.2s var(--ease-standard) infinite alternate;
-}
+html :where(#modal_overlay > .alert-message.spinning)::after { display: block; inline-size: auto; margin-block-start: var(--spacing-3); }
 
 /* ── Tooltip ─────────────────────────────────────────────────────
    The inverted fill (text colour behind, surface colour in front), 4 / 8 inside, container radius, body text, no arrow. Two kinds:

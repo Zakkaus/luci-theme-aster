@@ -384,20 +384,16 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   }
   /* Signal quality is the reference's StatusDot: 8 round, green from 50 %,
      amber below, grey with no signal. LuCI grades it in the image's name. */
-  & .ifacebox-body > div > .ifacebadge:has(> img[src*="/signal-"])::before,
-  & .td > .ifacebadge:has(> img[src*="/signal-"])::before {
+  & :is(.ifacebox-body > div, .td) > .ifacebadge:has(> img[src*="/signal-"])::before {
     inline-size: var(--spacing-2);
     block-size: var(--spacing-2);
     border-radius: var(--radius-full);
     background-color: var(--color-icon-success);
   }
-  & .ifacebox-body > div > .ifacebadge:has(> img:is([src*="/signal-025-"], [src*="/signal-000-025"]))::before,
-  & .td > .ifacebadge:has(> img:is([src*="/signal-025-"], [src*="/signal-000-025"]))::before { background-color: var(--color-icon-warning); }
-  & .ifacebox-body > div > .ifacebadge:has(> img:is([src*="/signal-000-000"], [src*="/signal-none"]))::before,
-  & .td > .ifacebadge:has(> img:is([src*="/signal-000-000"], [src*="/signal-none"]))::before { background-color: var(--color-icon-secondary); }
+  & :is(.ifacebox-body > div, .td) > .ifacebadge:has(> img:is([src*="/signal-025-"], [src*="/signal-000-025"]))::before { background-color: var(--color-icon-warning); }
+  & :is(.ifacebox-body > div, .td) > .ifacebadge:has(> img:is([src*="/signal-000-000"], [src*="/signal-none"]))::before { background-color: var(--color-icon-secondary); }
   & .ifacebox > .ifacebox-body > img,
-  & .ifacebox-body > div > .ifacebadge > img,
-  & .td > .ifacebadge > img { display: none; }
+  & :is(.ifacebox-body > div, .td) > .ifacebadge > img { display: none; }
   /* Port tiles, the reference's port band. The Port status card is the reference's section: its title over a grid of
      port tiles with no card around them. */
   & > .cbi-section:has(img[src*="/port_"]) {
@@ -420,59 +416,59 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     min-inline-size: 0 !important;
     max-inline-size: none !important;
     margin: 0 !important;
-  }
-  /* A port with no carrier is the reference's muted Card: the sunken fill, no
-     edge, muted text. LuCI says so only in the image: port_down, port_pse_down. */
-  & .ifacebox:has(> .ifacebox-body > img[src*="_down."]) {
-    --card-border: transparent;
-    --card-bg: var(--color-background-muted);
-  }
-  /* The name row: the icon, green with a link, then the name. Its bold is
-     inline; the heading weight is 600. The end stays free for the zone dots. */
-  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head:first-child {
-    padding-inline-end: var(--spacing-6);
-    font-weight: var(--text-heading-3-weight) !important;
-  }
-  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head:first-child::before { background-color: var(--color-icon-success); }
-  & .ifacebox:has(> .ifacebox-body > img[src*="_down."]) > .ifacebox-head:first-child::before { background-color: var(--color-icon-secondary); }
-  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-body { text-align: start; }
-  /* The speed ("10 GbE", "no link"): body text on one line, muted without a
-     link. The <br> after the hidden image would leave an empty line. */
-  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-body:nth-child(2) {
-    --ifacebox-body-fg: var(--color-text-primary);
-    --ifacebox-body-size: var(--text-body-size);
-    --ifacebox-body-leading: var(--text-body-leading);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-body:nth-child(2) > br { display: none; }
-  & .ifacebox:has(> .ifacebox-body > img[src*="_down."]) > .ifacebox-body:nth-child(2) { --ifacebox-body-fg: var(--color-text-secondary); }
-  /* The zone bars (inline flex: 1 and height) become 8 dots in LuCI's
-     colours at the name row's end, where the reference puts the role. */
-  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head.cbi-tooltip-container {
-    position: absolute;
-    inset-block-start: calc(var(--spacing-4) - var(--border-width));
-    inset-inline-end: calc(var(--spacing-4) - var(--border-width));
-    block-size: calc(var(--text-heading-3-size) * var(--text-heading-3-leading));
-    gap: var(--spacing-1);
-  }
-  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head > .zonebadge {
-    flex: none !important;
-    inline-size: var(--spacing-2);
-    block-size: var(--spacing-2) !important;
-    min-inline-size: 0;
-    padding: 0;
-    border-radius: var(--radius-full);
-    background-image: none;
-  }
-  /* Traffic: "▲ sent", "▼ received", two supporting lines 4 apart. The arrows
-     are characters in LuCI's text and stay; the 80 % size is inline. */
-  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-body > .cbi-tooltip-container {
-    color: var(--color-text-secondary);
-    font-size: var(--text-supporting-size) !important;
-    font-variant-numeric: tabular-nums;
-    line-height: calc(var(--text-supporting-size) * var(--text-supporting-leading) + var(--spacing-1));
+    /* The name row: the icon, green with a link, then the name. Its bold is
+       inline; the heading weight is 600. The end stays free for the zone dots. */
+    & > .ifacebox-head:first-child {
+      padding-inline-end: var(--spacing-6);
+      font-weight: var(--text-heading-3-weight) !important;
+      &::before { background-color: var(--color-icon-success); }
+    }
+    & > .ifacebox-body { text-align: start; }
+    /* The speed ("10 GbE", "no link"): body text on one line, muted without a
+       link. The <br> after the hidden image would leave an empty line. */
+    & > .ifacebox-body:nth-child(2) {
+      --ifacebox-body-fg: var(--color-text-primary);
+      --ifacebox-body-size: var(--text-body-size);
+      --ifacebox-body-leading: var(--text-body-leading);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      & > br { display: none; }
+    }
+    /* A port with no carrier is the reference's muted Card: the sunken fill, no
+       edge, muted text. LuCI says so only in the image: port_down, port_pse_down. */
+    &:has(> .ifacebox-body > img[src*="_down."]) {
+      --card-border: transparent;
+      --card-bg: var(--color-background-muted);
+      & > .ifacebox-head:first-child::before { background-color: var(--color-icon-secondary); }
+      & > .ifacebox-body:nth-child(2) { --ifacebox-body-fg: var(--color-text-secondary); }
+    }
+    /* The zone bars (inline flex: 1 and height) become 8 dots in LuCI's
+       colours at the name row's end, where the reference puts the role. */
+    & > .ifacebox-head.cbi-tooltip-container {
+      position: absolute;
+      inset-block-start: calc(var(--spacing-4) - var(--border-width));
+      inset-inline-end: calc(var(--spacing-4) - var(--border-width));
+      block-size: calc(var(--text-heading-3-size) * var(--text-heading-3-leading));
+      gap: var(--spacing-1);
+    }
+    & > .ifacebox-head > .zonebadge {
+      flex: none !important;
+      inline-size: var(--spacing-2);
+      block-size: var(--spacing-2) !important;
+      min-inline-size: 0;
+      padding: 0;
+      border-radius: var(--radius-full);
+      background-image: none;
+    }
+    /* Traffic: "▲ sent", "▼ received", two supporting lines 4 apart. The arrows
+       are characters in LuCI's text and stay; the 80 % size is inline. */
+    & > .ifacebox-body > .cbi-tooltip-container {
+      color: var(--color-text-secondary);
+      font-size: var(--text-supporting-size) !important;
+      font-variant-numeric: tabular-nums;
+      line-height: calc(var(--text-supporting-size) * var(--text-supporting-leading) + var(--spacing-1));
+    }
   }
   /* PoE: inline black, grey and red, picked for a white page; black on a dark
      card cannot be read. */
@@ -497,10 +493,10 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     padding-block: var(--spacing-1);
     overflow-wrap: anywhere;
     white-space: normal;
-  }
-  & .network-status-table > .ifacebox:not(:has(img[src*="/signal-"])) .nowrap > strong {
-    color: var(--color-text-secondary);
-    font-weight: var(--font-weight-medium);
+    & > strong {
+      color: var(--color-text-secondary);
+      font-weight: var(--font-weight-medium);
+    }
   }
   /* A chip in a box (the upstream's device, a radio's SSID) is the plain
      Badge as a group under the box's own lines, apart by a divider. */
@@ -519,35 +515,37 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
      the radio's name, and at the end a dot, green while the radio is up (LuCI
      marks the head .active). Under it the radio's facts and one group per
      SSID, aligned with the name. */
-  & .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head::after {
-    content: "";
-    flex: none;
-    margin-inline-start: auto;
-    inline-size: var(--spacing-2);
-    block-size: var(--spacing-2);
-    border-radius: var(--radius-full);
-    background-color: var(--color-icon-secondary);
+  & .ifacebox:has(img[src*="/signal-"]) {
+    & > .ifacebox-head::after {
+      content: "";
+      flex: none;
+      margin-inline-start: auto;
+      inline-size: var(--spacing-2);
+      block-size: var(--spacing-2);
+      border-radius: var(--radius-full);
+      background-color: var(--color-icon-secondary);
+    }
+    & > .ifacebox-head.active::after { background-color: var(--color-icon-success); }
+    & > .ifacebox-body { padding-inline-start: calc(var(--aster-icon-md) + var(--spacing-2)); }
+    /* The facts are the reference's muted detail line: one run that wraps, the
+       items a gap apart. */
+    & > .ifacebox-body > span:first-child,
+    & .ifacebadge > span {
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: var(--spacing-3);
+    }
+    & .nowrap > strong { font-weight: inherit; }
+    /* The SSID leads its group as the reference's SSID does: body text, 600. */
+    & .ifacebadge > span > .nowrap:first-child {
+      flex-basis: 100%;
+      color: var(--color-text-primary);
+      font-size: var(--text-body-size);
+      font-weight: var(--font-weight-semibold);
+      line-height: var(--text-body-leading);
+    }
+    & .ifacebadge { gap: var(--spacing-2); }
   }
-  & .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head.active::after { background-color: var(--color-icon-success); }
-  & .ifacebox:has(img[src*="/signal-"]) > .ifacebox-body { padding-inline-start: calc(var(--aster-icon-md) + var(--spacing-2)); }
-  /* The facts are the reference's muted detail line: one run that wraps, the
-     items a gap apart. */
-  & .ifacebox:has(img[src*="/signal-"]) > .ifacebox-body > span:first-child,
-  & .ifacebox:has(img[src*="/signal-"]) .ifacebadge > span {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: var(--spacing-3);
-  }
-  & .ifacebox:has(img[src*="/signal-"]) .nowrap > strong { font-weight: inherit; }
-  /* The SSID leads its group as the reference's SSID does: body text, 600. */
-  & .ifacebox:has(img[src*="/signal-"]) .ifacebadge > span > .nowrap:first-child {
-    flex-basis: 100%;
-    color: var(--color-text-primary);
-    font-size: var(--text-body-size);
-    font-weight: var(--font-weight-semibold);
-    line-height: var(--text-body-leading);
-  }
-  & .ifacebox:has(img[src*="/signal-"]) .ifacebadge { gap: var(--spacing-2); }
   & .td > .ifacebadge small { color: var(--color-text-secondary); }
 }
 
@@ -592,13 +590,16 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   }
   /* Network > Interfaces has no header row, so the Table fold skips it: the
      box, its status and the actions stack, the actions wrap (layout). */
-  #view .tr:has(> .td > .ifacebox) { display: flex; flex-direction: column; }
+  #view .tr:has(> .td > .ifacebox) {
+    display: flex;
+    flex-direction: column;
+    & > .td { display: block; inline-size: auto; white-space: normal; }
+    & > .td:not(:last-child) { border: 0; }
+    & > .td.cbi-section-actions > * { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
+  }
   /* The table is a block here; a row group left as a table shrinks to its
      content and the rules stop short of the card edge (layout). */
   #view .tbody:has(> .tr > .td > .ifacebox) { display: block; }
-  #view .tr:has(> .td > .ifacebox) > .td { display: block; inline-size: auto; white-space: normal; }
-  #view .tr:has(> .td > .ifacebox) > .td:not(:last-child) { border: 0; }
-  #view .tr:has(> .td > .ifacebox) > .td.cbi-section-actions > * { display: flex; flex-wrap: wrap; gap: var(--spacing-2); }
   /* Actions that wrap (here and in the Table fold) are spaced by the gap
      alone, not also by the button-after-button margin. */
   #view .tr:has(> .td > .ifacebox) > .td.cbi-section-actions > * > *,
