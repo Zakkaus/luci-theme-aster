@@ -65,6 +65,14 @@ expect uniform 0 "" "no rule under a card's last row" -- "$url" "$password" --pa
 expect uniform 1 "card lastRule" "rule under a card's last row" "(want none)" -- "$url" "$password" --pages "$tmp/diagnostics.txt" \
 	--debug-css 'admin/network/diagnostics=#view .table .tr > .td { border-block-end: 1px solid rgb(0, 0, 0) !important }'
 
+# Raw glyphs: a Select's ▾ shown again instead of its chevron icon.
+printf 'admin/system/system\n' >"$tmp/system.txt"
+expect uniform 1 "glyph raw" "raw ▾ glyph shown" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=.cbi-dropdown > .open { font-size: 15px !important }'
+# The save bar over the page again: the main column runs under it.
+expect uniform 1 "footer overlap" "save bar covering the page" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=.shell-main { margin-block-end: 0 !important }'
+
 # Side nav: rows set flush again (the hovered row touched the selected one).
 expect uniform 1 "nav.item gap" "side nav rows with no gap" "0px (want 2px)" -- "$url" "$password" --pages "$tmp/reboot.txt" \
 	--debug-css 'admin/system/reboot=.nav, .nav-group { gap: 0 !important }'

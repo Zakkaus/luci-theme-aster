@@ -487,6 +487,23 @@ function collect(cfg) {
     if (left < Infinity) add('banner.icon', 'gap', px(left - icon), el);
   }
 
+  // Raw glyphs: an element whose own words are only a character LuCI draws
+  // as an icon (▾ ⇒ ∗ + × ···) shows it; the theme draws the Heroicon
+  // and hides the character (font-size 0). Only showing ones are listed.
+  for (const el of scope.querySelectorAll('*')) {
+    const t = ownText(el).trim();
+    if (!/^(▾|⇒|∗|\+|×|···)$/.test(t) || (!cfg.modal && el.closest('#modal_overlay')) || el.closest(APP_OWN) || !visible(el)) continue;
+    if (parseFloat(getComputedStyle(el).fontSize) > 0) add('glyph', 'raw', t, el);
+  }
+
+  // The save bar is the layout's footer: on a wide screen it sits under
+  // the main column, which ends above it, so it covers none of the page.
+  const bar = cfg.modal ? null : [...document.querySelectorAll('.cbi-page-actions')].find(visible);
+  if (bar && getComputedStyle(bar).position === 'fixed') {
+    const main = document.querySelector('.shell-main');
+    add('footer', 'overlap', px(Math.max(0, box(main).bottom - box(bar).top)), bar);
+  }
+
   // Font family of every element with its own words, and of every control.
   const fam = (f) => f.replace(/["']/g, '').split(',').map((x) => x.trim()).join(', ');
   for (const el of scope.querySelectorAll('*')) {
