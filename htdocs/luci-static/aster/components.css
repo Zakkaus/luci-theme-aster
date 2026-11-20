@@ -328,8 +328,11 @@ html :where(.cbi-dropdown[multiple] > ul > li > label),
 html :where(:is(.cbi-dropdown[multiple][more], .cbi-dropdown[multiple][empty]) > .more) { display: flex; }
 html :where(.cbi-dropdown[empty] > ul > li) { display: block; }
 html :where(:is(.cbi-dropdown:not(.btn, .cbi-button)) > ul > li[placeholder]) { color: var(--color-text-secondary); }
-html :where(.cbi-dropdown > ul > li[display]:not([display="0"])) { border-inline-start: var(--border-width) solid var(--color-border); }
-html :where(.cbi-dropdown > ul > li img) { block-size: var(--aster-icon-sm); inline-size: auto; }
+/* A multi-select shows its chosen values as chips in one row, 4 apart (no
+   rule between them, no stretching); a chip's device image is the 16 icon. */
+html :where(.cbi-dropdown[multiple] > ul) { gap: var(--spacing-1); padding-inline-start: var(--spacing-2); }
+html :where(.cbi-dropdown[multiple] > ul > li[display]) { flex: none; padding: 0; }
+html :where(.cbi-dropdown > ul > li img) { block-size: var(--aster-icon-sm); inline-size: var(--aster-icon-sm); }
 /* The chevron segment: centred; a Select's is 32 wide in the secondary
    icon colour (a ComboButton's is the button's own, above). */
 html :where(.cbi-dropdown > :is(.open, .more)) {
@@ -340,6 +343,18 @@ html :where(.cbi-dropdown > :is(.open, .more)) {
 html :where(.cbi-dropdown:not(.btn, .cbi-button) > :is(.open, .more)) {
   inline-size: var(--size-element-sm);
   color: var(--color-icon-secondary);
+}
+/* An empty multi-select shows its placeholder (.more, "unspecified") in
+   the value's place, not the first option's chip under it. */
+html :where(.cbi-dropdown[multiple][empty]:not([open]) > ul) { display: none; }
+html :where(.cbi-dropdown[multiple][empty] > .more) {
+  flex: 1 1 auto;
+  justify-content: flex-start;
+  min-inline-size: 0;
+  padding-inline: var(--spacing-3);
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
 }
 html :where(.cbi-dropdown > .open) { display: flex; font-size: 0; }
 /* LuCI writes the chevron as a ▾ glyph; it draws the 16 ChevronDown icon
@@ -545,11 +560,14 @@ html :where(.cbi-value) {
   column-gap: var(--spacing-4);
   padding-block: var(--spacing-2);
 }
+/* A block, not a flex box: a label with markup in it ("Allow forward to
+   <em>destination zones</em>:") keeps one run of text that wraps as words;
+   the padding centres its first line on a 36 control. */
 html :where(.cbi-value > .cbi-value-title) {
   flex: 0 0 var(--form-label-w, var(--aster-form-label-w));
-  display: flex;
-  align-items: center;
+  box-sizing: border-box;
   min-block-size: var(--size-element-md);
+  padding-block: calc((var(--size-element-md) - var(--text-label-size) * var(--text-label-leading)) / 2);
   color: var(--color-text-secondary);
   font-size: var(--text-label-size);
   font-weight: var(--text-label-weight);
@@ -586,7 +604,8 @@ html :where(.cbi-value-error) {
    marks the widget data-changed). */
 html :where(.cbi-value:has([data-changed="true"]) > .cbi-value-title)::after {
   content: "";
-  flex: none;
+  display: inline-block;
+  vertical-align: middle;
   inline-size: var(--spacing-2);
   block-size: var(--spacing-2);
   margin-inline-start: var(--spacing-2);
