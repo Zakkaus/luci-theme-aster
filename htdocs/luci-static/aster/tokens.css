@@ -396,8 +396,9 @@ html[data-theme="dark"] { color-scheme: dark; }
   --aster-form-label-w: 200px;
   --aster-field-w: 256px;
 
-  /* Menu and tooltip: the widest they open. */
+  /* Menu: the widest it opens. Tooltip: Astryx's text box, 300 at most. */
   --aster-menu-max-w: 384px;
+  --aster-tooltip-max-w: 300px;
 
   /* Spacing contract (lab spacing audit, 2026-11-20): a container owns the
      space between its children. Two stack steps: 16 inside a page region
@@ -415,4 +416,7 @@ html[data-theme="dark"] { color-scheme: dark; }
   --aster-dialog-sm-w: 400px;
   --aster-dialog-w: 560px;
   --aster-dialog-lg-w: 800px;
+  /* Dialog height: Astryx Dialog's maxHeight; past it the body scrolls
+     between the fixed title and footer. */
+  --aster-dialog-max-h: 75dvh;
 }
