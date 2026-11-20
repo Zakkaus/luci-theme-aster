@@ -257,7 +257,7 @@ html :where(select > option) { background: var(--color-background-popover); colo
     --field-ring: color-mix(in srgb, var(--color-border-emphasized) 30%, transparent);
   }
 }
-html :where(:is(input, textarea, select):focus, .cbi-dropdown:not(.btn, .cbi-button):is([open], :focus-visible)) {
+html :where(:is(input:not([type="checkbox"], [type="radio"]), textarea, select):focus, .cbi-dropdown:not(.btn, .cbi-button):is([open], :focus-visible)) {
   --field-border: var(--color-accent);
   --field-ring: var(--color-accent);
   --field-ring-w: var(--border-width);
