@@ -208,8 +208,13 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
 }
 /* A table with no card around it makes up the card's border only. */
 .shell-inner .table:not(.cbi-section *) { margin-inline: var(--border-width); }
-/* An interface box column is as narrow as the box. */
-.tr:has(> .td > .ifacebox) > .td:first-child { inline-size: 1%; white-space: nowrap; }
+/* An interface row: cells to the top, the box column as narrow as the box,
+   the status column the rest. */
+.tr:has(> .td > .ifacebox) > .td {
+  vertical-align: top;
+  &:first-child { inline-size: 1%; white-space: nowrap; }
+  &:nth-child(2) { inline-size: 100%; }
+}
 
 /* ── Tabs written by luci-base [ported] ─────────────────────── */
 
@@ -224,29 +229,40 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
    ServerStack for a wired device or a port, Wifi for a radio. */
 html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z'/></svg>"); --icon-wifi: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z'/></svg>"); }
 .shell-content .ifacebox { min-inline-size: 8rem; }
-/* Network > Interfaces: each box a small Card. The head: the name on the
-   muted strip led by the zone colour (LuCI's inline --zone-color-rgb) as an
-   8 StatusDot; the body: the 16 device icon for LuCI's picture; 8 clear of
-   the row rules. */
+/* Network > Interfaces: the interface cell is no Card (none in a card): a
+   StatusDot (success, or neutral when LuCI's icon is _disabled) before the
+   name, the inline zone colour as an 8 square after it; under it the
+   device's 16 icon (details on hover) and name in supporting text. */
 [data-page="admin-network-network"] #view .ifacebox {
+  --card-border-width: 0;
+  --card-radius: 0;
+  --card-bg: transparent;
+  gap: var(--spacing-1);
   margin-block: var(--spacing-2);
-  & > .ifacebox-head[style*="--zone-color-rgb"] {
+  & > .ifacebox-head {
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: var(--spacing-2);
-    background: var(--color-background-muted) !important; /* inline zone fill */
-    color: var(--color-text-primary);
-    filter: none;
-    &::before {
-      content: "";
-      flex: none;
-      inline-size: var(--spacing-2);
-      block-size: var(--spacing-2);
-      border-radius: var(--radius-full);
-      background: rgb(var(--zone-color-rgb));
-      box-shadow: inset 0 0 0 var(--border-width) var(--color-border-emphasized);
-    }
+    padding: 0;
+    border: 0;
+    background: none !important; /* inline zone fill */
+    font-size: var(--text-label-size);
+    font-weight: var(--text-label-weight);
+    line-height: var(--text-label-leading);
+    & > strong { font-weight: inherit; }
+    &::before, &::after { content: ""; flex: none; inline-size: var(--spacing-2); block-size: var(--spacing-2); }
+    &::before { margin-inline: var(--spacing-1); border-radius: var(--radius-full); background: var(--color-icon-success); }
+    &::after { background: rgb(var(--zone-color-rgb)); box-shadow: inset 0 0 0 var(--border-width) var(--color-border-emphasized); }
+  }
+  &:has(img[src*="_disabled"]) > .ifacebox-head::before { background: var(--color-icon-secondary); }
+  & > .ifacebox-body {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: 0;
+    color: var(--color-text-secondary);
+    & > br { display: none; }
+    & > small { font-size: inherit; }
   }
   & .ifacebox-body > .cbi-tooltip-container:has(> img) {
     display: inline-flex;
@@ -262,9 +278,26 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     & > img { display: none; }
   }
 }
+/* An interface's status (Interfaces, the editor's Status): a multi-column
+   MetadataList, each label on top in the secondary ink. */
+:is([id$="-ifc-description"], .ifacebadge.large:not(.cbi-tooltip) > span) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  gap: var(--spacing-2) var(--spacing-4);
+  & > br { display: none; }
+  & > .nowrap { display: block; white-space: normal; overflow-wrap: anywhere; }
+  & > .nowrap > strong {
+    display: block;
+    color: var(--color-text-secondary);
+    font-size: var(--text-supporting-size);
+    font-weight: var(--text-label-weight);
+    line-height: var(--text-supporting-leading);
+  }
+}
+/* The editor's Status: icon, then the list. */
+.ifacebadge.large:not(.cbi-tooltip) { --badge-bg: transparent; display: flex; align-items: flex-start; justify-content: start; gap: var(--spacing-3); padding: 0; white-space: normal; }
 /* The zone colour firewall.getZoneColorStyle() writes inline is the
    administrator's data: kept, toned down, with dark text on it. */
-.ifacebox-head[style*="background"],
 .zonebadge[style*="background"] { --badge-fg: var(--color-on-light); color: var(--color-on-light); filter: saturate(0.5); }
 /* A device that is down: LuCI fades its name to half opacity inline
    (2.2:1 on the badge); the secondary text colour says the same at 4.5:1. */
@@ -377,7 +410,6 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   & .td > .ifacebadge:has(> img[src*="/wifi"])::before {
     mask: var(--icon-wifi) center / contain no-repeat;
   }
-  & .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head::before { background-color: var(--color-icon-accent); }
   & .td > .ifacebadge:has(> img)::before {
     inline-size: var(--aster-icon-sm);
     block-size: var(--aster-icon-sm);
@@ -516,6 +548,7 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
      marks the head .active). Under it the radio's facts and one group per
      SSID, aligned with the name. */
   & .ifacebox:has(img[src*="/signal-"]) {
+    & > .ifacebox-head::before { background-color: var(--color-icon-accent); }
     & > .ifacebox-head::after {
       content: "";
       flex: none;
