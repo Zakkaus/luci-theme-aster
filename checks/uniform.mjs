@@ -16,8 +16,8 @@
  * On each page and each viewport and mode it reads computed styles per
  * component class (buttons by variant and size, fields, checkboxes, table
  * rows and cells, the phone fold, cards, headings, tabs, form rows, font
- * family) and layout (a field filling its row, a row its card, content no
- * wider than its card) and compares every sample with the canonical value:
+ * family, the side nav's row gap) and layout (a field filling its row, a
+ * row its card, content no wider than its card) and compares every sample with the canonical value:
  * px values within --tolerance, strings (colours, borders, font family,
  * font weight, display) exactly. A canonical null means "the majority of
  * this run at that viewport and mode", and the report prints the
@@ -405,6 +405,17 @@ function collect(cfg) {
     let n = el.nextElementSibling;
     while (n && !visible(n)) n = n.nextElementSibling;
     if (n && n.matches('.cbi-value')) add('form.row', 'gap', px(box(n).top - box(el).bottom), el);
+  }
+
+  // Side nav (outside the page's content): the space between two rows that
+  // follow each other, so a hovered row never touches the selected one.
+  // Logout sits apart at the foot of the list and is not read.
+  if (!cfg.modal) {
+    const rows = [...document.querySelectorAll('#mainmenu :is(.nav-label, .nav-item)')].filter(visible);
+    for (let i = 1; i < rows.length; i++) {
+      if (rows[i].closest('.nav > .nav-group:last-child:has(> .nav-item:only-child)')) continue;
+      add('nav.item', 'gap', px(box(rows[i]).top - box(rows[i - 1]).bottom), rows[i]);
+    }
   }
 
   // Font family of every element with its own words, and of every control.

@@ -163,18 +163,21 @@
 }
 
 /* The items list: 4 above and below, an 8 gutter each side, so a row is the
-   side nav's width less 16. */
+   side nav's width less 16. Rows stand 2 apart (SideNavSection's items), in
+   a group too, so a hovered row never touches the selected one. */
 .nav {
   /* The selected item's text: accent pulled 20% toward the text colour, so
      it reads 5.6:1 (light) and 5.1:1 (dark) on the accent-muted fill, where
      the plain accent is 4.2:1. */
   --nav-selected-fg: color-mix(in srgb, var(--color-text-accent) 80%, var(--color-text-primary));
+  --nav-gap: var(--spacing-0-5);
   display: flex;
   flex-direction: column;
   flex: 1;
+  gap: var(--nav-gap);
   padding: var(--spacing-1) var(--spacing-2);
 }
-.nav-group { display: flex; flex-direction: column; }
+.nav-group { display: flex; flex-direction: column; gap: var(--nav-gap); }
 /* Logout is the one top-level page with no group; it sits at the foot of the
    list as in the reference. */
 .nav > .nav-group:last-child:has(> .nav-item:only-child) {

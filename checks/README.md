@@ -47,6 +47,8 @@ Every rule is a command-line parameter; a bad option prints the usage and exits 
   scroll box inside a card is wider than it (`overflow excess`). Components
   that scroll by design (Field, the phone Tabs list) are named in
   `SCROLLS` and skipped.
+- `uniform.mjs` reads the side nav's row gap (`nav.item gap`), so a
+  hovered row never touches the selected one.
 - `uniform.json` holds one canonical value per component class and
   property. Values with a source in `lab/new-theme/astryx-ref/spec.json`
   are written out; `null` means "the majority of the run", and the report

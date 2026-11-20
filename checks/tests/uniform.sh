@@ -58,6 +58,10 @@ expect uniform 1 "card background" "dark card fill changed" -- "$url" "$password
 expect uniform 1 "overflow excess" "interfaces table wider than its card" -- "$url" "$password" --pages "$tmp/network.txt" \
 	--debug-css 'admin/network/network=.table:has([style*="min-width"]) { min-inline-size: max-content; }'
 
+# Side nav: rows set flush again (the hovered row touched the selected one).
+expect uniform 1 "nav.item gap" "side nav rows with no gap" "0px (want 2px)" -- "$url" "$password" --pages "$tmp/reboot.txt" \
+	--debug-css 'admin/system/reboot=.nav, .nav-group { gap: 0 !important }'
+
 # Lua CBI map (APPS=1: a box with OpenClash, as apps-install.sh leaves it).
 # A header table in a Lua map folds on a phone like a JS view's, and the
 # gate reads it as a fold; a row drawn as a flex column instead of the
