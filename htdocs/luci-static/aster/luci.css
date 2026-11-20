@@ -242,7 +242,7 @@ html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([cl
    card): the second row's field and Max rows start where the selects
    above them do. */
 @media (min-width: 48.0625rem) {
-  #content_syslog:has(#logTextFilter) {
+  #content_syslog:has(#logFacilitySelect):has(#logTextFilter) {
     display: grid;
     grid-template-columns: repeat(2, auto auto auto minmax(0, 1fr));
     column-gap: var(--spacing-2);
