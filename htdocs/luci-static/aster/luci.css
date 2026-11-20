@@ -115,7 +115,12 @@
    list needs the large width. */
 #modal_overlay > :is(.cbi-modal, .uci-dialog) { --dialog-w: var(--aster-dialog-lg-w); }
 /* A form inside a dialog: the dialog is the card. */
-#modal_overlay .cbi-section { --card-pad: 0; --card-border-width: 0; --card-bg: transparent; }
+#modal_overlay .cbi-section { --card-pad: 0; --card-bleed: var(--spacing-0); --card-border-width: 0; --card-bg: transparent; }
+/* The upload dialog's footer (Dialog): its .left / .right halves (inline
+   flex: 1) dissolve, so Browse, Cancel and Upload sit at the end 8 apart. */
+#modal_overlay > * > div:last-child:has(> .left + .right) > * { display: contents; }
+/* The changes dialog's .cbi-section ends at its footer, not 16 under it. */
+#modal_overlay > * > .cbi-section:last-child { margin-block-end: 0; }
 
 /* ── Form [ported] ──────────────────────────────────────────── */
 

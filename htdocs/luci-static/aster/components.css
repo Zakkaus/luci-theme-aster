@@ -1154,7 +1154,10 @@ html :where(#modal_overlay > * > h4:first-child) {
   line-height: var(--text-heading-2-leading);
 }
 html :where(#modal_overlay > * > h4:empty) { display: none; }
-html :where(#modal_overlay > * > :is(.right, .button-row):last-child) {
+/* Also the upload dialog's row (.left Browse, .right Cancel/Upload; luci.css
+   dissolves the halves so the three sit at the end) and the changes
+   dialog's buttons, the last thing in its .cbi-section. */
+html :where(#modal_overlay > * > :is(.right, .button-row, div:has(> .left + .right)):last-child, #modal_overlay > * > .cbi-section:last-child > :is(.right, .button-row):last-child) {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -1271,5 +1274,17 @@ html :where(.uci-change-list) :is(ins, del) {
 html :where(.uci-change-list, .uci-change-legend-label) :is(ins, del) { text-decoration: none; }
 html :where(:is(.uci-change-list, .uci-change-legend-label) ins) { background: var(--color-success-muted); }
 html :where(:is(.uci-change-list, .uci-change-legend-label) del) { background: var(--color-error-muted); }
-html :where(.uci-change-legend-label) :is(ins, del) { display: inline-block; margin: 0; padding: 0 var(--spacing-1); }
+/* The legend: its keys in a wrapping row, each a 16 swatch 8 before its
+   words. */
+html :where(.uci-change-legend) { display: flex; flex-wrap: wrap; gap: var(--spacing-2) var(--spacing-4); margin-block: var(--spacing-2) var(--spacing-4); }
+html :where(.uci-change-legend-label) { display: inline-flex; align-items: center; gap: var(--spacing-2); }
+html :where(.uci-change-legend-label) :is(ins, del) {
+  display: block;
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
+  overflow: hidden;
+  border-radius: calc(var(--radius-inner) / 2);
+}
+/* luci-base's <br> after the legend would add a line to its 16. */
+html :where(.uci-change-legend + br) { display: none; }
 html :where(.uci-change-list var) { font-style: normal; color: var(--color-text-secondary); }
