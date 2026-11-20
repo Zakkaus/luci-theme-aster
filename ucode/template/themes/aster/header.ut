@@ -16,9 +16,13 @@
 
  The other icons are Heroicons 2.2.0 outline (MIT,
  https://github.com/tailwindlabs/heroicons), the path data copied verbatim
- from @heroicons/react/24/outline: ComputerDesktop, Sun, Moon, Bars3,
- XMark, ChevronLeft, Swatch. The side nav's icons come from the same set through
- menu-aster.js; the licence is in LICENSES/heroicons-MIT.txt.
+ from @heroicons/react/24/outline into ICONS below; the licence is in
+ LICENSES/heroicons-MIT.txt.
+
+ The side nav is rendered here, not by script, so it is in the first paint
+ and stands still across page loads; the top bar and the side nav carry
+ view-transition names (shell.css), so a page change cross-fades only the
+ content.
 -#}
 
 {%
@@ -61,6 +65,154 @@
 		[ 'plum', 'Herbarium Plum' ],
 	];
 
+	// Heroicons 2.2.0 outline (MIT, https://github.com/tailwindlabs/heroicons):
+	// the path data of each icon in @heroicons/react/24/outline, verbatim,
+	// drawn with the set's own 1.5 stroke. The licence is in
+	// LICENSES/heroicons-MIT.txt.
+	const ICONS = {
+		ChartBarSquare: 'M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z',
+		CpuChip: 'M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 0 0 2.25-2.25V6.75a2.25 2.25 0 0 0-2.25-2.25H6.75A2.25 2.25 0 0 0 4.5 6.75v10.5a2.25 2.25 0 0 0 2.25 2.25Zm.75-12h9v9h-9v-9Z',
+		Squares2X2: 'M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z',
+		GlobeAlt: 'M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418',
+		ShieldCheck: 'M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z',
+		CircleStack: 'M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125',
+		ArrowRightStartOnRectangle: 'M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9',
+		ChevronDown: 'm19.5 8.25-7.5 7.5-7.5-7.5',
+		ComputerDesktop: 'M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25',
+		Sun: 'M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z',
+		Moon: 'M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z',
+		Bars3: 'M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5',
+		XMark: 'M6 18 18 6M6 6l12 12',
+		ChevronLeft: 'M15.75 19.5 8.25 12l7.5-7.5',
+	};
+
+	// The brand mark (Ray Floret): six quills round the centre.
+	const mark = '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z"/><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z" transform="rotate(60 12 12)"/><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z" transform="rotate(120 12 12)"/><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z" transform="rotate(180 12 12)"/><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z" transform="rotate(240 12 12)"/><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z" transform="rotate(300 12 12)"/></svg>';
+
+	function svg(name, attrs) {
+		return `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"${attrs ?? ''}><path d="${ICONS[name]}"/></svg>`;
+	}
+
+	// A span, the side nav's icon host (shell.css .ico-host).
+	const ico = (name, cls) => `<span class="${cls ?? 'ico-host'}" aria-hidden="true">${svg(name)}</span>`;
+
+	// The three colour schemes: the stored value, the label, the icon.
+	const schemes = [
+		[ 'auto', _('Auto'), 'ComputerDesktop' ],
+		[ 'light', _('Light'), 'Sun' ],
+		[ 'dark', _('Dark'), 'Moon' ],
+	];
+
+	// The appearance control: one IconButton showing the scheme in force and
+	// one Menu (doona's ChoiceMenu with a scheme section and a palette
+	// section; Astryx DropdownMenu sections: a heading, the rows, a divider).
+	// The same control in the top bar and in the login page's corner;
+	// theme-aster.js drives every copy. `id` keeps each menu's id unique.
+	function appearance(id) {
+		const label = entityencode(_('Design'), true);
+		let rows = `<li class="menu-heading" role="presentation" aria-hidden="true">${_('Theme')}</li>`;
+
+		for (let s in schemes)
+			rows += `<li role="menuitemradio" tabindex="-1" aria-checked="false" data-group="scheme" data-value="${s[0]}">${svg(s[2])}${s[1]}</li>`;
+
+		rows += `<li role="separator"></li><li class="menu-heading" role="presentation" aria-hidden="true">${_('Palette')}</li>`;
+
+		for (let p in palettes)
+			rows += `<li role="menuitemradio" tabindex="-1" aria-checked="false" data-group="palette" data-value="${p[0]}"><span class="palette-swatch" data-swatch="${p[0]}"></span>${p[1]}${(p[0] == palettes[0][0]) ? ' <small>' + _('Default') + '</small>' : ''}</li>`;
+
+		return `<div class="palette-menu"><button class="icon-btn appearance" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="appearance-${id}" aria-label="${label}" data-tooltip="${label}">` +
+			`${svg('ComputerDesktop', ' data-scheme="auto"')}${svg('Sun', ' data-scheme="light"')}${svg('Moon', ' data-scheme="dark"')}</button>` +
+			`<ul id="appearance-${id}" role="menu" aria-label="${label}" hidden>${rows}</ul></div>`;
+	}
+
+	// The side nav, rendered here so it is part of the first paint and stands
+	// still from one page to the next. The tree is the one the admin/menu
+	// request answers with (dispatcher.menu_json with the session's ACLs),
+	// filtered and ordered as luci-base's ui.menu does it (ui.js scrubMenu
+	// and getChildren); menu-aster.js adds the behaviour and the tab row.
+	const menutree = blank_page ? null : dispatcher.menu_json(ctx?.authacl ?? {});
+
+	// scrubMenu: a firstchild node with no shown child of its own is not
+	// satisfied either.
+	function shown(node) {
+		if (!node?.satisfied)
+			return false;
+
+		if (node.action?.type != 'firstchild')
+			return true;
+
+		for (let k, c in node.children)
+			if (c.title && !c.firstchild_ineligible && shown(c))
+				return true;
+
+		return false;
+	}
+
+	// getChildren: shown children with a title, an alias or rewrite taking
+	// its target's children, sorted by order and then by name.
+	function kids(node) {
+		let out = [];
+
+		for (let k, c in node?.children) {
+			if (!shown(c) || !exists(c, 'title'))
+				continue;
+
+			let n = { ...c, name: k };
+
+			if (type(c.action) == 'object' && c.action.path != null && (c.action.type == 'alias' || c.action.type == 'rewrite')) {
+				let r = menutree;
+
+				for (let s in split(c.action.path, '/'))
+					r = (type(r?.children) == 'object') ? r.children[s] : null;
+
+				if (r)
+					n = { ...n, children: r.children, action: r.action };
+			}
+
+			push(out, n);
+		}
+
+		return sort(out, (a, b) => {
+			if ((a.order ?? 1000) != (b.order ?? 1000))
+				return (a.order ?? 1000) - (b.order ?? 1000);
+
+			return (lc(a.name) < lc(b.name)) ? -1 : (lc(a.name) > lc(b.name)) ? 1 : 0;
+		});
+	}
+
+	// Top-level path segment -> icon, as the reference's luci:* keys. A group
+	// not listed (a package's own top-level entry) gets the services grid.
+	const ICON_FOR = {
+		status: 'ChartBarSquare',
+		system: 'CpuChip',
+		services: 'Squares2X2',
+		network: 'GlobeAlt',
+		vpn: 'ShieldCheck',
+		nas: 'CircleStack',
+		storage: 'CircleStack',
+		logout: 'ArrowRightStartOnRectangle',
+	};
+
+	// A SideNavItem. aria-label names it when the rail hides the text; only a
+	// top-level page carries an icon, a page under a group is indented to the
+	// group's label instead.
+	function navitem(href, title, active, icon) {
+		const t = entityencode(_(title), true);
+
+		return `<a class="nav-item" href="${href}" aria-label="${t}"${active ? ' data-active aria-current="page"' : ''}>${icon ? ico(icon) : ''}<span>${t}</span></a>`;
+	}
+
+	// The modes (one, "admin", on a stock install) and the one in use: the
+	// request's first segment, or the first mode.
+	const reqpath = ctx?.request_path ?? [];
+	const curpath = ctx?.path ?? [];
+	const modes = menutree ? kids(menutree) : [];
+	let curmode = null;
+
+	for (let i, m in modes)
+		if (length(reqpath) ? m.name == reqpath[0] : i == 0)
+			curmode = m;
+
 	// Cache buster for the theme's own stylesheets. Without it a browser keeps
 	// the CSS it already has: LuCI versions luci.js and cbi.js this way, but a
 	// theme's sheets carry no version at all, so an edited stylesheet reaches
@@ -78,7 +230,7 @@
 -%}
 
 <!DOCTYPE html>
-<html lang="{{ dispatcher.lang }}"{{ mode != 'auto' ? ` data-theme="${mode}"` : '' }}>
+<html lang="{{ dispatcher.lang }}"{{ mode != 'auto' ? ` data-theme="${mode}"` : '' }} data-scheme="{{ mode }}">
 	<head>
 		<meta charset="utf-8">
 		<title>{{ striptags(`${boardinfo.hostname ?? '?'}${dispatched?.title ? ` | ${_(dispatched.title)}` : ''}`) }}</title>
@@ -123,6 +275,11 @@
 				   follow the device. */
 				if (v === 'light' || v === 'dark')
 					root.setAttribute('data-theme', v);
+
+				/* The scheme in force, which the appearance button draws
+				   (shell.css): the stored choice, else the device default. */
+				if (v === 'auto' || v === 'light' || v === 'dark')
+					root.setAttribute('data-scheme', v);
 
 				/* The phone paints its chrome from these: the palette's shell
 				   colour, read from the stylesheet once it applies. An
@@ -217,12 +374,13 @@
 			 TopNav: the brand on the start side — the NavIcon mark and the host
 			 name, which is the one piece of text saying which of several
 			 devices this tab is pointed at — and the page-level controls on the
-			 end side. On a phone the theme switch and the palette menu move into
-			 the drawer and the drawer toggle appears.
+			 end side, every one a ghost IconButton with a tooltip, as doona's
+			 top bar: LuCI's indicators (menu-aster.js), the appearance menu
+			 and, on a phone, the drawer toggle.
 			-#}
 			<header class="shell-header">
 				<a class="brand" href="{{ dispatcher.build_url('admin') }}">
-					<span class="mark" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z"/><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z" transform="rotate(60 12 12)"/><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z" transform="rotate(120 12 12)"/><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z" transform="rotate(180 12 12)"/><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z" transform="rotate(240 12 12)"/><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z" transform="rotate(300 12 12)"/></svg></span>
+					<span class="mark" aria-hidden="true">{{ mark }}</span>
 					<span class="brand-text">
 						<span class="name">{{ boardinfo.hostname ?? 'OpenWrt' }}</span>
 						{% if (boardinfo.model): %}<span class="sub">{{ boardinfo.model }}</span>{% endif %}
@@ -230,58 +388,92 @@
 				</a>
 				<div class="hdr-actions">
 					<div id="indicators"></div>
-					<div class="theme-switch" id="theme-switch" role="radiogroup" aria-label="{{ _('Theme') }}">
-						<button class="icon-btn" type="button" role="radio" aria-checked="false" value="auto" title="{{ _('Auto') }}" aria-label="{{ _('Auto') }}"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"/></svg></button>
-						<button class="icon-btn" type="button" role="radio" aria-checked="false" value="light" title="{{ _('Light') }}" aria-label="{{ _('Light') }}"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/></svg></button>
-						<button class="icon-btn" type="button" role="radio" aria-checked="false" value="dark" title="{{ _('Dark') }}" aria-label="{{ _('Dark') }}"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/></svg></button>
-					</div>
-					<div class="palette-menu">
-						<button class="icon-btn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="palette-menu-top" title="{{ _('Palette') }}" aria-label="{{ _('Palette') }}"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402M6.75 21A3.75 3.75 0 0 1 3 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 0 0 3.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008Z"/></svg></button>
-						<ul id="palette-menu-top" role="menu" aria-label="{{ _('Palette') }}" hidden>
-							{% for (let p in palettes): %}<li role="menuitemradio" tabindex="-1" aria-checked="false" data-value="{{ p[0] }}"><span class="palette-swatch" data-swatch="{{ p[0] }}"></span>{{ p[1] }}{% if (p[0] == palettes[0][0]): %} <small>{{ _('Default') }}</small>{% endif %}</li>{% endfor %}
-						</ul>
-					</div>
+					{{ appearance('top') }}
 					<button class="icon-btn" id="sidebar-toggle" type="button"
-						aria-expanded="false" aria-controls="sidebar" aria-label="{{ _('Navigation') }}">
-						<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
-					</button>
+						aria-expanded="false" aria-controls="sidebar" aria-label="{{ _('Navigation') }}">{{ svg('Bars3') }}</button>
 				</div>
 			</header>
 
 			<aside class="shell-aside" id="sidebar" aria-label="{{ _('Navigation') }}">
 				<div class="drawer-head">
 					<a class="brand" tabindex="-1" href="{{ dispatcher.build_url('admin') }}">
-						<span class="mark" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z"/><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z" transform="rotate(60 12 12)"/><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z" transform="rotate(120 12 12)"/><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z" transform="rotate(180 12 12)"/><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z" transform="rotate(240 12 12)"/><path d="M10.4 8.6C8.9 6.1 10.6 3.3 13.5 1.6C14.9 4.6 14.1 7.5 12.8 9.1Z" transform="rotate(300 12 12)"/></svg></span>
+						<span class="mark" aria-hidden="true">{{ mark }}</span>
 						<span class="brand-text">
 							<span class="name">{{ boardinfo.hostname ?? 'OpenWrt' }}</span>
 							{% if (boardinfo.model): %}<span class="sub">{{ boardinfo.model }}</span>{% endif %}
 						</span>
 					</a>
-					<button class="icon-btn" id="sidebar-close" type="button" aria-label="{{ _('Close') }}">
-						<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6l12 12"/></svg>
-					</button>
+					<button class="icon-btn" id="sidebar-close" type="button" aria-label="{{ _('Close') }}">{{ svg('XMark') }}</button>
 				</div>
-				{# menu-aster.js fills these. #}
-				<nav class="nav" id="mainmenu" aria-label="{{ _('Navigation') }}"></nav>
-				<ul id="modemenu" hidden></ul>
-				<div class="drawer-foot">
-					<div class="theme-switch" role="radiogroup" aria-label="{{ _('Theme') }}">
-						<button class="icon-btn" type="button" role="radio" aria-checked="false" value="auto" title="{{ _('Auto') }}" aria-label="{{ _('Auto') }}"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"/></svg></button>
-						<button class="icon-btn" type="button" role="radio" aria-checked="false" value="light" title="{{ _('Light') }}" aria-label="{{ _('Light') }}"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/></svg></button>
-						<button class="icon-btn" type="button" role="radio" aria-checked="false" value="dark" title="{{ _('Dark') }}" aria-label="{{ _('Dark') }}"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/></svg></button>
+				{#
+				 SideNav: a group row per top-level entry (icon, label, chevron)
+				 and its pages under it; a top-level page with no children
+				 (Logout) is a row with an icon. A group is collapsed unless it
+				 holds the current page: seven groups with fifty-nine items
+				 measured 3196px on a box with services installed. The script
+				 after the side nav reopens what the reader had open on the
+				 last page and puts the list back where it was scrolled.
+				-#}
+				<nav class="nav" id="mainmenu" aria-label="{{ _('Navigation') }}">
+					{%- if (curmode): for (let g in kids(curmode)): -%}
+					{%- let items = kids(g), cur = (curpath[1] == g.name), t = entityencode(_(g.title), true); -%}
+					{%- if (!length(items)): -%}
+					<div class="nav-group">{{ navitem(dispatcher.build_url(curmode.name, g.name), g.title, cur, ICON_FOR[g.name] ?? 'Squares2X2') }}</div>
+					{%- else -%}
+					<div class="nav-group" data-name="{{ entityencode(g.name, true) }}"{{ cur ? '' : ' data-collapsed' }}>
+						<div class="nav-label" role="button" tabindex="0" aria-expanded="{{ cur ? 'true' : 'false' }}" aria-label="{{ t }}">{{ ico(ICON_FOR[g.name] ?? 'Squares2X2') }}<span>{{ t }}</span>{{ ico('ChevronDown', 'ico-host chevron') }}</div>
+						{%- for (let c in items): -%}
+						{{ navitem(dispatcher.build_url(curmode.name, g.name, c.name), c.title, cur && curpath[2] == c.name) }}
+						{%- endfor -%}
 					</div>
-					<div class="palette-menu">
-						<button class="icon-btn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="palette-menu-drawer" title="{{ _('Palette') }}" aria-label="{{ _('Palette') }}"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402M6.75 21A3.75 3.75 0 0 1 3 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 0 0 3.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008Z"/></svg></button>
-						<ul id="palette-menu-drawer" role="menu" aria-label="{{ _('Palette') }}" hidden>
-							{% for (let p in palettes): %}<li role="menuitemradio" tabindex="-1" aria-checked="false" data-value="{{ p[0] }}"><span class="palette-swatch" data-swatch="{{ p[0] }}"></span>{{ p[1] }}{% if (p[0] == palettes[0][0]): %} <small>{{ _('Default') }}</small>{% endif %}</li>{% endfor %}
-						</ul>
-					</div>
-				</div>
+					{%- endif -%}
+					{%- endfor; endif -%}
+				</nav>
+				{# The mode row only earns its place with more than one mode. #}
+				<ul id="modemenu"{{ (length(modes) > 1) ? '' : ' hidden' }}>
+					{%- for (let m in modes): -%}
+					<li><a class="nav-item" href="{{ dispatcher.build_url(m.name) }}" aria-label="{{ entityencode(_(m.title), true) }}"{{ (m === curmode) ? ' data-active aria-current="true"' : '' }}><span>{{ entityencode(_(m.title), true) }}</span></a></li>
+					{%- endfor -%}
+				</ul>
 				<button class="icon-btn rail-toggle" id="rail-toggle" type="button"
-					aria-expanded="true" aria-controls="sidebar" aria-label="{{ _('Collapse') }}" title="{{ _('Collapse') }}">
-					<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
-				</button>
+					aria-expanded="true" aria-controls="sidebar" aria-label="{{ _('Collapse') }}" data-tooltip="{{ _('Collapse') }}">{{ svg('ChevronLeft') }}</button>
 			</aside>
+			{#
+			 The side nav as the reader left it on the last page, before the
+			 first paint: the groups they had open and its scroll position
+			 (sessionStorage "aster-nav", written as the page goes).
+			-#}
+			<script>
+				(function () {
+					var side = document.getElementById('sidebar');
+					var s = null;
+
+					try { s = JSON.parse(sessionStorage.getItem('aster-nav')); }
+					catch (e) { /* no stored state: the server's is the answer */ }
+
+					if (s && Array.isArray(s.open)) {
+						side.querySelectorAll('.nav-group[data-name]').forEach(function (g) {
+							if (s.open.indexOf(g.getAttribute('data-name')) < 0)
+								return;
+
+							g.removeAttribute('data-collapsed');
+							g.querySelector('.nav-label').setAttribute('aria-expanded', 'true');
+						});
+						side.scrollTop = +s.top || 0;
+					}
+
+					window.addEventListener('pagehide', function () {
+						var open = [];
+
+						side.querySelectorAll('.nav-group[data-name]:not([data-collapsed])').forEach(function (g) {
+							open.push(g.getAttribute('data-name'));
+						});
+
+						try { sessionStorage.setItem('aster-nav', JSON.stringify({ open: open, top: side.scrollTop })); }
+						catch (e) { /* private window: the next page starts from the server's state */ }
+					});
+				})();
+			</script>
 
 			<div class="shell-main">
 				<div class="shell-content" id="maincontent">
@@ -316,22 +508,11 @@
 						<div id="tabmenu" hidden></div>
 		{% elif (login): %}
 		{#
-		 The login page has no top bar, so its two page-level controls — the
-		 same theme switch and palette menu, from the same palettes list —
-		 sit in the page's corner, as on doona's sign-in page. theme-aster.js
-		 drives them through the login view.
+		 The login page has no top bar, so its appearance control — the same
+		 one as the top bar's — sits in the page's corner, as on doona's
+		 sign-in page. theme-aster.js drives it through the login view.
 		-#}
 		<header class="login-controls">
-			<div class="theme-switch" role="radiogroup" aria-label="{{ _('Theme') }}">
-				<button class="icon-btn" type="button" role="radio" aria-checked="false" value="auto" title="{{ _('Auto') }}" aria-label="{{ _('Auto') }}"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0V12a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 12V5.25"/></svg></button>
-				<button class="icon-btn" type="button" role="radio" aria-checked="false" value="light" title="{{ _('Light') }}" aria-label="{{ _('Light') }}"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/></svg></button>
-				<button class="icon-btn" type="button" role="radio" aria-checked="false" value="dark" title="{{ _('Dark') }}" aria-label="{{ _('Dark') }}"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"/></svg></button>
-			</div>
-			<div class="palette-menu">
-				<button class="icon-btn" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="palette-menu-login" title="{{ _('Palette') }}" aria-label="{{ _('Palette') }}"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402M6.75 21A3.75 3.75 0 0 1 3 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 0 0 3.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008Z"/></svg></button>
-				<ul id="palette-menu-login" role="menu" aria-label="{{ _('Palette') }}" hidden>
-					{% for (let p in palettes): %}<li role="menuitemradio" tabindex="-1" aria-checked="false" data-value="{{ p[0] }}"><span class="palette-swatch" data-swatch="{{ p[0] }}"></span>{{ p[1] }}</li>{% endfor %}
-				</ul>
-			</div>
+			{{ appearance('login') }}
 		</header>
 		{% endif %}

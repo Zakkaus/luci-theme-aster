@@ -70,16 +70,22 @@
   white-space: nowrap;
 }
 
+/* The actions take the rest of the bar and pack at its end, so an
+   indicator ui.js adds later grows the row leftwards without moving the
+   container or anything after it (no layout shift). */
 .hdr-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: var(--spacing-2);
-  flex: none;
+  flex: 1;
+  min-inline-size: 0;
 }
 #indicators { display: flex; align-items: center; gap: var(--spacing-2); }
 
-/* Icon button: md size, ghost until hovered, round like the reference's
-   top-bar controls. */
+/* Icon button (Astryx IconButton, ghost md): 36 round, no fill until
+   hovered, the label in a tooltip (data-tooltip, ui.js's Tooltip); the
+   top bar's actions are all of this one kind, as doona's. */
 .icon-btn {
   display: grid;
   place-items: center;
@@ -100,34 +106,73 @@
 }
 .icon-btn:active { background: var(--color-overlay-pressed); }
 
-/* Three modes as one segmented control; the chosen one takes the secondary
-   button fill. */
-.theme-switch {
-  display: flex;
-  gap: var(--spacing-0-5);
-  padding: var(--spacing-0-5);
-  border-radius: var(--radius-full);
+/* LuCI's indicators as the same IconButtons (menu-aster.js gives each a
+   role, a name and the tooltip): auto-refresh draws ArrowPath, in the
+   secondary ink while paused; unsaved changes draws the warning icon and
+   the count (data-count), as doona's held-changes button. The words stay
+   in the DOM at size 0, since ui.js rewrites them in place. */
+#indicators > span[data-indicator] {
+  --button-bg: transparent;
+  --button-fg: var(--color-icon-primary);
+  --button-px: 0;
+  min-inline-size: var(--size-element-md);
+  font-size: 0;
 }
-.theme-switch [role="radio"] { color: var(--color-icon-secondary); }
-.theme-switch [role="radio"][aria-checked="true"] {
-  background: var(--color-neutral);
-  color: var(--color-icon-primary);
+#indicators > span[data-indicator]::before {
+  content: "";
+  flex: none;
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
+  background-color: currentColor;
+  mask: var(--icon-refresh) center / contain no-repeat;
 }
+#indicators > span[data-indicator="poll-status"][data-style="inactive"] { --button-fg: var(--color-icon-secondary); }
+#indicators > span[data-indicator="uci-changes"] { --button-px: var(--spacing-2); gap: var(--spacing-1); }
+#indicators > span[data-indicator="uci-changes"]::before {
+  background-color: var(--color-icon-warning);
+  mask-image: var(--icon-warning);
+}
+#indicators > span[data-indicator="uci-changes"]::after {
+  content: attr(data-count);
+  font-size: var(--text-label-size);
+}
+/* Heroicons 2.2.0 outline ArrowPath (MIT), path data verbatim. */
+.shell-header { --icon-refresh: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99'/></svg>"); }
 
-/* The palette menu (components.css Menu) drops from its button, its end
-   edge on the button's, so it stays on screen at the top bar's end; in the
-   drawer's foot it opens upward. */
+/* The appearance control: the button draws the scheme in force
+   (data-scheme on the root, set before the first paint) and opens one
+   Menu (components.css) with a Theme section and a Palette section, each
+   under a heading (Astryx DropdownMenu section heading: supporting text,
+   secondary, 4 8) and divided by a rule 4 above and below. The menu drops
+   from the button, its end edge on the button's, so it stays on screen. */
+.appearance > .ico { display: none; }
+:root:not([data-scheme="light"], [data-scheme="dark"]) .appearance > [data-scheme="auto"],
+:root[data-scheme="light"] .appearance > [data-scheme="light"],
+:root[data-scheme="dark"] .appearance > [data-scheme="dark"] { display: block; }
 .palette-menu { position: relative; display: flex; }
 .palette-menu > [role="menu"] { inset-block-start: 100%; inset-inline: auto 0; }
-.drawer-foot .palette-menu > [role="menu"] {
-  inset-block: auto 100%;
-  transform: translateY(calc(var(--spacing-1) * -1));
+.palette-menu > [role="menu"] > li:is(.menu-heading, [role="separator"]) {
+  min-block-size: 0;
+  background: none;
+  cursor: default;
 }
+.palette-menu > [role="menu"] > .menu-heading {
+  padding: var(--spacing-1) var(--spacing-2);
+  color: var(--color-text-secondary);
+  font-size: var(--text-supporting-size);
+  line-height: var(--text-supporting-leading);
+  user-select: none;
+}
+.palette-menu > [role="menu"] > [role="separator"] {
+  margin-block: var(--spacing-1);
+  padding: 0;
+  border-block-start: var(--border-width) solid var(--color-border);
+}
+.palette-menu > [role="menu"] > li > .ico { color: var(--color-icon-secondary); }
 
 /* The drawer toggle and the drawer's own head exist only on a phone. */
 #sidebar-toggle,
-.drawer-head,
-.drawer-foot { display: none; }
+.drawer-head { display: none; }
 
 /* Heroicons outline: 24-unit artwork drawn at the sm size with the set's
    own 1.5 stroke, which the markup carries. */
@@ -303,12 +348,8 @@
     block-size: var(--aster-topbar-h-phone);
   }
   .brand .sub,
-  .shell-header .theme-switch,
-  .shell-header .palette-menu,
   .rail-toggle { display: none; }
-  #sidebar-toggle,
-  .drawer-head,
-  .drawer-foot { display: flex; }
+  .drawer-head { display: flex; }
   #sidebar-toggle { display: grid; }
 
   .shell-main { overflow: visible; }
@@ -355,12 +396,24 @@
     padding: var(--spacing-2);
     border-block-end: var(--border-width) solid var(--color-border);
   }
-  .drawer-foot {
-    justify-content: center;
-    align-items: center;
-    gap: var(--spacing-2);
-    padding: var(--spacing-2);
-    border-block-start: var(--border-width) solid var(--color-border);
-  }
   .nav { padding-block: var(--spacing-3); }
 }
+
+/* ── Page changes ──────────────────────────────────────────────────
+   A link to another page is a cross-document view transition: the top
+   bar and the side nav are named, so they stand still while only the
+   content cross-fades. They are drawn from the new page at once (the
+   server renders both), the old copies dropped. None under reduced
+   motion. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+}
+.shell-header { view-transition-name: aster-top; }
+.shell-aside { view-transition-name: aster-side; }
+::view-transition-old(aster-top),
+::view-transition-old(aster-side) { display: none; }
+::view-transition-new(aster-top),
+::view-transition-new(aster-side),
+::view-transition-group(aster-top),
+::view-transition-group(aster-side) { animation: none; }
+::view-transition-group(root) { animation-duration: var(--duration-fast); }

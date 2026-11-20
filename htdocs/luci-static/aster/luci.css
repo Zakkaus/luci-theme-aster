@@ -852,22 +852,6 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   & .td > .ifacebadge small { color: var(--color-text-secondary); }
 }
 
-/* ── Indicators [ported] ────────────────────────────────────── */
-
-/* luci-base's top bar indicators ("Refreshing", "Unsaved Changes: 7") are
-   secondary md Buttons (components.css). Unsaved changes asks for an
-   action, so it leads with the warning icon (Heroicons 2.2.0
-   ExclamationTriangle, MIT). */
-#indicators > [data-indicator="poll-status"][data-style="inactive"] { --button-fg: var(--color-text-secondary); }
-#indicators > [data-indicator="uci-changes"]::before {
-  content: "";
-  flex: none;
-  inline-size: var(--aster-icon-sm);
-  block-size: var(--aster-icon-sm);
-  background-color: var(--color-warning);
-  mask: var(--icon-warning) center / contain no-repeat;
-}
-
 /* ── Phone [ported] ─────────────────────────────────────────── */
 
 @media (max-width: 48rem) {
