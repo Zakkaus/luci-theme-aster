@@ -84,7 +84,7 @@
 html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([class]), form, .cbi-map, .cbi-section, .cbi-section-node, .cbi-tabcontainer, [data-tab]:not(li), :has(> [data-tab]:not(li)), #content_syslog, .nft-table, .nft-chains, .cbi-section > div:has(> :is(h3, h4, table, .table)), .cbi-value:has(> :is(h3, h4))) {
   & > * { margin-block: 0; }
   & > * + * { margin-block-start: var(--aster-space-region); }
-  & > :nth-child(1 of :not(script, style, template, noscript, [hidden], input[type="hidden"], :empty, [style*="display: none"], [style*="display:none"], [data-tab-active="false"])),
+  & > :nth-child(1 of :not(script, style, template, noscript, [hidden], input[type="hidden"], :empty, [style*="display: none"], [style*="display:none"], [data-tab-active="false"], [data-tab-title]:not([data-tab-active="true"]))),
   & > :is(.cbi-value + .cbi-value, .includes),
   & > :is(button, .btn, .cbi-button, input, select, label) + :is(button, .btn, .cbi-button, input, select, label) { margin-block-start: 0; }
   /* Page level: the title 4 over its description, 24 from what follows

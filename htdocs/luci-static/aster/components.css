@@ -983,7 +983,9 @@ html :where(.tab[data-errors], .cbi-tabmenu > li[data-errors])::after {
   margin-inline-start: var(--spacing-1);
   font-variant-numeric: tabular-nums;
 }
-html :where([data-tab-active="false"]) { display: none; }
+/* A pane shows only while it is the active one: luci-base marks the active
+   pane "true" and leaves the others "false" or unset (form.js's JS tabs). */
+html :where([data-tab-active="false"], [data-tab-title]:not([data-tab-active="true"])) { display: none; }
 /* Narrow: one line that scrolls sideways, as Astryx Tabs do; the selected
    tab is the list's initial scroll target where the browser has
    scroll-initial-target. The list's rule is painted inside its padding so
