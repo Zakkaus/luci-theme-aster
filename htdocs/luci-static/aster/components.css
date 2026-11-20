@@ -149,6 +149,35 @@ html :where(.cbi-map-descr, .cbi-section-descr, .cbi-value-description) {
   line-height: var(--text-supporting-leading);
 }
 html :where(code, kbd, pre, samp) { font-family: var(--font-family-code); }
+/* Code: inline code on the muted fill, 4 inline, the inner radius. Kbd: a
+   key cap, 20 high, the neutral fill over a 2 emphasized bottom edge, body
+   face at supporting size. */
+html :where(code:not(pre *, .cbi-dynlist *)) {
+  padding: 0 var(--spacing-1);
+  border-radius: var(--radius-inner);
+  background-color: var(--color-background-muted);
+  font-size: var(--text-code-size);
+  line-height: inherit;
+  overflow-wrap: break-word;
+}
+html :where(kbd) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-inline-size: var(--spacing-5);
+  block-size: var(--spacing-5);
+  padding: 0 var(--spacing-1);
+  border-block-end: calc(var(--border-width) * 2) solid var(--color-border-emphasized);
+  border-radius: var(--radius-inner);
+  background-color: var(--color-neutral);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-body);
+  font-size: var(--text-supporting-size);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--text-supporting-leading);
+  user-select: none;
+}
 
 /* ── Button ──────────────────────────────────────────────────────
    Secondary md by default: 36 high, pill, 12 inline, label weight, the
@@ -1024,6 +1053,11 @@ html :where(.label:not(.cbi-section .label[data-style]), .badge, .zonebadge, .if
   line-height: var(--text-supporting-leading);
   white-space: nowrap;
 }
+/* Status variants (.label.success / .warning / .danger): Astryx's solid
+   status fills with their on-colour text. */
+html :where(.label.success) { --badge-bg: var(--color-success); --badge-fg: var(--color-on-success); }
+html :where(.label.warning) { --badge-bg: var(--color-warning); --badge-fg: var(--color-on-warning); }
+html :where(.label.danger) { --badge-bg: var(--color-error); --badge-fg: var(--color-on-error); }
 /* A device chip or a firewall clause: the muted fill, its icon 16. */
 html :where(.ifacebadge) { --badge-bg: var(--color-background-muted); border-radius: var(--radius-inner); }
 html :where(.ifacebadge img) { inline-size: var(--aster-icon-sm); block-size: var(--aster-icon-sm); }
@@ -1054,7 +1088,7 @@ html :where([data-page="admin-status-overview"] #view :is(.ifacebox-body > div, 
 /* Status icons (Heroicons 2.2.0 outline, MIT, path data verbatim), shared
    by the Banner, the InfoTip and the top bar's unsaved-changes button. */
 html { --icon-info: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z'/></svg>"); --icon-warning: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z'/></svg>"); }
-html :where(.alert-message) {
+html :where(.alert-message, .cbi-section-error) {
   --banner-bg: var(--color-info-muted);
   --banner-fg: var(--color-on-info-muted);
   --banner-pad-block: var(--spacing-3);
@@ -1074,7 +1108,7 @@ html :where(.alert-message) {
    keeps its icon: the shorthand and the resets drop the busy track's
    gradient, motion and round ends (ProgressBar), which would otherwise show
    through the mask. */
-html :where(.alert-message)::before {
+html :where(.alert-message, .cbi-section-error)::before {
   content: "";
   position: absolute;
   inset-block-start: var(--banner-pad-block);
@@ -1096,13 +1130,16 @@ html :where(.alert-message.warning) {
   --banner-fg: var(--color-on-warning-muted);
   --banner-mask: var(--icon-warning);
 }
-html :where(.alert-message:is(.error, .danger)) {
+html :where(.alert-message:is(.error, .danger), .cbi-section-error) {
   --banner-bg: var(--color-error-muted);
   --banner-fg: var(--color-on-error-muted);
   --banner-mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z'/></svg>");
 }
-html :where(.alert-message) > :first-child { margin-block-start: 0; }
-html :where(.alert-message) > :last-child { margin-block-end: 0; }
+html :where(.alert-message, .cbi-section-error) > :first-child { margin-block-start: 0; }
+html :where(.alert-message, .cbi-section-error) > :last-child { margin-block-end: 0; }
+/* A section's error list (.cbi-section-error) is the error Banner, one
+   message a line, no bullets. */
+html :where(.cbi-section-error) :is(ul, li) { margin: 0; padding: 0; list-style: none; }
 html :where(.alert-message h4) {
   margin-block-end: var(--spacing-1);
   font-size: var(--text-body-size);
