@@ -716,6 +716,9 @@ html body[data-page^="admin-services-openclash"] .cm-editor .cm-gutters { color:
    actions sit 8 apart and wrap, like every table's actions (node_list.htm
    sets the gap to 0 under 500). */
 html body[data-page^="admin-services-passwall"] .pw-actions > .node-wrapper { flex-wrap: wrap; gap: var(--spacing-2); }
+/* A node group tab's count (node_list.htm, inline red) is supporting
+   text beside the group's name. */
+html body[data-page^="admin-services-passwall"] #maincontent .cbi-tabmenu > li > a > font[style*="color"] { color: var(--color-text-secondary) !important; } /* inline color:red */
 /* Running Status tiles: the label and the state words in the theme's
    inks (status.htm's own greys and oranges are under 3:1 on the card). */
 html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .block h4 { color: var(--color-text-secondary) !important; } /* status.htm color:#8898aa!important */
@@ -731,6 +734,10 @@ html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .yell
 @media (max-width: 48rem) {
   html body[data-page^="admin-services-passwall"] .table:has(> :is(.thead, thead, tbody) > .tr > .th) .tr.cbi-section-table-row { display: grid; }
   html body[data-page^="admin-services-passwall"] .table .tr > .pw-actions { padding-inline: var(--spacing-4) !important; } /* node_list.htm padding 5px !important */
+  /* A folded row reads from the start like every fold: node_list.htm
+     centres its cells and right-aligns the actions (!important there). */
+  html body[data-page^="admin-services-passwall"] .table .tr > :is(.td, td) { text-align: start; }
+  html body[data-page^="admin-services-passwall"] .table .tr > .pw-actions { text-align: start !important; } /* node_list.htm text-align:right !important */
   /* app_version.htm centres its rows' items; the label spans the stacked
      row like every form row's (layout). */
   html body[data-page^="admin-services-passwall"] #app_version > .cbi-value { align-items: stretch; }

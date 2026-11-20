@@ -769,6 +769,18 @@ html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -
     font-weight: var(--font-weight-medium);
   }
   html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td):has(> :is(input:not([type="checkbox"]), select, .cbi-dropdown, .cbi-dynlist)))::before { display: block; }
+  /* A row that opens with a lone selection checkbox (PassWall's node
+     list): the checkbox sits before the title, which is the cell after it;
+     the rest stack under the title. */
+  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr:has(> :is(.td, td):first-child > input[type="checkbox"]:only-child)) { grid-template-columns: auto minmax(0, 1fr); }
+  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr:has(> :is(.td, td):first-child > input[type="checkbox"]:only-child) > :is(.td, td)) { grid-column: 2; }
+  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child)) { grid-column: 1; grid-row: 1; padding-inline-end: 0; }
+  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child) + :is(.td, td)) {
+    color: var(--color-text-primary);
+    font-size: var(--text-body-size);
+    line-height: var(--text-body-leading);
+  }
+  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th) .tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child) + :is(.td, td))::before { content: none; }
   /* The actions take a line of their own under the stack, so the data
      keeps the row's full width (a column beside it left long values a
      narrow one); several wrap, 8 apart. */

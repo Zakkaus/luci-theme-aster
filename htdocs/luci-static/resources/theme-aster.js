@@ -21,6 +21,39 @@
 return baseclass.extend({
 	__init__() {
 		this.bind();
+		this.lua();
+	},
+
+	/* Lua CBI pages (a <form> around the .cbi-map) are in the document by
+	 * the time this runs; form.js views render later and need none of it.
+	 *  - A table cell with no data-title takes its column header's own words,
+	 *    which the phone fold prints before it, as form.js tables carry;
+	 *    again when the page's own script moves rows (PassWall's node
+	 *    groups). */
+	lua() {
+		const words = (el) => Array.from(el.childNodes).filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim();
+
+		const titles = () => document.querySelectorAll('form > .cbi-map :is(table, .table)').forEach((t) => {
+			const head = Array.from(t.querySelectorAll(':scope > .tr, :scope > :is(.thead, thead, tbody) > .tr')).find((r) => r.querySelector(':scope > .th'));
+
+			if (!head)
+				return;
+
+			const names = Array.from(head.children).map(words);
+
+			t.querySelectorAll(':scope > .tr, :scope > :is(.tbody, tbody) > .tr').forEach((r) => Array.from(r.children).forEach((c, i) => {
+				if (c.matches('.td, td') && !c.hasAttribute('data-title') && names[i])
+					c.setAttribute('data-title', names[i]);
+			}));
+		});
+		let queued = false;
+		const observer = new MutationObserver(() => {
+			if (!queued)
+				queued = requestAnimationFrame(() => { queued = false; titles(); });
+		});
+
+		titles();
+		document.querySelectorAll('form > .cbi-map').forEach((m) => observer.observe(m, { childList: true, subtree: true }));
 	},
 
 	bind() {
