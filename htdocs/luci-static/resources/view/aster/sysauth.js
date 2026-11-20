@@ -25,6 +25,25 @@ return view.extend({
 		else
 			form.querySelector('input[type="text"]')?.focus();
 
+		/* The reveal toggle shows the password as text and back. It keeps
+		 * its place in the tab order after the field, as doona's TextField
+		 * does, and says its state with aria-pressed. */
+		const reveal = form.querySelector('.login-reveal');
+
+		if (password && reveal) {
+			reveal.hidden = false;
+			reveal.addEventListener('click', () => {
+				const shown = password.type === 'password';
+
+				password.type = shown ? 'text' : 'password';
+				reveal.setAttribute('aria-pressed', String(shown));
+			});
+
+			/* A submitted password goes back to dots first, so the browser's
+			 * password manager sees a password field. */
+			form.addEventListener('submit', () => { password.type = 'password'; });
+		}
+
 		/* Busy state goes on the element as an attribute, and the handler
 		 * blocks itself. `disabled` would drop the button out of the tab
 		 * order mid-operation, which loses focus for a screen-reader user
