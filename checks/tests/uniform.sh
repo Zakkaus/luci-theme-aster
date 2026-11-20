@@ -82,7 +82,7 @@ expect uniform 1 "footer overlap" "save bar covering the page" -- "$url" "$passw
 # sessions alike; this is the fault it would be). The margin keeps the
 # column scrolling, so the check applies.
 expect uniform 1 "space.page.bar gap" "last block 9 above the save bar" "(want 24px)" -- "$url" "$password" --pages "$tmp/system.txt" \
-	--debug-css 'admin/system/system=.shell-footer { padding-block-end: 9px !important; margin-block-start: 100px !important }'
+	--debug-css 'admin/system/system=.shell-footer { padding-block-end: 9px !important; margin-block-start: 1000px !important }'
 
 # Side nav: rows set flush again (the hovered row touched the selected one).
 expect uniform 1 "nav.item gap" "side nav rows with no gap" "0px (want 2px)" -- "$url" "$password" --pages "$tmp/reboot.txt" \

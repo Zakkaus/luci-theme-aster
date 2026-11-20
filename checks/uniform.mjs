@@ -42,7 +42,10 @@ const opt = parseArgs(process.argv.slice(2), {
 opt.timeout = +opt.timeout;
 opt.settle = +opt.settle;
 const tol = +opt.tolerance;
-const pages = readPages(opt.pages.length ? opt.pages : [path.join(CHECKS, 'pages.txt')]);
+/* A fixture= entry (gate.mjs FIXTURES) is markup added for the contrast
+ * gate's samples, placed without a page's layout around it: not measured. */
+const pages = readPages(opt.pages.length ? opt.pages : [path.join(CHECKS, 'pages.txt')]).filter((e) => !e.fixture);
+if (!pages.length) die('the page list holds only fixture= entries, which uniform does not measure');
 const debugCss = parseDebugCss(opt['debug-css']);
 let canonical;
 try {
@@ -856,14 +859,15 @@ function collect(cfg) {
     // The last block 24 above the bar (Astryx LayoutFooter; spacing
     // contract), read with the column scrolled to its end. That block is
     // the page footer's line when it shows (its own bottom padding is the
-    // 24), else the page's last block. A page shorter than the column ends
-    // in free space, not a gap.
+    // 24), else the page's last block; a tooltip floats over the page and
+    // ends nothing. A page shorter than the column ends in free space, not
+    // a gap.
     if (main.scrollHeight > main.clientHeight + 1) {
       const st = main.scrollTop;
       main.scrollTop = main.scrollHeight;
       const foot = main.querySelector(':scope > .shell-footer');
       const ends = [...scope.querySelectorAll('#view *')]
-        .filter((e) => !bar.contains(e) && !e.closest('#modal_overlay') && visible(e) && getComputedStyle(e).position !== 'fixed')
+        .filter((e) => !bar.contains(e) && !e.closest('#modal_overlay, .cbi-tooltip') && visible(e) && getComputedStyle(e).position !== 'fixed')
         .map((e) => box(e).bottom);
       if (foot && visible(foot)) ends.push(box(foot).bottom - parseFloat(getComputedStyle(foot).paddingBlockEnd));
       if (ends.length) add('space.page.bar', 'gap', px(box(bar).top - Math.max(...ends)), bar);

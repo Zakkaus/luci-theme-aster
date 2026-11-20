@@ -239,12 +239,13 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
   :root[data-rail] .cbi-page-actions { inset-inline-start: var(--aster-rail-w); }
   body:not([data-page="admin-system-flash"]:has([data-tab="actions" i][data-tab-active="true"])) .shell:has(.cbi-page-actions:not([hidden])) > .shell-main { margin-block-end: calc(var(--size-element-md) + 2 * var(--spacing-3) + var(--border-width)); }
 }
-/* A card's own save bar (Startup's Local Startup, Backup's Configuration)
+/* A card's own save bar (Startup's Local Startup, Backup's Configuration;
+   on 24.10 Local Startup's tab pane is the card)
    in a phone's flow is the card's last button row, 24 under its content as
    any bar in the flow: no divider, no fill, no padding, or it is a frame
    inside the card. */
 @media (max-width: 48rem) {
-  .cbi-section .cbi-page-actions {
+  :is(.cbi-section, #view > div:not(.cbi-map) > div > [data-tab]) .cbi-page-actions {
     padding-block: 0;
     border-block-start: 0;
     background: none;
