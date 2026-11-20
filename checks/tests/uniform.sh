@@ -77,6 +77,12 @@ expect uniform 1 "glyph raw" "raw ▲ glyph shown" -- "$url" "$password" --pages
 # The save bar over the page again: the main column runs under it.
 expect uniform 1 "footer overlap" "save bar covering the page" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=.shell-main { margin-block-end: 0 !important }'
+# The last line 9 above the save bar: the footer's bottom padding cut (the
+# router measure's 9-9.6 was a viewport artifact, normal and read-only
+# sessions alike; this is the fault it would be). The margin keeps the
+# column scrolling, so the check applies.
+expect uniform 1 "space.page.bar gap" "last block 9 above the save bar" "(want 24px)" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=.shell-footer { padding-block-end: 9px !important; margin-block-start: 100px !important }'
 
 # Side nav: rows set flush again (the hovered row touched the selected one).
 expect uniform 1 "nav.item gap" "side nav rows with no gap" "0px (want 2px)" -- "$url" "$password" --pages "$tmp/reboot.txt" \

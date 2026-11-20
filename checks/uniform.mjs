@@ -836,6 +836,22 @@ function collect(cfg) {
   if (bar && getComputedStyle(bar).position === 'fixed') {
     const main = document.querySelector('.shell-main');
     add('footer', 'overlap', px(Math.max(0, box(main).bottom - box(bar).top)), bar);
+    // The last block 24 above the bar (Astryx LayoutFooter; spacing
+    // contract), read with the column scrolled to its end. That block is
+    // the page footer's line when it shows (its own bottom padding is the
+    // 24), else the page's last block. A page shorter than the column ends
+    // in free space, not a gap.
+    if (main.scrollHeight > main.clientHeight + 1) {
+      const st = main.scrollTop;
+      main.scrollTop = main.scrollHeight;
+      const foot = main.querySelector(':scope > .shell-footer');
+      const ends = [...scope.querySelectorAll('#view *')]
+        .filter((e) => !bar.contains(e) && !e.closest('#modal_overlay') && visible(e) && getComputedStyle(e).position !== 'fixed')
+        .map((e) => box(e).bottom);
+      if (foot && visible(foot)) ends.push(box(foot).bottom - parseFloat(getComputedStyle(foot).paddingBlockEnd));
+      if (ends.length) add('space.page.bar', 'gap', px(box(bar).top - Math.max(...ends)), bar);
+      main.scrollTop = st;
+    }
   }
 
   // Font family of every element with its own words, and of every control.
