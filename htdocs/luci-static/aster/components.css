@@ -827,8 +827,8 @@ html :where(th, .th) {
 html :where(.tr.placeholder) { display: table-caption; caption-side: bottom; }
 /* A form section (form.js) puts the message row in a tbody of its own,
    where a caption cannot sit: the tbody becomes the caption. */
-html :where(.tbody:has(> .tr.placeholder:only-child)) { display: table-caption; caption-side: bottom; }
-html :where(.tbody > .tr.placeholder) { display: block; }
+html :where(.tbody:not(tbody):has(> .tr.placeholder:only-child)) { display: table-caption; caption-side: bottom; }
+html :where(.tbody:not(tbody) > .tr.placeholder) { display: block; }
 /* Lua CBI tables are real <table>s: the parser's <tbody> holds the title row
    and the placeholder; dissolve it so the caption is the table's own. */
 html :where(tbody:has(> .tr.placeholder)) { display: contents; }
