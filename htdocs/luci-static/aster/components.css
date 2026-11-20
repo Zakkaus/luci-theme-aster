@@ -616,8 +616,8 @@ html :where(.cbi-value) {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
-  column-gap: var(--spacing-4);
-  padding-block: var(--spacing-2);
+  column-gap: var(--aster-space-region);
+  padding-block: var(--aster-space-row);
 }
 /* A block, not a flex box: a label with markup in it ("Allow forward to
    <em>destination zones</em>:") keeps one run of text that wraps as words;
@@ -639,7 +639,7 @@ html :where(.cbi-value > .cbi-value-field) {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--spacing-1) var(--spacing-2);
+  gap: var(--aster-space-tight) var(--aster-space-row);
   min-inline-size: 0;
   min-block-size: var(--size-element-md);
 }
@@ -690,7 +690,7 @@ html :where(.control-group) { display: flex; flex-wrap: wrap; align-items: cente
 @property --card-shadow { syntax: "*"; inherits: false; }
 
 html :where(.cbi-section, .cbi-section-node, .ifacebox, #view > :is(table, .table), #view > .cbi-map > :is(table, .table), #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], .nft-chain) {
-  --card-pad: calc(var(--spacing-4) - var(--border-width));
+  --card-pad: calc(var(--aster-space-region) - var(--border-width));
   --card-bleed: var(--card-pad);
   box-sizing: border-box;
   min-inline-size: 0;
@@ -702,7 +702,8 @@ html :where(.cbi-section, .cbi-section-node, .ifacebox, #view > :is(table, .tabl
   box-shadow: var(--card-shadow, none);
 }
 /* A card inside a card is a group of it: no frame. Two groups in a row
-   are divided by a rule with 24 on either side. */
+   are divided by a rule 16 under the first (the region's gap) and 16 over
+   the second. */
 html :where(.cbi-section, .cbi-section-node) :where(.cbi-section, .cbi-section-node) {
   --card-pad: 0;
   --card-bleed: inherit;
@@ -711,8 +712,7 @@ html :where(.cbi-section, .cbi-section-node) :where(.cbi-section, .cbi-section-n
   --card-bg: transparent;
 }
 html :where(.cbi-section, .cbi-section-node) :where(.cbi-section + .cbi-section, .cbi-section-node + .cbi-section-node) {
-  margin-block-start: var(--spacing-6);
-  padding-block-start: var(--spacing-6);
+  padding-block-start: var(--aster-space-region);
   border-block-start: var(--border-width) solid var(--color-border);
 }
 /* The interface box is a small Card: element radius, a header strip (the

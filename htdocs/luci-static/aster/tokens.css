@@ -399,6 +399,18 @@ html[data-theme="dark"] { color-scheme: dark; }
   /* Menu and tooltip: the widest they open. */
   --aster-menu-max-w: 384px;
 
+  /* Spacing contract (lab spacing audit, 2026-11-20): a container owns the
+     space between its children. Two stack steps: 16 inside a page region
+     (cards, sections, a card's padding, heading or tabs to content), 24
+     between page-level parts (the page inset, the title to what follows,
+     the last block to the save bar). 4 ties a title to its description, a
+     stacked label to its field and help to its field; 8 pads a form row
+     and parts controls on a line. */
+  --aster-space-page: var(--spacing-6);
+  --aster-space-region: var(--spacing-4);
+  --aster-space-row: var(--spacing-2);
+  --aster-space-tight: var(--spacing-1);
+
   /* Dialog widths: sm (a status), md (default), lg (a form). */
   --aster-dialog-sm-w: 400px;
   --aster-dialog-w: 560px;

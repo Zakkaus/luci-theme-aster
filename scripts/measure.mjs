@@ -75,9 +75,12 @@ const FIELDS = [
   {name: 'frame padding', from: ['frame', 'Main content (LayoutContent)', 'padding'], sel: '.shell-content', prop: 'padding'},
   {name: 'section gap', from: ['frame', 'Page VStack (band gap)', 'gap'], measure: 'sectionGap'},
   {name: 'card gap', from: ['frame', 'Grid: 系統 + 記憶體 cards', 'gap'], sel: '#view', prop: 'gap'},
-  // Cards sharing a grid row end on one line (系統 and 記憶體與儲存): the
-  // largest spread of bottom edges within a row. Phones stack the cards.
-  {name: 'same-row card bottoms', from: ['frame', 'Grid: 系統 + 記憶體 cards', 'height'], want: '0px', devices: ['desktop'], measure: 'rowSpread', edge: 'bottom'},
+  // A card ends 16 under its content (the spacing contract, owner
+  // 2026-11-20): the reference stretches the cards of a grid row to one
+  // height (系統 and 記憶體與儲存 ended level, the shorter one 56 empty at
+  // its foot); the contract keeps every card's padding 16, so the largest
+  // content-to-bottom inset of the overview's cards is read instead.
+  {name: 'card content end', from: ['frame', 'Grid: 系統 + 記憶體 cards', 'height'], want: '16px', devices: ['desktop'], measure: 'contentEnd'},
   // ... and start their first line of content level (型號 and 可用記憶體).
   {name: 'same-row first line', from: ['frame', 'Grid: 系統 + 記憶體 cards', 'height'], want: '0px', devices: ['desktop'], measure: 'rowSpread', edge: 'firstLine'},
   // Cards.
@@ -160,6 +163,14 @@ function readAll(fields) {
       const title = document.querySelector('.shell-inner > h2, #view > h2');
       const card = [...document.querySelectorAll('#view > .cbi-section')].find(shown);
       out[f.name] = title && card ? {value: `${px(card.getBoundingClientRect().top - title.getBoundingClientRect().bottom)}`, count: 1} : {value: null, count: 0};
+      continue;
+    }
+    if (f.measure === 'contentEnd') {
+      const ends = [...document.querySelectorAll('#view > .cbi-section')].filter(shown).map((c) => {
+        const kids = [...c.children].filter(shown);
+        return kids.length ? c.getBoundingClientRect().bottom - Math.max(...kids.map((k) => k.getBoundingClientRect().bottom)) : NaN;
+      }).filter((v) => !Number.isNaN(v));
+      out[f.name] = ends.length ? {value: px(Math.max(...ends)), count: ends.length} : {value: null, count: 0};
       continue;
     }
     if (f.measure === 'rowSpread') {

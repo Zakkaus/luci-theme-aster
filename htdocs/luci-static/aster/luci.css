@@ -72,41 +72,51 @@
 /* luci-mod-statistics pairs a select with its button in a span. */
 .shell-content .nowrap:not(.td, .th) { display: inline-flex; align-items: center; gap: var(--spacing-2); }
 
-/* ── Headings [ported] ───────────────────────────────────────── */
+/* ── Spacing [ported] ────────────────────────────────────────── */
 
-/* Page title, supporting line 4 under it, 24 to the first card; a card
-   title 16 above its content; a title below content 24 under it. */
-.shell-content h2:not(.cbi-section *) { margin-block-end: var(--spacing-6); }
-.shell-content h2:not(.cbi-section *):has(+ .cbi-map-descr) { margin-block-end: var(--spacing-1); }
-.cbi-map-descr { margin-block-end: var(--spacing-6); }
-.cbi-section-descr { margin-block-end: var(--spacing-4); }
-.shell-content .cbi-section :is(h2, h3, h4) { margin-block-end: var(--spacing-4); }
-.shell-content * + :is(h2, h3):not(.cbi-section > :first-child) { margin-block-start: var(--spacing-6); }
-.shell-content .shell-inner > h2:first-of-type { margin-block-start: 0; }
-/* The card's title row: the title and, on the overview, Hide/Show. */
+/* One contract for every page (design/layout.css --aster-space-*): the
+   page column and each region in it own the space between their children,
+   which keep no block margin. Blocks in a column 16 apart; the first shown
+   child at the top (a script, an empty or hidden block before it does not
+   count); form rows abut (each pads 8 above and below); controls on one
+   line keep their line. The html weight puts it over an app's own
+   margins (Software's <style>). */
+html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([class]), form, .cbi-map, .cbi-section, .cbi-section-node, .cbi-tabcontainer, [data-tab]:not(li), :has(> [data-tab]:not(li)), #content_syslog, .nft-table, .nft-chains, .cbi-section > div:has(> :is(h3, h4, table, .table)), .cbi-value:has(> :is(h3, h4))) {
+  & > * { margin-block: 0; }
+  & > * + * { margin-block-start: var(--aster-space-region); }
+  & > :nth-child(1 of :not(script, style, template, noscript, [hidden], input[type="hidden"], :empty, [style*="display: none"], [style*="display:none"], [data-tab-active="false"])),
+  & > :is(.cbi-value + .cbi-value, .includes),
+  & > :is(button, .btn, .cbi-button, input, select, label) + :is(button, .btn, .cbi-button, input, select, label) { margin-block-start: 0; }
+  /* Page level: the title 4 over its description, 24 from what follows
+     (tabs or the first block); the last block 24 above a save bar in the
+     page's flow (a phone). */
+  & > h2:not(.cbi-section *) + :is(.cbi-map-descr, .cbi-section-descr) { margin-block-start: var(--aster-space-tight); }
+  & > h2:not(.cbi-section *) + :not(.cbi-map-descr, .cbi-section-descr),
+  & > h2:not(.cbi-section *) + :is(.cbi-map-descr, .cbi-section-descr) + * { margin-block-start: var(--aster-space-page); }
+  & > * + .cbi-page-actions { margin-block-start: var(--aster-space-page); }
+  /* A line break between blocks would add an empty line; a textarea on a
+     line of its own is a block, with no descender space under it. */
+  & > br { display: none; }
+  & > textarea { display: block; }
+}
+/* An empty description or Add row holds no line. */
+:is(.cbi-map-descr, .cbi-section-descr):empty,
+.cbi-section-create:not(:has(*)) { display: none; }
+/* The card's title row: the title and, on the overview, Hide/Show; the
+   row is as high as the title, 16 above the content like any heading. */
 .cbi-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--spacing-2);
-  margin-block-end: var(--spacing-4);
+  gap: var(--aster-space-row);
 }
-.cbi-title > :is(h2, h3) { flex: 1; align-items: center; margin-block-end: 0; }
-
-/* ── Cards [ported] ──────────────────────────────────────────── */
+.cbi-title > * { margin: 0; }
+.cbi-title > :is(h2, h3) { flex: 1; align-items: center; }
 
 /* "Loading view…" (luci-base's placeholder for the whole view, the view's
    one div; its script follows) stands in the region the view fills:
    centred in it, 48 under the title (layout). */
 #view > div.spinning:only-of-type { justify-content: center; padding-block: var(--spacing-12); }
-
-/* Cards 16 apart; a map's last block 24 above what follows. */
-.cbi-section, .cbi-section-node, #view > :is(table, .table), #view > .cbi-map > :is(table, .table), #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], .nft-chain { margin-block-end: var(--spacing-4); }
-.cbi-section > :is(.cbi-section, .cbi-section-node):last-child { margin-block-end: 0; }
-.cbi-map { margin-block-end: var(--spacing-6); }
-:not(.cbi-map) + .cbi-map { margin-block-start: var(--spacing-4); }
-.cbi-section-create,
-.cbi-section > :is(.btn, .cbi-button) { margin-block-start: var(--spacing-4); }
 
 /* ── Feedback [ported] ──────────────────────────────────────── */
 
@@ -134,7 +144,6 @@
    column ending above it so it covers nothing; on a phone it ends the page. */
 .cbi-page-actions {
   justify-content: flex-end;
-  margin-block-start: var(--spacing-4);
   padding-block: var(--spacing-3);
   border-block-start: var(--border-width) solid var(--color-border);
   background: var(--color-background-body);
@@ -162,23 +171,49 @@
 .td textarea { max-block-size: 8.5rem; }
 /* The SSH keys list holds whole keys: full width. */
 [data-page="admin-system-admin-sshkeys"] .cbi-dynlist { --field-w: 100%; }
-/* System Log's filter rows (layout): a wrapping toolbar, each label on its
+/* System and Kernel Log's filter rows (layout): a wrapping toolbar, each label on its
    control's centre line, 8 apart, the controls sharing what is left; the
    inline 5 / 10 px margins go (only !important beats them). */
-#view div:has(> [id^="invertLog"]) {
+#view div:has(> [id^="invert"]) {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--spacing-2);
-  margin-block-end: var(--spacing-2) !important; /* inline margin-bottom:10px */
+  margin-block-end: 0 !important; /* inline margin-bottom:10px; the card owns the gap */
   & > * { margin: 0 !important; } /* inline margins */
   & > :is(select, input:not([type="checkbox"])) { flex: 1 1 var(--aster-label-w); }
+}
+/* Kernel Log writes a no-break space between Not and the severity select:
+   a flex item of its own. Set at size 0, the checkbox takes one gap back. */
+#view div:has(> #invertSeverity) {
+  font-size: 0;
+  & > * { font-size: var(--text-label-size); }
+  & > #invertSeverity { margin-inline-end: calc(var(--aster-space-row) * -1) !important; } /* the row's margin: 0 !important */
+}
+/* A phone: each control on a line of its own, 4 under its label, the next
+   label 16 under it. */
+@media (max-width: 48rem) {
+  #view div:has(> [id^="invert"]) {
+    row-gap: var(--aster-space-tight);
+    & > :is(select, input:not([type="checkbox"])) { flex-basis: 100%; }
+    & > :is(select, input:not([type="checkbox"])):not(:last-child) { margin-block-end: calc(var(--aster-space-region) - var(--aster-space-tight)) !important; } /* the row's margin: 0 !important */
+  }
 }
 /* Software: the disk-space value shares the label's line (the bar's value
    text sits a line above the track) where the line holds both: the value
    is about 400 wide, so from 64rem; under that it keeps its own line. The
    pager's arrows 8 off its text. */
-@media (min-width: 64rem) { #disk-space-label + .cbi-progressbar { margin-block-start: var(--spacing-1); } }
+@media (min-width: 64rem) { #disk-space-label + .cbi-progressbar { margin-block-start: 0; } }
+/* Software's toolbar: its own <style> pads each group (.controls > *);
+   the toolbar owns the gaps here (id weight beats it). Groups 16 apart, a
+   label 4 over its control. */
+#view .controls {
+  gap: var(--aster-space-region);
+  & > * { padding: 0; gap: var(--aster-space-tight) var(--aster-space-row); }
+}
+/* The log views' Scroll buttons: LuCI pads their line 20 inline; the card
+   owns the gap. */
+#content_syslog > div[style*="padding"] { padding: 0 !important; } /* inline padding-bottom: 20px */
 #view .pager { gap: var(--spacing-2); }
 
 /* ── Dropdown, dynlist, filebrowser [ported] ────────────────── */
@@ -205,6 +240,14 @@
 
 /* ── Tables [ported] ────────────────────────────────────────── */
 
+/* Buttons a cell holds in a wrapper (Processes' Hang Up, Terminate,
+   Kill): one row 8 apart, with no whitespace between them. */
+.td > div:has(> :is(.btn, .cbi-button)):not(:has(> :not(.btn, .cbi-button, button))) {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--aster-space-row);
+  & > * { margin: 0; }
+}
 /* The diagnostics page lays three tools out as three cells of one row. */
 .table:has(.diag-action) { table-layout: fixed; }
 .td > input + .diag-action { display: block; margin: var(--spacing-2) 0 0; }
@@ -241,11 +284,6 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
   margin-inline: calc(var(--card-bleed) * -1);
 }
 .cbi-value > .cbi-section.cbi-tblsection { padding-inline: var(--card-bleed); }
-/* DHCP's lease tables under their headings: content to the next heading
-   24, inside the rows (rows abut). Form rows leave 16 between them (8 +
-   8); the static leases' group ends 16 lower again, under its Add. */
-.cbi-value + .cbi-value:has(> h4:first-child) { padding-block-start: var(--spacing-4); }
-.cbi-value:has(> .cbi-tblsection) + .cbi-value:has(> h4:first-child) { padding-block-start: 0; }
 :is(.cbi-section, .cbi-section-node) > div:not(.cbi-value, .cbi-section-node):has(> .table .th) {
   margin-inline: calc(var(--card-pad, var(--spacing-0)) * -1);
   padding-inline: var(--card-pad, var(--spacing-0));
@@ -263,9 +301,7 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
 /* ── Tabs written by luci-base [ported] ─────────────────────── */
 
 /* The theme's tab row under the page title (menu-aster.js moves it
-   there), a form's above its fields. */
-#tabmenu:not([hidden]) { margin-block-end: var(--spacing-6); }
-.cbi-tabmenu { margin-block-end: var(--spacing-4); }
+   there) and a form's tabs: 16 above the content (Spacing). */
 
 /* ── Network pages [ported] ─────────────────────────────────── */
 
@@ -375,17 +411,13 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
 [data-page="admin-status-overview"] #view {
   /* Bands of cards, as the reference: a grid of at most two tracks (320
      at least, 16 apart), a wide table, interface boxes or a long list
-     across it; two cards in a row stretch to it. */
+     across it; a card is as tall as its content. */
   &:has(> .cbi-section) {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(max(min(100%, var(--aster-card-min)), calc((100% - var(--spacing-4)) / 2)), 1fr));
     gap: var(--spacing-4);
-    align-items: stretch;
+    align-items: start; /* a card ends 16 under its content, never stretched empty */
   }
-  /* A card collapsed with Hide keeps only its title row; stretched, it would
-     be an empty box as tall as its neighbour. luci-mod-status hides the
-     content by writing display: none on its container. */
-  & > .cbi-section:has(> div[style*="display: none"]) { align-self: start; }
   & > :not(.cbi-section) { grid-column: 1 / -1; }
   & > .cbi-section { margin: 0; min-inline-size: 0; }
   & > .cbi-section:has(.tr > .td:nth-child(3), .th, .ifacebox, .network-status-table, .tr:nth-child(7) > .td > .cbi-progressbar) { grid-column: 1 / -1; }
@@ -653,7 +685,7 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   /* A form row stacks: the label over the control, which fills the row.
      One line, so a long value cannot widen the column past the row. */
   .cbi-value { flex-direction: column; flex-wrap: nowrap; align-items: stretch; }
-  .cbi-value > .cbi-value-title { flex-basis: auto; min-block-size: 0; margin-block-end: var(--spacing-1); }
+  .cbi-value > .cbi-value-title { flex-basis: auto; min-block-size: 0; margin-block-end: var(--aster-space-tight); }
   /* A label kept for screen readers only leaves no empty line (layout). */
   .cbi-value.aster-same-label > .cbi-value-title { position: absolute; }
   .cbi-value-field { --field-w: 100%; flex-basis: auto; }
