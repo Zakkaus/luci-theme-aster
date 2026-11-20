@@ -182,18 +182,15 @@ html body[data-page^="admin-services-openclash"] .oc.cbi-button.cbi-button {
   cursor: pointer;
   transition: background-color var(--duration-fast) var(--ease-standard);
 }
-@media (hover: hover) {
-  html :where(button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button, .cbi-section .label[data-style], #indicators > :is(span, a)):hover:not(:disabled, [disabled], [aria-disabled="true"]) {
-    background-image: linear-gradient(var(--color-overlay-hover), var(--color-overlay-hover));
+html :where(button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button, .cbi-section .label[data-style], #indicators > :is(span, a)) {
+  @media (hover: hover) {
+    &:hover:not(:disabled, [disabled], [aria-disabled="true"]) { background-image: linear-gradient(var(--color-overlay-hover), var(--color-overlay-hover)); }
   }
-}
-html :where(button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button, .cbi-section .label[data-style], #indicators > :is(span, a)):active:not(:disabled, [disabled], [aria-disabled="true"]) {
-  background-image: linear-gradient(var(--color-overlay-pressed), var(--color-overlay-pressed));
-  transform: scale(0.98);
-}
-html :where(button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button, .cbi-section .label[data-style], #indicators > :is(span, a)):is(:disabled, [disabled], [aria-disabled="true"]) {
-  opacity: 0.5;
-  cursor: default;
+  &:active:not(:disabled, [disabled], [aria-disabled="true"]) {
+    background-image: linear-gradient(var(--color-overlay-pressed), var(--color-overlay-pressed));
+    transform: scale(0.98);
+  }
+  &:is(:disabled, [disabled], [aria-disabled="true"]) { opacity: 0.5; cursor: default; }
 }
 /* IconButton: a button that draws one glyph instead of words (a pager's
    arrows, the drag handle, a dynlist's add, a field's reveal and CIDR
@@ -364,7 +361,7 @@ html :where(.cbi-dropdown > .open)::before {
   inline-size: var(--aster-icon-sm);
   block-size: var(--aster-icon-sm);
   background-color: currentColor;
-  mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='m19.5%208.25-7.5%207.5-7.5-7.5'/></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='m19.5 8.25-7.5 7.5-7.5-7.5'/></svg>") center / contain no-repeat;
 }
 
 /* ── Menu ────────────────────────────────────────────────────────
@@ -423,7 +420,7 @@ html :where(.cbi-dropdown[open]:not([multiple]) > ul.dropdown > li[selected], .p
   inline-size: var(--aster-icon-sm);
   block-size: var(--aster-icon-sm);
   background-color: var(--color-icon-accent);
-  mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='m4.5%2012.75%206%206%209-13.5'/></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='m4.5 12.75 6 6 9-13.5'/></svg>") center / contain no-repeat;
 }
 html :where(.cbi-dropdown[open] > ul.dropdown > li[unselectable]) { opacity: 0.5; }
 html :where(.palette-menu[open] > [role="menu"] > li) { cursor: pointer; }
@@ -1031,7 +1028,9 @@ html :where([data-page="admin-status-overview"] #view :is(.ifacebox-body > div, 
    ui.js removes it when the .fade-out transition ends, so that transition
    always runs. */
 
-html :where(.alert-message, .td > [data-tooltip]) { --icon-info: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='m11.25%2011.25.041-.02a.75.75%200%200%201%201.063.852l-.708%202.836a.75.75%200%200%200%201.063.853l.041-.021M21%2012a9%209%200%201%201-18%200%209%209%200%200%201%2018%200Zm-9-3.75h.008v.008H12V8.25Z'/></svg>"); }
+/* Status icons (Heroicons 2.2.0 outline, MIT, path data verbatim), shared
+   by the Banner, the InfoTip and the top bar's unsaved-changes button. */
+html { --icon-info: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z'/></svg>"); --icon-warning: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z'/></svg>"); }
 html :where(.alert-message) {
   --banner-bg: var(--color-info-muted);
   --banner-fg: var(--color-on-info-muted);
@@ -1067,17 +1066,17 @@ html :where(.alert-message)::before {
 html :where(.alert-message.success) {
   --banner-bg: var(--color-success-muted);
   --banner-fg: var(--color-on-success-muted);
-  --banner-mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M9%2012.75%2011.25%2015%2015%209.75M21%2012a9%209%200%201%201-18%200%209%209%200%200%201%2018%200Z'/></svg>");
+  --banner-mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'/></svg>");
 }
 html :where(.alert-message.warning) {
   --banner-bg: var(--color-warning-muted);
   --banner-fg: var(--color-on-warning-muted);
-  --banner-mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M12%209v3.75m-9.303%203.376c-.866%201.5.217%203.374%201.948%203.374h14.71c1.73%200%202.813-1.874%201.948-3.374L13.949%203.378c-.866-1.5-3.032-1.5-3.898%200L2.697%2016.126ZM12%2015.75h.007v.008H12v-.008Z'/></svg>");
+  --banner-mask: var(--icon-warning);
 }
 html :where(.alert-message:is(.error, .danger)) {
   --banner-bg: var(--color-error-muted);
   --banner-fg: var(--color-on-error-muted);
-  --banner-mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M12%209v3.75m9-.75a9%209%200%201%201-18%200%209%209%200%200%201%2018%200Zm-9%203.75h.008v.008H12v-.008Z'/></svg>");
+  --banner-mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z'/></svg>");
 }
 html :where(.alert-message) > :first-child { margin-block-start: 0; }
 html :where(.alert-message) > :last-child { margin-block-end: 0; }

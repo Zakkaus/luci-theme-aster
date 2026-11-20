@@ -215,6 +215,9 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
 
 /* ── Network pages [ported] ─────────────────────────────────── */
 
+/* Device icons (Heroicons 2.2.0 outline, MIT, path data verbatim):
+   ServerStack for a wired device or a port, Wifi for a radio. */
+html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z'/></svg>"); --icon-wifi: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z'/></svg>"); }
 .shell-content .ifacebox { min-inline-size: 8rem; }
 /* The zone colour firewall.getZoneColorStyle() writes inline is the
    administrator's data: kept, toned down, with dark text on it. */
@@ -334,12 +337,12 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
   & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head:first-child::before,
   & .ifacebox-body > div > .ifacebadge:has(> img:not([src*="/signal-"], [src*="/wifi"]))::before,
   & .td > .ifacebadge:has(> img:not([src*="/signal-"], [src*="/wifi"]))::before {
-    mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M5.25%2014.25h13.5m-13.5%200a3%203%200%200%201-3-3m3%203a3%203%200%201%200%200%206h13.5a3%203%200%201%200%200-6m-16.5-3a3%203%200%200%201%203-3h13.5a3%203%200%200%201%203%203m-19.5%200a4.5%204.5%200%200%201%20.9-2.7L5.737%205.1a3.375%203.375%200%200%201%202.7-1.35h7.126c1.062%200%202.062.5%202.7%201.35l2.587%203.45a4.5%204.5%200%200%201%20.9%202.7m0%200a3%203%200%200%201-3%203m0%203h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3%206h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z'/></svg>") center / contain no-repeat;
+    mask: var(--icon-server) center / contain no-repeat;
   }
   & .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head::before,
   & .ifacebox-body > div > .ifacebadge:has(> img[src*="/wifi"])::before,
   & .td > .ifacebadge:has(> img[src*="/wifi"])::before {
-    mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M8.288%2015.038a5.25%205.25%200%200%201%207.424%200M5.106%2011.856c3.807-3.808%209.98-3.808%2013.788%200M1.924%208.674c5.565-5.565%2014.587-5.565%2020.152%200M12.53%2018.22l-.53.53-.53-.53a.75.75%200%200%201%201.06%200Z'/></svg>") center / contain no-repeat;
+    mask: var(--icon-wifi) center / contain no-repeat;
   }
   & .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head::before { background-color: var(--color-icon-accent); }
   & .td > .ifacebadge:has(> img)::before {
@@ -534,7 +537,7 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
   inline-size: var(--aster-icon-sm);
   block-size: var(--aster-icon-sm);
   background-color: var(--color-warning);
-  mask: url("data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'><path%20d='M12%209v3.75m-9.303%203.376c-.866%201.5.217%203.374%201.948%203.374h14.71c1.73%200%202.813-1.874%201.948-3.374L13.949%203.378c-.866-1.5-3.032-1.5-3.898%200L2.697%2016.126ZM12%2015.75h.007v.008H12v-.008Z'/></svg>") center / contain no-repeat;
+  mask: var(--icon-warning) center / contain no-repeat;
 }
 
 /* ── Phone [ported] ─────────────────────────────────────────── */
@@ -723,38 +726,40 @@ html body[data-page^="admin-services-openclash"] {
   & .cm-editor .cm-gutters { color: var(--color-text-secondary); }
 }
 
-/* PassWall (body[data-page^="admin-services-passwall"]): a node row's
-   actions sit 8 apart and wrap, like every table's actions (node_list.htm
-   sets the gap to 0 under 500). */
-html body[data-page^="admin-services-passwall"] .pw-actions > .node-wrapper { flex-wrap: wrap; gap: var(--spacing-2); }
-/* A node group tab's count (node_list.htm, inline red) is supporting
-   text beside the group's name. */
-html body[data-page^="admin-services-passwall"] #maincontent .cbi-tabmenu > li > a > font[style*="color"] { color: var(--color-text-secondary) !important; } /* inline color:red */
-/* Running Status tiles: the label and the state words in the theme's
-   inks (status.htm's own greys and oranges are under 3:1 on the card). */
-html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .block h4 { color: var(--color-text-secondary) !important; } /* status.htm color:#8898aa!important */
-/* App Update: each version under its name at the label's ink, not
-   app_version.htm's 70% opacity (under 4.5:1). */
-html body[data-page^="admin-services-passwall"] #app_version .app-version-sub { opacity: 1; color: var(--color-text-secondary); }
-html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .green { color: var(--color-text-success); }
-html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .red { color: var(--color-text-error); }
-html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .yellow { color: var(--color-text-warning); }
+html body[data-page^="admin-services-passwall"] {
+  /* PassWall (body[data-page^="admin-services-passwall"]): a node row's
+     actions sit 8 apart and wrap, like every table's actions (node_list.htm
+     sets the gap to 0 under 500). */
+  & .pw-actions > .node-wrapper { flex-wrap: wrap; gap: var(--spacing-2); }
+  /* A node group tab's count (node_list.htm, inline red) is supporting
+     text beside the group's name. */
+  & #maincontent .cbi-tabmenu > li > a > font[style*="color"] { color: var(--color-text-secondary) !important; } /* inline color:red */  /* Running Status tiles: the label and the state words in the theme's
+     inks (status.htm's own greys and oranges are under 3:1 on the card). */
+  & #_passwall_status_fieldset .block h4 { color: var(--color-text-secondary) !important; } /* status.htm color:#8898aa!important */  /* App Update: each version under its name at the label's ink, not
+     app_version.htm's 70% opacity (under 4.5:1). */
+  & #app_version .app-version-sub { opacity: 1; color: var(--color-text-secondary); }
+  & #_passwall_status_fieldset .green { color: var(--color-text-success); }
+  & #_passwall_status_fieldset .red { color: var(--color-text-error); }
+  & #_passwall_status_fieldset .yellow { color: var(--color-text-warning); }
+}
 /* On a phone the node table folds like every other table: node_list.htm
    draws its rows as flex rows under 1152 (layout), and pads the actions
    cell 5 a side (!important there) where the fold insets it 16. */
 @media (max-width: 48rem) {
-  html body[data-page^="admin-services-passwall"] .table:has(> :is(.thead, thead, tbody) > .tr > .th) .tr.cbi-section-table-row { display: grid; }
-  html body[data-page^="admin-services-passwall"] .table .tr > .pw-actions { padding-inline: var(--spacing-4) !important; } /* node_list.htm padding 5px !important */
-  /* A folded row reads from the start like every fold: node_list.htm
-     centres its cells and right-aligns the actions (!important there). */
-  html body[data-page^="admin-services-passwall"] .table .tr > :is(.td, td) { text-align: start; }
-  html body[data-page^="admin-services-passwall"] .table .tr > .pw-actions { text-align: start !important; } /* node_list.htm text-align:right !important */
-  /* app_version.htm centres its rows' items; the label spans the stacked
-     row like every form row's (layout). */
-  html body[data-page^="admin-services-passwall"] #app_version > .cbi-value { align-items: stretch; }
+  html body[data-page^="admin-services-passwall"] {
+    & .table:has(> :is(.thead, thead, tbody) > .tr > .th) .tr.cbi-section-table-row { display: grid; }
+    & .table .tr > .pw-actions { padding-inline: var(--spacing-4) !important; } /* node_list.htm padding 5px !important */    /* A folded row reads from the start like every fold: node_list.htm
+         centres its cells and right-aligns the actions (!important there). */
+    & .table .tr > :is(.td, td) { text-align: start; }
+    & .table .tr > .pw-actions { text-align: start !important; } /* node_list.htm text-align:right !important */    /* app_version.htm centres its rows' items; the label spans the stacked
+         row like every form row's (layout). */
+    & #app_version > .cbi-value { align-items: stretch; }
+  }
 }
 /* The Running Status tiles go one a row on a narrow phone: two a row
    (status.htm's own) leave a tile narrower than its icon and label. */
 @media (max-width: 30rem) {
-  html body[data-page^="admin-services-passwall"] #_passwall_status_fieldset .pure-u-1-4 { inline-size: 100%; }
+  html body[data-page^="admin-services-passwall"] {
+    & #_passwall_status_fieldset .pure-u-1-4 { inline-size: 100%; }
+  }
 }
