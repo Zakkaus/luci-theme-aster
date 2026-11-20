@@ -31,7 +31,7 @@
                                 .cbi-value-error, .control-group,
                                 .aster-same-label (theme-aster.js)
    Card          Card           .cbi-section, .cbi-section-node, .ifacebox
-                                (+ .ifacebox-head/-body), .cbi-page-actions,
+                                (+ .ifacebox-head/-body),
                                 a table straight in the view, #content_syslog,
                                 a tab pane straight in a view, .nft-chain
                                 (24.10 writes these without .cbi-section)
@@ -629,7 +629,7 @@ html :where(.control-group) { display: flex; flex-wrap: wrap; align-items: cente
 @property --card-radius { syntax: "*"; inherits: false; }
 @property --card-shadow { syntax: "*"; inherits: false; }
 
-html :where(.cbi-section, .cbi-section-node, .ifacebox, .cbi-page-actions, #view > :is(table, .table), #view > .cbi-map > :is(table, .table), #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], .nft-chain) {
+html :where(.cbi-section, .cbi-section-node, .ifacebox, #view > :is(table, .table), #view > .cbi-map > :is(table, .table), #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], .nft-chain) {
   --card-pad: calc(var(--spacing-4) - var(--border-width));
   box-sizing: border-box;
   min-inline-size: 0;

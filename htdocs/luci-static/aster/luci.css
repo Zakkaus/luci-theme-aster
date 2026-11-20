@@ -113,16 +113,33 @@
 
 /* ── Form [ported] ──────────────────────────────────────────── */
 
-/* The save bar stays reachable: a raised Card stuck to the bottom. */
+/* The save bar is the layout's footer (Astryx LayoutFooter with its
+   divider): on the page's own background, 12 above and below its buttons.
+   On a wide screen it is fixed under the main column, which ends above
+   it, so the bar stays in reach and never covers the content; on a phone
+   it closes the page. */
 .cbi-page-actions {
-  --card-shadow: var(--shadow-med);
-  --card-pad: calc(var(--spacing-3) - var(--border-width));
-  position: sticky;
-  inset-block-end: var(--spacing-3);
-  z-index: 10;
   justify-content: flex-end;
   margin-block-start: var(--spacing-4);
+  padding-block: var(--spacing-3);
+  border-block-start: var(--border-width) solid var(--color-border);
+  background: var(--color-background-body);
 }
+@media (min-width: 48.0625rem) {
+  .cbi-page-actions {
+    position: fixed;
+    inset-block-end: 0;
+    inset-inline: var(--aster-sidenav-w) 0;
+    z-index: 10;
+    margin: 0;
+    padding-inline: var(--spacing-6);
+  }
+  :root[data-rail] .cbi-page-actions { inset-inline-start: var(--aster-rail-w); }
+  body:not([data-page="admin-system-flash"]:has([data-tab="actions" i][data-tab-active="true"])) .shell:has(.cbi-page-actions:not([hidden])) > .shell-main { margin-block-end: calc(var(--size-element-md) + 2 * var(--spacing-3) + var(--border-width)); }
+}
+/* Backup / Flash Firmware: only its Configuration tab has anything to
+   save; on the Actions tab the bar would hold a lone Save. */
+[data-page="admin-system-flash"] #view:has([data-tab="actions" i][data-tab-active="true"]) .cbi-page-actions { display: none; }
 /* A read-only value may be as wide as it needs, never narrower than a
    field. */
 .cbi-value-field input[readonly] { field-sizing: content; min-inline-size: var(--aster-field-w); }
@@ -566,7 +583,6 @@ form > .cbi-map .cbi-section div:not(.cbi-value *):has(> .table) { overflow-x: a
      cells too wide for a phone; the pairs stack, value beside label (layout). */
   [data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr { display: grid; grid-template-columns: auto minmax(0, 1fr); }
   [data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr > .td { display: block; }
-  .cbi-page-actions { position: static; }
   /* A dialog fits the screen. */
   #modal_overlay { padding: var(--spacing-4); }
 }
