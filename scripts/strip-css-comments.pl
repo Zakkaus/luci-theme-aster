@@ -41,6 +41,7 @@ if (!@ARGV) {
 	exit 0;
 }
 for my $file (@ARGV) {
+	-f $file or die "$file: not a regular file\n";
 	open my $in, '<:raw', $file or die "$file: $!\n";
 	my $css = <$in>;
 	close $in;
