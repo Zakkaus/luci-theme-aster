@@ -126,13 +126,13 @@
   background-color: currentColor;
   mask: var(--icon-refresh) center / contain no-repeat;
 }
-#indicators > [data-indicator="poll-status"][data-style="inactive"] { --button-fg: var(--color-icon-secondary); }
-#indicators > [data-indicator="uci-changes"] { --button-px: var(--spacing-2); gap: var(--spacing-1); }
-#indicators > [data-indicator="uci-changes"]::before {
+#indicators > span[data-indicator="poll-status"][data-style="inactive"] { --button-fg: var(--color-icon-secondary); }
+#indicators > span[data-indicator="uci-changes"] { --button-px: var(--spacing-2); gap: var(--spacing-1); }
+#indicators > span[data-indicator="uci-changes"]::before {
   background-color: var(--color-icon-warning);
   mask-image: var(--icon-warning);
 }
-#indicators > [data-indicator="uci-changes"]::after {
+#indicators > span[data-indicator="uci-changes"]::after {
   content: attr(data-count);
   font-size: var(--text-label-size);
 }

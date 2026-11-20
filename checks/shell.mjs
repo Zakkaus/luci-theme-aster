@@ -20,9 +20,10 @@
  *               while every group above it has the same open state), and
  *               no layout-shift entry has a source in the shell;
  *   keep        a group open on one page is still open on the next;
- *   vt          the top bar and the side nav carry their view-transition
- *               names and the cross-document @view-transition sits in a
- *               media rule that does not match under reduced motion;
+ *   vt          a side nav link runs a view transition (pagereveal), the
+ *               top bar and the side nav carry their view-transition names
+ *               and the cross-document @view-transition sits in a media
+ *               rule that does not match under reduced motion;
  *   appearance  the top bar's and the login page's appearance control, by
  *               keyboard only: Tab reaches the button, Enter opens it with
  *               the checked row focused, arrows move, Enter and Space pick
@@ -105,7 +106,8 @@ function probe([css, js]) {
     };
     return out;
   };
-  window.__shell = {shifts, sample, first: null, navAt: null};
+  window.__shell = {shifts, sample, first: null, navAt: null, vt: null};
+  addEventListener('pagereveal', (e) => { window.__shell.vt = !!e.viewTransition; });
   document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(() => { window.__shell.first = sample(); }));
   const seen = () => {
     if (document.querySelector('#mainmenu .nav-item')) window.__shell.navAt = Math.round(performance.now());
@@ -138,7 +140,7 @@ async function settled(page) {
   await page.waitForFunction(() => window.__shell && window.__shell.first && document.querySelector('#mainmenu .nav-item'), null, {timeout: opt.timeout});
   await page.waitForTimeout(opt.settle);
   await dismiss(page);
-  return page.evaluate(() => ({first: window.__shell.first, last: window.__shell.sample(), shifts: window.__shell.shifts, navAt: window.__shell.navAt,
+  return page.evaluate(() => ({first: window.__shell.first, last: window.__shell.sample(), shifts: window.__shell.shifts, navAt: window.__shell.navAt, vt: window.__shell.vt,
     fcp: Math.round(performance.getEntriesByName('first-contentful-paint')[0]?.startTime ?? -1)}));
 }
 
@@ -173,9 +175,10 @@ async function walk(browser) {
     for (const [k, b] of Object.entries(s.last.boxes)) { const d = delta(s.first.boxes[k], b); if (d !== null) within = Math.max(within, d); }
     s.last.rows.forEach((r, j) => { const d = delta(s.first.rows[j]?.box, r.box); if (d !== null) within = Math.max(within, d); });
     if (within > TOL) fail('shift', `${p}: the shell moved ${within}px between the first frame and settled`);
+    if (i > 0 && s.vt !== true) fail('vt', `${p}: the link from ${pages[i - 1]} ran no view transition`);
     const cls = s.shifts.reduce((a, e) => a + e.value, 0);
     if (s.shifts.length) fail('shift', `${p}: layout shift ${cls.toFixed(4)} from ${[...new Set(s.shifts.flatMap((e) => e.nodes))].join(', ')}`);
-    note(`${p}: within-page shell move ${within}px, shell layout shift ${cls.toFixed(4)}, rows at first frame ${s.first.rows.filter((r) => r.box).length}/${s.last.rows.length}, nav at ${s.navAt} ms, first contentful paint ${s.fcp} ms`);
+    note(`${p}: within-page shell move ${within}px, shell layout shift ${cls.toFixed(4)}, rows at first frame ${s.first.rows.filter((r) => r.box).length}/${s.last.rows.length}, nav at ${s.navAt} ms, first contentful paint ${s.fcp} ms, view transition ${s.vt}`);
   }
   for (let i = 1; i < runs.length; i++) {
     const a = runs[0].last, b = runs[i].last;
