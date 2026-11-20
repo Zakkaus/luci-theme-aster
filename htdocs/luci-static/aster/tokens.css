@@ -217,6 +217,8 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-text-error: light-dark(#9D303D, #F2ACB3);
   --color-text-primary: light-dark(#19202C, #E4E8EF);
   --color-text-secondary: light-dark(#515F74, #AFBACB);
+  --color-text-success: light-dark(#246445, #99D2AF);
+  --color-text-warning: light-dark(#80500E, #EDC588);
   --color-warning: light-dark(#BE852E, #D3A258);
   --color-warning-muted: light-dark(#BE852E33, #D3A2583F);
   --focus-outline-color: light-dark(#315FD3, #87A9FA);
@@ -258,6 +260,8 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-text-error: light-dark(#933B37, #EFAEA9);
   --color-text-primary: light-dark(#172824, #E0EAE6);
   --color-text-secondary: light-dark(#50645F, #A9BDB5);
+  --color-text-success: light-dark(#44622E, #BDDA9E);
+  --color-text-warning: light-dark(#785017, #E7C697);
   --color-warning: light-dark(#BA863E, #CEA468);
   --color-warning-muted: light-dark(#BA863E33, #CEA4683F);
   --focus-outline-color: light-dark(#246B69, #7DC8BC);
@@ -299,6 +303,8 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-text-error: light-dark(#943F30, #EFAE9C);
   --color-text-primary: light-dark(#292329, #ECE5E5);
   --color-text-secondary: light-dark(#695E66, #C3B6BD);
+  --color-text-success: light-dark(#4C6134, #C5D4A0);
+  --color-text-warning: light-dark(#805017, #EBC492);
   --color-warning: light-dark(#BF873D, #CFA163);
   --color-warning-muted: light-dark(#BF873D33, #CFA1633F);
   --focus-outline-color: light-dark(#785378, #C9A2C5);
@@ -340,6 +346,8 @@ html[data-theme="dark"] { color-scheme: dark; }
   --color-text-error: light-dark(#8F4F61, #F19DB5);
   --color-text-primary: light-dark(#575279, #E0DEF4);
   --color-text-secondary: light-dark(#69657F, #938FAC);
+  --color-text-success: light-dark(#3E6B73, #74A1B3);
+  --color-text-warning: light-dark(#8C5E1F, #F6C177);
   --color-warning: light-dark(#EA9D34, #F6C177);
   --color-warning-muted: light-dark(#EA9D3433, #F6C1773F);
   --focus-outline-color: light-dark(#286983, #9CCFD8);

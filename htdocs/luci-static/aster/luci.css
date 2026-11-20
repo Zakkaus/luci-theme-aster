@@ -684,7 +684,7 @@ html body[data-page^="admin-services-openclash"] .oc .icon-btn { --icon-btn-size
    become the theme's text inks; an accent-tinted chip (a version, the
    edited file's name) is inked in the theme's blue text, not the accent. */
 html body[data-page^="admin-services-openclash"] .oc {
-  --teal: var(--color-text-blue);
+  --teal: var(--color-on-info-muted);
   --azure: var(--color-text-accent);
   --magenta: var(--color-text-secondary);
   --orange: var(--color-text-warning);
@@ -698,9 +698,9 @@ html body[data-page^="admin-services-openclash"] .oc {
   --orange-a15: color-mix(in srgb, var(--orange) 12%, transparent);
   --amber-a15: color-mix(in srgb, var(--amber) 12%, transparent);
   --red-a15: color-mix(in srgb, var(--red) 12%, transparent);
-  --magenta-bright-a15: color-mix(in srgb, var(--warning-color) 12%, transparent);
+  --magenta-bright-a15: color-mix(in srgb, var(--color-text-warning) 12%, transparent);
 }
-html body[data-page^="admin-services-openclash"] .oc :is(.addr-row .ver-link, .config-editor-title .config-file-name) { --primary-color: var(--color-text-blue); }
+html body[data-page^="admin-services-openclash"] .oc :is(.addr-row .ver-link, .config-editor-title .config-file-name) { --primary-color: var(--color-on-info-muted); }
 /* OpenClash's good/bad notes outside .oc (a map's description) keep its
    literal fallbacks; they take the status inks. */
 html body[data-page^="admin-services-openclash"] .oc-txt-good { color: var(--color-text-success); }
