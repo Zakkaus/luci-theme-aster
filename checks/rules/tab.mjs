@@ -111,13 +111,18 @@ export async function collect(cfg) {
         // With its words whole (G5), whatever the theme's stylesheet says:
         // CJK breaks only where words do, a rule's name not at a hyphen.
         const cells = [...t.querySelectorAll('.td, .th, td, th')].filter((c) => c.closest('.table, table') === t);
+        // A list (", ": a station's addresses and rates) breaks after its
+        // commas, whatever nowrap the theme puts on it (C7, f).
+        const lists = cells.flatMap((c) => [c, ...c.querySelectorAll('*')]).filter((e) => !e.closest('.cbi-section-actions') && [...e.childNodes].some((n) => n.nodeType === 3 && n.data.includes(', ')));
         const set = (on) => cells.forEach((c) => {
           on ? c.style.setProperty('word-break', 'keep-all', 'important') : c.style.removeProperty('word-break');
           c.matches('.cbi-section-table .td:is(.cbi-section-table-titles, [data-name="name"])') && (on ? c.style.setProperty('white-space', 'nowrap', 'important') : c.style.removeProperty('white-space'));
         });
         set(true);
+        lists.forEach((e) => e.style.setProperty('white-space', 'normal', 'important'));
         const need = t.scrollWidth, room = p.clientWidth - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight) - parseFloat(ts.marginLeft) - parseFloat(ts.marginRight);
         set(false);
+        lists.forEach((e) => e.style.removeProperty('white-space'));
         t.style.width = w;
         t.dataset.fold = fold;
         if (fold === 'fold' && need <= room - 16.5) state = `folded, fits (${Math.round(need)} in ${Math.round(room)})`;
