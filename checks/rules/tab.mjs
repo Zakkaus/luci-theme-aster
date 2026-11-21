@@ -12,13 +12,13 @@
 export const canonical = {
   'c6.table': {
     _source: 'COMPONENTS.md C6 (owner Q1 = A): the actions cell pads 8 (a row with sm buttons 49); its last button ends 16 from the card border; LuCI .right columns end-aligned',
-    actionsPad: [8, 8], actionsEnd: 16, rowActions: 49, numAlign: 'end', run: 'ok',
+    actionsPad: [8, 8], actionsEnd: 16, rowActions: 49, numAlign: 'end', run: 'ok', headLine: 0, read: 'whole',
   },
   'c7.when': {_source: 'COMPONENTS.md C7: a table is folded iff its min-content is wider than its room (unfolds with 16 to spare); every data table is measured', state: 'ok'},
   'c7.sig': {
     _source: 'COMPONENTS.md C7: one folded signature: subgrid, gap 16 / 8, blocks 12 / 12, flush at the ends, label 15/500 secondary, value 15/400 primary, title 15/500 primary, Divider 1 on the content box',
     grid: 'subgrid', columnGap: 16, rowGap: 8, blockPad: [12, 12], firstPad: 0, lastPad: 0,
-    label: '15/500 secondary', value: '15/400 primary', title: '15/500 primary', divider: '1 border', divStart: 0, divEnd: 0,
+    label: '15/500 secondary', value: '15/400 primary', title: '15/500 primary', divider: '1 border', divStart: 0, divEnd: 0, titleMargin: 0,
   },
   'c7.x': {_source: 'COMPONENTS.md C7: per folded table one label x (= title x) and one value x (counts are strings: a count read as px would pass 2 within the 1px tolerance)', labelXs: 'one', valueXs: 'one', labelToTitle: 0},
   'c7.title': {_source: 'COMPONENTS.md C7: the title is the column that names the row: the first that is not the row\'s interface, network, device or (start) priority, nor one LuCI hides on phones (hide-xs); the same table folds by the same column on every page', column: 'names the row'},
@@ -138,6 +138,14 @@ export async function collect(cfg) {
     const rows = rowsOf(t);
     const card = cardOf(t);
 
+    // A read-only text in a cell (a repository key) shows all its lines,
+    // wide or folded: nothing scrolls inside it.
+    for (const x of t.querySelectorAll('.td textarea[readonly]')) {
+      if (!shown(x)) continue;
+      const cut = Math.max(x.scrollWidth - x.clientWidth, x.scrollHeight - x.clientHeight);
+      add('c6.table', 'read', cut > 1 ? `cut ${Math.round(cut)}` : 'whole', x);
+    }
+
     // C20: the table's message row.
     for (const c of t.querySelectorAll('.tr.placeholder > .td')) {
       if (!shown(c) || c.closest('.table, table') !== t) continue;
@@ -169,6 +177,16 @@ export async function collect(cfg) {
     }
 
     if (fold === 'wide') {
+      // The header's line runs as far as the rows' (to the card border),
+      // also over an actions column with no header cell of its own.
+      const head = [...t.querySelectorAll('.tr')].find((r) => r.closest('.table, table') === t && r.querySelector(':scope > :is(.th, th)') && shown(r));
+      const rowEnd = rows.length ? Math.max(...cellsOf(rows[0]).filter(shown).map((c) => box(c).right)) : 0;
+      if (head && rowEnd) {
+        const ruled = [...head.children].filter((c) => shown(c) && parseFloat(cs(c).borderBottomWidth) > 0);
+        const after = getComputedStyle(head, '::after');
+        const end = after.content !== 'none' && parseFloat(after.borderBottomWidth) > 0 ? box(head).right : Math.max(...ruled.map((c) => box(c).right));
+        if (ruled.length) add('c6.table', 'headLine', px(Math.max(0, rowEnd - end)), head);
+      }
       for (const r of rows) {
         const cells = cellsOf(r);
         if (!cells.length) continue;
@@ -233,6 +251,11 @@ export async function collect(cfg) {
       const tf = tc && firstText(tc);
       if (tc && tf) {
         add('c7.sig', 'title', font(cs(tc)), tc);
+        // The block's padding is its only space: no box in the title
+        // (WireGuard's <p>, 1em) adds margins above or below its line.
+        // (A Badge's 2 in a sentence is its own; plain inline boxes have none.)
+        const mb = [...tc.querySelectorAll('*')].filter((e) => shown(e) && cs(e).display !== 'inline').reduce((m, e) => Math.max(m, Math.abs(parseFloat(cs(e).marginTop)), Math.abs(parseFloat(cs(e).marginBottom))), 0);
+        add('c7.sig', 'titleMargin', mb > 2 ? px(mb) : 0, tc);
         titleX ??= tf.left;
         add('g.marker.table', 'offset', px(Math.max(0, tf.left - contentL)), tc);
       }

@@ -32,6 +32,7 @@
     "table.kv.row.*": {"height": null},
     "table.kv.row.wrap": {"_source": "realtime legends: a row of label/value pairs is a grid that wraps the pairs by its own room (G9: no query), at every width", "display": "grid"},
     "table.kv.wrap.td": {"_source": "realtime legends: a pair on the card content edge", "paddingBlock": 4, "paddingInlineStart": 0, "fontSize": 15},
+    "table.td.top": {"_source": "COMPONENTS.md C6: a row with sm Buttons is 8 + 32 + 8; a text cell aligned to its top (Interfaces: a box and a status list) starts its first line on the buttons' centre, 12, and ends 12 under its last", "paddingBlock": 12, "paddingInlineStart": 16, "fontSize": 15},
     "table.td.actions": {"_source": "COMPONENTS.md C6: the actions cell pads 8 above and below (G7), 16 start", "paddingBlock": 8, "paddingInlineStart": 16, "fontSize": 15},
     "table.kv.td": {"_source": "M2 overview System card", "paddingBlock": 4, "paddingInlineStart": 16, "fontSize": 15},
     "table.kv.td.key": {"_source": "M2 overview System card: the key column flush with the card (MetadataList)", "paddingBlock": 4, "paddingInlineStart": 0, "fontSize": 15},

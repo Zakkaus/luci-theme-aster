@@ -271,6 +271,21 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
 /* A field in a table cell fills the cell. */
 .td > :is(input, select, .cbi-dropdown:not(.btn, .cbi-button)) { --field-w: 100%; }
 .td textarea { max-block-size: 8.5rem; }
+/* A read-only text in a table (a repository key) is read whole, as tall
+   as its lines: wide, as wide as its longest line, so a card that cannot
+   hold it folds the table (C7); folded, the value column wide, its lines
+   wrapping. */
+.cbi-section-table .td textarea[readonly] {
+  field-sizing: content;
+  max-block-size: none;
+  [data-fold="wide"] & { inline-size: auto; min-inline-size: 100%; }
+  [data-fold="fold"] & { inline-size: 100%; white-space: pre-wrap; overflow-wrap: anywhere; }
+}
+/* Its baseline is its last line: folded, its label sits on its first. */
+.cbi-section-table[data-fold="fold"] .td:has(textarea[readonly]) {
+  align-items: start;
+  &::before { margin-block-start: calc(var(--spacing-1) + var(--border-width) + (var(--text-supporting-size) - var(--text-body-size)) * var(--text-body-leading) / 2); }
+}
 /* The SSH keys list holds whole keys: full width. */
 [data-page="admin-system-admin-sshkeys"] .cbi-dynlist { --field-w: 100%; }
 /* System and Kernel Log's filter rows (layout): a wrapping toolbar, each label on its
@@ -467,6 +482,10 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
   &:first-child { inline-size: 1%; white-space: nowrap; }
   &:nth-child(2) { inline-size: 100%; }
 }
+/* Wide, every cell's first line sits on the buttons' centre and the row
+   ends as far below its last line: 12 above and below the text, 8 around
+   the buttons (C6: 8 + 32 + 8). */
+[data-fold="wide"] .tr:has(> .td > .ifacebox) > .td:not(.cbi-section-actions) { padding-block: var(--spacing-3); }
 
 /* ── Tabs written by luci-base [ported] ─────────────────────── */
 
@@ -491,7 +510,7 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   --card-radius: 0;
   --card-bg: transparent;
   gap: var(--spacing-1);
-  margin-block: var(--spacing-2);
+  margin-block: 0;
   & > .ifacebox-head {
     display: flex;
     align-items: center;

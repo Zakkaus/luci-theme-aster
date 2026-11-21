@@ -904,7 +904,17 @@ html :where(:is(th, td, .th, .td):last-child) { padding-inline-end: var(--spacin
 /* No rule under the last row: the card's edge closes the table (Astryx
    TableCell drops the last body row's divider). */
 html :where(:is(tr, .tr):last-child > :is(td, .td)) { border-block-end: 0; }
+/* A header row with no actions header over its rows' actions (System,
+   Repository keys) still draws its line from card border to card border. */
+html :where(.cbi-section-table:has(.tr > .td.cbi-section-actions) .tr.cbi-section-table-titles:not(:has(> .cbi-section-actions)))::after {
+  content: "";
+  display: table-cell;
+  border-block-end: var(--border-width) solid var(--color-border);
+}
 html :where(td, .td) { line-height: var(--text-body-leading); font-variant-numeric: tabular-nums; }
+/* A cell's paragraph (a WireGuard peer's name) is a line of the cell: no
+   1em margins above and below it (C7 blocks 12 / 12). */
+html :where(:is(td, .td) p) { margin-block: 0; }
 /* luci-mod-status's nftables view sets its cells to .25em with !important
    in a <style> it adds after the theme; only !important, one id heavier,
    gives the cell padding back. */
@@ -958,7 +968,7 @@ html :where(:is(.td, .th, td, th).right) { text-align: end; }
    and a name (Allow-DHCP-Renew) not at its hyphens. Where whole words do
    not fit, the table folds. */
 html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="wide"] :is(.td, .th, td, th)) { word-break: keep-all; }
-html :where(:is(#view, form > .cbi-map) .cbi-section-table[data-fold="wide"] .td:is(.cbi-section-table-titles, [data-name="name"])) { white-space: nowrap; }
+html :where(:is(#view, form > .cbi-map) .cbi-section-table[data-fold="wide"] .td:is(.cbi-section-table-titles, [data-name="name"], [data-name="filename"])) { white-space: nowrap; }
 /* In a data table a device, network or nftables chip is plain text (a
    Badge is for zones and states only): no fill, no pill, the cell's own
    type; its icon follows its words (text first, marker after). */

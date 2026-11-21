@@ -52,6 +52,23 @@ expect uniform 1 "c6.table run" "zone forwards stacked (c)" -- "$url" "$password
 # name (g); the 15/400 number is no title, and the actions centre on it.
 expect uniform 1 "c7.title column,c7.sig title,c7.actions centre" "folded by the start priority (g)" -- "$url" "$password" --pages "$tmp/tab-title.txt" --viewports phone \
 	--debug-css 'admin/system/startup=#view [data-fold="fold"] .tr > .td[data-head] { display: grid !important; grid-row: auto !important; grid-column: 1 / -1 !important } #view [data-fold="fold"] .tr > .td:first-child { display: block !important; grid-row: 1 !important; grid-column: 1 / -2 !important }'
+# WireGuard peers (e): a title's box with 1em margins, the first block 35
+# above its title and 14 below (Interfaces' box here: a core page).
+printf '%s\n' 'admin/network/network require=c7.sig' >"$tmp/tab-net.txt"
+expect uniform 1 "c7.actions centre,c7.sig titleMargin" "title box with margins (e)" -- "$url" "$password" --pages "$tmp/tab-net.txt" --viewports phone \
+	--debug-css 'admin/network/network=html #view [data-fold="fold"] .td > .ifacebox { margin-block: 15px !important }'
+# Interfaces wide (b): the row's text 4 under its line beside buttons 8
+# under it, so the row is 4 above its first line and 12 under its last.
+printf '%s\n' 'admin/network/network' >"$tmp/tab-net-wide.txt"
+expect uniform 1 "table.td.top paddingBlock" "interface row text off the buttons' centre (b)" -- "$url" "$password" --pages "$tmp/tab-net-wide.txt" --viewports desktop \
+	--debug-css 'admin/network/network=html #view .tr:has(> .td > .ifacebox) > .td:not(.cbi-section-actions) { padding-block: 4px !important }'
+# Repository keys (d): the header's line stops over the actions column;
+# the key scrolls inside its box (wide, and folded on a phone).
+printf '%s\n' 'admin/system/admin/repokeys require=c6.table' >"$tmp/tab-keys.txt"
+expect uniform 1 "c6.table headLine" "header line short of the card border (d)" -- "$url" "$password" --pages "$tmp/tab-keys.txt" --viewports desktop \
+	--debug-css 'admin/system/admin/repokeys=html #view .cbi-section-table-titles::after { content: none !important }'
+expect uniform 1 "c6.table read" "key cut in its box (d)" -- "$url" "$password" --pages "$tmp/tab-keys.txt" \
+	--debug-css 'admin/system/admin/repokeys=html #view .td textarea[readonly] { field-sizing: fixed !important; inline-size: 8rem !important; block-size: 3rem !important }'
 # G9: a media query laying out table rows.
 expect uniform 1 "g.mq blocks" "table layout by a media query" -- "$url" "$password" --pages "$tmp/tab-proc.txt" \
 	--debug-css 'admin/status/processes=@media (min-width: 1px) { #view .table .tr { color: inherit } }'
