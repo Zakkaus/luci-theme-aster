@@ -110,18 +110,12 @@ const FIELDS = [
   {name: 'icon size', from: ['components', 'Icon sm', 'width'], sel: '.shell-header .icon-btn:not([hidden]) svg', prop: 'width', visible: true},
   // Port tiles (Port status): the first tile with a link.
   {name: 'port grid gap', from: ['frame', 'Grid: port tiles', 'gap'], sel: '#view div[style*="grid-template-columns"]:has(> .ifacebox)', prop: 'gap'},
-  {name: 'port tile radius', from: ['components', 'Port tile (Card)', 'radius'], sel: PORT_UP, prop: 'radius'},
-  {name: 'port tile padding', from: ['components', 'Port tile (Card)', 'padding'], sel: PORT_UP, prop: 'padding'},
-  {name: 'port tile border', from: ['components', 'Port tile (Card)', 'border'], sel: PORT_UP, prop: 'border', exact: true},
-  {name: 'port tile background', from: ['components', 'Port tile (Card)', 'background'], sel: PORT_UP, prop: 'background', exact: true},
-  // A tile is a metric tile (owner's port sheet, 2026-11-21): the name a
-  // Heading 4 (the body size), the link state supporting text after a
-  // StatusDot (success with a link), the traffic the value in body size;
-  // the port icon neutral, as the state is the dot and its words.
+  // A tile is COMPONENTS.md C25 (it wins over the reference's Card tile):
+  // no border, fill or device icon; the name in body size with its
+  // StatusDot trailing it (success with a link), the link state in
+  // supporting text, the traffic the value in body size.
   {name: 'port name size', from: ['components', 'Port tile: speed text', 'fontSize'], sel: `${PORT_UP} > .ifacebox-head:first-child`, prop: 'fontSize'},
-  {name: 'port icon size', from: ['components', 'Port tile: port icon', 'width'], sel: `${PORT_UP} > .ifacebox-head:first-child`, pseudo: '::before', prop: 'width'},
-  {name: 'port icon colour', from: ['components', 'Port tile: port icon', 'color'], want: {light: 'rgb(78, 96, 111)', dark: 'rgb(170, 175, 181)'}, sel: `${PORT_UP} > .ifacebox-head:first-child`, pseudo: '::before', prop: 'background', exact: true},
-  {name: 'port state dot', from: ['components', 'Port tile: port icon', 'color'], want: {light: 'rgb(9, 68, 31)', dark: 'rgb(165, 246, 144)'}, sel: `${PORT_UP} > .ifacebox-body:nth-child(2)`, pseudo: '::before', prop: 'background', exact: true},
+  {name: 'port state dot', from: ['components', 'Port tile: port icon', 'color'], want: {light: 'rgb(9, 68, 31)', dark: 'rgb(165, 246, 144)'}, sel: `${PORT_UP} > .ifacebox-head:first-child`, pseudo: '::after', prop: 'background', exact: true},
   {name: 'port speed size', from: ['components', 'Port tile: TX/RX text', 'fontSize'], sel: `${PORT_UP} > .ifacebox-body:nth-child(2)`, prop: 'fontSize'},
   {name: 'port traffic size', from: ['components', 'Port tile: speed text', 'fontSize'], sel: `${PORT_UP} > .ifacebox-body > .cbi-tooltip-container`, prop: 'fontSize'},
   // Main colours.
