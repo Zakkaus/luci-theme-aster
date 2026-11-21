@@ -731,6 +731,15 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
     border-start-end-radius: 0;
   }
 }
+/* A peer that never shook hands needs the user (C13: a warning Badge).
+   Folded, the value has its box (.aster-v); wide, the cell holds bare
+   text, which no stylesheet can draw as a Badge. */
+#view .table[id^="peers-"] .td[data-value="0"]:last-child > .aster-v {
+  --badge-bg: var(--color-warning-muted);
+  --badge-fg: var(--color-on-warning-muted);
+  justify-self: start;
+  align-self: center;
+}
 .ifacebox-body > div > .ifacebadge { display: flex; }
 .ifacebox-body > div > .ifacebadge + .ifacebadge { margin-block-start: var(--spacing-2); }
 .network-status-table { display: flex; flex-wrap: wrap; gap: var(--spacing-3); }

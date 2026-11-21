@@ -1319,7 +1319,7 @@ html :where(#modal_overlay > .alert-message.spinning)::after {
 /* ── Badge ───────────────────────────────────────────────────────
    20 high, pill, 8 inline, supporting size at medium weight. */
 
-html :where(.label:not(.cbi-section .label[data-style]), .badge, .zonebadge, .ifacebadge, .tab[data-errors]::after, .cbi-tabmenu > li[data-errors]::after) {
+html :where(.label:not(.cbi-section .label[data-style]), .badge, .zonebadge, .ifacebadge, .tab[data-errors]::after, .cbi-tabmenu > li[data-errors]::after, [id^="peers-"] .td[data-value="0"]:last-child > .aster-v) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
