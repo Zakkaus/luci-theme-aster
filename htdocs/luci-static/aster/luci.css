@@ -677,6 +677,19 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
 [style*="238, 238, 238"] { --zone-bg: var(--color-neutral); }
 .zonebadge[style*="--zone-color-rgb"]:not(.cbi-tooltip *) { --badge-bg: var(--zone-bg); --badge-fg: var(--zone-fg); }
 .zonebadge[style*="--zone-color-rgb"] { background-color: var(--badge-bg) !important; /* inline zone fill */ }
+/* A verdict ("REJECT", "REJECT all others": .zonebadge-empty) and a place
+   that is no zone ("this device", "any zone", "unspecified": an em alone)
+   are text in LuCI's zone chip (C13: verdicts are text, Badges are zones). */
+html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
+  min-inline-size: 0;
+  min-block-size: 0;
+  margin-inline: 0 !important; /* a chip's 4 in a cell (the zone forwards' 8 kept) */
+  padding: 0;
+  background: none !important; /* inline zone fill */
+  color: inherit;
+  font: inherit;
+  & > strong { font-weight: inherit; }
+}
 /* A device that is down: LuCI fades its name to half opacity inline
    (2.2:1 on the badge), WireGuard its instance line's port and key to 80 %
    (4.2:1, the key 3.9:1 on its fill); the secondary text colour says the

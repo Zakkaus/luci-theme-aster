@@ -24,7 +24,7 @@ export const canonical = {
   'g.break': {_source: 'COMPONENTS.md G5: an identifier or value token never breaks across lines (or is truncated with a title)', broken: 0},
   'g.colon': {_source: 'COMPONENTS.md G10: labels carry no trailing colon', trailing: 'none'},
   'g.marker': {_source: 'COMPONENTS.md G4 / 0.1: a box title (name) starts at its list labels\' x; markers trail the text', offset: 0},
-  'c13.badge': {_source: 'COMPONENTS.md C13: filled pills only for zones, action-needed status, Tokens, buttons; .ifacebadge is text (no fill, no border)', stray: 0, ifacebadge: 'plain'},
+  'c13.badge': {_source: 'COMPONENTS.md C13: filled pills only for zones (a verdict, "this device" or "any zone" is text), action-needed status, Tokens, buttons; .ifacebadge is text (no fill, no border)', stray: 0, ifacebadge: 'plain'},
   'c14.token': {_source: 'COMPONENTS.md C14: Astryx Token md, dynamic lists only', height: 28, radius: 8, stray: 0},
   'c7.keys': {_source: 'COMPONENTS.md section 3 system/admin/sshkeys: C7 title-line-only blocks (name the title, type + key its subline, the key cut with an ellipsis before the remove mark), not Tokens', lines: 'name/sub', key: 'cut', fill: 'none', width: 'full'},
   'c15.dot': {_source: 'COMPONENTS.md C15: StatusDot 8 px; up = success, down = neutral, on every page', size: '8x8', ink: 'ok'},
@@ -272,7 +272,7 @@ export function collect(cfg) {
     if (clear(s.backgroundColor) || !shown(e)) continue;
     const r = e.getBoundingClientRect();
     const rad = parseFloat(s.borderTopLeftRadius) || 0;
-    if (r.height >= 12 && r.height <= 24 && r.width > r.height && rad >= r.height / 2 - 0.5 && !e.matches('.zonebadge, .label:is(.warning, .error, .important), .cbi-dynlist > .item, .cbi-progressbar, .cbi-progressbar *')) { stray++; note('pill', `${px(r.height)} ${e.className}`.trim(), e); }
+    if (r.height >= 12 && r.height <= 24 && r.width > r.height && rad >= r.height / 2 - 0.5 && !e.matches('.zonebadge:not(.zonebadge-empty, :has(> em:only-child)), .label:is(.warning, .error, .important), .cbi-dynlist > .item, .cbi-progressbar, .cbi-progressbar *')) { stray++; note('pill', `${px(r.height)} ${e.className}`.trim(), e); }
     if (s.backgroundColor === fills.muted && Math.abs(r.height - 28) <= 1 && Math.abs(rad - 8) <= 0.5 && !e.closest('.cbi-dynlist, .cbi-dropdown')) { tokens++; note('token', e.className || e.tagName, e); }
   }
   add('c13.badge', 'stray', stray, named('pill', scope));
