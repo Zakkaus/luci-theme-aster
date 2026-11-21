@@ -310,13 +310,25 @@ function collect(cfg) {
       // (an actions cell with no button, LuCI's "-") or a height kept from
       // the wide layout leaves a blank band over the row's rule. A cell's
       // content is its elements' boxes and its text's line boxes (the
-      // glyph box plus the half-leading). Not the cells' own boxes: a grid
-      // stretches them to a taller row.
+      // glyph box plus the half-leading), an inline box's margin (it is in
+      // its line: a badge's margin) and a cell's ::before key line (a key
+      // whose value is empty, Routes' Protocol). Not the cells' own boxes: a
+      // grid stretches them to a taller row.
       const rs = getComputedStyle(row);
       const end = box(row).bottom - parseFloat(rs.paddingBottom) - parseFloat(rs.borderBottomWidth);
       let last = box(row).top + parseFloat(rs.paddingTop) + parseFloat(rs.borderTopWidth);
       for (const c of cells) {
-        for (const e of c.querySelectorAll('*')) if (visible(e) && box(e).height > 0) last = Math.max(last, box(e).bottom);
+        const kb = getComputedStyle(c, '::before');
+        if (visible(c) && kb.display !== 'none' && !/^(none|normal|""|'')$/.test(kb.content)) {
+          const cs = getComputedStyle(c);
+          const lh = parseFloat(kb.lineHeight) || parseFloat(kb.fontSize) * 1.2;
+          last = Math.max(last, box(c).top + parseFloat(cs.borderTopWidth) + parseFloat(cs.paddingTop) + lh);
+        }
+        for (const e of c.querySelectorAll('*')) {
+          if (!visible(e) || !(box(e).height > 0)) continue;
+          const es = getComputedStyle(e);
+          last = Math.max(last, box(e).bottom + (es.display.startsWith('inline') ? Math.max(0, parseFloat(es.marginBottom)) : 0));
+        }
         const tw = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
         for (let n = tw.nextNode(); n; n = tw.nextNode()) {
           if (!n.data.trim()) continue;
