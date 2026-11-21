@@ -11,8 +11,8 @@
 
 export const canonical = {
   'c6.table': {
-    _source: 'COMPONENTS.md C6 (owner Q1 = A), G7: the actions cell pads 8 (a row with sm buttons 49); its last button ends 16 from the card border; a field keeps 8 from the row lines; LuCI .right columns and columns of sizes, rates or shares end-aligned',
-    actionsPad: [8, 8], actionsEnd: 16, rowActions: 49, numAlign: 'end', run: 'ok', headLine: 0, read: 'whole', fieldGap: 'ok',
+    _source: 'COMPONENTS.md C6 (owner Q1 = A), G7: the actions cell pads 8 (a row with sm buttons 49); its last button ends 16 from the card border; a field keeps 8 from the row lines; LuCI .right columns and columns of sizes, rates or shares end-aligned; LuCI inline column widths (nftables 60 %) take no effect',
+    actionsPad: [8, 8], actionsEnd: 16, rowActions: 49, numAlign: 'end', run: 'ok', headLine: 0, read: 'whole', fieldGap: 'ok', inlineWidth: 0,
   },
   'card.table': {_source: 'COMPONENTS.md C2/C6: a wide table that is the Card (WireGuard peers, 24.10 Processes) pads 15 + border above and below; its cells own the inline 16, so rows run border to border', padding: [15, 0, 15, 0]},
   'table.td.field': {_source: 'COMPONENTS.md G7, C6: a cell holding a field (a zone\'s policy select) pads 8, so the field keeps 8 from the row lines (row 53)', paddingBlock: 8, paddingInlineStart: 16, fontSize: 15},
@@ -100,9 +100,24 @@ export async function collect(cfg) {
   }
   add('g.mq', 'blocks', mq ? `${mq} blocks` : 'none', mqAt);
 
+  // C7 title: read from the header as COMPONENTS.md words it: the first
+  // column that is not the row's interface, network, device or (start)
+  // priority, nor hidden on phones, nor a checkbox or a signal (Mounts'
+  // Enabled, a Wireless SSID's signal); with no header row, each row's
+  // first cell that is not a checkbox or a signal.
+  const skip = ['Interface', 'Network', 'Device', 'Priority', 'Start priority'].map((x) => (typeof _ === 'function' ? _(x) : x));
+  const mark = (c) => c?.querySelector('[type=checkbox], [data-signal]');
+  const headOf = (t) => {
+    const ths = [...(t.querySelector('.tr:has(> .th)')?.children || [])];
+    const r0 = [...t.querySelectorAll('.tr:not(:has(> .th))')].find((r) => r.closest('.table, table') === t);
+    const i = ths.findIndex((c, k) => !c.matches('.hide-xs') && !mark(r0?.children[k]) && !skip.includes(c.textContent.trim()));
+    return (r) => (ths.length ? Math.max(0, i) : Math.max(0, [...r.children].findIndex((c) => !mark(c))));
+  };
+
   for (const t of scope.querySelectorAll(TABLES)) {
     if (!shown(t) || t.closest('.cbi-tooltip')) continue;
     const fold = t.dataset.fold;
+    const head = headOf(t);
     // C7 when: re-measure as theme-aster.js does.
     {
       const p = t.parentNode, ps = cs(p), ts = cs(t);
@@ -116,8 +131,12 @@ export async function collect(cfg) {
         // CJK breaks only where words do, a rule's name not at a hyphen.
         const cells = [...t.querySelectorAll('.td, .th, td, th')].filter((c) => c.closest('.table, table') === t);
         // A list (", ": a station's addresses and rates) breaks after its
-        // commas, whatever nowrap the theme puts on it (C7, f).
-        const lists = cells.flatMap((c) => [c, ...c.querySelectorAll('*')]).filter((e) => !e.closest('.cbi-section-actions') && [...e.childNodes].some((n) => n.nodeType === 3 && n.data.includes(', ')));
+        // commas, whatever nowrap the theme puts on it (C7, f); an nftables
+        // set is one clipped line (its items in its tooltip). The title
+        // (a lease's host) wraps at its spaces (C7): the same leases fit on
+        // Overview as on DHCP's page (audit 2, C7 A).
+        const titles = rowsOf(t).map((r) => r.children[head(r)]).filter((c) => c && !c.matches('.cbi-section-table .td:is(.cbi-section-table-titles, [data-name="name"])'));
+        const lists = [...titles, ...cells.flatMap((c) => [c, ...c.querySelectorAll('*')]).filter((e) => !e.closest('.cbi-section-actions, .nft-set, .nft-list') && [...e.childNodes].some((n) => n.nodeType === 3 && n.data.includes(', ')))];
         const set = (on) => cells.forEach((c) => {
           on ? c.style.setProperty('word-break', 'keep-all', 'important') : c.style.removeProperty('word-break');
           c.matches('.cbi-section-table .td:is(.cbi-section-table-titles, [data-name="name"])') && (on ? c.style.setProperty('white-space', 'nowrap', 'important') : c.style.removeProperty('white-space'));
@@ -211,6 +230,17 @@ export async function collect(cfg) {
       // also over an actions column with no header cell of its own.
       const head = [...t.querySelectorAll('.tr')].find((r) => r.closest('.table, table') === t && r.querySelector(':scope > :is(.th, th)') && shown(r));
       const rowEnd = rows.length ? Math.max(...cellsOf(rows[0]).filter(shown).map((c) => box(c).right)) : 0;
+      // C6: LuCI's inline column widths (nftables' 60 % / 40 %) change
+      // nothing: the columns are as wide with every such cell at auto.
+      const fixed = [...t.querySelectorAll(':is(.td, .th, td, th)[style*="width"]:not(.cbi-section-actions)')].filter((c) => c.closest('.table, table') === t && shown(c));
+      if (fixed.length) {
+        const ws = () => fixed.map((c) => box(c).width);
+        const before = ws(), styles = fixed.map((c) => c.getAttribute('style'));
+        fixed.forEach((c) => c.style.setProperty('width', 'auto', 'important'));
+        const moved = Math.max(...ws().map((w, i) => Math.abs(w - before[i])));
+        fixed.forEach((c, i) => c.setAttribute('style', styles[i]));
+        add('c6.table', 'inlineWidth', moved > 1 ? px(moved) : 0, fixed[0]);
+      }
       if (head && rowEnd) {
         const ruled = [...head.children].filter((c) => shown(c) && parseFloat(cs(c).borderBottomWidth) > 0);
         const after = getComputedStyle(head, '::after');
@@ -273,10 +303,6 @@ export async function collect(cfg) {
     const titleOf = (r) => cellsOf(r).find((c) => cs(c).gridRowStart === '1' && !c.matches('.cbi-section-actions') && !(cs(c).gridColumnStart === '-2'));
     const actsOf = (r) => cellsOf(r).find((c) => c.matches('.cbi-section-actions') || cs(c).gridColumnStart === '-2');
     const labelled = (r) => cellsOf(r).filter((c) => c !== titleOf(r) && c !== actsOf(r) && !/^(none|normal)$/.test(cs(c, '::before').content));
-    // C7 title: read from the header as COMPONENTS.md words it.
-    const ths = [...(t.querySelector('.tr:has(> .th)')?.children || [])];
-    const skip = ['Interface', 'Network', 'Device', 'Priority', 'Start priority'].map((x) => (typeof _ === 'function' ? _(x) : x));
-    const head = Math.max(0, ths.findIndex((c) => !c.matches('.hide-xs') && !skip.includes(c.textContent.trim())));
     const contentL = box(t).left + parseFloat(ts.paddingLeft), contentR = box(t).right - parseFloat(ts.paddingRight);
     const lxs = new Set(), vxs = new Set();
     let titleX = null, labelW = 0, longest = 0;
@@ -297,7 +323,7 @@ export async function collect(cfg) {
         add('c7.sig', 'divEnd', px(contentR - box(r).right), r);
       }
       const tc = titleOf(r);
-      add('c7.title', 'column', tc && tc === r.children[head] ? 'names the row' : `column ${[...r.children].indexOf(tc) + 1}, not ${head + 1}`, tc || r);
+      add('c7.title', 'column', tc && tc === r.children[head(r)] ? 'names the row' : `column ${[...r.children].indexOf(tc) + 1}, not ${head(r) + 1}`, tc || r);
       const tf = tc && firstText(tc);
       if (tc && tf) {
         add('c7.sig', 'title', font(cs(tc)), tc);

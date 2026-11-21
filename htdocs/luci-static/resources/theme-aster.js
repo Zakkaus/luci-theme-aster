@@ -55,13 +55,14 @@ return baseclass.extend({
 			if (t.dataset.fold == 'wide')
 				return t.querySelectorAll('.tr > * > div.aster-v').forEach((v) => v.replaceWith(...v.childNodes));
 
-			/* Title: the row's name (C7). */
+			/* Title: the row's name, not a checkbox or signal (C7). */
 			const hs = [...(t.querySelector('.tr:has(> .th)')?.children || [])], h = hs.map((c) => c.textContent.trim()),
-				ti = h.findIndex((x, i) => !hs[i].matches('.hide-xs') && ![_('Interface'), _('Network'), _('Device'), _('Priority'), _('Start priority')].includes(x));
-			t.querySelectorAll('.tr:not(:has(> .th))').forEach((r) => [...r.children].forEach((c, i) => {
+				rs = t.querySelectorAll('.tr:not(:has(> .th))'), mark = (c) => c?.querySelector('[type=checkbox],[data-signal]'),
+				ti = h.findIndex((x, i) => !hs[i].matches('.hide-xs') && !mark(rs[0]?.children[i]) && ![_('Interface'), _('Network'), _('Device'), _('Priority'), _('Start priority')].includes(x));
+			rs.forEach((r) => [...r.children].forEach((c, i, a) => {
 				const n = [...c.childNodes].filter((x) => x.nodeType == 1 || x.data.trim());
 
-				c.toggleAttribute('data-head', i == ti);
+				c.toggleAttribute('data-head', i == (hs[0] ? ti : a.findIndex((x) => !mark(x))));
 				c.hasAttribute('data-title') || !h[i] || c.setAttribute('data-title', h[i]);
 				c.toggleAttribute('data-empty', /^-?$/.test(c.textContent.trim()) && !c.querySelector('input, select, button, img'));
 				(n[1] || n[0]?.nodeType == 3) && !c.matches('.cbi-section-actions') && c.replaceChildren(E('div', { class: 'aster-v' }, n));

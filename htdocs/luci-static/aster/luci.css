@@ -620,8 +620,10 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
    than its card. A station's addresses and its two rates are lists, not
    ids: the addresses break after a comma. A rate ("HE-MCS 5, HE-NSS 1")
    stays one line while wide, as CSS cannot keep it from breaking at its
-   hyphens (G5); folded, it wraps after its commas (C7). */
-#view :is(.leases, .lases, .leases6, .assoclist)[data-fold="wide"] .td { white-space: nowrap; }
+   hyphens (G5); folded, it wraps after its commas (C7). A lease's host
+   name wraps at its spaces (Overview, below), as on DHCP's page: the same
+   leases fit there, so they fit here (C7). */
+#view .assoclist[data-fold="wide"] .td { white-space: nowrap; }
 #view .assoclist[data-fold="wide"] .td .hide-xs { white-space: normal; }
 #view .assoclist .td :is(.hide-xs, .ifacebadge small) { display: block; }
 /* An interface row: cells to the top, the box column as narrow as the box,
