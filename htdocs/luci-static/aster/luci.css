@@ -831,8 +831,13 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
       }
     }
   }
+  /* --aster-kv-w is the narrowest the label column may be, not its width:
+     measured before a group or a font settles (the router's DHCPv6
+     statistics label wrapped in a 123 column) it would break a label. A
+     label is one line up to the form's label column. */
   & .network-status-table[style*="--aster-kv-w"] > .ifacebox:not(:has(img[src*="/signal-"])) > .ifacebox-body {
-    grid-template-columns: min(var(--aster-kv-w), var(--aster-form-label-w)) minmax(0, 1fr);
+    grid-template-columns: minmax(min(var(--aster-kv-w), var(--aster-form-label-w)), max-content) minmax(0, 1fr);
+    & .nowrap:not(.cbi-tooltip *) > strong { max-inline-size: var(--aster-form-label-w); }
   }
   & .network-status-table > .ifacebox > .ifacebox-body > span:first-child > br,
   & .ifacebox-body > div > .ifacebadge > span > br { display: none; }
