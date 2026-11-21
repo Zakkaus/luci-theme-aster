@@ -156,7 +156,7 @@ return baseclass.extend({
 	 *    realtime legends) and labels (fields, toolbars, nft clauses, the
 	 *    changes legend) lose LuCI's colon (G10); the overview's upstreams
 	 *    share one label column (--aster-kv-w); an interface's value is
-	 *    .aster-v, "(N 封包)" kept whole by a no-break space;
+	 *    .aster-v, titled, "(N 封包)" kept whole by a no-break space;
 	 *  - "K: <b>v</b>, …" (nft hook, nlbw kpi) and WireGuard's " · Port N
 	 *    · key", wireless' "K: v | K: v" become rows. */
 	marks() {
@@ -212,7 +212,7 @@ return baseclass.extend({
 
 				/\|/.test(p.previousSibling?.data) && p.previousSibling.remove();
 
-				if (p.matches('[id$="-ifc-description"] > *') && !p.querySelector('.aster-v'))
+				if (p.matches('.nowrap:not(.cbi-tooltip *)') && !p.querySelector('.aster-v'))
 					p.replaceChildren(s, E('span', { class: 'aster-v', title: v }, [v]));
 			});
 

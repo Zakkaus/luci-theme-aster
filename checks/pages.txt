@@ -16,7 +16,7 @@
 # is required on a phone only while it holds a row (table@rows).
 
 # Status
-admin/status/overview                require=font.body,heading.page,heading.card,card,table.kv,c8.kv,c8.x,g.colon,g.marker,c15.dot,c16.icon,c13.badge,g.px,g.overflow,g.nested,c2.card,c3.heading,c19.progress
+admin/status/overview                require=font.body,heading.page,heading.card,card,table.kv,c8.kv,c8.x,g.colon,g.marker,c15.dot,c16.icon,c13.badge,g.px,g.overflow,g.nested,c2.card,c3.heading,c19.progress,c8.bar
 admin/status/routes                  require=font.body,heading.page,card,table,c7.when,g.marker.table
 # Banners, WireGuard's faded instance line and inline code, which the lab
 # boxes never draw (checks/lib/gate.mjs FIXTURES).

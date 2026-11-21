@@ -35,7 +35,16 @@ expect uniform 1 "c16.icon legacy,icon legacy" "legacy device image shown (defec
 expect uniform 1 "g.marker offset,g.marker.table offset" "Interfaces dot before the name (G4)" -- "$url" "$password" --pages "$tmp/lst-net.txt" \
 	--debug-css 'admin/network/network=#view .ifacebox > .ifacebox-head::before { order: -1 !important }'
 
-ov='admin/status/overview require=c8.kv,c8.x,g.colon,g.marker,c15.dot,c16.icon,c13.badge'
+# Audit2 C8: each interface's list with its own label column (wan6's
+# values 26 left of lan's in one table).
+expect uniform 1 "c8.x *" "Interfaces lists with their own label columns (audit2 C8)" -- "$url" "$password" --pages "$tmp/lst-net.txt" \
+	--debug-css 'admin/network/network=html #view [id$="-ifc-description"] > .nowrap > strong { min-inline-size: 0 !important }'
+# Audit2 C13: on a phone the box column 1 % wide and the zone Badge rigid:
+# "區域 lan 的部" cut with a square end.
+expect uniform 1 "c13.badge clipped" "Interfaces zone Badge cut (audit2 C13)" -- "$url" "$password" --pages "$tmp/lst-net.txt" --viewports phone \
+	--debug-css 'admin/network/network=html #view .table .tr:has(> .td > .ifacebox) > .td:first-child { inline-size: 1% !important } html #view .ifacebox > .ifacebox-head::after { flex: none !important }'
+
+ov='admin/status/overview require=c8.kv,c8.x,c8.bar,g.colon,g.marker,c15.dot,c16.icon,c13.badge'
 printf '%s\n' "$ov" >"$tmp/lst-ov.txt"
 expect uniform 0 "" "Overview: port tiles, upstream and radio lists" -- "$url" "$password" --pages "$tmp/lst-ov.txt"
 # C25 / G4 (defect 10): a port's and a radio's dot before the name.
@@ -51,6 +60,10 @@ expect uniform 1 "c13.badge *" "nftables clauses as filled pills (defect 3)" -- 
 # Defect 7's shape: the hook line as one sentence, no label column.
 expect uniform 1 "c8.kv *,c8.x *" "nftables hook as one line (C8)" -- "$url" "$password" --pages "$tmp/lst-nft.txt" \
 	--debug-css 'admin/status/nftables=.nft-chain-hook > ul { display: block !important }'
+
+# Audit2 C19 in C8: the value right-aligned over a bar under the name too.
+expect uniform 1 "c8.bar layout" "Overview bar value at the end (audit2 C19)" -- "$url" "$password" --pages "$tmp/lst-ov.txt" \
+	--debug-css 'admin/status/overview=html #view .cbi-progressbar::before { text-align: end !important }'
 
 bw='admin/status/realtime/bandwidth require=c8.kv,g.colon'
 printf '%s\n' "$bw" >"$tmp/lst-bw.txt"

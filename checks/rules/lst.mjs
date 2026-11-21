@@ -12,10 +12,11 @@
 
 export const canonical = {
   'c8.kv': {
-    _source: 'COMPONENTS.md C8: Astryx MetadataList columns=single, label start (grid auto minmax(0,1fr), gap 8 16); label 15/500 secondary, value 15/400 primary, baseline',
-    layout: 'rows', columnGap: 16, rowGap: 8, labelSize: 15, labelWeight: '500', labelInk: 'secondary', valueSize: 15, valueInk: 'primary', align: 'baseline',
+    _source: 'COMPONENTS.md C8: Astryx MetadataList columns=single, label start (grid auto minmax(0,1fr), gap 8 16); label 15/500 secondary, value 15/400 primary, baseline; no underline on a label or value that is not a link',
+    layout: 'rows', columnGap: 16, rowGap: 8, labelSize: 15, labelWeight: '500', labelInk: 'secondary', valueSize: 15, valueInk: 'primary', align: 'baseline', underline: 'none',
   },
-  'c8.x': {_source: 'COMPONENTS.md C8: one value x per list; label column = longest label, capped at 50%', valueXs: 1, labelFit: 0},
+  'c8.x': {_source: 'COMPONENTS.md C8: one value x per list (Interfaces: per table, the label column at least --aster-label-w); label column = longest label, capped at 50% (nlbw\'s shrink-wrapped summary: uncapped)', valueXs: 1, tableXs: 1, labelFit: 0},
+  'c8.bar': {_source: 'COMPONENTS.md C19 in C8: label | value text at the value column\'s start, the bar under it as wide as the value column; one value x per list; label 500 secondary', layout: 'value column', valueXs: 1, labelWeight: '500', labelInk: 'secondary'},
   'c8.tracks': {_source: 'COMPONENTS.md C8: no value column narrower than its longest token (unless truncated with a title)', narrow: 0},
   'c8.ifstatus': {
     _source: 'COMPONENTS.md C8 Interfaces status cell: one single-column list (2 tracks); values wrap at spaces only (keep-all holds CJK words: "(432089 封包)" stays whole); dot neutral iff the own device image is _disabled or missing',
@@ -24,11 +25,11 @@ export const canonical = {
   'g.break': {_source: 'COMPONENTS.md G5: an identifier or value token never breaks across lines (or is truncated with a title)', broken: 0},
   'g.colon': {_source: 'COMPONENTS.md G10: labels carry no trailing colon', trailing: 'none'},
   'g.marker': {_source: 'COMPONENTS.md G4 / 0.1: a box title (name) starts at its list labels\' x; markers trail the text', offset: 0},
-  'c13.badge': {_source: 'COMPONENTS.md C13: filled pills only for zones (a verdict, "this device" or "any zone" is text), action-needed status, Tokens, buttons; .ifacebadge is text (no fill, no border)', stray: 0, ifacebadge: 'plain'},
+  'c13.badge': {_source: 'COMPONENTS.md C13: filled pills only for zones (a verdict, "this device" or "any zone" is text), action-needed status, Tokens, buttons; .ifacebadge is text (no fill, no border); an interface\'s zone Badge is never cut (ellipsis inside it)', stray: 0, ifacebadge: 'plain', clipped: 0},
   'c14.token': {_source: 'COMPONENTS.md C14: Astryx Token md, dynamic lists only', height: 28, radius: 8, stray: 0},
   'c7.keys': {_source: 'COMPONENTS.md section 3 system/admin/sshkeys: C7 title-line-only blocks (name the title, type + key its subline, the key cut with an ellipsis before the remove mark), not Tokens', lines: 'name/sub', key: 'cut', fill: 'none', width: 'full'},
   'c15.dot': {_source: 'COMPONENTS.md C15: StatusDot 8 px; up = success, down = neutral, on every page', size: '8x8', ink: 'ok'},
-  'c16.icon': {_source: 'COMPONENTS.md C16: no LuCI image from /resources/icons/ visible; icon glyphs 16 or 20', legacy: 0, size: 'ok'},
+  'c16.icon': {_source: 'COMPONENTS.md C16: no LuCI image from /resources/icons/ visible; icon glyphs 16 or 20; an interface\'s port icons all shown (they wrap)', legacy: 0, size: 'ok', clipped: 0},
 };
 
 /* In the page (after gate.mjs installHelpers). */
@@ -132,6 +133,7 @@ export function collect(cfg) {
     if (pairs.length) lists.push({el, kind: el.matches('.kpi > ul') ? 'nlbw' : el.matches('.nft-chain-hook > ul') ? 'nft' : 'kv', pairs});
   });
 
+  const ifs = [];
   for (const {el, kind, pairs} of lists) {
     // Text rects (a grid item's own box is its whole line box).
     const texts = (nodes) => nodes.flatMap((n) => (n.nodeType === 3 ? [n] : textNodes(n)));
@@ -142,7 +144,24 @@ export function collect(cfg) {
     const rows = pairs.every((p, i) => Math.abs(lr[i][0].bottom - vr[i][0].bottom) <= 1 && vx[i] > Math.max(...lr[i].map((r) => r.right)));
     add('c8.kv', 'layout', rows ? 'rows' : 'stacked', el);
     add('c8.kv', 'align', rows ? 'baseline' : 'off', el);
-    const k0 = pairs[0][0], v0 = pairs[0][1][0].nodeType === 1 ? pairs[0][1][0] : pairs[0][1][0].parentNode;
+    // The label's own text box (a legend's <strong>, not its cell).
+    const k0 = textNodes(pairs[0][0])[0]?.parentNode || pairs[0][0], v0 = pairs[0][1][0].nodeType === 1 ? pairs[0][1][0] : pairs[0][1][0].parentNode;
+    // An underline (text decoration or a bottom border, LuCI's legend
+    // series colour) on a label's or value's text that is not a link;
+    // a cell's own row line is the table's.
+    const lined = (n, cell) => {
+      for (let x = n.nodeType === 3 ? n.parentNode : n; x && x !== document.body; x = x.parentElement) {
+        if (x.closest('a')) return false;
+        if (x === cell && x.matches('td, .td')) return false;
+        const t = cs(x);
+        if (/underline/.test(t.textDecorationLine) || (t.borderBottomStyle !== 'none' && parseFloat(t.borderBottomWidth) > 0)) { note('line', x.textContent.trim().slice(0, 16), x); return true; }
+        if (x === cell) return false;
+      }
+      return false;
+    };
+    const ul = pairs.filter(([k, v]) => [k, ...v].some((c) => texts([c]).some((t) => lined(t, c)))).length;
+    add('c8.kv', 'underline', ul ? 'underlined' : 'none', named('line', el));
+    delete seen.line;
     add('c8.kv', 'labelSize', px(cs(k0).fontSize), k0);
     add('c8.kv', 'labelWeight', cs(k0).fontWeight, k0);
     add('c8.kv', 'labelInk', inkName(cs(k0).color), k0);
@@ -167,6 +186,10 @@ export function collect(cfg) {
       if (pairs.length > 1) add('c8.kv', 'rowGap', px(s.rowGap), el);
     } else add('c8.kv', 'columnGap', `display ${s.display}`, el);
     if (kind === 'legend') {
+      // One list per series (a LuCI row): its values on one x.
+      const rowXs = new Map();
+      pairs.forEach(([k], i) => rowXs.set(k.parentNode, [...(rowXs.get(k.parentNode) || []), Math.round(vx[i])]));
+      rowXs.forEach((xs, r) => add('c8.x', 'valueXs', new Set(xs).size, r));
       pairs.forEach(([k]) => add('g.colon', 'trailing', /[:：]\s*$/.test(k.textContent) ? 'colon' : 'none', k));
       let broken = 0;
       pairs.forEach(([, v]) => v.forEach((n) => { broken += brokenTokens(n); }));
@@ -181,8 +204,13 @@ export function collect(cfg) {
     const widest = Math.max(...lr.map((r) => Math.max(...r.map((x) => x.right)) - r[0].left));
     const gap = kind === 'table' ? px(cs(pairs[0][1][0]).paddingInlineStart) : px(s.columnGap);
     const col = Math.min(...vx) - gap - left;
-    const want = Math.min(widest, (box.right - left) / 2);
-    add('c8.x', 'labelFit', Math.abs(col - want) <= 1 ? 0 : px(col - want), el);
+    // Interfaces' lists share their table's column (checked below); nlbw's
+    // summary is as wide as its words, so half of it is no cap.
+    if (kind === 'ifstatus') ifs.push({el, t: el.closest('table, .table'), col, widest, half: (box.right - left) / 2, x: Math.round(Math.min(...vx))});
+    else {
+      const want = kind === 'nlbw' ? widest : Math.min(widest, (box.right - left) / 2);
+      add('c8.x', 'labelFit', Math.abs(col - want) <= 1 ? 0 : px(col - want), el);
+    }
     // c8.tracks: each value's longest token against the value column.
     const room = box.right - Math.min(...vx);
     let narrow = 0;
@@ -212,6 +240,43 @@ export function collect(cfg) {
     const head = el.closest('.ifacebox')?.querySelector(':scope > .ifacebox-head');
     if (kind === 'upstream' && head && textNodes(head).length) add('g.marker', 'offset', px(range(textNodes(head))[0].left - left), head);
   }
+  // Interfaces: one label column down a table, the longest label of any
+  // of its lists and at least --aster-label-w (Astryx dt 112).
+  if (ifs.length) {
+    const p = document.createElement('div');
+    p.style.inlineSize = 'var(--aster-label-w)';
+    document.body.append(p);
+    const min = p.getBoundingClientRect().width;
+    p.remove();
+    for (const t of new Set(ifs.map((i) => i.t))) {
+      const g = ifs.filter((i) => i.t === t), widest = Math.max(min, ...g.map((i) => i.widest));
+      add('c8.x', 'tableXs', new Set(g.map((i) => i.x)).size, t);
+      g.forEach((i) => { const want = Math.min(widest, i.half); add('c8.x', 'labelFit', Math.abs(i.col - want) <= 1 ? 0 : px(i.col - want), i.el); });
+    }
+  }
+  /* C19 in C8 (overview Memory, Storage, Active Connections): the bar's
+     value text starts its list's value column, the bar as wide as the
+     column, both after the name. */
+  scope.querySelectorAll('.table, table').forEach((t) => {
+    const bars = [...t.querySelectorAll(':scope > .tr > .td > .cbi-progressbar, :scope > tbody > tr > td > .cbi-progressbar')].filter((b) => shown(b) && !b.closest('.cbi-tooltip'));
+    if (!bars.length) return;
+    let off = 0;
+    for (const b of bars) {
+      const cell = b.parentNode, k = cell.previousElementSibling, br = b.getBoundingClientRect();
+      const why = !/^(start|left)$/.test(cs(b, '::before').textAlign) ? 'value text not at the column start'
+        : Math.abs(br.width - cell.getBoundingClientRect().width) > 1 ? 'bar not the value column'
+        : k && k.getBoundingClientRect().right > br.left + 0.5 ? 'bar under the name' : '';
+      if (why) { off++; note('bar', why, b); }
+    }
+    const k0 = bars[0].parentNode.previousElementSibling;
+    add('c8.bar', 'layout', off ? 'off' : 'value column', named('bar', t));
+    delete seen.bar;
+    add('c8.bar', 'valueXs', new Set(bars.map((b) => Math.round(b.getBoundingClientRect().left))).size, t);
+    if (k0) {
+      add('c8.bar', 'labelWeight', cs(k0).fontWeight, k0);
+      add('c8.bar', 'labelInk', inkName(cs(k0).color), k0);
+    }
+  });
   // An unsplit label/value sentence ("主機數: 17") is a list of no rows.
   for (const {el, pairs} of lists) if (pairs.some(([, v]) => !v.length)) add('g.colon', 'trailing', /[:：]/.test(el.textContent) ? 'colon' : 'none', el);
 
@@ -223,6 +288,20 @@ export function collect(cfg) {
     scope.querySelectorAll('.ifacebox > .ifacebox-head:first-child, .td > .ifacebox > .ifacebox-body > small').forEach((h) => {
       if (!shown(h) || h.closest('.cbi-tooltip') || !textNodes(h).length) return;
       add('g.marker', 'offset', px(range(textNodes(h))[0].left - edge(h.matches('small') ? h.parentNode : h)), h);
+    });
+  }
+
+  /* C13 / C16 Interfaces: a head (name, dot, zone Badge) and a device
+     line (name, icons) show all they hold: nothing cut at the box. */
+  if (document.querySelector('[data-page="admin-network-network"]')) {
+    scope.querySelectorAll('.td > .ifacebox').forEach((b) => {
+      if (!shown(b)) return;
+      // The head's Badge is its ::after (its overflow is the head's); the
+      // device line's icons are elements (its hidden tooltips are not).
+      const h = b.querySelector(':scope > .ifacebox-head'), d = b.querySelector(':scope > .ifacebox-body');
+      if (h && shown(h)) add('c13.badge', 'clipped', Math.max(0, px(h.scrollWidth - h.clientWidth)), h);
+      const ends = d ? [...d.querySelectorAll(':scope > *, :scope > span > *')].filter((x) => !x.matches('.cbi-tooltip, br') && x.getClientRects().length).map((x) => x.getBoundingClientRect().right) : [];
+      if (ends.length) add('c16.icon', 'clipped', Math.max(0, px(Math.max(...ends) - b.getBoundingClientRect().right)), d);
     });
   }
 
