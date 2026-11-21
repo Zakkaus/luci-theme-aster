@@ -213,6 +213,8 @@ return baseclass.extend({
 
 				const p = s.parentNode, v = p.textContent.slice(t.length).replace(/\((\S+) /g, '($1\xa0');
 
+				/\|/.test(p.previousSibling?.data) && p.previousSibling.remove();
+
 				if (p.matches('[id$="-ifc-description"] > *') && !p.querySelector('.aster-v'))
 					p.replaceChildren(s, E('span', { class: 'aster-v', title: v }, [v]));
 			});
@@ -222,6 +224,8 @@ return baseclass.extend({
 
 				return v ? row(k, v) : E('li', { class: 'aster-row' }, h);
 			})));
+
+			root.querySelectorAll('.ifacebadge:has(img, em)').forEach(({ firstChild: t }) => /:\s*$/.test(t.data) && (t.data = t.data.split(':')[0]));
 
 			root.querySelectorAll('#view > p > .ifacebadge + span').forEach((s) => {
 				const [, k, n] = s.textContent.match(/([^\s·\d][^·\d]*?) *(\d+)/) || [], c = s.querySelector('code');
