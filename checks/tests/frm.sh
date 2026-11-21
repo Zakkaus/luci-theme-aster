@@ -19,6 +19,8 @@ printf 'admin/status/realtime/bandwidth require=c4.tabs\n' >"$tmp/frm-bw.txt"
 printf 'admin/status/overview require=c19.progress\n' >"$tmp/frm-ov.txt"
 printf 'admin/system/flash require=c22.divider\n' >"$tmp/frm-flash.txt"
 printf 'admin/network/network modal=interface-edit require=c18.dialog\n' >"$tmp/frm-dialog.txt"
+printf 'admin/system/admin/dropbear require=c3.heading\n' >"$tmp/frm-drop.txt"
+printf 'admin/network/firewall/zones require=c9.button\n' >"$tmp/frm-zones.txt"
 expect uniform 0 "" "System: every frame rule measures and holds" -- "$url" "$password" --pages "$tmp/frm-sys.txt" --viewports desktop,phone
 
 # G1: a form row's gap off the spacing scale.
@@ -64,6 +66,29 @@ expect uniform 1 "c19.progress conform" "progress bar 12 high (C19)" -- "$url" "
 # C22: a Divider drawn 2 thick.
 expect uniform 1 "c22.divider conform" "Divider 2 thick (C22)" -- "$url" "$password" --pages "$tmp/frm-flash.txt" \
 	--debug-css 'admin/system/flash=#view .cbi-value + .cbi-value > .cbi-section { border-block-start-width: 2px }'
+
+# C11, audit2: the save bar in LuCI's order, Save & Apply first.
+expect uniform 1 "c9.button conform" "save bar Save & Apply first (C11, audit2)" "save bar last" -- "$url" "$password" --pages "$tmp/frm-sys.txt" \
+	--debug-css 'admin/system/system=.cbi-page-actions > * { order: 0 !important }'
+# C18, audit2: a dialog's confirm before its secondaries.
+expect uniform 1 "c18.dialog conform" "dialog confirm first (C18, audit2)" "confirm last" -- "$url" "$password" --pages "$tmp/frm-dialog.txt" \
+	--debug-css 'admin/network/network=#modal_overlay .button-row { flex-direction: row-reverse }'
+# C10, audit2: a section's Remove alone on a row under its heading.
+expect uniform 1 "c3.heading conform,space.heading.content gap" "Remove on its own row (C10, audit2)" "remove row" -- "$url" "$password" --pages "$tmp/frm-drop.txt" \
+	--debug-css 'admin/system/admin/dropbear=#view .cbi-section { display: block !important }'
+# C5, audit2: the local time's buttons wrapped 4 under it (phone).
+expect uniform 1 "c5.form conform" "buttons 4 under their field (C5, audit2)" "button wrap gap" -- "$url" "$password" --pages "$tmp/frm-sys.txt" --viewports phone \
+	--debug-css 'admin/system/system=#view .cbi-value > .cbi-value-field { row-gap: 4px !important }'
+# C5, audit2: the read-only local time held at the field width and cut
+# (a box's time is short: spaced out to the router's length).
+expect uniform 1 "c5.form conform" "read-only value cut (C5, audit2)" "read-only value" -- "$url" "$password" --pages "$tmp/frm-sys.txt" \
+	--debug-css 'admin/system/system=#view #localtime { field-sizing: fixed !important; inline-size: 256px !important; letter-spacing: 6px }'
+# C5, audit2: the Notes text area across the row.
+expect uniform 1 "c5.form conform" "labelled text area full row (C5, audit2)" "textarea width" -- "$url" "$password" --pages "$tmp/frm-sys.txt" \
+	--debug-css 'admin/system/system=#view .cbi-value-field > div:has(> textarea) { inline-size: 100% !important; flex-basis: 100% !important }'
+# C9, audit2: the drag handle a filled secondary.
+expect uniform 1 "c9.button conform" "drag handle filled (C9, audit2)" "drag handle fill" -- "$url" "$password" --pages "$tmp/frm-zones.txt" \
+	--debug-css 'admin/network/firewall/zones=#view .drag-handle { --button-bg: var(--color-neutral) }'
 
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true
