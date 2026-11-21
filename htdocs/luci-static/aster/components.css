@@ -859,7 +859,7 @@ html :where(th, td, .th, .td) {
   text-align: start;
   vertical-align: middle;
 }
-html :where(th, td, .th, .td):last-child { padding-inline-end: var(--spacing-4); }
+html :where(:is(th, td, .th, .td):last-child) { padding-inline-end: var(--spacing-4); }
 /* No rule under the last row: the card's edge closes the table (Astryx
    TableCell drops the last body row's divider). */
 html :where(:is(tr, .tr):last-child > :is(td, .td)) { border-block-end: 0; }
@@ -896,63 +896,123 @@ html :where(td, .td) :where(.btn, .cbi-button, button) { --button-h: var(--size-
 html :where(.dragging) { opacity: 0.5; }
 html :where(.drag-over-above) { box-shadow: inset 0 calc(var(--border-width) * 2) 0 var(--color-accent); }
 html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -2) 0 var(--color-accent); }
-/* Collapsible: a data table that does not fit its card folds each row
-   into a stack, at any window width (theme-aster.js measures it and sets
-   data-fold; no media or container query decides a table's layout): the
-   first cell primary, the rest under it with their column names
-   (data-title), the actions last. Rows in thead/tbody (form.js), straight
-   in the table (ui.Table) or in a Lua table's <tbody> are all reached. */
+/* ── FoldedBlock ─────────────────────────────────────────────────
+   A data table that does not fit its card folds, at any window width
+   (theme-aster.js measures it and sets data-fold; no media or container
+   query decides a table's layout). One layout for every table on every
+   page: each row is a block, its identifier the title line (trailing
+   markers, the actions at its end), under it one MetadataList row per
+   other cell (label = the column's name, data-title). The table is a
+   grid of three tracks (labels, values, actions); every block and every
+   label/value row is a subgrid of it, so the label column is as wide as
+   the table's longest label (at most half) and every value starts on one
+   x. Blocks are 12 + 12 apart with a Divider between them on the card's
+   content box; the first starts and the last ends flush. Rows in
+   thead/tbody (form.js), straight in the table (ui.Table) or in a Lua
+   table's <tbody> are all reached. theme-aster.js puts a cell's mixed
+   content in one .aster-v box, so it is one grid item. */
 html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
-  display: block;
-  overflow: visible;
+  display: grid;
+  grid-template-columns: fit-content(50%) minmax(0, 1fr) auto;
+  column-gap: var(--spacing-4);
+  box-sizing: border-box;
+  padding-inline: var(--aster-bleed, 0);
   /* Nested rules keep the parent's one element of weight (& is :is()). */
   & > :where(.thead, .tbody, .tfoot, thead, tbody, tfoot) { display: contents; }
-  & :where(.tr:has(> .th)) { display: none; }
-  & :where(.tr.placeholder) { display: block; }
-  & :where(.tr:not(:has(> .th), .placeholder)) {
+  & :where(.tr:has(> :is(.th, th)), .tr.cbi-section-table-descr) { display: none; }
+  & :where(.tr.placeholder) { display: block; grid-column: 1 / -1; }
+  & :where(.tr:not(.placeholder):has(> :is(.td, td))) {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    padding-block: var(--spacing-1);
-    border-block-end: var(--border-width) solid var(--color-border);
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    row-gap: var(--spacing-2);
+    align-items: first baseline;
+    padding-block: var(--spacing-3);
   }
-  & :where(.tr:last-child) { border-block-end: 0; }
+  & :where(.tr:nth-child(1 of .tr:not(.placeholder):has(> :is(.td, td)))) { padding-block-start: 0; }
+  & :where(.tr:nth-last-child(1 of .tr:not(.placeholder):has(> :is(.td, td)))) { padding-block-end: 0; }
+  & :where(.tr:not(.placeholder):has(> :is(.td, td)) ~ .tr:not(.placeholder):has(> :is(.td, td))) { border-block-start: var(--border-width) solid var(--color-border); }
+  /* A label/value row. */
   & :where(.tr > :is(.td, td)) {
-    display: block;
-    grid-column: 1;
-    padding: 0 var(--spacing-2) 0 var(--spacing-4);
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    align-items: first baseline;
+    min-inline-size: 0;
+    padding: 0;
     border: 0;
-    color: var(--color-text-secondary);
-    font-size: var(--text-supporting-size);
-    line-height: var(--text-supporting-leading);
-    overflow-wrap: anywhere;
-    text-align: start;
-  }
-  & :where(.tr > :is(.td, td):first-child, .tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child) + :is(.td, td)) {
     color: var(--color-text-primary);
     font-size: var(--text-body-size);
+    font-weight: var(--text-body-weight);
     line-height: var(--text-body-leading);
+    text-align: start;
+    white-space: normal;
+    /* A token wider than the value column ends in an ellipsis, never
+       breaks (identifiers wrap at spaces only). */
+    & > * { grid-column: 2 / -1; justify-self: start; min-inline-size: 0; max-inline-size: 100%; margin: 0; overflow-x: clip; text-overflow: ellipsis; }
+    & > .aster-v { justify-self: stretch; }
+    &::before {
+      content: attr(data-title);
+      grid-column: 1;
+      color: var(--color-text-secondary);
+      font-weight: var(--text-label-weight);
+      overflow-wrap: normal;
+      word-break: keep-all;
+    }
   }
-  & :where(.tr > :is(.td, td)[data-title]:not(:first-child, .cbi-section-actions))::before {
-    content: attr(data-title);
-    margin-inline-end: var(--spacing-2);
-    font-weight: var(--font-weight-medium);
+  & :where(.tr > :is(.td, td):not([data-title]), .tr > :is(.td, td)[data-title=""]) {
+    &::before { content: none; }
+    & > * { grid-column: 1 / -1; }
   }
-  & :where(.tr > :is(.td, td):has(> :is(input:not([type="checkbox"]), select, .cbi-dropdown, .cbi-dynlist)))::before { display: block; }
-  /* A row that opens with a lone selection checkbox (PassWall's node
-     list): the checkbox sits before the title, which is the cell after it;
-     the rest stack under the title. */
-  & :where(.tr:has(> :is(.td, td):first-child > input[type="checkbox"]:only-child)) { grid-template-columns: auto minmax(0, 1fr); }
-  & :where(.tr:has(> :is(.td, td):first-child > input[type="checkbox"]:only-child) > :is(.td, td)) { grid-column: 2; }
-  & :where(.tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child)) { grid-column: 1; grid-row: 1; padding-inline-end: 0; }
-  & :where(.tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child) + :is(.td, td))::before { content: none; }
-  /* The actions take a line of their own under the stack, so the data
-     keeps the row's full width (a column beside it left long values a
-     narrow one); 8 apart on one line, the rest in the "more" menu where
-     it is too short (Startup's five; theme-aster.js). */
-  & :where(.tr > :is(.td, td).cbi-section-actions) { padding: var(--spacing-2) var(--spacing-4) 0; }
-  & :where(.tr > :is(.td, td).cbi-section-actions > div) { display: flex; gap: var(--spacing-2); }
+  /* The title line: the identifier (the first cell, or the column a table
+     names its rows by), its markers after it, the actions at the end. */
+  & :where(.tr > :is(.td, td):first-child),
+  &:where(.assoclist) :where(.tr > .td:nth-child(3)),
+  &:where(#status_leases6:has(.th:nth-child(7))) :where(.tr > .td:nth-child(2)),
+  &:where([data-page^="admin-status-route"] .table:has(.th:nth-child(6))) :where(.tr > .td:nth-child(2)) {
+    display: block;
+    grid-row: 1;
+    grid-column: 1 / -2;
+    align-self: center;
+    font-weight: var(--text-label-weight);
+    &::before { content: none; }
+  }
+  &:where(.assoclist, #status_leases6:has(.th:nth-child(7)), [data-page^="admin-status-route"] .table:has(.th:nth-child(6))) :where(.tr > :is(.td, td):first-child) {
+    display: grid;
+    grid-row: auto;
+    grid-column: 1 / -1;
+    align-self: auto;
+    font-weight: var(--text-body-weight);
+    &::before { content: attr(data-title); }
+  }
+  /* The title's second line (a device under its interface, a station's
+     addresses under its host): supporting text, no marker before it. */
+  & :where(.tr > :is(.td, td) :is(.hide-xs, .ifacebox-body)) {
+    display: block;
+    color: var(--color-text-secondary);
+    font-size: var(--text-supporting-size);
+    font-weight: var(--text-body-weight);
+    line-height: var(--text-supporting-leading);
+  }
+  /* The actions (RowActions): on the title line, at its end. A lone
+     button in an untitled cell (Wireless' Disconnect) is one too. */
+  & :where(.tr > :is(.td, td):is(.cbi-section-actions, :not([data-title]):has(> .cbi-button:only-child))) {
+    display: block;
+    grid-row: 1;
+    grid-column: -2;
+    align-self: center;
+    justify-self: end;
+    inline-size: auto;
+    &::before { content: none; }
+    & > div { display: flex; gap: var(--spacing-2); }
+    & > div > * { margin: 0; }
+  }
+  /* A cell with nothing in it (LuCI's "-" too, theme-aster.js) takes no
+     row; nor do actions with no button. */
+  & :where(.tr > :is(.td, td):not(:first-child):is(:empty, [data-empty]), .tr > .cbi-section-actions:not(:has(button, .btn, .cbi-button))) { display: none; }
 }
-html #view .nft-rules[data-fold="fold"] tr > td { padding-block: 0 !important; } /* nftables' <style>, as above */
+/* nftables' <style> pads its cells .25em with !important (one id heavier). */
+html #view .nft-rules[data-fold="fold"] tr > td { padding: 0 !important; }
 /* A Lua button table (one action per cell, Commit and Apply) stacks
    its buttons 8 apart: the cell, or the option's div in it, which may
    carry the button's script beside it (OpenClash's Create). (:has()
@@ -960,55 +1020,11 @@ html #view .nft-rules[data-fold="fold"] tr > td { padding-block: 0 !important; }
 html :where(form > .cbi-map .table[data-fold="fold"] .tr > :is(.td, td):has(> :is(.btn, .cbi-button):only-child), form > .cbi-map .table[data-fold="fold"] .tr > :is(.td, td) > div:only-child:has(> :is(.btn, .cbi-button)):not(:has(> :not(script, .btn, .cbi-button)))) {
   padding-block: var(--spacing-1);
 }
-/* Leases and stations never break a line (luci.css): a table whose lines
-   do not fit its card folds as above, as the reference's compact
-   columns: the first cell the title, its one action (Disconnect, Reserve
-   IP; Wireless' Disconnect cell has no class or title) at the end of the
-   title line, not a line of its own; under it every value in one column
-   after a key column of --aster-label-w (MetadataList on a phone: keys
-   wrap, 16 to the value),
-   so a value's second line (the addresses, the TX rate) starts under its
-   first. A cell with nothing in it (no action, LuCI's "-") takes no
-   line. theme-aster.js measures the unbroken table (data-fold); without
-   it the page decides (under the 1440 desktop's). */
-html :where(#view .table:is(.leases, .lases, .leases6, .assoclist)[data-fold="fold"]) {
-  display: block;
-  & > :where(.thead, .tbody, thead, tbody) { display: contents; }
-  & :where(.tr.table-titles) { display: none; }
-  & :where(.tr:not(.table-titles, .placeholder)) {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    padding-block: var(--spacing-1);
-    border-block-end: var(--border-width) solid var(--color-border);
-  }
-  & :where(.tr:last-child) { border-block-end: 0; }
-  & :where(.tr > .td) {
-    display: block;
-    grid-column: 1 / -1;
-    padding: 0 var(--spacing-2) 0 var(--spacing-4);
-    border: 0;
-    color: var(--color-text-secondary);
-    font-size: var(--text-supporting-size);
-    line-height: var(--text-supporting-leading);
-    white-space: normal;
-    overflow-wrap: anywhere;
-  }
-  & :where(.tr > .td:first-child) { grid-column: 1; color: var(--color-text-primary); font-size: var(--text-body-size); line-height: var(--text-body-leading); }
-  & :where(.tr > .td[data-title]:not(:first-child, .cbi-section-actions)) {
-    display: flow-root;
-    margin-inline-start: calc(var(--aster-label-w) + var(--spacing-4));
-  }
-  & :where(.tr > .td[data-title]:not(:first-child, .cbi-section-actions))::before {
-    content: attr(data-title);
-    float: inline-start;
-    inline-size: var(--aster-label-w);
-    margin-inline: calc((var(--aster-label-w) + var(--spacing-4)) * -1) 0;
-    font-weight: var(--font-weight-medium);
-    word-break: keep-all; /* "接收速率 /" over "發送速率", not "發送速" over "率" */
-  }
-  & :where(.tr > .td:is(.cbi-section-actions, :not([data-title]):has(> .cbi-button:only-child))) { grid-column: 2; grid-row: 1; align-self: center; padding: 0 var(--spacing-4); }
-  & :where(.tr > .td:is(:empty, .cbi-section-actions:not(:has(button, .btn, .cbi-button)), :not(:first-child, [data-title]):not(:has(*)))) { display: none; }
-}
+/* Wide, a cell's mixed content is the cell's own (theme-aster.js keeps
+   the box it adds for the fold). */
+html :where(.aster-v) { display: contents; }
+html :where([data-fold="fold"] .aster-v) { display: block; }
+
 /* ── MetadataList ────────────────────────────────────────────────
    A table with no header row: Astryx's single-column list (auto
    minmax(0, 1fr), 8 16 apart): the key column as wide as the widest key

@@ -44,6 +44,21 @@ return baseclass.extend({
 			const need = t.scrollWidth, room = p.clientWidth - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight) - parseFloat(ts.marginLeft) - parseFloat(ts.marginRight);
 			t.style.width = w;
 			t.dataset.fold = need > room + 0.5 - (was ? 16 : 0) ? 'fold' : 'wide';
+
+			/* Folded, a cell is a label and a value: it takes its column's
+			 * name where LuCI gives none (nftables, Lua maps), an empty one
+			 * ("-") is marked, and mixed content goes into one box. */
+			if (t.dataset.fold == 'wide')
+				return t.querySelectorAll('.aster-v').forEach((v) => v.replaceWith(...v.childNodes));
+
+			const h = [...(t.querySelector('.tr:has(> .th)')?.children || [])].map((c) => c.textContent.trim());
+			t.querySelectorAll('.tr:not(:has(> .th))').forEach((r) => [...r.children].forEach((c, i) => {
+				const n = [...c.childNodes].filter((x) => x.nodeType == 1 || x.data.trim());
+
+				c.hasAttribute('data-title') || !h[i] || c.setAttribute('data-title', h[i]);
+				c.toggleAttribute('data-empty', /^-?$/.test(c.textContent.trim()) && !c.querySelector('input, select, button, img'));
+				(n[1] || n[0]?.nodeType == 3) && !c.matches('.cbi-section-actions') && c.replaceChildren(E('div', { class: 'aster-v' }, n));
+			}));
 		};
 		const ro = new ResizeObserver(() => frame ||= requestAnimationFrame(() => (frame = 0, view.querySelectorAll(sel).forEach(fit))));
 		/* Only the tables a change is in, or under (a view re-rendered). */
@@ -225,17 +240,12 @@ return baseclass.extend({
 
 	/* Lua CBI pages (a <form> around the .cbi-map) are in the document by
 	 * the time this runs; form.js views render later and need none of it.
-	 *  - A Button option whose label repeats the button's words (PassWall's
-	 *    "Delete All Subscribe Node" over the same button) is marked
-	 *    .aster-same-label: the label is kept for screen readers and not
-	 *    drawn, so the row shows the button once (components.css, Form row).
-	 *  - A table cell with no data-title takes its column header's own words,
-	 *    which the phone fold prints before it, as form.js tables carry;
-	 *    again when the page's own script moves rows (PassWall's node
-	 *    groups). */
+	 * A Button option whose label repeats the button's words (PassWall's
+	 * "Delete All Subscribe Node" over the same button) is marked
+	 * .aster-same-label: the label is kept for screen readers and not
+	 * drawn, so the row shows the button once (components.css, Form row).
+	 * (A table cell's column name: fold().) */
 	lua() {
-		const words = (el) => Array.from(el.childNodes).filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim();
-
 		document.querySelectorAll('form > .cbi-map .cbi-value').forEach((row) => {
 			const label = row.querySelector(':scope > .cbi-value-title');
 			const ctl = row.querySelectorAll(':scope > .cbi-value-field :is(input:not([type="hidden"]), select, textarea, button)');
@@ -244,28 +254,6 @@ return baseclass.extend({
 			    (ctl[0].value || ctl[0].textContent).trim() === label.textContent.trim())
 				row.classList.add('aster-same-label');
 		});
-
-		const titles = () => document.querySelectorAll('form > .cbi-map :is(table, .table)').forEach((t) => {
-			const head = Array.from(t.querySelectorAll(':scope > .tr, :scope > :is(.thead, thead, tbody) > .tr')).find((r) => r.querySelector(':scope > .th'));
-
-			if (!head)
-				return;
-
-			const names = Array.from(head.children).map(words);
-
-			t.querySelectorAll(':scope > .tr, :scope > :is(.tbody, tbody) > .tr').forEach((r) => Array.from(r.children).forEach((c, i) => {
-				if (c.matches('.td, td') && !c.hasAttribute('data-title') && names[i])
-					c.setAttribute('data-title', names[i]);
-			}));
-		});
-		let queued = false;
-		const observer = new MutationObserver(() => {
-			if (!queued)
-				queued = requestAnimationFrame(() => { queued = false; titles(); });
-		});
-
-		titles();
-		document.querySelectorAll('form > .cbi-map').forEach((m) => observer.observe(m, { childList: true, subtree: true }));
 	},
 
 	/* The appearance control (header.ut): one button, the scheme in force
