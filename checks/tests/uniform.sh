@@ -227,6 +227,15 @@ expect uniform 1 "dialog fits" "dialog taller than the window" -- "$url" "$passw
 expect uniform 1 "dialog scrim" "save bar over the dialog's scrim" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
 	--debug-css 'admin/network/network=.cbi-page-actions { z-index: 200 !important }'
 
+# A cell that cuts its text: a lease's MAC clipped at 40 px with no
+# ellipsis (the router's station rates cut at the card's edge).
+expect uniform 1 "table.cell clip" "lease cell clips its text" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=#view .table.leases .tr > .td:nth-child(3) { display: block; max-inline-size: 40px; overflow: hidden; white-space: nowrap; text-overflow: clip }'
+# A folded row with a blank band under its last line (a height kept from
+# the wide layout, an empty actions line).
+expect uniform 1 "table.fold.row trail" "folded lease rows 240 high" -- "$url" "$password" --pages "$tmp/overview.txt" --viewports phone \
+	--debug-css 'admin/status/overview=#view .table.leases .tr:not(.table-titles) { min-block-size: 240px }'
+
 # Lua CBI map (APPS=1: a box with OpenClash, as apps-install.sh leaves it).
 # A header table in a Lua map folds on a phone like a JS view's, and the
 # gate reads it as a fold; a row drawn as a flex column instead of the

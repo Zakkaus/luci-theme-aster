@@ -254,6 +254,23 @@ function collect(cfg) {
     if (!table) continue;
     const cells = [...row.children].filter((c) => c.matches('th, td, .th, .td') && visible(c));
     if (!cells.length) continue;
+    // No cell cuts its text: a cell, or anything in it, that hides or
+    // clips what does not fit (the router's station rates cut mid-word at
+    // the card's edge) instead of wrapping it. An ellipsis marks a
+    // truncation and is not read (the overflow rule's exception); a field
+    // scrolls its own text.
+    for (const c of cells) {
+      if (c.matches('th, .th')) continue;
+      let cut = 0, worst = c;
+      for (const e of [c, ...c.querySelectorAll('*')]) {
+        if (e.matches('input, select, textarea') || !visible(e)) continue;
+        const s = getComputedStyle(e);
+        if (s.overflowX === 'visible' || s.textOverflow === 'ellipsis') continue;
+        const x = e.scrollWidth - e.clientWidth;
+        if (x > cut) { cut = x; worst = e; }
+      }
+      add('table.cell', 'clip', px(cut), worst);
+    }
     // Diagnostics lays its three tools out as the cells of one row: layout,
     // not data, so its row height is not read. Its cells keep the table
     // cell's inset, and each tool's field fills its cell less the button on
@@ -289,6 +306,22 @@ function collect(cfg) {
     }
     if (!progress && cfg.device === 'phone' && table.matches(FOLD)) {
       add('table.fold.row', 'display', getComputedStyle(row).display, row);
+      // Nothing under the row's last line but its padding: an empty cell
+      // (an actions cell with no button, LuCI's "-") or a height kept from
+      // the wide layout leaves a blank band over the row's rule. A cell's
+      // content is its text and boxes; a cell with a ::before key (the
+      // leases' key column) is as tall as its key.
+      const rs = getComputedStyle(row);
+      const end = box(row).bottom - parseFloat(rs.paddingBottom) - parseFloat(rs.borderBottomWidth);
+      let last = box(row).top + parseFloat(rs.paddingTop) + parseFloat(rs.borderTopWidth);
+      for (const c of cells) {
+        const rg = document.createRange();
+        rg.selectNodeContents(c);
+        const rects = [...rg.getClientRects()].filter((r) => r.width > 0 && r.height > 0);
+        if (rects.length) last = Math.max(last, ...rects.map((r) => r.bottom));
+        if (getComputedStyle(c, '::before').content !== 'none') last = Math.max(last, box(c).bottom - parseFloat(getComputedStyle(c).paddingBottom));
+      }
+      add('table.fold.row', 'trail', px(Math.max(0, end - last)), row);
       cells.forEach((c, i) => {
         const s = getComputedStyle(c);
         if (c.matches('.cbi-section-actions')) {
