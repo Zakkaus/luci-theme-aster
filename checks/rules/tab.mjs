@@ -135,8 +135,9 @@ export async function collect(cfg) {
       const g = r.querySelector(':scope > :is(.td, td).cbi-section-actions > div');
       if (!g) continue;
       const bs = [...g.querySelectorAll(`:scope > ${BTN}`)].filter(shown);
-      bs.sort((x, y) => box(x).left - box(y).left);
-      for (let i = 1; i < bs.length; i++) add('c10.actions', 'gap', px(box(bs[i]).left - box(bs[i - 1]).right), bs[i]);
+      // Gaps on a line (a second line is table.actions' lines).
+      bs.sort((x, y) => box(x).top - box(y).top || box(x).left - box(y).left);
+      for (let i = 1; i < bs.length; i++) if (Math.abs(box(bs[i]).top - box(bs[i - 1]).top) < 1) add('c10.actions', 'gap', px(box(bs[i]).left - box(bs[i - 1]).right), bs[i]);
       const menus = g.querySelectorAll(':scope > .aster-more').length;
       if (bs.length) add('c10.actions', 'menus', menus <= 1 ? 'ok' : `${menus} menus`, g);
     }
@@ -160,7 +161,7 @@ export async function collect(cfg) {
           if (!bs.length) continue;
           const s = cs(c);
           add('c6.table', 'actionsPad', [px(s.paddingTop), px(s.paddingBottom)], c);
-          if (card) add('c6.table', 'actionsEnd', px(box(card).right - parseFloat(cs(card).borderRightWidth) - Math.max(...bs.map((b) => box(b).right))), c);
+          if (card && new Set(bs.map((b) => Math.round(box(b).top))).size === 1) add('c6.table', 'actionsEnd', px(box(card).right - parseFloat(cs(card).borderRightWidth) - Math.max(...bs.map((b) => box(b).right))), c);
           if (!r.querySelector('input:not([type="hidden"], [type="button"], [type="submit"]), select, textarea, .cbi-dropdown:not(.btn)') && cells.every((x) => x.getClientRects().length === 1 && box(x).height <= 50)) {
             add('c6.table', 'rowActions', px(box(r).height), r);
           }
@@ -224,7 +225,7 @@ export async function collect(cfg) {
       if (bs.length && tc) {
         const tops = new Set(bs.map((b) => Math.round(box(b).top)));
         add('c7.actions', 'lines', tops.size === 1 ? 'one' : `${tops.size} lines`, a);
-        add('c7.actions', 'end', px(contentR - Math.max(...bs.map((b) => box(b).right))), a);
+        if (tops.size === 1) add('c7.actions', 'end', px(contentR - Math.max(...bs.map((b) => box(b).right))), a);
         // The title line: the identifier's first line (a subline follows).
         const mid = (box(bs[0]).top + box(bs[0]).bottom) / 2, tb = box(tc);
         add('c7.actions', 'centre', px(Math.abs(mid - (tf ? (tf.top + tf.bottom) / 2 : (tb.top + tb.bottom) / 2))), a);
