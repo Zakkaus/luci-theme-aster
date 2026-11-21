@@ -24,7 +24,7 @@
 }
 /* In a table row every action is the secondary Button, small (doona's
    row actions; Astryx ActionGroup: one primary at most, on the page, not
-   repeated down the rows). Diagnostics' tools are the page's own actions. */
+   repeated down the rows). Diagnostics' tools: below, with the form rows. */
 :is(.td, td) :is(.cbi-button-positive, .cbi-button-apply, .cbi-button-save, .cbi-button-action, .cbi-button-primary, .btn.primary, .btn.important):not(.diag-action *) {
   --button-bg: var(--color-neutral);
   --button-fg: var(--color-text-primary);
@@ -38,6 +38,9 @@
    primary. */
 :is(.cbi-value-field, .controls .control-group, .cbi-page-actions:has(.cbi-dropdown) > *) :is(.cbi-button-positive, .cbi-button-apply, .cbi-button-save, .cbi-button-action, .cbi-button-primary, .btn.primary, .btn.important):not(.cbi-dropdown),
 .cbi-page-actions:has(.cbi-dropdown) > .cbi-button-save,
+/* Diagnostics: three tools, each a field and its action (a ComboButton
+   with IPv4/IPv6): no tool is the page's one main action. */
+.diag-action > :is(.btn, .cbi-button, .cbi-dropdown),
 .toggle-lookups {
   --button-bg: var(--color-neutral);
   --button-fg: var(--color-text-primary);
@@ -68,6 +71,11 @@
   gap: var(--spacing-2);
 }
 .right:not(td, th, .td, .th) { justify-content: flex-end; }
+/* A card's own button row (Add, Force reload, a key list's Add, a
+   section's Remove) is the sm size of a card (C9) and starts on the card's
+   content edge like the rest of the card (C10); toolbars, form rows, the
+   save bar and dialogs keep md. */
+:is(.cbi-section, .cbi-section-node):not(#modal_overlay *) > :is(.right:not(td, th, .td, .th), .cbi-section-remove) { --button-h: var(--size-element-sm); justify-content: flex-start; }
 :is(.right:not(td, th, .td, .th), .cbi-page-actions, .btn-group, .cbi-section-create) > * { margin-inline: 0; }
 :is(td, th, .td, .th).right { text-align: end; }
 /* An actions cell stays a table cell; its buttons sit 8 apart. */
