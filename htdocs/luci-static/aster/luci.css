@@ -557,14 +557,10 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   opacity: 1 !important; /* inline opacity:.5, WireGuard's .8 */
   color: var(--color-text-secondary);
 }
-/* WireGuard status: the instance chip's image is written 32 inline, a
-   Badge's icon is 16; a key in a chip is the chip's words, not a chip of
+/* WireGuard status: the instance chip's image is a device icon
+   (components.css, Badge); a key in a chip is the chip's words, not a chip of
    its own (one 8 inset, the Badge's size); the instance line's key
    wraps anywhere (base64 has no break), each line keeping its inset. */
-.ifacebadge > img[style*="width"] {
-  inline-size: var(--aster-icon-sm) !important; /* inline width:32px */
-  block-size: var(--aster-icon-sm) !important; /* inline height:32px */
-}
 .ifacebadge > code { padding: 0; background: none; font-size: inherit; line-height: inherit; }
 #view > p:has(> .ifacebadge) code { overflow-wrap: anywhere; box-decoration-break: clone; }
 .ifacebox-body > div > .ifacebadge { display: flex; }
