@@ -705,14 +705,48 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
    nftables.js centres it (middle), which grew the row 1-2 px. */
 .nft-rules :is(.nft-set, .nft-set-items) { vertical-align: baseline; }
 /* Realtime graphs' legends (load, bandwidth, wireless, connections) are
-   MetadataLists (C8): labels without colons (theme-aster.js), values on
-   their labels' baseline; the columns as wide as their words, not LuCI's
-   fixed sixths, where a nowrap label ran over its value ("訊號:" over
-   "-45 dBm", audit #4). */
+   MetadataLists (C8), one per series (LuCI's row: the series, Average,
+   Peak), side by side at most two a row, 24 apart: labels 500 secondary
+   without colons (theme-aster.js), from the start (LuCI sets .right on
+   them), values on their baseline. LuCI underlines a series' name in its
+   graph's colour; that colour is a StatusDot-size swatch after the name
+   (G4), as no label is a link. */
 [data-page^="admin-status-realtime"] #view .table:not(:has(.th)) {
-  table-layout: auto !important; /* inline table-layout:fixed */
-  & .td { vertical-align: baseline; }
-  & .td:first-child { inline-size: auto; } /* a list key's 1 %: a grid track on a phone */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(max(min(100%, var(--aster-card-min)), calc((100% - var(--aster-space-page)) / 2)), 1fr));
+  gap: var(--aster-space-page);
+  & > .tr {
+    display: grid;
+    grid-template-columns: fit-content(50%) minmax(0, 1fr);
+    gap: var(--spacing-2) var(--spacing-4);
+    align-items: baseline;
+  }
+  & > .tr > .td {
+    display: block;
+    inline-size: auto;
+    padding: 0;
+    border: 0;
+    color: var(--color-text-primary);
+    text-align: start;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    &:nth-child(odd) { color: var(--color-text-secondary); font-weight: var(--text-label-weight); }
+  }
+  & .td > strong {
+    color: inherit;
+    font-weight: inherit;
+    border-block-end-style: none !important; /* inline series underline */
+    &[style*="border"]::after {
+      content: "";
+      display: inline-block;
+      inline-size: var(--spacing-2);
+      margin-inline-start: var(--spacing-2);
+      border-block-end: var(--spacing-2) solid;
+      border-block-end-color: inherit;
+      border-radius: var(--radius-full);
+      vertical-align: middle;
+    }
+  }
 }
 .nft-comment { --badge-bg: transparent; cursor: help; }
 /* nftables.js's own style pads a badge's tooltip .5em on every side; it
@@ -1026,12 +1060,6 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   min-inline-size: 0 !important; /* inline min-width */
   inline-size: auto !important; /* inline width */
 }
-/* Realtime graphs: a legend row holds three label and value pairs; where
-   six cells do not fit, the pairs stack, value beside label on its
-   baseline. (A repeat(auto-fit) track needs a fixed minimum, or the whole
-   template is dropped and every cell takes a line of its own.) */
-[data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr { display: grid; grid-template-columns: repeat(auto-fit, minmax(6rem, max-content) minmax(6rem, 1fr)); column-gap: var(--spacing-4); align-items: baseline; }
-[data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr > .td { display: block; padding-inline: 0; }
 
 /* ── Realtime graphs [ported] ───────────────────────────────── */
 
@@ -1054,9 +1082,6 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   border-radius: 0;
 }
 #view svg line { stroke: var(--color-border) !important; } /* inline stroke:black */
-/* The legend under a graph: each name and value on one line, from the
-   start (luci-mod-status sets .right on the names). */
-[data-page^="admin-status-realtime"] #view .table:not(:has(.th)) .td { white-space: nowrap; text-align: start; }
 #view svg text {
   fill: var(--color-text-secondary) !important; /* inline fill:#eee */
   text-shadow: none !important; /* inline dark shadow */
