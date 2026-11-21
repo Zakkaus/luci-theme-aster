@@ -192,6 +192,9 @@ html :where(kbd) {
    browser shears the glyphs): LuCI's placeholders ("無", "此部份還未包含
    任何值") are upright, in secondary ink. */
 html :where(:lang(zh), :lang(ja), :lang(ko)) :where(em, i:not([class])) { font-style: normal; color: var(--color-text-secondary); }
+/* A <var> (a firewall rule's protocol and verdict, Unbound's zone names)
+   is upright too, in the ink of its text. */
+html :where(:lang(zh), :lang(ja), :lang(ko)) :where(var) { font-style: normal; }
 
 /* ── Button ──────────────────────────────────────────────────────
    Secondary md by default: 36 high, pill, 12 inline, label weight, the
