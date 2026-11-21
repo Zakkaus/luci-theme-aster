@@ -12,7 +12,7 @@
 export const canonical = {
   'c6.table': {
     _source: 'COMPONENTS.md C6 (owner Q1 = A): the actions cell pads 8 (a row with sm buttons 49); its last button ends 16 from the card border; LuCI .right columns end-aligned',
-    actionsPad: [8, 8], actionsEnd: 16, rowActions: 49, numAlign: 'end',
+    actionsPad: [8, 8], actionsEnd: 16, rowActions: 49, numAlign: 'end', run: 'ok',
   },
   'c7.when': {_source: 'COMPONENTS.md C7: a table is folded iff its min-content is wider than its room (unfolds with 16 to spare); every data table is measured', state: 'ok'},
   'c7.sig': {
@@ -150,6 +150,16 @@ export async function collect(cfg) {
       for (let i = 1; i < bs.length; i++) if (Math.abs(box(bs[i]).top - box(bs[i - 1]).top) < 1) add('c10.actions', 'gap', px(box(bs[i]).left - box(bs[i - 1]).right), bs[i]);
       const menus = g.querySelectorAll(':scope > .aster-more').length;
       if (bs.length) add('c10.actions', 'menus', menus <= 1 ? 'ok' : `${menus} menus`, g);
+    }
+
+    // Zone => Forwards (C13 Badges in a cell): one run, wrapping only
+    // where it does not fit, never a column of boxes.
+    for (const z of t.querySelectorAll('.zone-forwards')) {
+      const it = [...z.querySelectorAll('.zonebadge, :scope > span')].filter(shown);
+      if (it.length < 2 || !shown(z)) continue;
+      const w = it.reduce((a, e) => a + box(e).width, 0) + 8 * (it.length - 1);
+      const lines = 1 + it.filter((e, i) => i && box(e).top >= box(it[i - 1]).bottom - 1).length;
+      add('c6.table', 'run', lines > 1 && w <= z.clientWidth + 1 ? `${lines} lines` : 'ok', z);
     }
 
     if (fold === 'wide') {

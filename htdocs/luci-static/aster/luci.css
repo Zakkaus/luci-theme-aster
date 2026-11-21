@@ -352,6 +352,13 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
 /* A zone's chip that opens its cell (Firewall Zones' "lan => wan") starts
    on the column's text edge, under the column's heading. */
 .td .zone-forwards > .zone-src:first-child > .zonebadge:first-child { margin-inline-start: 0; }
+/* Zone => Forwards is one line of text (source, arrow, destinations), its
+   Badges 8 apart, wrapping between them; LuCI's column of boxes put each
+   on a line of its own (three lines at any width). As text, a folded
+   title line centres it on the actions (C7). */
+.zone-forwards > :is(.zone-src, .zone-dest) { display: contents; }
+.td .zone-forwards :is(.zonebadge, span) { margin: 0 var(--spacing-2) 0 0; vertical-align: middle; }
+.td .zone-forwards > .zone-dest > :last-child { margin-inline-end: 0; }
 
 /* ── Tables [ported] ────────────────────────────────────────── */
 

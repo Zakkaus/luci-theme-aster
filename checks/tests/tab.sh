@@ -19,6 +19,7 @@ printf '%s\n' 'admin/status/routes require=c7.sig,c7.x,c7.labelw,c7.when' >"$tmp
 printf '%s\n' 'admin/network/firewall/ipsets require=c20.empty' >"$tmp/tab-empty.txt"
 printf '%s\n' 'admin/status/routes require=c7.when' >"$tmp/tab-when.txt"
 printf '%s\n' 'admin/status/nftables require=c7.when,c20.empty' >"$tmp/tab-nft.txt"
+printf '%s\n' 'admin/network/firewall/zones require=c6.table' >"$tmp/tab-zones.txt"
 expect uniform 0 "" "Processes: a wide Table on the desktop" -- "$url" "$password" --pages "$tmp/tab-proc.txt"
 expect uniform 0 "" "Processes: one FoldedBlock layout on a phone" -- "$url" "$password" --pages "$tmp/tab-proc-phone.txt" --viewports phone
 expect uniform 0 "" "IP sets: the compact EmptyState" -- "$url" "$password" --pages "$tmp/tab-empty.txt"
@@ -41,6 +42,10 @@ expect uniform 1 "c7.when state,overflow excess" "wide table that does not fit" 
 # chain's 1px ::after resizes it, so theme-aster.js measures again.
 expect uniform 1 "c7.when state,overflow excess,table.row.text height" "table measured with words broken (CJK)" -- "$url" "$password" --pages "$tmp/tab-nft.txt" --viewports phone \
 	--debug-css 'admin/status/nftables=html #view .table[style*="min-content"] :is(.td, .th) { word-break: break-all !important } html #view .nft-chain::after { content: ""; display: block; block-size: 1px }'
+# Zones: "lan => wan REJECT all others" as LuCI's column of boxes, three
+# lines in a 360 column (c).
+expect uniform 1 "c6.table run" "zone forwards stacked (c)" -- "$url" "$password" --pages "$tmp/tab-zones.txt" \
+	--debug-css 'admin/network/firewall/zones=html #view .zone-forwards, html #view .zone-forwards > * { display: block !important }'
 # G9: a media query laying out table rows.
 expect uniform 1 "g.mq blocks" "table layout by a media query" -- "$url" "$password" --pages "$tmp/tab-proc.txt" \
 	--debug-css 'admin/status/processes=@media (min-width: 1px) { #view .table .tr { color: inherit } }'

@@ -58,7 +58,7 @@ admin/network/routes                 require=font.body,heading.page,card,button,
 # form one tab over (pages-25.12.txt requires the fields there).
 admin/network/dhcp                   require=font.body,heading.page,card,button,tab
 admin/network/diagnostics            require=font.body,heading.page,card,button,field.input
-admin/network/firewall/zones         require=font.body,heading.page,card,button,field,checkbox,form.label,table,tab,c7.when,c10.actions
+admin/network/firewall/zones         require=font.body,heading.page,card,button,field,checkbox,form.label,table,tab,c7.when,c10.actions,c6.table
 admin/network/firewall/forwards      require=font.body,heading.page,card,button,table@rows,tab
 admin/network/firewall/rules         require=font.body,heading.page,card,button,table,tab,c7.when,c10.actions
 admin/network/firewall/snats         require=font.body,heading.page,card,button,table@rows,tab
