@@ -86,13 +86,16 @@ return baseclass.extend({
 		const menu = document.body.appendChild(E('ul', { id: 'aster-more-menu', role: 'menu', popover: 'auto',
 			beforetoggle: (ev) => {
 				owner.ariaExpanded = ev.newState == 'open';
-				ev.newState == 'open' && menu.replaceChildren(...[...acts(owner.parentNode)].slice(1).sort((x, y) => x.matches(neg) - y.matches(neg)).map((b, i) =>
+				/* The rest in DOM order, Remove/Negative last in red after a Divider. */
+				ev.newState == 'open' && menu.replaceChildren(...[...acts(owner.parentNode)].filter((b) => !b.hasAttribute('data-keep')).sort((x, y) => x.matches(neg) - y.matches(neg)).flatMap((b, i, l) => [
+					...(b.matches(neg) && i && !l[i - 1].matches(neg) ? [E('li', { role: 'separator' })] : []),
 					E('li', { role: 'menuitem', tabindex: -1, class: b.matches(neg) ? 'negative' : null, 'aria-disabled': b.disabled || null, autofocus: !i || null,
-						click: b.disabled ? null : () => (menu.hidePopover(), b.click()) }, (b.textContent || b.value).trim())));
+						click: b.disabled ? null : () => (menu.hidePopover(), b.click()) }, (b.textContent || b.value).trim())]));
 			},
 			keydown: (ev) => {
-				const k = ev.key, a = ev.target, f = menu.firstChild, l = menu.lastChild,
-					go = { ArrowDown: a.nextSibling || f, ArrowUp: a.previousSibling || l, Home: f, End: l }[k];
+				const k = ev.key, a = ev.target, f = menu.firstChild, l = menu.lastChild;
+				let go = { ArrowDown: a.nextSibling || f, ArrowUp: a.previousSibling || l, Home: f, End: l }[k];
+				go?.role == 'separator' && (go = k == 'ArrowUp' ? go.previousSibling : go.nextSibling);
 				if (go)
 					go.focus();
 				else if (k == 'Enter' || k == ' ')
@@ -103,20 +106,33 @@ return baseclass.extend({
 			}
 		}));
 		const fit = (t) => {
-			const gs = groups(t), on = (v) => gs.forEach((g) => g.toggleAttribute('data-collapsed', v));
+			const gs = groups(t), on = (v) => gs.forEach((g) => {
+				const a = [...acts(g)];
 
+				g.toggleAttribute('data-collapsed', v);
+				a.forEach((b) => b.toggleAttribute('data-keep', b == (a.find((b) => b.matches('.cbi-button-edit, .important')) || a.find((b) => !b.matches(neg)) || a[0])));
+			});
+
+			/* Collapsed where the line does not fit; folded, also where that
+			 * saves a title line a wrap (the actions collapse before the
+			 * title wraps; they never take a line of their own). */
 			if (t.offsetWidth) {
+				on(true);
+				const h = t.offsetHeight;
 				on(false);
-				on(wide(t.parentNode) || wide(t) || gs.some((g) => wide(g) || g.offsetWidth > g.parentNode.clientWidth));
+				on(wide(t.parentNode) || wide(t) || [...t.querySelectorAll('.tr > *')].some(wide) || gs.some((g, r, b) => (r = g.getBoundingClientRect(), b = t.getBoundingClientRect(), wide(g) || g.offsetWidth > g.parentNode.clientWidth || r.left < b.left - 1 || r.right > b.right + 1)) || t.dataset.fold == 'fold' && h < t.offsetHeight);
 			}
 		};
-		const ro = new ResizeObserver((es) => es.forEach((e) => e.target.querySelectorAll(':scope > :is(.table, table)').forEach(fit)));
+		/* The parent's room, or the table's own size (it folds), read on the
+		 * next frame. */
+		const q = new Set();
+		const ro = new ResizeObserver((es) => (q.size || requestAnimationFrame(() => (q.forEach(fit), q.clear())), es.forEach((e) => (e.target.matches('.table, table') ? [e.target] : e.target.querySelectorAll(':scope > :is(.table, table)')).forEach((t) => q.add(t)))));
 		const run = () => new Set(groups(view).map((g) => {
 			g.querySelector('.aster-more') || g.appendChild(E('button', { type: 'button', class: 'btn cbi-button aster-more',
 				'aria-haspopup': 'menu', 'aria-expanded': false, 'aria-label': _('Actions'), popovertarget: 'aster-more-menu',
 				click: (ev) => owner = ev.currentTarget }));
 			return g.closest('.table, table');
-		})).forEach((t) => (ro.observe(t.parentNode), fit(t)));
+		})).forEach((t) => (ro.observe(t.parentNode), ro.observe(t), fit(t)));
 
 		run();
 		new MutationObserver(run).observe(view, { childList: true, subtree: true });

@@ -231,14 +231,14 @@ html :where(button, input[type="button"], input[type="submit"], input[type="rese
 }
 /* The "more" IconButton after a row's first action (theme-aster.js
    actions(), doona ActionGroup): square at the Button's height, Heroicons
-   2.2.0 EllipsisVertical (MIT) at 20. */
+   2.2.0 EllipsisHorizontal (MIT) at 16 (RowActions). */
 html :where(.aster-more) { --button-px: 0; inline-size: var(--button-h, var(--size-element-md)); }
 html :where(.aster-more)::before {
   content: "";
-  inline-size: var(--aster-icon-md);
-  block-size: var(--aster-icon-md);
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
   background-color: currentColor;
-  mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z'/></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z'/></svg>") center / contain no-repeat;
 }
 /* IconButton (Astryx isIconOnly): a button drawing one glyph (pager
    arrows, drag handle, dynlist add, a field's reveal or CIDR switch, a Lua
@@ -531,6 +531,7 @@ html :where(.palette-menu[open] > [role="menu"] > li, #aster-more-menu > li) { c
 html :where(#aster-more-menu:popover-open) { position: fixed; inset: auto; position-anchor: --aster-more; position-area: block-end span-inline-start; position-try-fallbacks: flip-block; min-inline-size: 0; margin: var(--spacing-1) 0; border: 0; transform: none; }
 html :where(.aster-more[aria-expanded="true"]) { anchor-name: --aster-more; }
 html :where(#aster-more-menu > li.negative) { --menu-item-fg: var(--color-text-error); }
+html :where(#aster-more-menu > li[role="separator"]) { block-size: 0; min-block-size: 0; margin-block: var(--spacing-1); padding: 0; border-block-start: var(--border-width) solid var(--color-border); pointer-events: none; }
 html :where(#aster-more-menu > li[aria-disabled="true"]) { opacity: 0.5; cursor: default; }
 html :where(.palette-menu [role="menu"] small) { color: var(--color-text-secondary); font-size: var(--text-supporting-size); }
 html :where(.palette-swatch) {

@@ -370,9 +370,12 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
    short wrapped Delete under the rest (Traffic Rules). */
 #view .td.cbi-section-actions > div { flex-wrap: nowrap; white-space: nowrap; }
 /* A row's actions that do not fit (theme-aster.js data-collapsed): the
-   first, then the "more" button; the rest are its menu's rows. */
-:is(.td, td) > div[data-collapsed] > :not(.drag-handle, .aster-more) ~ :not(.aster-more),
+   edit action (or the first), then the "more" button; the rest are its
+   menu's rows (RowActions). */
+:is(.td, td) > div[data-collapsed] > :not(.drag-handle, .aster-more, [data-keep]),
 :is(.td, td) > div:not([data-collapsed]) > .aster-more { display: none; }
+/* Sorting by drag: the handle is the actions' last item. */
+:is(.td, td) > div > .drag-handle { order: 1; }
 /* The diagnostics page lays three tools out as three cells of one row. */
 .table:has(.diag-action) { table-layout: fixed; }
 .td > input + .diag-action { display: block; margin: var(--spacing-2) 0 0; }
