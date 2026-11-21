@@ -1013,12 +1013,10 @@ html #view > p.center {
   & > em { font-style: normal; }
 }
 /* The actions cell keeps its buttons 8 off the row lines (a row with
-   actions is 32 + 16 + 1 = 49); numbers end-aligned in their column
+   actions is 32 + 16 + 1 = 49), as does a row's field (a zone's policy
+   select, G7: 36 + 16 + 1 = 53); numbers end-aligned in their column
    (LuCI's .right), the header with them. */
-html :where(:is(.td, td).cbi-section-actions, .tr > .td:not([data-title]):has(> .cbi-button:only-child)) { padding-block: var(--spacing-2); }
-/* A row's field (a zone's policy select) keeps 8 off the row lines too (G7):
-   36 + 16 + 1 = 53. */
-html :where([data-fold="wide"] .td.cbi-value-field:has(select, .cbi-dropdown, textarea, input:not([type="hidden"], [type="checkbox"], [type="radio"]))) { padding-block: var(--spacing-2); }
+html :where(:is(.td, td).cbi-section-actions, .tr > .td:not([data-title]):has(> .cbi-button:only-child), [data-fold="wide"] .td.cbi-value-field:has(select, .cbi-dropdown, textarea, input:not([type="hidden"], [type="checkbox"], [type="radio"]))) { padding-block: var(--spacing-2); }
 html :where(:is(.td, .th, td, th).right) { text-align: end; }
 /* An identifier in a cell is one line (G5): a package's name, a mount's
    device (its UUID), a <var> in LuCI's words (an unbound zone, a server, a
@@ -1188,6 +1186,10 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
   }
   & :where(.tr:has(> .cbi-section-actions :is(.btn, .cbi-button, button), > :not([data-title]) > .cbi-button:only-child)) { --aster-title-line: var(--size-element-sm); }
   & :where(.tr > :is(.td, td) .ifacebox-head) { min-block-size: var(--aster-title-line, auto); align-items: center; }
+  /* So is a radio's badge and a network's name (Wireless, AUDIT4 B3):
+     4.5 above the buttons' centre, on a line of their own (the badge
+     inherits its line's). */
+  & :where(.tr > [data-head] > div:has(> .ifacebadge), .tr > [data-head] > div > .nowrap:first-child) { line-height: var(--aster-title-line, inherit); }
   /* The title's second line (a device under its interface, a station's
      addresses under its host): supporting text, no marker before it. */
   & :where(.tr > :is(.td, td) :is(.hide-xs, .ifacebox-body)) {

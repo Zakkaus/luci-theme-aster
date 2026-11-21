@@ -945,6 +945,10 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
   & .nowrap { display: contents; white-space: normal; }
   & .nowrap > strong { grid-column: 1; color: var(--color-text-secondary); font-weight: var(--text-label-weight); }
   & .nowrap:not(:has(> strong)) { display: block; grid-column: 1 / -1; }
+  /* Folded, a network's name is its title (C7): its first pair (SSID,
+     Mesh ID) without the label, one line on the content edge beside
+     Edit; mode, BSSID and encryption follow as rows (AUDIT4 B3). */
+  [data-fold="fold"] &[data-head] .nowrap:first-child { display: block; grid-column: 1 / -1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; & > strong { display: none; } }
 }
 /* Realtime graphs' legends (load, bandwidth, wireless, connections) are
    MetadataLists (C8), one per series (LuCI's row: the series, Average,
