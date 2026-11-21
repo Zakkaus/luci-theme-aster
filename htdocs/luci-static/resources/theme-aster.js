@@ -51,7 +51,7 @@ return baseclass.extend({
 			 * name where LuCI gives none (nftables, Lua maps), an empty one
 			 * ("-") is marked, and mixed content goes into one box. */
 			if (t.dataset.fold == 'wide')
-				return t.querySelectorAll('.aster-v').forEach((v) => v.replaceWith(...v.childNodes));
+				return t.querySelectorAll('.tr > * > div.aster-v').forEach((v) => v.replaceWith(...v.childNodes));
 
 			const h = [...(t.querySelector('.tr:has(> .th)')?.children || [])].map((c) => c.textContent.trim());
 			t.querySelectorAll('.tr:not(:has(> .th))').forEach((r) => [...r.children].forEach((c, i) => {
