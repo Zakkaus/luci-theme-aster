@@ -970,9 +970,10 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   overflow: hidden;
 }
 /* Inside a card the card is the frame: a section, or a tab pane drawn as
-   the card (Channel Analysis: one pane a band, its graph in it). */
+   the card (Channel Analysis: one pane a band, its graph in it). No
+   border at all, so the graph runs from content edge to content edge. */
 #view :is(.cbi-section, #view > div:not(.cbi-map) > div > [data-tab], #view > div:not(.cbi-map) > div:has(> .cbi-tabmenu) > div > [data-tab]) div[style*="border:1px solid #000"] {
-  border-color: transparent !important; /* inline black frame */
+  border-width: 0 !important; /* inline black frame */
   border-radius: 0;
 }
 #view svg line { stroke: var(--color-border) !important; } /* inline stroke:black */
