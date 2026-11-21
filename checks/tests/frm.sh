@@ -23,6 +23,8 @@ printf 'admin/status/nftables require=c2.card,g.nested\n' >"$tmp/frm-nft.txt"
 printf 'admin/system/crontab require=c1.descr\n' >"$tmp/frm-cron.txt"
 printf 'admin/system/admin/dropbear require=c3.heading\n' >"$tmp/frm-drop.txt"
 printf 'admin/network/firewall/zones require=c9.button\n' >"$tmp/frm-zones.txt"
+printf 'admin/status/routes require=c3.heading\n' >"$tmp/frm-routes.txt"
+printf 'admin/status/realtime/connections require=c1.header\n' >"$tmp/frm-conn.txt"
 expect uniform 0 "" "System: every frame rule measures and holds" -- "$url" "$password" --pages "$tmp/frm-sys.txt" --viewports desktop,phone
 
 # G1: a form row's gap off the spacing scale.
@@ -109,6 +111,16 @@ expect uniform 1 "c5.form conform" "labelled text area full row (C5, audit2)" "t
 # C9, audit2: the drag handle a filled secondary.
 expect uniform 1 "c9.button conform" "drag handle filled (C9, audit2)" "drag handle fill" -- "$url" "$password" --pages "$tmp/frm-zones.txt" \
 	--debug-css 'admin/network/firewall/zones=#view .drag-handle { --button-bg: var(--color-neutral) }'
+# C3, audit3 B1: Routing's tables, one card without a title, headed at
+# two sizes (Neighbours 18, Routes and Rules 15).
+expect uniform 1 "c3.heading conform,heading.card *" "routing table headings at two sizes (C3, audit3 B1)" "card size" -- "$url" "$password" --pages "$tmp/frm-routes.txt" \
+	--debug-css 'admin/status/routes=#view .cbi-section > h3 ~ h3 { font-size: 15px !important }'
+# G5, audit3 B2: a dialog title broken inside a word.
+expect uniform 1 "c18.dialog conform" "dialog title broken in a word (G5, audit3 B2)" "title word" -- "$url" "$password" --pages "$tmp/frm-dialog.txt" --viewports phone \
+	--debug-css 'admin/network/network=#modal_overlay > .modal > h4 { inline-size: 24px; word-break: break-all !important }'
+# C1, audit3 B3: Connections' filter against its DNS switch (phone).
+expect uniform 1 "c1.header conform" "toolbar controls touching (C1, audit3 B3)" "toolbar gap" -- "$url" "$password" --pages "$tmp/frm-conn.txt" --viewports phone \
+	--debug-css 'admin/status/realtime/connections=#settings-row { gap: 0 !important }'
 
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true

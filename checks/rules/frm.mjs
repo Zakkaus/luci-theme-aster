@@ -25,7 +25,7 @@ const RULES = {
   'g.nested': 'G8: no box or fill inside a card but controls, Badges, Banners, code',
   'g.textx': 'G3: headings, descriptions, form labels and button rows start on the card content edge',
   'g.label': 'G10: a label (form row, toolbar, nft clause, dialog legend) has no trailing colon',
-  'c1.header': 'C1: no actions in the title line; a card title does not repeat the page title or the selected tab',
+  'c1.header': 'C1: no actions in the title line; a card title does not repeat the page title or the selected tab; a toolbar\'s controls 8 apart',
   'c1.descr': 'C1/C3: page description body 15/24, card description supporting 13/20, both secondary',
   'c2.card': 'C2: radius 16, border 1, card fill, padding 16',
   'c3.heading': 'C3: page 26/600, card 18/600, inner 16/600; heading box -> content 16; actions (a section\'s Remove, C10) on the heading\'s row, ending on the content end',
@@ -33,7 +33,7 @@ const RULES = {
   'c5.form': 'C5: label 200 + 16 (stacked 4), row padding 8, fields 36, a labelled text area 256, a read-only value whole, buttons wrapped 8 under their field, help 4',
   'c9.button': 'C9: md 36 in toolbars/forms/save bar/dialogs, sm 32 in tables/cards/heading rows; one primary; red only in a dialog; the drag handle ghost; C11: the save bar reads Reset, Save, Save & Apply',
   'c17.banner': 'C17: padding 12, radius 12, icon gap 8',
-  'c18.dialog': 'C18: padding 16, title/footer gaps 16, button gap 8, the confirm last, width 400/560/800 or window - 32, fits',
+  'c18.dialog': 'C18: padding 16, title/footer gaps 16, button gap 8, the confirm last, width 400/560/800 or window - 32, fits; G5: the title breaks between words',
   'c19.progress': 'C19: bar 8 high, 4 under its text',
   'c20.upright': 'C20: CJK text is never slanted (em, i, var upright)',
   'c22.divider': 'C22: 1 thick, spans the card content box; 16 under the last control of the form row above',
@@ -249,7 +249,9 @@ export function collect(cfg) {
       // The card's title: its first heading, unless that names a flat section
       // inside it (24.10's leases card has no title but its first heading).
       // nftables' table title sits in a section of its own (25.12).
-      const top = h === hs[0] && h.matches('h3') && (h.parentElement.matches('.nft-table > .cbi-section') ? c : h.parentElement.closest(CARD_SEL)) === c;
+      // Without a title, a table's own heading is one (the routing tables,
+      // 24.10's leases: audit3 B1), as in components.css.
+      const top = (h === hs[0] || h.matches(':is(.cbi-section > div:not(.cbi-title), .cbi-section) > h3 ~ h3:has(+ :is(table, .table)):not(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div > h3)')) && h.matches('h3') && (h.parentElement.matches('.nft-table > .cbi-section') ? c : h.parentElement.closest(CARD_SEL)) === c;
       const want = top ? H3 : H4;
       check('c3.heading', top ? 'card size' : 'inner size', f(s.fontSize), want, h);
       check('c3.heading', 'weight', s.fontWeight, '600', h);
@@ -394,6 +396,18 @@ export function collect(cfg) {
     const kids = [...scope.children].filter(visible);
     const title = kids.find((k) => k.matches('h4, h3'));
     if (title && kids[kids.indexOf(title) + 1]) check('c18.dialog', 'title gap', box(kids[kids.indexOf(title) + 1]).top - box(title).bottom, 16, title);
+    // G5: the title wraps between words, never inside one (a rule's name:
+    // audit3 B2).
+    if (title) {
+      let cut = 'none';
+      for (let w = document.createTreeWalker(title, NodeFilter.SHOW_TEXT), t; (t = w.nextNode());) for (const m of t.data.matchAll(/\S+/g)) {
+        const r = document.createRange();
+        r.setStart(t, m.index);
+        r.setEnd(t, m.index + m[0].length);
+        if (new Set([...r.getClientRects()].map((x) => Math.round(x.top))).size > 1) cut = m[0];
+      }
+      check('c18.dialog', 'title word', cut, 'none', title);
+    }
     const foot = kids.find((k) => k.matches('.button-row, .right:last-child'));
     if (foot && kids[kids.indexOf(foot) - 1]) {
       check('c18.dialog', 'footer gap', box(foot).top - box(kids[kids.indexOf(foot) - 1]).bottom, 16, foot);
@@ -465,6 +479,17 @@ export function collect(cfg) {
       for (const b of all(BTN)) if (!pinned(b) && box(b).top < hb.bottom - 0.5 && box(b).bottom > hb.top + 0.5) fail('c1.header', 'action in title line', b.textContent.trim(), 'none', b);
     }
     for (const h of all('.cbi-section > h3')) { count('c1.header'); if (said.includes(h.textContent.trim())) fail('c1.header', 'repeats', h.textContent.trim(), 'hidden', h); }
+    // A toolbar's controls on one line keep 8 apart, also where a field
+    // shrinks (Connections' filter and DNS switch: audit3 B3).
+    for (const t of all('#settings-row, #view div:has(> [id^="invert"])')) {
+      const cs = [...t.querySelectorAll(`${BTN}, ${FIELD}`)].filter((e) => visible(e) && !e.parentElement.closest(`${BTN}, .cbi-dropdown`)).sort((a, b) => box(a).left - box(b).left);
+      for (let i = 1; i < cs.length; i++) {
+        const a = box(cs[i - 1]), b = box(cs[i]);
+        if (b.top >= a.bottom - 0.5 || a.top >= b.bottom - 0.5) continue;
+        count('c1.header');
+        if (b.left - a.right < 7.5) fail('c1.header', 'toolbar gap', b.left - a.right, 8, cs[i]);
+      }
+    }
     // A type style as the page computes it: [size, line height].
     const type = (n) => {
       const p = document.body.appendChild(document.createElement('div'));
