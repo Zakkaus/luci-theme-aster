@@ -557,11 +557,24 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   opacity: 1 !important; /* inline opacity:.5, WireGuard's .8 */
   color: var(--color-text-secondary);
 }
-/* WireGuard status: the instance chip's image is a device icon
-   (components.css, Badge); a key in a chip is the chip's words, not a chip of
-   its own (one 8 inset, the Badge's size); the instance line's key
-   wraps anywhere (base64 has no break), each line keeping its inset. */
+/* WireGuard status: a key in a peer's chip is the chip's words, not a
+   chip of its own (one 8 inset, the Badge's size); the instance line's
+   key wraps anywhere (base64 has no break), each line keeping its inset. */
 .ifacebadge > code { padding: 0; background: none; font-size: inherit; line-height: inherit; }
+/* The instance line is one line of metadata, not a chip and text (owner
+   2026-11-21: the chip's words sat 4-5 above the port's baseline and
+   started 45 in): the device icon (components.css) on the content edge,
+   centred on the line, then the name in body text and LuCI's
+   " · port · key" after it, all on one baseline. */
+#view > p > .ifacebadge {
+  display: inline;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--color-text-primary);
+  font: inherit;
+  &::before { display: inline-block; margin-inline-end: var(--spacing-1); vertical-align: middle; }
+}
 #view > p:has(> .ifacebadge) code { overflow-wrap: anywhere; box-decoration-break: clone; }
 .ifacebox-body > div > .ifacebadge { display: flex; }
 .ifacebox-body > div > .ifacebadge + .ifacebadge { margin-block-start: var(--spacing-2); }
