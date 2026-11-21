@@ -146,35 +146,59 @@ html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([cl
 
 /* ── Page layouts [ported] ──────────────────────────────────── */
 
-/* nftables titles each table with a card holding only its heading: the
-   heading of the chains under it, no card (settings template: a section
-   title, no frame). */
-.nft-table > .cbi-section:has(> h3:only-child) {
-  --card-pad: 0;
-  --card-border-width: 0;
-  --card-radius: 0;
-  --card-bg: transparent;
-}
-
 /* A page title with page-level actions (Channel Analysis' Refresh
-   Channels: .cbi-title-section) is Astryx's PageHeader: the title at the
-   start, the actions at the end of its line, centred on it; 24 to what
-   follows, as under any page title. */
+   Channels: .cbi-title-section) is Astryx's PageHeader: no actions in the
+   title line (C1); they are its toolbar, a row of their own 24 under the
+   title, 16 over what follows. */
 .cbi-title-section {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--aster-space-row) var(--aster-space-region);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--aster-space-page);
   & > h2 { margin: 0; }
   & > .cbi-title-buttons { display: flex; flex-wrap: wrap; gap: var(--aster-space-row); }
+  & > .cbi-title-buttons:empty { display: none; }
   & > .cbi-title-buttons > * { margin: 0; }
 }
 #view > .cbi-title-section + *, #view > div > .cbi-title-section + * { margin-block-start: var(--aster-space-page); }
+#view > .cbi-title-section:has(> .cbi-title-buttons > *) + *, #view > div > .cbi-title-section:has(> .cbi-title-buttons > *) + * { margin-block-start: var(--aster-space-region); }
 
-/* A page's description written as a bare <p> under its title (Routing)
-   is the map description: supporting size, secondary ink. */
-#view > h2 + p, #view > div > h2 + p {
+/* nlbwmon's Backup tab writes each action as a heading and a button row
+   straight in the view (h5 + p), no section around them. Each pair is a
+   Card (C2): the heading its title (Heading 3) and top, the row its
+   bottom, 16 between them (C3); the cards 16 apart. */
+[data-page="admin-services-nlbw-backup"] #view {
+  & > h5, & > h5 + p {
+    padding-inline: calc(var(--aster-space-region) - var(--border-width));
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-background-surface);
+  }
+  & > h5 {
+    padding-block: calc(var(--aster-space-region) - var(--border-width)) var(--aster-space-region);
+    border-block-end: 0;
+    border-start-start-radius: var(--radius-container);
+    border-start-end-radius: var(--radius-container);
+    font-size: var(--text-heading-3-size);
+    line-height: var(--text-heading-3-leading);
+  }
+  & > h5 + p {
+    margin-block-start: 0;
+    padding-block-end: calc(var(--aster-space-region) - var(--border-width));
+    border-block-start: 0;
+    border-end-start-radius: var(--radius-container);
+    border-end-end-radius: var(--radius-container);
+  }
+}
+/* The page's description (C1): the map's, a section's straight under the
+   title (Crontab) or a bare <p> there (Routing): body 15/24, secondary ink,
+   one style on every page. A card's description is supporting 13/20 (C3;
+   components.css), as is a tab pane's leading paragraph (Startup). */
+#view :is(h2:not(.cbi-section *) + :is(.cbi-map-descr, .cbi-section-descr, p), .cbi-map > .cbi-map-descr) {
+  color: var(--color-text-secondary);
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-leading);
+}
+#view [data-tab]:not(li) > p:first-child:not(:has(input, select, textarea, button)) {
   color: var(--color-text-secondary);
   font-size: var(--text-supporting-size);
   line-height: var(--text-supporting-leading);

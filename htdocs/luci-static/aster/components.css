@@ -152,7 +152,7 @@ html :where(h1, .shell-content h2:not(.cbi-section *)) {
   line-height: var(--text-heading-1-leading);
 }
 /* Supporting text: descriptions and help. */
-html :where(.cbi-map-descr, .cbi-section-descr, .cbi-value-description) {
+html :where(.cbi-map-descr, .cbi-section-descr, .cbi-tab-descr, .cbi-value-description) {
   color: var(--color-text-secondary);
   font-size: var(--text-supporting-size);
   line-height: var(--text-supporting-leading);
