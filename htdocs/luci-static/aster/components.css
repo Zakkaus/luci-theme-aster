@@ -1155,19 +1155,14 @@ html :where(.tabs, .cbi-tabmenu) {
 }
 html :where(.tabs > li, .cbi-tabmenu > li) { flex: none; }
 html :where(.tab[data-active], .cbi-tabmenu > .cbi-tab) { scroll-initial-target: nearest; }
-/* A list that scrolls fades out 32 at the end that has more (both ends
-   in the middle), so a tab cut at the edge reads as more to scroll. A
-   scroll timeline runs only while the list overflows. */
-html :where(.tabs, .cbi-tabmenu) {
-  mask: linear-gradient(to right, transparent, black var(--tabs-fade-s) calc(100% - var(--tabs-fade-e)), transparent);
-  animation: aster-tabs-fade linear both;
-  animation-timeline: scroll(self inline);
-}
-@property --tabs-fade-s { syntax: "<length>"; inherits: false; initial-value: 0; }
-@property --tabs-fade-e { syntax: "<length>"; inherits: false; initial-value: 0; }
-@keyframes aster-tabs-fade {
-  from { --tabs-fade-s: 0; --tabs-fade-e: var(--spacing-8); }
-  to { --tabs-fade-s: var(--spacing-8); --tabs-fade-e: 0; }
+/* A second tab level (a view's tabs under the page's, nlbwmon; a tabbed
+   section inside a tab, DHCP) is Astryx's sm TabList: 32 high, 8 inline,
+   label in supporting text, so the two rows never read as one menu. */
+html :where(#view:has(> #tabmenu, > .cbi-map > #tabmenu) .cbi-tabmenu, [data-tab] .cbi-tabmenu) > li > a {
+  min-block-size: var(--size-element-sm);
+  padding-inline: var(--spacing-2);
+  font-size: var(--text-supporting-size);
+  line-height: var(--text-supporting-leading);
 }
 
 /* ── ProgressBar ─────────────────────────────────────────────────
