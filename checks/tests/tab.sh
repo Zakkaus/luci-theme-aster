@@ -18,9 +18,13 @@ printf '%s\n' 'admin/status/processes require=c7.sig,c7.x,c7.labelw,c7.actions,c
 printf '%s\n' 'admin/status/routes require=c7.sig,c7.x,c7.labelw,c7.when' >"$tmp/tab-routes.txt"
 printf '%s\n' 'admin/network/firewall/ipsets require=c20.empty' >"$tmp/tab-empty.txt"
 printf '%s\n' 'admin/status/routes require=c7.when' >"$tmp/tab-when.txt"
+printf '%s\n' 'admin/status/nftables require=c7.when,c20.empty' >"$tmp/tab-nft.txt"
+printf '%s\n' 'admin/network/firewall/zones require=c6.table' >"$tmp/tab-zones.txt"
+printf '%s\n' 'admin/system/startup require=c7.title' 'admin/status/routes require=c7.title' >"$tmp/tab-title.txt"
 expect uniform 0 "" "Processes: a wide Table on the desktop" -- "$url" "$password" --pages "$tmp/tab-proc.txt"
 expect uniform 0 "" "Processes: one FoldedBlock layout on a phone" -- "$url" "$password" --pages "$tmp/tab-proc-phone.txt" --viewports phone
 expect uniform 0 "" "IP sets: the compact EmptyState" -- "$url" "$password" --pages "$tmp/tab-empty.txt"
+expect uniform 0 "" "Startup, Routes: folded by the column naming the row" -- "$url" "$password" --pages "$tmp/tab-title.txt" --viewports phone
 
 # Defect 11: row actions on the row line (no padding in the actions cell).
 expect uniform 1 "c6.table *,table.row.button height,table.td.actions paddingBlock" "row actions on the row lines (defect 11)" -- "$url" "$password" --pages "$tmp/tab-proc.txt" \
@@ -35,6 +39,19 @@ expect uniform 1 "g.marker.table offset,table.row.button height" "marker before 
 # outside theme-aster.js's measuring, which sets an inline width).
 expect uniform 1 "c7.when state,overflow excess,g.overflow conform" "wide table that does not fit" -- "$url" "$password" --pages "$tmp/tab-when.txt" \
 	--debug-css 'admin/status/routes=#view .table:not([style*="min-content"]) .tr > .td:nth-child(2) { min-inline-size: 1600px }'
+# C7 when, G5: nftables on a phone measured with CJK breaking after any
+# character, so its tables "fit" and stay wide, one glyph a line (a). The
+# chain's 1px ::after resizes it, so theme-aster.js measures again.
+expect uniform 1 "c7.when state,overflow excess,table.row.text height" "table measured with words broken (CJK)" -- "$url" "$password" --pages "$tmp/tab-nft.txt" --viewports phone \
+	--debug-css 'admin/status/nftables=html #view .table[style*="min-content"] :is(.td, .th) { word-break: break-all !important } html #view .nft-chain::after { content: ""; display: block; block-size: 1px }'
+# Zones: "lan => wan REJECT all others" as LuCI's column of boxes, three
+# lines in a 360 column (c).
+expect uniform 1 "c6.table run" "zone forwards stacked (c)" -- "$url" "$password" --pages "$tmp/tab-zones.txt" \
+	--debug-css 'admin/network/firewall/zones=html #view .zone-forwards, html #view .zone-forwards > * { display: block !important }'
+# C7 title: Startup folded by its start priority instead of the script's
+# name (g); the 15/400 number is no title, and the actions centre on it.
+expect uniform 1 "c7.title column,c7.sig title,c7.actions centre" "folded by the start priority (g)" -- "$url" "$password" --pages "$tmp/tab-title.txt" --viewports phone \
+	--debug-css 'admin/system/startup=#view [data-fold="fold"] .tr > .td[data-head] { display: grid !important; grid-row: auto !important; grid-column: 1 / -1 !important } #view [data-fold="fold"] .tr > .td:first-child { display: block !important; grid-row: 1 !important; grid-column: 1 / -2 !important }'
 # G9: a media query laying out table rows.
 expect uniform 1 "g.mq blocks" "table layout by a media query" -- "$url" "$password" --pages "$tmp/tab-proc.txt" \
 	--debug-css 'admin/status/processes=@media (min-width: 1px) { #view .table .tr { color: inherit } }'

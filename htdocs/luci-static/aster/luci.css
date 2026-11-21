@@ -363,6 +363,13 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
 /* A zone's chip that opens its cell (Firewall Zones' "lan => wan") starts
    on the column's text edge, under the column's heading. */
 .td .zone-forwards > .zone-src:first-child > .zonebadge:first-child { margin-inline-start: 0; }
+/* Zone => Forwards is one line of text (source, arrow, destinations), its
+   Badges 8 apart, wrapping between them; LuCI's column of boxes put each
+   on a line of its own (three lines at any width). As text, a folded
+   title line centres it on the actions (C7). */
+.zone-forwards > :is(.zone-src, .zone-dest) { display: contents; }
+.td .zone-forwards :is(.zonebadge, span) { margin: 0 var(--spacing-2) 0 0; vertical-align: middle; }
+.td .zone-forwards > .zone-dest > :last-child { margin-inline-end: 0; }
 
 /* ── Tables [ported] ────────────────────────────────────────── */
 
@@ -447,8 +454,11 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
    interface under the SSID. Where the lines do not fit the card the table
    folds (components.css, Table) instead of breaking them: theme-aster.js
    measures it unbroken (data-fold "wide") and folds it where it is wider
-   than its card. */
+   than its card. A station's addresses and its two rates are lists, not
+   ids: they break after a comma, so a station table that fits (1440, the
+   Disconnect column too) stays a wide Table instead of folding (C6/C7). */
 #view :is(.leases, .lases, .leases6, .assoclist)[data-fold="wide"] .td { white-space: nowrap; }
+#view .assoclist[data-fold="wide"] .td :is(.hide-xs, .td > span:not(.ifacebadge) > span) { white-space: normal; }
 #view .assoclist .td :is(.hide-xs, .ifacebadge small) { display: block; }
 /* An interface row: cells to the top, the box column as narrow as the box,
    the status column the rest. */

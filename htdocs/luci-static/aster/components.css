@@ -910,6 +910,7 @@ html :where(td, .td) { line-height: var(--text-body-leading); font-variant-numer
    gives the cell padding back. */
 html #view .nft-rules tr > td { padding: var(--spacing-1) var(--spacing-2) var(--spacing-1) var(--spacing-4) !important; }
 html #view .nft-rules tr > td:last-child { padding-inline-end: var(--spacing-4) !important; }
+html #view .nft-rules .tr.placeholder > td { padding: var(--spacing-4) !important; } /* an empty chain (C20) */
 html :where(th, .th) {
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-semibold);
@@ -952,6 +953,12 @@ html #view > p.center {
    (LuCI's .right), the header with them. */
 html :where(:is(.td, td).cbi-section-actions, .tr > .td:not([data-title]):has(> .cbi-button:only-child)) { padding-block: var(--spacing-2); }
 html :where(:is(.td, .th, td, th).right) { text-align: end; }
+/* Wide, a table keeps its words whole (G5), and theme-aster.js measures
+   its narrowest so: CJK breaks where words do, not after any character,
+   and a name (Allow-DHCP-Renew) not at its hyphens. Where whole words do
+   not fit, the table folds. */
+html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="wide"] :is(.td, .th, td, th)) { word-break: keep-all; }
+html :where(:is(#view, form > .cbi-map) .cbi-section-table[data-fold="wide"] .td:is(.cbi-section-table-titles, [data-name="name"])) { white-space: nowrap; }
 /* In a data table a device, network or nftables chip is plain text (a
    Badge is for zones and states only): no fill, no pill, the cell's own
    type; its icon follows its words (text first, marker after). */
@@ -1057,12 +1064,12 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
     &::before { content: none; }
     & > * { grid-column: 1 / -1; }
   }
-  /* The title line: the identifier (the first cell, or the column a table
-     names its rows by), its markers after it, the actions at the end. */
-  & :where(.tr > :is(.td, td):first-child),
-  &:where(.assoclist) :where(.tr > .td:nth-child(3)),
-  &:where(#status_leases6:has(.th:nth-child(7))) :where(.tr > .td:nth-child(2)),
-  &:where([data-page^="admin-status-route"] .table:has(.th:nth-child(6))) :where(.tr > .td:nth-child(2)) {
+  /* The title line: the identifier, its markers after it, the actions at
+     the end. The identifier is the column that names the row (data-head,
+     theme-aster.js: the first column that is not the row's interface,
+     network, device or priority, nor one LuCI hides on phones; a station's
+     host, a lease's host, a script, a route's target), else the first. */
+  & :where(.tr > :is(.td, td):is([data-head], :first-child:not(:has(~ [data-head])))) {
     display: block;
     grid-row: 1;
     grid-column: 1 / -2;
@@ -1075,14 +1082,6 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
   }
   & :where(.tr:has(> .cbi-section-actions :is(.btn, .cbi-button, button), > :not([data-title]) > .cbi-button:only-child)) { --aster-title-line: var(--size-element-sm); }
   & :where(.tr > :is(.td, td) .ifacebox-head) { min-block-size: var(--aster-title-line, auto); align-items: center; }
-  &:where(.assoclist, #status_leases6:has(.th:nth-child(7)), [data-page^="admin-status-route"] .table:has(.th:nth-child(6))) :where(.tr > :is(.td, td):first-child) {
-    display: grid;
-    grid-row: auto;
-    grid-column: 1 / -1;
-    align-self: auto;
-    font-weight: var(--text-body-weight);
-    &::before { content: attr(data-title); }
-  }
   /* The title's second line (a device under its interface, a station's
      addresses under its host): supporting text, no marker before it. */
   & :where(.tr > :is(.td, td) :is(.hide-xs, .ifacebox-body)) {
@@ -1107,10 +1106,13 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
   }
   /* A cell with nothing in it (LuCI's "-" too, theme-aster.js) takes no
      row; nor do actions with no button. */
-  & :where(.tr > :is(.td, td):not(:first-child):is(:empty, [data-empty]), .tr > .cbi-section-actions:not(:has(button, .btn, .cbi-button))) { display: none; }
+  & :where(.tr > :is(.td, td):not([data-head], :first-child:not(:has(~ [data-head]))):is(:empty, [data-empty]), .tr > .cbi-section-actions:not(:has(button, .btn, .cbi-button))) { display: none; }
 }
 /* nftables' <style> pads its cells .25em with !important (one id heavier). */
 html #view .nft-rules[data-fold="fold"] tr > td { padding: 0 !important; }
+/* Folded, an nftables match is a sentence that wraps at its spaces; as a
+   flex row its parts shrank into columns, one glyph a line. */
+html #view .nft-rules[data-fold="fold"] .td .ifacebadge:not(.large) { display: inline; }
 /* 24.10: a chain outside a card; LuCI's 1px margin set the table 2 past it. */
 html #view .nft-chain:not(.cbi-section) > .nft-rules { margin-inline: 0; }
 /* An interface's box is the title line itself (luci.css spaces it 8 in a

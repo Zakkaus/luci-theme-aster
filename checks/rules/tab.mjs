@@ -12,7 +12,7 @@
 export const canonical = {
   'c6.table': {
     _source: 'COMPONENTS.md C6 (owner Q1 = A): the actions cell pads 8 (a row with sm buttons 49); its last button ends 16 from the card border; LuCI .right columns end-aligned',
-    actionsPad: [8, 8], actionsEnd: 16, rowActions: 49, numAlign: 'end',
+    actionsPad: [8, 8], actionsEnd: 16, rowActions: 49, numAlign: 'end', run: 'ok',
   },
   'c7.when': {_source: 'COMPONENTS.md C7: a table is folded iff its min-content is wider than its room (unfolds with 16 to spare); every data table is measured', state: 'ok'},
   'c7.sig': {
@@ -21,6 +21,7 @@ export const canonical = {
     label: '15/500 secondary', value: '15/400 primary', title: '15/500 primary', divider: '1 border', divStart: 0, divEnd: 0,
   },
   'c7.x': {_source: 'COMPONENTS.md C7: per folded table one label x (= title x) and one value x (counts are strings: a count read as px would pass 2 within the 1px tolerance)', labelXs: 'one', valueXs: 'one', labelToTitle: 0},
+  'c7.title': {_source: 'COMPONENTS.md C7: the title is the column that names the row: the first that is not the row\'s interface, network, device or (start) priority, nor one LuCI hides on phones (hide-xs); the same table folds by the same column on every page', column: 'names the row'},
   'c7.labelw': {_source: 'COMPONENTS.md C7: the label column is the longest label, at most half the content width', fit: 0},
   'c7.actions': {_source: 'COMPONENTS.md C7/C10: a folded row\'s actions are on its title line, one line, ending on the content edge, centred on the title line', lines: 'one', end: 0, centre: 0},
   'c10.actions': {_source: 'COMPONENTS.md C10 (doona ActionGroup, Astryx MoreMenu): buttons 8 apart, at most one More menu per row', gap: 8, menus: 'ok'},
@@ -108,10 +109,25 @@ export async function collect(cfg) {
         const w = t.style.width;
         t.dataset.fold = 'wide';
         t.style.width = 'min-content';
+        // With its words whole (G5), whatever the theme's stylesheet says:
+        // CJK breaks only where words do, a rule's name not at a hyphen.
+        const cells = [...t.querySelectorAll('.td, .th, td, th')].filter((c) => c.closest('.table, table') === t);
+        // A list (", ": a station's addresses and rates) breaks after its
+        // commas, whatever nowrap the theme puts on it (C7, f).
+        const lists = cells.flatMap((c) => [c, ...c.querySelectorAll('*')]).filter((e) => !e.closest('.cbi-section-actions') && [...e.childNodes].some((n) => n.nodeType === 3 && n.data.includes(', ')));
+        const set = (on) => cells.forEach((c) => {
+          on ? c.style.setProperty('word-break', 'keep-all', 'important') : c.style.removeProperty('word-break');
+          c.matches('.cbi-section-table .td:is(.cbi-section-table-titles, [data-name="name"])') && (on ? c.style.setProperty('white-space', 'nowrap', 'important') : c.style.removeProperty('white-space'));
+        });
+        set(true);
+        lists.forEach((e) => e.style.setProperty('white-space', 'normal', 'important'));
         const need = t.scrollWidth, room = p.clientWidth - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight) - parseFloat(ts.marginLeft) - parseFloat(ts.marginRight);
+        set(false);
+        lists.forEach((e) => e.style.removeProperty('white-space'));
         t.style.width = w;
         t.dataset.fold = fold;
         if (fold === 'fold' && need <= room - 16.5) state = `folded, fits (${Math.round(need)} in ${Math.round(room)})`;
+        if (fold === 'wide' && need > room + 0.5) state = `wide, words do not fit (${Math.round(need)} in ${Math.round(room)})`;
         // Wide, the table as drawn (its content box, as theme-aster.js
         // measures it): wider than its room.
         const drawn = t.scrollWidth;
@@ -140,6 +156,16 @@ export async function collect(cfg) {
       for (let i = 1; i < bs.length; i++) if (Math.abs(box(bs[i]).top - box(bs[i - 1]).top) < 1) add('c10.actions', 'gap', px(box(bs[i]).left - box(bs[i - 1]).right), bs[i]);
       const menus = g.querySelectorAll(':scope > .aster-more').length;
       if (bs.length) add('c10.actions', 'menus', menus <= 1 ? 'ok' : `${menus} menus`, g);
+    }
+
+    // Zone => Forwards (C13 Badges in a cell): one run, wrapping only
+    // where it does not fit, never a column of boxes.
+    for (const z of t.querySelectorAll('.zone-forwards')) {
+      const it = [...z.querySelectorAll('.zonebadge, :scope > span')].filter(shown);
+      if (it.length < 2 || !shown(z)) continue;
+      const w = it.reduce((a, e) => a + box(e).width, 0) + 8 * (it.length - 1);
+      const lines = 1 + it.filter((e, i) => i && box(e).top >= box(it[i - 1]).bottom - 1).length;
+      add('c6.table', 'run', lines > 1 && w <= z.clientWidth + 1 ? `${lines} lines` : 'ok', z);
     }
 
     if (fold === 'wide') {
@@ -179,6 +205,10 @@ export async function collect(cfg) {
     const titleOf = (r) => cellsOf(r).find((c) => cs(c).gridRowStart === '1' && !c.matches('.cbi-section-actions') && !(cs(c).gridColumnStart === '-2'));
     const actsOf = (r) => cellsOf(r).find((c) => c.matches('.cbi-section-actions') || cs(c).gridColumnStart === '-2');
     const labelled = (r) => cellsOf(r).filter((c) => c !== titleOf(r) && c !== actsOf(r) && !/^(none|normal)$/.test(cs(c, '::before').content));
+    // C7 title: read from the header as COMPONENTS.md words it.
+    const ths = [...(t.querySelector('.tr:has(> .th)')?.children || [])];
+    const skip = ['Interface', 'Network', 'Device', 'Priority', 'Start priority'].map((x) => (typeof _ === 'function' ? _(x) : x));
+    const head = Math.max(0, ths.findIndex((c) => !c.matches('.hide-xs') && !skip.includes(c.textContent.trim())));
     const contentL = box(t).left + parseFloat(ts.paddingLeft), contentR = box(t).right - parseFloat(ts.paddingRight);
     const lxs = new Set(), vxs = new Set();
     let titleX = null, labelW = 0, longest = 0;
@@ -199,6 +229,7 @@ export async function collect(cfg) {
         add('c7.sig', 'divEnd', px(contentR - box(r).right), r);
       }
       const tc = titleOf(r);
+      add('c7.title', 'column', tc && tc === r.children[head] ? 'names the row' : `column ${[...r.children].indexOf(tc) + 1}, not ${head + 1}`, tc || r);
       const tf = tc && firstText(tc);
       if (tc && tf) {
         add('c7.sig', 'title', font(cs(tc)), tc);
