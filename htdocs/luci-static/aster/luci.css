@@ -792,34 +792,32 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   &:nth-child(-n+2) { white-space: normal; overflow-wrap: normal; }
 }
 
-/* A row holding a progress bar is the reference's ProgressBar with its
-   label: the name and the value text on one line, the track under both. */
-[data-page="admin-status-overview"] .table .tr:has(> .td > .cbi-progressbar) {
-  display: block;
-  padding-block: var(--spacing-2);
-}
-
-[data-page="admin-status-overview"] .table .tr:has(> .td > .cbi-progressbar) > .td {
-  display: block;
-  inline-size: auto;
-  padding: 0;
-  border: 0;
-}
-
-/* The name and the value text share a line. The value ("218.81 GiB /
-   648.51 GiB (33%)", at most about thirteen and a half supporting-size
-   em) keeps its room; a longer name ends in an ellipsis instead of
-   running into it ("Active Connections" fits a phone's card). */
-[data-page="admin-status-overview"] .table .tr:has(> .td > .cbi-progressbar) > .td:first-child {
-  max-inline-size: calc(100% - 13.5 * var(--text-supporting-size));
-  overflow: hidden;
-  color: var(--color-text-primary);
-  font-weight: var(--font-weight-normal);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-[data-page="admin-status-overview"] .table .tr:has(> .td > .cbi-progressbar) > .td:has(> .cbi-progressbar) {
-  margin-block-start: calc(var(--text-body-size) * var(--text-body-leading) * -1);
+/* A bar row is a MetadataList row (C8 with C19): the name in the label
+   column (the table's longest name, at most half), the value text at the
+   value column's start, its track 4 under it as wide as the column. */
+[data-page="admin-status-overview"] .table:has(> .tr > .td > .cbi-progressbar) {
+  display: grid;
+  grid-template-columns: fit-content(50%) minmax(0, 1fr);
+  gap: var(--spacing-2) var(--spacing-4);
+  align-items: start;
+  & > .tr { display: contents; }
+  & > .tr > .td {
+    display: block;
+    inline-size: auto;
+    padding: 0;
+    border: 0;
+  }
+  & > .tr > .td:first-child {
+    color: var(--color-text-secondary);
+    font-weight: var(--text-label-weight);
+    overflow-wrap: normal;
+    word-break: keep-all;
+  }
+  & .cbi-progressbar::before {
+    color: var(--color-text-primary);
+    font-size: var(--text-body-size);
+    text-align: start;
+  }
 }
 [data-page="admin-status-overview"] #view {
   /* Interface boxes: ports (29_ports.js), upstreams (30_network.js) and
