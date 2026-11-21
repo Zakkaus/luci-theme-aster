@@ -416,18 +416,52 @@ html :where(.cbi-dropdown > ul > li img) { block-size: var(--aster-icon-sm); inl
    instance chip and the editor's Status: the Heroicons ServerStack, Wifi
    for a radio (luci.css --icon-*), 16 in the secondary icon colour; 20
    beside the Status. */
-html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip), #view > p > .ifacebadge):has(> img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"]))::before {
+html :where(.cbi-dropdown > ul > li, .cbi-dropdown > ul > li > label, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip), #view > p > .ifacebadge):has(> img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"]))::before {
   content: "";
   display: block;
   flex: none;
   inline-size: var(--aster-icon-sm);
   block-size: var(--aster-icon-sm);
   background-color: var(--color-icon-secondary);
-  mask: var(--icon-server) center / contain no-repeat;
+  mask: var(--aster-glyph, var(--icon-server)) center / contain no-repeat;
 }
-html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip), #view > p > .ifacebadge):has(> img[src*="/wifi"])::before { mask-image: var(--icon-wifi); }
 html :where(.ifacebadge.large:not(.cbi-tooltip))::before { inline-size: var(--aster-icon-md); block-size: var(--aster-icon-md); }
-html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip), #view > p > .ifacebadge) > img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"]) { display: none; }
+html :where(.cbi-dropdown > ul > li, .cbi-dropdown > ul > li > label, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip), #view > p > .ifacebadge) > img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"]) { display: none; }
+/* Which Heroicon each LuCI image is (C16), named once for every place
+   that draws one in its stead (--aster-glyph): a signal's in the
+   quality's ink, red below 25 %, amber below 50 %, SignalSlash without. */
+html :where(.ifacebadge, .cbi-dropdown li, .cbi-dropdown li > label, .cbi-tooltip-container, .btn) {
+  &:has(> img[src*="/icons/wifi"]) { --aster-glyph: var(--icon-wifi); }
+  &:has(> img[src*="/icons/bridge"]) { --aster-glyph: var(--icon-bridge); }
+  &:has(> img[src*="/icons/switch"]) { --aster-glyph: var(--icon-switch); }
+  &:has(> img[src*="/icons/vlan"]) { --aster-glyph: var(--icon-vlan); }
+  &:has(> img[src*="/icons/alias"]) { --aster-glyph: var(--icon-alias); }
+  &:has(> img[src*="/icons/tunnel"]) { --aster-glyph: var(--icon-tunnel); }
+  &:has(> img[src*="/icons/vrf"]) { --aster-glyph: var(--icon-vrf); }
+  &:has(> img[src*="/icons/wireguard"]) { --aster-glyph: var(--icon-lock); }
+  &:has(> img[src*="/icons/signal-"]) { --aster-glyph: var(--icon-signal); --aster-glyph-ink: var(--color-icon-success); }
+  &:has(> img[src*="/signal-000-025"]) { --aster-glyph-ink: var(--color-text-error); }
+  &:has(> img[src*="/signal-025-"]) { --aster-glyph-ink: var(--color-icon-warning); }
+  &:has(> img:is([src*="/signal-000-000"], [src*="/signal-none"])) { --aster-glyph: var(--icon-signal-slash); --aster-glyph-ink: var(--color-icon-secondary); }
+  &:has(> img[src*="/cbi/"]) { --aster-glyph-ink: currentColor; }
+  &:has(> img[src*="/cbi/file"]) { --aster-glyph: var(--icon-doc); }
+  &:has(> img[src*="/cbi/folder"]) { --aster-glyph: var(--icon-folder); }
+  &:has(> img[src*="/cbi/link"]) { --aster-glyph: var(--icon-alias); }
+}
+/* Any other device chip (a select's "lan" chip, a wireless radio, SSID or
+   station): its words, then the glyph 16 (G4; the Overview draws its
+   own). A file browser's button: the glyph inside, before its words. */
+html :where(body:not([data-page="admin-status-overview"]) .ifacebadge:not(.large):has(> img[src*="/icons/"]), .btn:has(> img[src*="/cbi/"]))::before {
+  content: "";
+  flex: none;
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
+  background-color: var(--aster-glyph-ink, var(--color-icon-secondary));
+  mask: var(--aster-glyph, var(--icon-server)) center / contain no-repeat;
+}
+html :where(body:not([data-page="admin-status-overview"]) .ifacebadge:not(.large):has(> img[src*="/icons/"]))::before { order: 1; }
+html :where(:is(.td, td) .ifacebadge:not(.large):has(> img[src*="/icons/"]))::before { align-self: start; margin-block-start: var(--spacing-1); } /* on the first line */
+html :where(body:not([data-page="admin-status-overview"]) .ifacebadge:not(.large), .btn) > img:is([src*="/icons/"], [src*="/cbi/"]) { display: none; }
 /* The chevron segment: a Select's ends 12 inside the border, in the
    secondary icon colour (a ComboButton's is the button's own, above). */
 html :where(.cbi-dropdown > :is(.open, .more)) {
@@ -997,7 +1031,7 @@ html [data-page] #view .td > .ifacebadge:has(> img[src*="/signal-"])::before { /
   inline-size: var(--aster-icon-sm);
   block-size: var(--aster-icon-sm);
   border-radius: 0;
-  mask: var(--icon-signal) center / contain no-repeat;
+  mask: var(--aster-glyph, var(--icon-signal)) center / contain no-repeat;
 }
 /* A form table's cell writes its text in <small> (Traffic Rules' match):
    it is the cell's text, body size. */
@@ -1632,10 +1666,10 @@ html :where(.cbi-tooltip) :is(.ifacebadge, .zonebadge, .ifacebox, .ifacebox-head
   --card-border: color-mix(in srgb, currentColor 24%, transparent);
   color: inherit;
 }
-/* A cell's "#" with a data-tooltip (more detail behind a row) is an
-   InfoTip: the 16 info icon (the Banner's) in a 20 box; the character
+/* A cell's "#" with a data-tooltip (more detail behind a row) or the
+   "#" of an nftables rule's comment is an InfoTip: the 16 info icon (the Banner's) in a 20 box; the character
    stays for screen readers. */
-html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button)) {
+html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button), .nft-comment > var) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1645,7 +1679,7 @@ html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button
   font-size: 0;
   cursor: help;
 }
-html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button))::after {
+html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button), .nft-comment > var)::after {
   content: "";
   inline-size: var(--aster-icon-sm);
   block-size: var(--aster-icon-sm);
