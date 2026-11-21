@@ -596,7 +596,6 @@ html :where(#aster-more-menu:popover-open) { position: fixed; inset: auto; posit
 html :where(.aster-more[aria-expanded="true"]) { anchor-name: --aster-more; }
 html :where(#aster-more-menu > li.negative) { --menu-item-fg: var(--color-text-error); }
 html :where(#aster-more-menu > li[role="separator"]) { block-size: 0; min-block-size: 0; margin-block: var(--spacing-1); padding: 0; border-block-start: var(--border-width) solid var(--color-border); pointer-events: none; }
-html :where(#aster-more-menu > li[aria-disabled="true"]) { opacity: 0.5; cursor: default; }
 html :where(.palette-menu [role="menu"] small) { color: var(--color-text-secondary); font-size: var(--text-supporting-size); }
 html :where(.palette-swatch) {
   flex: none;
@@ -654,7 +653,7 @@ html :where(input[type="checkbox"], input[type="radio"]):checked::before { trans
     background-image: linear-gradient(var(--color-overlay-hover) 0 0);
   }
 }
-html :where(:is(input[type="checkbox"], input[type="radio"]):disabled) { opacity: 0.5; cursor: default; }
+html :where(:is(input[type="checkbox"], input[type="radio"]):disabled, #aster-more-menu > li[aria-disabled="true"]) { opacity: 0.5; cursor: default; }
 html :where(input[type="checkbox"].cbi-input-invalid) { border-color: var(--color-border-error); }
 /* The tap target grows around the box on a touch screen. */
 @media (pointer: coarse) {
@@ -721,8 +720,6 @@ html :where(.cbi-dynlist) > .item::after {
 }
 html :where(.cbi-dynlist > .item > span) { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
 html :where(.cbi-dynlist > .item code) { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--color-text-secondary); }
-html :where(.cbi-dynlist > .item.dragging) { opacity: 0.5; }
-html :where(.cbi-dynlist) > :is(.item, .add-item > *).drag-over { box-shadow: inset 0 calc(var(--border-width) * 2) 0 var(--color-accent); }
 /* The add row keeps its button on the field's line (a control group that
    never wraps); the field takes what the button leaves. */
 html :where(.cbi-dynlist > .add-item) { display: flex; flex: 1 0 100%; flex-wrap: nowrap; gap: var(--spacing-2); min-inline-size: 0; }
@@ -984,10 +981,10 @@ html :where(th, .th) {
   line-height: var(--text-heading-5-leading);
   white-space: nowrap;
 }
-html :where(.tr.placeholder) { display: table-caption; caption-side: bottom; }
-/* A form section (form.js) puts the message row in a tbody of its own,
-   where a caption cannot sit: the tbody becomes the caption. */
-html :where(.tbody:not(tbody):has(> .tr.placeholder:only-child)) { display: table-caption; caption-side: bottom; }
+/* The message row is the table's caption; a form section (form.js) puts
+   it in a tbody of its own, where a caption cannot sit: the tbody becomes
+   the caption. */
+html :where(.tr.placeholder, .tbody:not(tbody):has(> .tr.placeholder:only-child)) { display: table-caption; caption-side: bottom; }
 html :where(.tbody:not(tbody) > .tr.placeholder) { display: block; }
 /* Lua CBI tables are real <table>s: the parser's <tbody> holds the title row
    and the placeholder; dissolve it so the caption is the table's own. */
@@ -1095,7 +1092,7 @@ html :where(:is(.td, td).cbi-value-field > small) { font-size: inherit; line-hei
 html :where(td, .td) :where(.btn, .cbi-button, button) { --button-h: var(--size-element-sm); }
 /* Sorting by drag: the moved row fades, the drop line is the accent. */
 html :where(.dragging) { opacity: 0.5; }
-html :where(.drag-over-above) { box-shadow: inset 0 calc(var(--border-width) * 2) 0 var(--color-accent); }
+html :where(.cbi-dynlist) > :is(.item, .add-item > *).drag-over, html :where(.drag-over-above) { box-shadow: inset 0 calc(var(--border-width) * 2) 0 var(--color-accent); }
 html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -2) 0 var(--color-accent); }
 /* ── FoldedBlock ─────────────────────────────────────────────────
    A data table that does not fit its card folds, at any window width
