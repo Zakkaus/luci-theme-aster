@@ -44,8 +44,10 @@ return baseclass.extend({
 			const need = t.scrollWidth, room = p.clientWidth - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight) - parseFloat(ts.marginLeft) - parseFloat(ts.marginRight);
 			t.style.width = w;
 			t.dataset.fold = need > room + 0.5 - (was ? 16 : 0) ? 'fold' : 'wide';
-			/* nftables' comment mark follows the rule's words (text first). */
+			/* nftables' comment mark follows the rule's words (text first); an
+			 * empty chain's line is the table's placeholder (C20). */
 			t.querySelectorAll('.td > .nft-comment:not(:last-child)').forEach((c) => c.parentNode.append(c));
+			t.querySelectorAll('.tr > .td.center[colspan]:only-child').forEach((c) => c.parentNode.classList.add('placeholder'));
 
 			/* Folded, a cell is a label and a value: it takes its column's
 			 * name where LuCI gives none (nftables, Lua maps), an empty one

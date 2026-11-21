@@ -108,10 +108,20 @@ export async function collect(cfg) {
         const w = t.style.width;
         t.dataset.fold = 'wide';
         t.style.width = 'min-content';
+        // With its words whole (G5), whatever the theme's stylesheet says:
+        // CJK breaks only where words do, a rule's name not at a hyphen.
+        const cells = [...t.querySelectorAll('.td, .th, td, th')].filter((c) => c.closest('.table, table') === t);
+        const set = (on) => cells.forEach((c) => {
+          on ? c.style.setProperty('word-break', 'keep-all', 'important') : c.style.removeProperty('word-break');
+          c.matches('.cbi-section-table .td:is(.cbi-section-table-titles, [data-name="name"])') && (on ? c.style.setProperty('white-space', 'nowrap', 'important') : c.style.removeProperty('white-space'));
+        });
+        set(true);
         const need = t.scrollWidth, room = p.clientWidth - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight) - parseFloat(ts.marginLeft) - parseFloat(ts.marginRight);
+        set(false);
         t.style.width = w;
         t.dataset.fold = fold;
         if (fold === 'fold' && need <= room - 16.5) state = `folded, fits (${Math.round(need)} in ${Math.round(room)})`;
+        if (fold === 'wide' && need > room + 0.5) state = `wide, words do not fit (${Math.round(need)} in ${Math.round(room)})`;
         // Wide, the table as drawn (its content box, as theme-aster.js
         // measures it): wider than its room.
         const drawn = t.scrollWidth;

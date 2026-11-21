@@ -870,6 +870,7 @@ html :where(td, .td) { line-height: var(--text-body-leading); font-variant-numer
    gives the cell padding back. */
 html #view .nft-rules tr > td { padding: var(--spacing-1) var(--spacing-2) var(--spacing-1) var(--spacing-4) !important; }
 html #view .nft-rules tr > td:last-child { padding-inline-end: var(--spacing-4) !important; }
+html #view .nft-rules .tr.placeholder > td { padding: var(--spacing-4) !important; } /* an empty chain (C20) */
 html :where(th, .th) {
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-semibold);
@@ -912,6 +913,12 @@ html #view > p.center {
    (LuCI's .right), the header with them. */
 html :where(:is(.td, td).cbi-section-actions, .tr > .td:not([data-title]):has(> .cbi-button:only-child)) { padding-block: var(--spacing-2); }
 html :where(:is(.td, .th, td, th).right) { text-align: end; }
+/* Wide, a table keeps its words whole (G5), and theme-aster.js measures
+   its narrowest so: CJK breaks where words do, not after any character,
+   and a name (Allow-DHCP-Renew) not at its hyphens. Where whole words do
+   not fit, the table folds. */
+html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="wide"] :is(.td, .th, td, th)) { word-break: keep-all; }
+html :where(:is(#view, form > .cbi-map) .cbi-section-table[data-fold="wide"] .td:is(.cbi-section-table-titles, [data-name="name"])) { white-space: nowrap; }
 /* In a data table a device, network or nftables chip is plain text (a
    Badge is for zones and states only): no fill, no pill, the cell's own
    type; its icon follows its words (text first, marker after). */
@@ -1071,6 +1078,9 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
 }
 /* nftables' <style> pads its cells .25em with !important (one id heavier). */
 html #view .nft-rules[data-fold="fold"] tr > td { padding: 0 !important; }
+/* Folded, an nftables match is a sentence that wraps at its spaces; as a
+   flex row its parts shrank into columns, one glyph a line. */
+html #view .nft-rules[data-fold="fold"] .td .ifacebadge:not(.large) { display: inline; }
 /* 24.10: a chain outside a card; LuCI's 1px margin set the table 2 past it. */
 html #view .nft-chain:not(.cbi-section) > .nft-rules { margin-inline: 0; }
 /* An interface's box is the title line itself (luci.css spaces it 8 in a
