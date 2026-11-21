@@ -12,7 +12,7 @@
 export const canonical = {
   'c6.table': {
     _source: 'COMPONENTS.md C6 (owner Q1 = A): the actions cell pads 8 (a row with sm buttons 49); its last button ends 16 from the card border; LuCI .right columns end-aligned',
-    actionsPad: [8, 8], actionsEnd: 16, rowActions: 49, numAlign: 'end', run: 'ok',
+    actionsPad: [8, 8], actionsEnd: 16, rowActions: 49, numAlign: 'end', run: 'ok', headLine: 0, read: 'whole',
   },
   'c7.when': {_source: 'COMPONENTS.md C7: a table is folded iff its min-content is wider than its room (unfolds with 16 to spare); every data table is measured', state: 'ok'},
   'c7.sig': {
@@ -132,6 +132,14 @@ export async function collect(cfg) {
     const rows = rowsOf(t);
     const card = cardOf(t);
 
+    // A read-only text in a cell (a repository key) shows all its lines,
+    // wide or folded: nothing scrolls inside it.
+    for (const x of t.querySelectorAll('.td textarea[readonly]')) {
+      if (!shown(x)) continue;
+      const cut = Math.max(x.scrollWidth - x.clientWidth, x.scrollHeight - x.clientHeight);
+      add('c6.table', 'read', cut > 1 ? `cut ${Math.round(cut)}` : 'whole', x);
+    }
+
     // C20: the table's message row.
     for (const c of t.querySelectorAll('.tr.placeholder > .td')) {
       if (!shown(c) || c.closest('.table, table') !== t) continue;
@@ -163,6 +171,16 @@ export async function collect(cfg) {
     }
 
     if (fold === 'wide') {
+      // The header's line runs as far as the rows' (to the card border),
+      // also over an actions column with no header cell of its own.
+      const head = [...t.querySelectorAll('.tr')].find((r) => r.closest('.table, table') === t && r.querySelector(':scope > :is(.th, th)') && shown(r));
+      const rowEnd = rows.length ? Math.max(...cellsOf(rows[0]).filter(shown).map((c) => box(c).right)) : 0;
+      if (head && rowEnd) {
+        const ruled = [...head.children].filter((c) => shown(c) && parseFloat(cs(c).borderBottomWidth) > 0);
+        const after = getComputedStyle(head, '::after');
+        const end = after.content !== 'none' && parseFloat(after.borderBottomWidth) > 0 ? box(head).right : Math.max(...ruled.map((c) => box(c).right));
+        if (ruled.length) add('c6.table', 'headLine', px(Math.max(0, rowEnd - end)), head);
+      }
       for (const r of rows) {
         const cells = cellsOf(r);
         if (!cells.length) continue;

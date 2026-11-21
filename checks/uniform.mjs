@@ -379,7 +379,8 @@ function collect(cfg) {
     const wrapped = base === 'table.kv' && getComputedStyle(row).display !== 'table-row';
     if (wrapped) add('table.kv.row.wrap', 'display', getComputedStyle(row).display, row);
     if (isHeader(row)) add(`${base}.header`, 'height', rowH(), row);
-    else if (!progress && !wrapped && cells.every((c) => lines(c) <= 1)) {
+    // (A textarea is as tall as its lines: its row has no one height.)
+    else if (!progress && !wrapped && cells.every((c) => lines(c) <= 1) && !row.querySelector('textarea')) {
       const kind = row.querySelector('input:not([type="hidden"], [type="button"], [type="submit"], [type="reset"], [type="image"]), select, textarea, .cbi-dropdown') ? 'control' : row.querySelector(BTN) ? 'button' : 'text';
       add(`${base}.row.${kind}`, 'height', rowH(), row);
     }

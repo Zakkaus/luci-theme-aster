@@ -56,6 +56,13 @@ expect uniform 1 "c7.actions centre,c7.sig titleMargin" "title box with margins 
 printf '%s\n' 'admin/network/network' >"$tmp/tab-net-wide.txt"
 expect uniform 1 "table.td.top paddingBlock" "interface row text off the buttons' centre (b)" -- "$url" "$password" --pages "$tmp/tab-net-wide.txt" --viewports desktop \
 	--debug-css 'admin/network/network=html #view .tr:has(> .td > .ifacebox) > .td:not(.cbi-section-actions) { padding-block: 4px !important }'
+# Repository keys (d): the header's line stops over the actions column;
+# the key scrolls inside its box (wide, and folded on a phone).
+printf '%s\n' 'admin/system/admin/repokeys require=c6.table' >"$tmp/tab-keys.txt"
+expect uniform 1 "c6.table headLine" "header line short of the card border (d)" -- "$url" "$password" --pages "$tmp/tab-keys.txt" --viewports desktop \
+	--debug-css 'admin/system/admin/repokeys=html #view .cbi-section-table-titles::after { content: none !important }'
+expect uniform 1 "c6.table read" "key cut in its box (d)" -- "$url" "$password" --pages "$tmp/tab-keys.txt" \
+	--debug-css 'admin/system/admin/repokeys=html #view .td textarea[readonly] { field-sizing: fixed !important; inline-size: 8rem !important; block-size: 3rem !important }'
 # G9: a media query laying out table rows.
 expect uniform 1 "g.mq blocks" "table layout by a media query" -- "$url" "$password" --pages "$tmp/tab-proc.txt" \
 	--debug-css 'admin/status/processes=@media (min-width: 1px) { #view .table .tr { color: inherit } }'
