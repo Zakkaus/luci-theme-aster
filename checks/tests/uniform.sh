@@ -229,12 +229,12 @@ expect uniform 1 "dialog scrim" "save bar over the dialog's scrim" -- "$url" "$p
 
 # A cell that cuts its text: a lease's MAC clipped at 40 px with no
 # ellipsis (the router's station rates cut at the card's edge).
-expect uniform 1 "table.cell clip" "lease cell clips its text" -- "$url" "$password" --pages "$tmp/overview.txt" \
-	--debug-css 'admin/status/overview=#view .table.leases .tr > .td:nth-child(3) { display: block; max-inline-size: 40px; overflow: hidden; white-space: nowrap; text-overflow: clip }'
+expect uniform 1 "overflow excess,table.cell clip" "lease cell clips its text" -- "$url" "$password" --pages "$tmp/overview.txt" \
+	--debug-css 'admin/status/overview=#status_leases .tr > .td:nth-child(3) { display: block; max-inline-size: 40px; overflow: hidden; white-space: nowrap; text-overflow: clip }'
 # A folded row with a blank band under its last line (a height kept from
 # the wide layout, an empty actions line).
-expect uniform 1 "table.fold.row trail" "folded lease rows 240 high" -- "$url" "$password" --pages "$tmp/overview.txt" --viewports phone \
-	--debug-css 'admin/status/overview=#view .table.leases .tr:not(.table-titles) { min-block-size: 240px }'
+expect uniform 1 "table.fold.row trail" "folded lease rows 800 high" -- "$url" "$password" --pages "$tmp/overview.txt" --viewports phone \
+	--debug-css 'admin/status/overview=#status_leases .tr:not(.table-titles) { min-block-size: 800px }'
 
 # Lua CBI map (APPS=1: a box with OpenClash, as apps-install.sh leaves it).
 # A header table in a Lua map folds on a phone like a JS view's, and the

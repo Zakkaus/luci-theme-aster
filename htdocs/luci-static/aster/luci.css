@@ -433,7 +433,7 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
    would outgrow its card (the Disconnect column, 69 over at 1440) they
    break after a comma instead of running past the card's edge. */
 @container aster-page (min-width: 72rem) {
-  #view :is(.leases, .leases6, .assoclist) .td { white-space: nowrap; }
+  #view :is(.leases, .lases, .leases6, .assoclist) .td { white-space: nowrap; }
   #view .assoclist .td :is(.hide-xs, .td > span:not(.ifacebadge) > span) { white-space: normal; }
 }
 #view .assoclist .td :is(.hide-xs, .ifacebadge small) { display: block; }
@@ -615,7 +615,7 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
    break inside (br-lan broke into "br-" and "lan", owner 2026-11-21); the
    host name (first or, after Interface, second) wraps at its spaces and
    hyphens only. A table that does not fit folds (Table) or scrolls. */
-[data-page="admin-status-overview"] .table:is(.leases, .leases6) .td {
+[data-page="admin-status-overview"] .table:is(.leases, .lases, .leases6) .td {
   white-space: nowrap;
   &:nth-child(-n+2) { white-space: normal; overflow-wrap: normal; }
 }

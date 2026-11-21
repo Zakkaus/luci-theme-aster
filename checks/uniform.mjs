@@ -309,17 +309,22 @@ function collect(cfg) {
       // Nothing under the row's last line but its padding: an empty cell
       // (an actions cell with no button, LuCI's "-") or a height kept from
       // the wide layout leaves a blank band over the row's rule. A cell's
-      // content is its text and boxes; a cell with a ::before key (the
-      // leases' key column) is as tall as its key.
+      // content is its elements' boxes and its text's line boxes (the
+      // glyph box plus the half-leading). Not the cells' own boxes: a grid
+      // stretches them to a taller row.
       const rs = getComputedStyle(row);
       const end = box(row).bottom - parseFloat(rs.paddingBottom) - parseFloat(rs.borderBottomWidth);
       let last = box(row).top + parseFloat(rs.paddingTop) + parseFloat(rs.borderTopWidth);
       for (const c of cells) {
-        const rg = document.createRange();
-        rg.selectNodeContents(c);
-        const rects = [...rg.getClientRects()].filter((r) => r.width > 0 && r.height > 0);
-        if (rects.length) last = Math.max(last, ...rects.map((r) => r.bottom));
-        if (getComputedStyle(c, '::before').content !== 'none') last = Math.max(last, box(c).bottom - parseFloat(getComputedStyle(c).paddingBottom));
+        for (const e of c.querySelectorAll('*')) if (visible(e) && box(e).height > 0) last = Math.max(last, box(e).bottom);
+        const tw = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
+        for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+          if (!n.data.trim()) continue;
+          const lh = parseFloat(getComputedStyle(n.parentElement).lineHeight);
+          const rg = document.createRange();
+          rg.selectNodeContents(n);
+          for (const r of rg.getClientRects()) if (r.height > 0) last = Math.max(last, r.bottom + (lh > r.height ? (lh - r.height) / 2 : 0));
+        }
       }
       add('table.fold.row', 'trail', px(Math.max(0, end - last)), row);
       cells.forEach((c, i) => {
