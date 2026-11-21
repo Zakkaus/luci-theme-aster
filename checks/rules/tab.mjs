@@ -1,7 +1,7 @@
 /**
  * Gate rules of the M4 "tab" stream (COMPONENTS.md sections 0, 0.1 and 4):
  * Table (C6), FoldedBlock (C7), RowActions (C10), EmptyState (C20), and
- * G4 / G9 inside data tables.
+ * G4 / G5 / G7 / G9 inside data tables.
  *
  * uniform.mjs merges `canonical` into its own and adds `collect`'s samples
  * to each page's; a page list entry requires a rule with require=<rule id>,
@@ -11,9 +11,12 @@
 
 export const canonical = {
   'c6.table': {
-    _source: 'COMPONENTS.md C6 (owner Q1 = A): the actions cell pads 8 (a row with sm buttons 49); its last button ends 16 from the card border; LuCI .right columns end-aligned',
-    actionsPad: [8, 8], actionsEnd: 16, rowActions: 49, numAlign: 'end', run: 'ok', headLine: 0, read: 'whole',
+    _source: 'COMPONENTS.md C6 (owner Q1 = A), G7: the actions cell pads 8 (a row with sm buttons 49); its last button ends 16 from the card border; a field keeps 8 from the row lines; LuCI .right columns and columns of sizes, rates or shares end-aligned',
+    actionsPad: [8, 8], actionsEnd: 16, rowActions: 49, numAlign: 'end', run: 'ok', headLine: 0, read: 'whole', fieldGap: 'ok',
   },
+  'card.table': {_source: 'COMPONENTS.md C2/C6: a wide table that is the Card (WireGuard peers, 24.10 Processes) pads 15 + border above and below; its cells own the inline 16, so rows run border to border', padding: [15, 0, 15, 0]},
+  'table.td.field': {_source: 'COMPONENTS.md G7, C6: a cell holding a field (a zone\'s policy select) pads 8, so the field keeps 8 from the row lines (row 53)', paddingBlock: 8, paddingInlineStart: 16, fontSize: 15},
+  'g.break.table': {_source: 'COMPONENTS.md G5: an identifier in a cell (a one-word cell while wide, a package name, a mount device, a <var>, a station rate) is one line, or ends in an ellipsis; never broken at a hyphen', token: 'whole'},
   'c7.when': {_source: 'COMPONENTS.md C7: a table is folded iff its min-content is wider than its room (unfolds with 16 to spare); every data table is measured', state: 'ok'},
   'c7.sig': {
     _source: 'COMPONENTS.md C7: one folded signature: subgrid, gap 16 / 8, blocks 12 / 12, flush at the ends, label 15/500 secondary, value 15/400 primary, title 15/500 primary, Divider 1 on the content box',
@@ -176,6 +179,33 @@ export async function collect(cfg) {
       add('c6.table', 'run', lines > 1 && w <= z.clientWidth + 1 ? `${lines} lines` : 'ok', z);
     }
 
+    // G5: an identifier in a cell is one line or ends in an ellipsis.
+    {
+      const CJK = /[\u2e80-\u9fff\uac00-\ud7af\uf900-\ufaff\uff00-\uffef]/;
+      const ids = new Set([...t.querySelectorAll('#packages .td:first-child, .td[data-name="_device"], .td var' + (fold === 'wide' ? ', .assoclist .td > span:not(.ifacebadge) > span:not(.hide-xs)' : ''))].filter((e) => e.closest('.table, table') === t && shown(e)));
+      if (fold === 'wide') for (const r of rows) for (const c of cellsOf(r)) {
+        const v = c.textContent.trim();
+        if (v.length > 1 && !/\s/.test(v.replace(/\u00a0/g, '')) && !CJK.test(v) && !c.querySelector('input, select, textarea, .cbi-dropdown, button')) ids.add(c);
+      }
+      for (const e of ids) {
+        const cut = cs(e).textOverflow === 'ellipsis' && e.scrollWidth > e.clientWidth + 1;
+        let bad = '';
+        const w = document.createTreeWalker(e, NodeFilter.SHOW_TEXT);
+        while (!bad && w.nextNode()) {
+          const n = w.currentNode;
+          if (n.parentNode.closest('.cbi-tooltip') || !shown(n.parentNode)) continue;
+          for (const m of n.data.matchAll(/[^ \t\n]+/g)) {
+            if (m[0].length < 2 || CJK.test(m[0])) continue;
+            const rg = document.createRange();
+            rg.setStart(n, m.index);
+            rg.setEnd(n, m.index + m[0].length);
+            if (new Set([...rg.getClientRects()].filter((x) => x.width > 0.5).map((x) => Math.round(x.top))).size > 1) { bad = `broken "${m[0].slice(0, 24)}"`; break; }
+          }
+        }
+        add('g.break.table', 'token', bad && !cut ? bad : 'whole', e);
+      }
+    }
+
     if (fold === 'wide') {
       // The header's line runs as far as the rows' (to the card border),
       // also over an actions column with no header cell of its own.
@@ -187,6 +217,20 @@ export async function collect(cfg) {
         const end = after.content !== 'none' && parseFloat(after.borderBottomWidth) > 0 ? box(head).right : Math.max(...ruled.map((c) => box(c).right));
         if (ruled.length) add('c6.table', 'headLine', px(Math.max(0, rowEnd - end)), head);
       }
+      // C6: a column of sizes, rates or shares (every body cell a number
+      // with its unit) is end-aligned; the first column names the row.
+      const NUM = /^-?\d+(?:[.,]\d+)?\s?(?:%|[kKMGTP]?i?B|[kKMG]?bit\/s|[kKMG]?B\/s)(?:\s*\(.*\))?$/;
+      const cols = new Map();
+      for (const r of rows) cellsOf(r).forEach((c, i) => {
+        if (!i || c.matches('.cbi-section-actions')) return;
+        const v = c.textContent.replace(/\s+/g, ' ').trim();
+        if (!v || v === '-') return;
+        const k = cols.get(i) || {num: 0, other: 0, cells: []};
+        NUM.test(v) ? k.num++ : k.other++;
+        k.cells.push(c);
+        cols.set(i, k);
+      });
+      for (const k of cols.values()) if (k.num && !k.other) add('c6.table', 'numAlign', cs(k.cells[0]).textAlign === 'right' || cs(k.cells[0]).textAlign === 'end' ? 'end' : cs(k.cells[0]).textAlign, k.cells[0]);
       for (const r of rows) {
         const cells = cellsOf(r);
         if (!cells.length) continue;
@@ -200,6 +244,12 @@ export async function collect(cfg) {
         }
         for (const c of cells) {
           if (c.matches('.right') && !c.matches('.cbi-section-actions')) add('c6.table', 'numAlign', cs(c).textAlign === 'right' ? 'end' : cs(c).textAlign, c);
+          // G7: a field in a row keeps 8 from the row's lines.
+          const fld = [...c.querySelectorAll('select, .cbi-dropdown, textarea, input:not([type="hidden"], [type="checkbox"], [type="radio"], [type="button"], [type="submit"])')].find((e) => shown(e) && !e.closest('.cbi-dropdown *'));
+          if (fld) {
+            const fb = box(fld), cb = box(c), gap = Math.min(fb.top - cb.top, cb.bottom - parseFloat(cs(c).borderBottomWidth) - fb.bottom);
+            add('c6.table', 'fieldGap', gap >= 7.5 ? 'ok' : px(gap), c);
+          }
           if (!c.matches('.cbi-section-actions')) continue;
           const bs = [...c.querySelectorAll(BTN)].filter(shown);
           if (!bs.length) continue;
