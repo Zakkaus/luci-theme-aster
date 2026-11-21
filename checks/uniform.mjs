@@ -32,6 +32,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {CHECKS, parseArgs, readPages, parseDebugCss, classMatches, openPage, eachCombo, show, writeOut, die} from './lib/gate.mjs';
+import * as frm from './rules/frm.mjs';
 
 const usage = 'usage: node checks/uniform.mjs <base url> <password> [--user root] [--pages <file>]... [--canonical <json>] [--viewports desktop,phone] [--modes light,dark] [--palette aster] [--tolerance 1] [--json <file>] [--out <file>] [--timeout ms] [--settle ms] [--width-test n] [--debug-css <page>=<css>]...';
 const opt = parseArgs(process.argv.slice(2), {
@@ -53,6 +54,7 @@ try {
 } catch (e) {
   die(`--canonical ${opt.canonical}: ${e.message}`);
 }
+Object.assign(canonical, frm.canonical);
 
 /* ── In the page ─────────────────────────────────────────────── */
 
@@ -155,7 +157,7 @@ function collect(cfg) {
       : el.matches('.cbi-button-link') ? 'link'
       : el.matches('.cbi-button-negative, .cbi-button-remove') ? 'danger'
       : el.matches('.cbi-button-positive, .cbi-button-apply, .cbi-button-save, .cbi-button-action, .btn.important') ? 'primary' : 'secondary';
-    const size = el.closest('td, .td') ? 'sm' : 'md';
+    const size = el.closest('td, .td, .cbi-section-remove, :is(.cbi-section, .cbi-section-node):not(#modal_overlay *) > .right') ? 'sm' : 'md';
     // A label of one or two glyphs and no letter or digit (a pager's « and
     // », the drag handle, a dynlist's +) draws an icon, so the button is an
     // icon one: square, so its width is read too.
@@ -472,7 +474,7 @@ function collect(cfg) {
     // A heading inside a card's content under its title (Heading 3: the
     // overview's leases and stations) is not the card's title: not its
     // first heading.
-    const inner = el.matches('.cbi-section > div:not(.cbi-title) > h3') && el.closest('.cbi-section').querySelector('h1, h2, h3, h4, h5, h6, legend') !== el;
+    const inner = el.matches('.cbi-section > div:not(.cbi-title) > h3') && el.closest('.cbi-section').querySelector('h1, h2, h3, h4, h5, h6, legend') !== el || el.matches('.cbi-value > .cbi-section > h3, .cbi-section > h3 ~ h3');
     const cls = cfg.modal ? 'heading.modal' : !inCard && el.matches('h1, h2') ? 'heading.page' : inner ? 'heading.inner' : inCard ? 'heading.card' : 'heading.sub';
     add(cls, 'fontSize', px(s.fontSize), el);
     add(cls, 'fontWeight', s.fontWeight, el);
@@ -494,7 +496,7 @@ function collect(cfg) {
     return 'none';
   };
   for (const el of all('.tabs > li > .tab, .cbi-tabmenu > li')) {
-    add('tab', 'height', px(box(el).height), el);
+    add(el.matches('.cbi-tabmenu > li') && el.parentElement.closest('[data-tab]:not(li), #view:has(> #tabmenu, > .cbi-map > #tabmenu)') ? 'tab.sm' : 'tab', 'height', px(box(el).height), el);
     if (el.matches('[data-active], .cbi-tab')) add('tab', 'indicator', indicator(el), el);
   }
   // The strip is one line at every width (Astryx TabList scrolls).
@@ -1020,6 +1022,7 @@ await eachCombo(opt, async (ctx, device, mode, combo) => {
     }
     const samples = await r.page.evaluate(collect, {modal: !!entry.modal, device});
     samples.push(...await r.page.evaluate(widthTest, {modal: !!entry.modal, limit: +opt['width-test']}));
+    samples.push(...await r.page.evaluate(frm.collect, {modal: !!entry.modal, device}));
     const rows = await r.page.evaluate(dataRows, {modal: !!entry.modal});
     await r.page.close();
     results.push({entry, device, mode, combo, samples, rows, note: r.note, pageErrors: r.errors});
