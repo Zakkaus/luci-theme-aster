@@ -963,8 +963,10 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   inline-size: auto !important; /* inline width */
 }
 /* Realtime graphs: a legend row holds three label and value pairs; where
-   six cells do not fit, the pairs stack, value beside label. */
-[data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr { display: grid; grid-template-columns: repeat(auto-fit, minmax(min-content, max-content) minmax(6rem, 1fr)); column-gap: var(--spacing-4); }
+   six cells do not fit, the pairs stack, value beside label on its
+   baseline. (A repeat(auto-fit) track needs a fixed minimum, or the whole
+   template is dropped and every cell takes a line of its own.) */
+[data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr { display: grid; grid-template-columns: repeat(auto-fit, minmax(6rem, max-content) minmax(6rem, 1fr)); column-gap: var(--spacing-4); align-items: baseline; }
 [data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr > .td { display: block; padding-inline: 0; }
 
 /* ── Realtime graphs [ported] ───────────────────────────────── */
