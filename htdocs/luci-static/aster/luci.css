@@ -465,7 +465,10 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
 /* A table that is the Card (WireGuard's peers, 24.10's Processes): wide,
    its cells own the 16, so the header and the rows start on the card's
    content edge and the row lines run border to border (C2, C6). */
-#view > :is(table, .table)[data-fold="wide"], #view > .cbi-map > :is(table, .table)[data-fold="wide"] { padding-inline: 0; }
+#view > :is(table, .table)[data-fold="wide"], #view > .cbi-map > :is(table, .table)[data-fold="wide"] {
+  padding-inline: 0;
+  & > .tr.placeholder { margin-inline: var(--border-width); } /* its caption, inside the border */
+}
 /* A WireGuard peer's short key is the subline under its name (0.1):
    supporting 13/20 secondary, the body face. */
 #view .td > div > p + .ifacebadge {
