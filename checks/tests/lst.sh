@@ -59,5 +59,13 @@ expect uniform 0 "" "Realtime legend as a list" -- "$url" "$password" --pages "$
 expect uniform 1 "c8.kv layout,c8.kv align" "Realtime legend value off its label (audit #4)" -- "$url" "$password" --pages "$tmp/lst-bw.txt" \
 	--debug-css 'admin/status/realtime/bandwidth=#view .table:not(:has(.th)) .td:nth-child(even) { position: relative; top: 12px }'
 
+ssh='admin/system/admin/sshkeys require=c7.keys'
+printf '%s\n' "$ssh" >"$tmp/lst-ssh.txt"
+expect uniform 0 "" "SSH keys: C7 blocks, name over type and key" -- "$url" "$password" --pages "$tmp/lst-ssh.txt" --viewports desktop,phone
+# Audit2 (A): each key a Token chip, name glued to its type, the key to the
+# chip's edge, chips as wide as their words.
+expect uniform 1 "c7.keys *" "SSH keys as Tokens (audit2 A)" -- "$url" "$password" --pages "$tmp/lst-ssh.txt" \
+	--debug-css 'admin/system/admin/sshkeys=[data-page] .cbi-dynlist > .item { display: inline-flex !important; align-self: start !important; background: var(--color-background-muted) !important } [data-page] .cbi-dynlist > .item > small > code { text-overflow: clip !important; overflow: visible !important }'
+
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true

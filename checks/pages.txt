@@ -34,7 +34,7 @@ admin/system/system                  require=font.body,heading.page,card,button,
 admin/system/system tab=timesync     require=font.body,card,checkbox,tab
 admin/system/admin/password          require=font.body,heading.page,card,button,field.input,form.label,tab
 admin/system/admin/dropbear          require=font.body,heading.page,card,button,field,checkbox,form.label,tab
-admin/system/admin/sshkeys           require=font.body,heading.page,card,button,field.input,tab
+admin/system/admin/sshkeys           require=font.body,heading.page,card,button,field.input,tab,c7.keys
 admin/system/admin/uhttpd            require=font.body,heading.page,card,button,checkbox,form.label,tab
 admin/system/admin/repokeys          require=font.body,heading.page,card,button,table,tab
 admin/system/package-manager         require=font.body,heading.page,card,button,field.input,table,tab,c7.when

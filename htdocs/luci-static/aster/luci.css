@@ -286,8 +286,59 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
   align-items: start;
   &::before { margin-block-start: calc(var(--spacing-1) + var(--border-width) + (var(--text-supporting-size) - var(--text-body-size)) * var(--text-body-leading) / 2); }
 }
-/* The SSH keys list holds whole keys: full width. */
-[data-page="admin-system-admin-sshkeys"] .cbi-dynlist { --field-w: 100%; }
+/* SSH keys (COMPONENTS.md section 3: C7 title-line-only blocks): a key is
+   a name, its type and the key, not one value, so it is a block, not a
+   Token. The name is the title (label type), the type and the key its
+   subline (supporting, secondary; the key one line cut with an ellipsis,
+   whole in the remove dialog), the remove mark the title line's IconButton
+   sm at its end, 8 after the text, centred on the name (it overhangs the
+   line by 4 each side). Blocks 12 / 12, a Divider between, the first 0 on
+   top, the last 0 under; the add row 16 below. */
+[data-page="admin-system-admin-sshkeys"] .cbi-dynlist {
+  --field-w: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  & > .item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--size-element-sm);
+    column-gap: var(--spacing-2);
+    block-size: auto;
+    padding: var(--spacing-3) 0;
+    border-radius: 0;
+    background: none;
+    font-size: var(--text-label-size);
+    font-weight: var(--text-label-weight);
+    line-height: var(--text-label-leading);
+    overflow: visible;
+    cursor: pointer;
+    &:first-child { padding-block-start: 0; }
+    &:not(:has(~ .item)) { padding-block-end: 0; }
+    & + .item { border-block-start: var(--border-width) solid var(--color-border); }
+    & br { display: none; }
+    & > strong { font-weight: inherit; overflow: hidden; text-overflow: ellipsis; }
+    & > small {
+      grid-column: 1;
+      display: flex;
+      gap: var(--spacing-2);
+      color: var(--color-text-secondary);
+      font-size: var(--text-supporting-size);
+      font-weight: var(--text-supporting-weight);
+      line-height: var(--text-supporting-leading);
+    }
+    & > small > code { flex: 1 1 0; min-inline-size: 0; font-size: inherit; }
+    &::after {
+      position: static;
+      grid-area: 1 / 2;
+      block-size: var(--size-element-sm);
+      inline-size: var(--size-element-sm);
+      margin-block: calc(0px - var(--spacing-1));
+      mask-size: var(--aster-icon-sm);
+    }
+  }
+  & > .add-item { margin-block-start: var(--spacing-4); }
+}
 /* System and Kernel Log's filter rows (layout): a wrapping toolbar, each label on its
    control's centre line, 8 apart, the controls sharing what is left; the
    inline 5 / 10 px margins go (only !important beats them). */
