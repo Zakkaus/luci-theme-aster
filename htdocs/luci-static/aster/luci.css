@@ -365,12 +365,10 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
   gap: var(--aster-space-row);
   & > * { margin: 0; }
 }
-/* A row's actions keep one line: form.js sizes the cell to the widest
-   row's buttons, and a fraction of a pixel short wrapped Delete under the
-   rest (Traffic Rules). The Table fold wraps them (components.css). */
-@container aster-page (min-width: 48.0625rem) {
-  #view .td.cbi-section-actions > div { flex-wrap: nowrap; white-space: nowrap; }
-}
+/* A row's actions keep one line, wide or folded (RowActions): form.js
+   sizes the cell to the widest row's buttons, and a fraction of a pixel
+   short wrapped Delete under the rest (Traffic Rules). */
+#view .td.cbi-section-actions > div { flex-wrap: nowrap; white-space: nowrap; }
 /* A row's actions that do not fit (theme-aster.js data-collapsed): the
    first, then the "more" button; the rest are its menu's rows. */
 :is(.td, td) > div[data-collapsed] > :not(.drag-handle, .aster-more) ~ :not(.aster-more),
@@ -430,14 +428,8 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
    interface under the SSID. Where the lines do not fit the card the table
    folds (components.css, Table) instead of breaking them: theme-aster.js
    measures it unbroken (data-fold "wide") and folds it where it is wider
-   than its card. Without the script the page decides: the 1440 desktop
-   keeps the rows, a station's address list and rates breaking after a
-   comma where they would run past the card's edge. */
+   than its card. */
 #view :is(.leases, .lases, .leases6, .assoclist)[data-fold="wide"] .td { white-space: nowrap; }
-@container aster-page (min-width: 72rem) {
-  #view :is(.leases, .lases, .leases6, .assoclist):not([data-fold]) .td { white-space: nowrap; }
-  #view .assoclist:not([data-fold]) .td :is(.hide-xs, .td > span:not(.ifacebadge) > span) { white-space: normal; }
-}
 #view .assoclist .td :is(.hide-xs, .ifacebadge small) { display: block; }
 /* Wireless: a radio's or a network's row (badge, status, actions) folds
    where it is wider than its card (theme-aster.js, data-fold): the badge
@@ -944,8 +936,6 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   .cbi-value-field { --field-w: 100%; flex-basis: auto; }
   /* CBI wraps a widget in a bare div, which must span the row too. */
   .cbi-value-field > :not(button, .btn, .cbi-button, .cbi-checkbox) { flex-basis: 100%; }
-  /* A wide table without a header row scrolls inside its card. */
-  .table:not(:has(> .tr > .th, > .thead > .tr > .th)) { display: block; overflow-x: auto; }
   /* A dialog fits the screen. */
   #modal_overlay { padding: var(--spacing-4); }
   /* An interface's status reads as the Table fold's rows (components.css):
@@ -960,45 +950,22 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   }
 }
 
-/* The page's tables fold where the page is narrow, not only on a phone
-   (the Table fold, components.css): rows that complete it. */
-@container aster-page (max-width: 48rem) {
-  /* The diagnostics tools stack instead of sharing a row (layout). */
-  .table:has(.diag-action) > .tr { display: flex; flex-direction: column; gap: var(--spacing-4); }
-  .table:has(.diag-action) > .tr > .td { display: block; padding-inline: 0; border: 0; }
-  /* form.js writes the widest row's measured width inline on every actions
-     cell; on a phone the cell takes the width its row gives it. */
-  #view .cbi-section-actions[style*="width"] {
-    min-inline-size: 0 !important; /* inline min-width */
-    inline-size: auto !important; /* inline width */
-  }
-  /* Network > Interfaces has no header row, so the Table fold skips it: the
-     box, its status and the actions stack (layout). */
-  #view .tr:has(> .td > .ifacebox) {
-    display: flex;
-    flex-direction: column;
-    & > .td { display: block; inline-size: auto; white-space: normal; }
-    & > .td:not(:last-child) { border: 0; }
-    & > .td.cbi-section-actions > * { display: flex; gap: var(--spacing-2); }
-  }
-  /* The table is a block here; a row group left as a table shrinks to its
-     content and the rules stop short of the card edge (layout). */
-  #view .tbody:has(> .tr > .td > .ifacebox) { display: block; }
-  /* Actions on a footer line (here and in the Table fold) are spaced by
-     the gap alone, not also by the button-after-button margin. */
-  #view .tr:has(> .td > .ifacebox) > .td.cbi-section-actions > * > *,
-  #view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions > div > * { margin-inline-start: 0; }
-  /* Under the stack the actions start where the stacked text does. */
-  #view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions { text-align: start; }
-  /* nftables: a rule's long badges wrap inside their cell (layout). */
-  #view .nft-rules .ifacebadge { flex-wrap: wrap; max-inline-size: 100%; }
-  #view .nft-rules .ifacebadge,
-  #view .nft-rules .ifacebadge > * { white-space: normal; }
-  /* Realtime graphs: a legend row holds three label and value pairs, six
-     cells too wide for a phone; the pairs stack, value beside label (layout). */
-  [data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr { display: grid; grid-template-columns: auto minmax(0, 1fr); }
-  [data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr > .td { display: block; }
+/* The diagnostics page lays three tools out as three cells of one row,
+   which wrap under each other where they do not fit (no query: the row
+   measures its own room). */
+.table:has(.diag-action) > .tr { display: flex; flex-wrap: wrap; gap: var(--spacing-4); }
+.table:has(.diag-action) > .tr > .td { display: block; flex: 1 1 16rem; padding-inline: 0; border: 0; }
+/* A folded table (components.css, Table): form.js writes the widest row's
+   measured width inline on every actions cell; folded, the cell takes the
+   width its row gives it. */
+#view .table[data-fold="fold"] .cbi-section-actions[style*="width"] {
+  min-inline-size: 0 !important; /* inline min-width */
+  inline-size: auto !important; /* inline width */
 }
+/* Realtime graphs: a legend row holds three label and value pairs; where
+   six cells do not fit, the pairs stack, value beside label. */
+[data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr { display: grid; grid-template-columns: repeat(auto-fit, minmax(min-content, max-content) minmax(6rem, 1fr)); column-gap: var(--spacing-4); }
+[data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr > .td { display: block; padding-inline: 0; }
 
 /* ── Realtime graphs [ported] ───────────────────────────────── */
 
@@ -1153,19 +1120,22 @@ html body[data-page^="admin-services-passwall"] {
   & #_passwall_status_fieldset .red { color: var(--color-text-error); }
   & #_passwall_status_fieldset .yellow { color: var(--color-text-warning); }
 }
-/* On a phone the node table folds like every other table: node_list.htm
-   draws its rows as flex rows under 1152 (layout), and pads the actions
-   cell 5 a side (!important there) where the fold insets it 16. */
-@media (max-width: 48rem) {
-  html body[data-page^="admin-services-passwall"] {
-    & .table:has(> :is(.thead, thead, tbody) > .tr > .th) .tr.cbi-section-table-row { display: grid; }
-    & .table .tr > .pw-actions { padding-inline: var(--spacing-4) !important; } /* node_list.htm padding 5px !important */    /* A folded row reads from the start like every fold: node_list.htm
-         centres its cells and right-aligns the actions (!important there). */
-    & .table .tr > :is(.td, td) { text-align: start; }
-    & .table .tr > .pw-actions { text-align: start !important; } /* node_list.htm text-align:right !important */    /* app_version.htm centres its rows' items; the label spans the stacked
-         row like every form row's (layout). */
-    & #app_version > .cbi-value { align-items: stretch; }
+/* PassWall's node table folds like every other table (Table, data-fold):
+   node_list.htm draws its rows as flex rows under 1152 (layout), pads the
+   actions cell 5 a side (!important there) where the fold insets it 16,
+   centres its cells and right-aligns the actions (!important there). */
+html body[data-page^="admin-services-passwall"] .table[data-fold="fold"] {
+  & .tr.cbi-section-table-row { display: grid; }
+  & .tr > :is(.td, td) { text-align: start; }
+  & .tr > .pw-actions {
+    padding-inline: var(--spacing-4) !important; /* node_list.htm padding 5px !important */
+    text-align: start !important; /* node_list.htm text-align:right !important */
   }
+}
+/* app_version.htm centres its rows' items; the label spans the stacked
+   row like every form row's (layout). */
+@media (max-width: 48rem) {
+  html body[data-page^="admin-services-passwall"] #app_version > .cbi-value { align-items: stretch; }
 }
 /* The Running Status tiles go one a row on a narrow phone: two a row
    (status.htm's own) leave a tile narrower than its icon and label. */

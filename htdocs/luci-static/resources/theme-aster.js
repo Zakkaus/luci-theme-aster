@@ -18,16 +18,15 @@ return baseclass.extend({
 		this.fold();
 	},
 
-	/* Tables whose lines never break (leases, stations, Wireless' radios)
-	 * fold where they do not fit their card (components.css, luci.css):
-	 * each is measured unfolded (data-fold "wide") at its narrowest
-	 * (min-content) and folds when that is wider than its room; folded, it
-	 * opens again only with 16 to spare, so the scroll bar a taller fold
-	 * brings does not flip it back. Resizes are read on the next frame, as a
-	 * fold resizes the card being observed. */
+	/* Every data table (Table, components.css) folds where it does not fit
+	 * its card, whatever the window: each is measured unfolded (data-fold
+	 * "wide") at its narrowest (min-content) and folds when that is wider
+	 * than its room; folded, it opens again only with 16 to spare, so the
+	 * scroll bar a taller fold brings does not flip it back. Resizes are
+	 * read on the next frame, as a fold resizes the card being observed. */
 	fold() {
-		const view = document.getElementById('view'), seen = new WeakSet(),
-			sel = '.table:is(.leases, .lases, .leases6, .assoclist, :has(.tr > [data-name="_badge"]))';
+		const view = document.getElementById('maincontent'), seen = new WeakSet(),
+			sel = ':is(#view, form > .cbi-map) :is(.table, table):is(:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th), .cbi-section-table):not(:has(.diag-action))';
 		let frame;
 
 		if (!view)
@@ -47,7 +46,9 @@ return baseclass.extend({
 			t.dataset.fold = need > room + 0.5 - (was ? 16 : 0) ? 'fold' : 'wide';
 		};
 		const ro = new ResizeObserver(() => frame ||= requestAnimationFrame(() => (frame = 0, view.querySelectorAll(sel).forEach(fit))));
-		const run = () => view.querySelectorAll(sel).forEach((t) => (seen.has(t.parentNode) || (seen.add(t.parentNode), ro.observe(t.parentNode)), fit(t)));
+		/* Only the tables a change is in, or under (a view re-rendered). */
+		const run = (rs) => new Set((rs || [{ target: view }]).flatMap((r) => r.target.closest(sel) || [...r.target.querySelectorAll(sel)]))
+			.forEach((t) => (seen.has(t.parentNode) || (seen.add(t.parentNode), ro.observe(t.parentNode)), fit(t)));
 
 		run();
 		new MutationObserver(run).observe(view, { childList: true, subtree: true });
