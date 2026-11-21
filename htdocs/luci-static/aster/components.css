@@ -305,6 +305,14 @@ html :where(textarea) {
    output; the code face replaces it (an inline style yields only to
    !important). */
 html :where(textarea[style*="monospace"]) { font-family: var(--font-family-code) !important; }
+/* A read-only log or command output (System and Kernel Log, Diagnostics)
+   is Astryx's CodeBlock: muted fill, no border, 12 16 inside, scrolling in
+   itself. Editable code (crontab, rc.local) stays a TextArea field (C24). */
+html :where(textarea[readonly]) {
+  padding: var(--spacing-3) var(--spacing-4);
+  border-width: 0;
+  background-color: var(--color-background-muted);
+}
 html :where(select[multiple]) { block-size: auto; padding-block: var(--spacing-1); }
 html :where(select > option) { background: var(--color-background-popover); color: var(--color-text-primary); }
 @media (hover: hover) {
