@@ -362,14 +362,17 @@ return baseclass.extend({
 		/* Each menu is a popover (header.ut): the browser keeps it in the top
 		   layer, closes it on Escape or a click outside, closes the other one
 		   when it opens, and puts the focus back on its button. Opening
-		   focuses the checked row. The button's tooltip gives way to the
-		   open menu. Without CSS anchor positioning the menu is placed under
-		   its button here. */
+		   focuses the checked row; a menu opened by the pointer shows no
+		   focus ring until a key moves in it (data-pointer, shell.css). The
+		   button's tooltip gives way to the open menu. Without CSS anchor
+		   positioning the menu is placed under its button here. */
 		menus.forEach((m) => {
 			const btn = m.querySelector('button');
 			const list = m.querySelector('[role="menu"]');
 			const rows = Array.from(list.querySelectorAll('[role="menuitemradio"]'));
 			const label = btn.getAttribute('aria-label');
+
+			btn.addEventListener('click', (ev) => m.toggleAttribute('data-pointer', ev.detail > 0));
 
 			list.addEventListener('beforetoggle', (ev) => {
 				const open = ev.newState === 'open';
@@ -408,6 +411,8 @@ return baseclass.extend({
 			list.addEventListener('keydown', (ev) => {
 				const i = rows.indexOf(document.activeElement);
 				const go = { ArrowDown: i + 1, ArrowUp: i - 1, Home: 0, End: rows.length - 1 }[ev.key];
+
+				m.removeAttribute('data-pointer');
 
 				if (go !== undefined)
 					rows[(go + rows.length) % rows.length].focus();

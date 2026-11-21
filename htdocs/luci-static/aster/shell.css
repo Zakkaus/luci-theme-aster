@@ -144,7 +144,10 @@
    palette button each open one Menu (components.css), one plain row per
    choice. The menu is a popover in the top layer, so no page element
    (a card's header, a sticky bar) can be drawn over it; it drops from
-   its button, end edges aligned, flipped above at the viewport's foot. */
+   its button, end edges aligned, flipped above at the viewport's foot.
+   A menu opened by the pointer shows no focus ring until a key moves in
+   it (theme-aster.js data-pointer); the checked row carries the check
+   only. */
 .appearance > .ico { display: none; }
 :root:not([data-scheme="light"], [data-scheme="dark"]) .appearance > [data-scheme="auto"],
 :root[data-scheme="light"] .appearance > [data-scheme="light"],
@@ -164,6 +167,7 @@
 .appearance + [role="menu"] { position-anchor: --aster-scheme; }
 .palette-btn { anchor-name: --aster-palette; }
 .palette-btn + [role="menu"] { position-anchor: --aster-palette; }
+.palette-menu[data-pointer] > [role="menu"] > li:focus-visible:not(:hover) { outline: none; background: none; }
 .palette-menu > [role="menu"] > li > .ico { color: var(--color-icon-secondary); }
 
 /* The drawer toggle and the drawer's own head exist only on a phone. */
