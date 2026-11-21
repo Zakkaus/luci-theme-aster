@@ -28,12 +28,12 @@ const RULES = {
   'c1.header': 'C1: no actions in the title line; a card title does not repeat the page title or the selected tab',
   'c1.descr': 'C1/C3: page description body 15/24, card description supporting 13/20, both secondary',
   'c2.card': 'C2: radius 16, border 1, card fill, padding 16',
-  'c3.heading': 'C3: page 26/600, card 18/600, inner 16/600; heading box -> content 16; actions end on the content end',
+  'c3.heading': 'C3: page 26/600, card 18/600, inner 16/600; heading box -> content 16; actions (a section\'s Remove, C10) on the heading\'s row, ending on the content end',
   'c4.tabs': 'C4: tabs 36 (second level 32), 2 apart, one line, 2 accent bar, list -> pane 16',
-  'c5.form': 'C5: label 200 + 16 (stacked 4), row padding 8, fields 36, help 4',
-  'c9.button': 'C9: md 36 in toolbars/forms/save bar/dialogs, sm 32 in tables/cards/heading rows; one primary; red only in a dialog',
+  'c5.form': 'C5: label 200 + 16 (stacked 4), row padding 8, fields 36, a labelled text area 256, a read-only value whole, buttons wrapped 8 under their field, help 4',
+  'c9.button': 'C9: md 36 in toolbars/forms/save bar/dialogs, sm 32 in tables/cards/heading rows; one primary; red only in a dialog; the drag handle ghost; C11: the save bar reads Reset, Save, Save & Apply',
   'c17.banner': 'C17: padding 12, radius 12, icon gap 8',
-  'c18.dialog': 'C18: padding 16, title/footer gaps 16, button gap 8, width 400/560/800 or window - 32, fits',
+  'c18.dialog': 'C18: padding 16, title/footer gaps 16, button gap 8, the confirm last, width 400/560/800 or window - 32, fits',
   'c19.progress': 'C19: bar 8 high, 4 under its text',
   'c20.upright': 'C20: CJK text is never slanted (em, i, var upright)',
   'c22.divider': 'C22: 1 thick, spans the card content box; 16 under the last control of the form row above',
@@ -253,8 +253,15 @@ export function collect(cfg) {
       check('c3.heading', top ? 'card size' : 'inner size', f(s.fontSize), want, h);
       check('c3.heading', 'weight', s.fontWeight, '600', h);
       const row = h.parentElement.matches('.cbi-title') ? h.parentElement : h;
+      // A section's Remove written next to its heading (C10) is the row's action.
+      const rm = [h.nextElementSibling, h.previousElementSibling].find((x) => x?.matches('.cbi-section-remove') && visible(x));
       let next = row.nextElementSibling;
-      while (next && (!visible(next) || css(next).position === 'absolute')) next = next.nextElementSibling;
+      while (next && (!visible(next) || css(next).position === 'absolute' || next === rm)) next = next.nextElementSibling;
+      const rb = rm && [...rm.querySelectorAll(BTN)].find(visible);
+      if (rb) {
+        check('c3.heading', 'remove row', (box(rb).top + box(rb).bottom - box(h).top - box(h).bottom) / 2, 0, rb);
+        check('c3.heading', 'actions end', content(cardOf(rm) ?? rm).r - box(rb).right, 0, rb);
+      }
       // From the heading's own box: 25.12's title row grows with its margin.
       if (next) check('c3.heading', 'next gap', box(next).top - box(h).bottom, 16, h);
       if (row !== h) {
@@ -296,6 +303,7 @@ export function collect(cfg) {
 
   /* C5: label column 200, 16 to the field (4 above it when stacked), row
      padding 8, fields 36, help 4 under the field. */
+  const FW = f(tok('width', 'var(--aster-field-w)'));
   for (const row of all('.cbi-value')) {
     const lab = row.querySelector(':scope > .cbi-value-title'), fld = row.querySelector(':scope > .cbi-value-field');
     if (!lab || !fld || !visible(lab) || !visible(fld) || row.closest(TABLE)) continue;
@@ -311,6 +319,18 @@ export function collect(cfg) {
     for (const c of fld.querySelectorAll(FIELD)) {
       if (!visible(c) || c.parentElement.closest('.cbi-dropdown') || c.closest('.cbi-dynlist, textarea')) continue;
       check('c5.form', 'field height', box(c).height, 36, c);
+    }
+    // A read-only value (the local time) is read whole.
+    for (const c of fld.querySelectorAll(':scope > input[readonly]')) if (visible(c)) check('c5.form', 'read-only value', c.scrollWidth <= c.clientWidth + 1 ? 'whole' : 'cut', 'whole', c);
+    // A field's own buttons wrapped under it sit 8 below, as 8 beside it.
+    for (const g of fld.querySelectorAll(':scope > .control-group')) {
+      const ctl = [...fld.querySelectorAll(':scope > :is(input, select, .cbi-dropdown)')].find(visible);
+      if (ctl && visible(g) && g.firstElementChild?.matches(BTN) && box(g).top >= box(ctl).bottom - 0.5) check('c5.form', 'button wrap gap', box(g).top - box(ctl).bottom, 8, g);
+    }
+    // Beside its label a text area is a field, 256.
+    if (fb.top < lb.bottom - 0.5 && lab.textContent.trim()) {
+      const ta = fld.querySelector(':scope > textarea, :scope > div > textarea:only-child');
+      if (ta && visible(ta)) check('c5.form', 'textarea width', box(ta).width, FW, ta);
     }
     const help = fld.querySelector(':scope > .cbi-value-description');
     if (help && visible(help)) {
@@ -338,8 +358,18 @@ export function collect(cfg) {
     if (s.backgroundColor === accent && !b.closest('.cbi-page-actions .cbi-dropdown')) primaries++;
     const red = tok('backgroundColor', 'var(--color-background-error, var(--color-error))');
     if (fill[3] > 0.5 && s.backgroundColor === red && !b.closest('.modal')) fail('c9.button', 'red', 'red outside a dialog', 'none', b);
+    if (b.matches('.drag-handle')) check('c9.button', 'drag handle fill', fill[3] > 0.04 ? s.backgroundColor : 'none', 'none', b);
   }
   if (!cfg.modal && primaries > 1) { count('c9.button'); fail('c9.button', 'primaries', primaries, 1, scope); }
+  // C11: the save bar reads Reset, Save, Save & Apply (the primary last).
+  const sbar = cfg.modal ? null : [...document.querySelectorAll('.cbi-page-actions')].find(visible);
+  if (sbar) {
+    const bs = [...sbar.children].filter((b) => b.matches(BTN) && visible(b)).sort((a, b) => box(a).left - box(b).left);
+    const line = (x) => bs.filter((b) => Math.abs(box(b).top - box(x).top) < 1);
+    const apply = bs.find((b) => b.matches('.cbi-button-apply')), reset = bs.find((b) => b.matches('.cbi-button-reset'));
+    if (apply) check('c9.button', 'save bar last', line(apply).at(-1) === apply ? 'Save & Apply' : (line(apply).at(-1).textContent || line(apply).at(-1).value).trim(), 'Save & Apply', sbar);
+    if (reset) check('c9.button', 'save bar first', line(reset)[0] === reset ? 'Reset' : (line(reset)[0].textContent || line(reset)[0].value).trim(), 'Reset', sbar);
+  }
 
   /* C17: Banner padding 12 16, icon gap 8, radius 12. */
   for (const a of [...(scope.matches('.alert-message:not(.modal)') ? [scope] : []), ...all('.alert-message:not(.modal)')]) {
@@ -368,6 +398,11 @@ export function collect(cfg) {
       check('c18.dialog', 'footer gap', box(foot).top - box(kids[kids.indexOf(foot) - 1]).bottom, 16, foot);
       const bs = [...foot.querySelectorAll(BTN)].filter(visible).sort((a, b) => box(a).left - box(b).left);
       for (let i = 1; i < bs.length; i++) if (Math.abs(box(bs[i]).top - box(bs[i - 1]).top) < 1) check('c18.dialog', 'button gap', box(bs[i]).left - box(bs[i - 1]).right, 8, bs[i]);
+      // The confirm (a filled accent or error button) ends the footer.
+      const red = tok('backgroundColor', 'var(--color-background-error, var(--color-error))');
+      const confirm = bs.filter((b) => !b.parentElement.closest(BTN) && [accent, red].includes(css(b).backgroundColor));
+      const last = bs.filter((b) => !b.parentElement.closest(BTN)).at(-1);
+      if (confirm.length) check('c18.dialog', 'confirm last', confirm.includes(last) ? 'last' : 'before a secondary', 'last', last);
     }
   }
 

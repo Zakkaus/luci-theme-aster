@@ -674,7 +674,11 @@ function collect(cfg) {
       const n = sib(el, 'nextElementSibling');
       if (!n || !n.matches(CTRL)) continue;
       const a = box(el), b = box(n);
-      if (b.left >= a.right - 0.5 && Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 1) put('space.control.row', 'gap', px(b.left - a.right), n);
+      // The save bar is ordered against the DOM (C11): a neighbour on the left counts too.
+      if (Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 1) {
+        if (b.left >= a.right - 0.5) put('space.control.row', 'gap', px(b.left - a.right), n);
+        else if (a.left >= b.right - 0.5 && n.parentElement.matches('.cbi-page-actions')) put('space.control.row', 'gap', px(a.left - b.right), n);
+      }
     }
     for (const el of all('.tabs > li, .cbi-tabmenu > li')) {
       const n = sib(el, 'nextElementSibling');

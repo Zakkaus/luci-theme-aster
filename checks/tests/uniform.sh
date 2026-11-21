@@ -121,7 +121,7 @@ expect uniform 1 "space.tabs.content gap,c4.tabs conform" "tabs 24 over their co
 	--debug-css 'admin/system/system=.cbi-tabmenu { margin-block-end: 24px !important }'
 expect uniform 1 "space.tabs.item gap,c4.tabs conform" "tabs 8 apart" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=.cbi-tabmenu { gap: 8px !important }'
-expect uniform 1 "space.block gap" "a Remove row 24 over its section" -- "$url" "$password" --pages "$tmp/dropbear.txt" \
+expect uniform 1 "c3.heading conform,space.block gap" "a Remove row 24 over its section (the heading row grows)" -- "$url" "$password" --pages "$tmp/dropbear.txt" \
 	--debug-css 'admin/system/admin/dropbear=.cbi-section-remove { margin-block-end: 24px !important }'
 expect uniform 1 "space.card.pad padding" "card content 8 lower" -- "$url" "$password" --pages "$tmp/overview.txt" \
 	--debug-css 'admin/status/overview=#view > .cbi-section > :first-child { margin-block-start: 8px !important }'
