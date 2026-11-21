@@ -79,6 +79,8 @@ export function collect(cfg) {
       const re = /[^ \t\n\r]+/g;
       let m;
       while ((m = re.exec(t.data))) {
+        // A run of 4+ ideographs is prose (CJK breaks between them), not an identifier.
+        if (/\p{Script=Han}{4}/u.test(m[0])) continue;
         const r = document.createRange();
         r.setStart(t, m.index);
         r.setEnd(t, m.index + m[0].length);
@@ -102,7 +104,8 @@ export function collect(cfg) {
   scope.querySelectorAll('[id$="-ifc-description"]').forEach((el) => shown(el) && fromNowrap(el, 'ifstatus', [...el.querySelectorAll(':scope > .nowrap')]));
   scope.querySelectorAll('.network-status-table > .ifacebox > .ifacebox-body').forEach((el) => shown(el) && fromNowrap(el, 'upstream', [...el.querySelectorAll('.nowrap')].filter((n) => !n.closest('.cbi-tooltip'))));
   scope.querySelectorAll('.table:not(:has(.th, th)), table:not(:has(th, .th))').forEach((t) => {
-    if (!shown(t) || t.closest('.cbi-tooltip, .cbi-section-table, .ifacebox')) return;
+    // A row whose value is a C19 bar (Memory, Storage) is the Progress component's.
+    if (!shown(t) || t.closest('.cbi-tooltip, .cbi-section-table, .ifacebox') || t.querySelector('.cbi-progressbar')) return;
     const rows = [...t.querySelectorAll(':scope > .tr, :scope > tbody > tr, :scope > .tbody > .tr, :scope > tr')].filter(shown);
     const pairs = rows.map((r) => {
       const c = [...r.children].filter((x) => x.matches('td, .td'));

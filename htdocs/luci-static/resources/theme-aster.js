@@ -114,13 +114,18 @@ return baseclass.extend({
 	 *    "<strong>Error:</strong> text" item) gets .aster-error, set in the
 	 *    error ink (luci.css, Network pages);
 	 *  - a key in an interface's list ("<strong>Protocol:</strong>": the
-	 *    overview's boxes, Interfaces' status) loses LuCI's colon: both are
+	 *    overview's boxes, Interfaces' status, realtime legends) loses
+	 *    LuCI's colon: all are
 	 *    drawn as a MetadataList, whose labels carry no colons; the
 	 *    overview's upstreams share one label column, as wide as their
-	 *    longest label (--aster-kv-w; luci.css caps it). */
+	 *    longest label (--aster-kv-w; luci.css caps it); an interface's
+	 *    value is .aster-v, "(N 封包)" kept whole by a no-break space;
+	 *  - "K: <b>v</b>, …" (nft hook, nlbw kpi) and WireGuard's " · Port N
+	 *    · key" become rows. */
 	marks() {
 		const roots = ['view', 'modal_overlay'].map((id) => document.getElementById(id)).filter(Boolean);
 		const error = _('Error');
+		const row = (k, v) => E('li', { class: 'aster-row' }, [E('span', { class: 'aster-k' }, [k]), E('span', { class: 'aster-v' }, v)]);
 		const glyph = (s) => {
 			const g = document.createElement('span');
 
@@ -139,7 +144,7 @@ return baseclass.extend({
 			while (walk.nextNode())
 				hits.push(walk.currentNode);
 
-			hits.forEach((n) => n.replaceWith(...n.data.split(/([▲▼])/).filter(Boolean).map((s) => /^[▲▼]$/.test(s) ? glyph(s) : s)));
+			hits.forEach((n) => n.replaceWith(...n.data.split(/([▲▼])/).filter(Boolean).map((s) => /^[▲▼]$/.test(s) ? glyph(s) : s.trim())));
 
 			const v = document.getElementById('view');
 			const cur = [...document.querySelectorAll('#mainmenu [aria-current="page"]')].pop();
@@ -159,17 +164,28 @@ return baseclass.extend({
 					s.parentNode.classList.add('aster-error');
 			});
 
-			root.querySelectorAll('.ifacebox-body .nowrap > strong:first-child, [id$="-ifc-description"] > .nowrap > strong:first-child, .ifacebadge.large > span > .nowrap > strong:first-child').forEach((s) => {
+			root.querySelectorAll('.ifacebox-body .nowrap > strong:first-child, [id$="-ifc-description"] > .nowrap > strong:first-child, .ifacebadge.large > span > .nowrap > strong:first-child, .table:not(:has(.th)) .td > strong:only-child').forEach((s) => {
 				const t = s.textContent.replace(/\s*[:：]\s*$/, '');
 
 				if (t !== s.textContent)
 					s.textContent = t;
 
-				/* An interface's value, wrapped to truncate; "(N 封包)" kept whole. */
-				const p = s.parentNode, t2 = p.textContent.slice(t.length).replace(/\((\S+) /g, '($1\xa0');
+				const p = s.parentNode, v = p.textContent.slice(t.length).replace(/\((\S+) /g, '($1\xa0');
 
 				if (p.matches('[id$="-ifc-description"] > *') && !p.querySelector('.aster-v'))
-					p.replaceChildren(s, E('span', { class: 'aster-v', title: t2 }, t2));
+					p.replaceChildren(s, E('span', { class: 'aster-v', title: v }, [v]));
+			});
+
+			root.querySelectorAll('.nft-chain-hook li:not(.aster-row), .kpi li:not(.aster-row)').forEach((li) => li.replaceWith(...li.innerHTML.split(/[，,] *(?=[^<]*[:：] *<)/).map((h) => {
+				const [k, v] = h.split(/[:：] *(.*)/s);
+
+				return v ? row(k, v) : E('li', { class: 'aster-row' }, h);
+			})));
+
+			root.querySelectorAll('#view > p > .ifacebadge + span').forEach((s) => {
+				const [, k, n] = s.textContent.match(/([^\s·\d][^·\d]*?) *(\d+)/) || [], c = s.querySelector('code');
+
+				n && c && (c.title = c.textContent, s.parentNode.replaceChildren(E('ul', { class: 'aster-kv' }, [row(k, n), row(_('Public Key'), c)])));
 			});
 
 			root.querySelectorAll('.network-status-table').forEach((n) => {

@@ -479,13 +479,15 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
 /* ── Network pages [ported] ─────────────────────────────────── */
 
 /* Device icons (Heroicons 2.2.0 outline, MIT, path data verbatim):
-   ServerStack for a wired device or a port, Wifi for a radio. */
-html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z'/></svg>"); --icon-wifi: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z'/></svg>"); }
+   ServerStack for a wired device or a port, Wifi for a radio, Squares2X2
+   for a bridge, Tag for a VLAN, Link for an alias (C16). */
+html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z'/></svg>"); --icon-wifi: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z'/></svg>"); --icon-bridge: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z'/></svg>"); --icon-vlan: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z'/><path d='M6 6h.008v.008H6V6Z'/></svg>"); --icon-alias: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244'/></svg>"); }
 .shell-content .ifacebox { min-inline-size: 8rem; }
-/* Network > Interfaces: the interface cell is no Card (none in a card): a
-   StatusDot (success, or neutral when LuCI's icon is _disabled) before the
-   name, its zone as a Badge after it; under it the
-   device's 16 icon (details on hover) and name in supporting text. */
+/* Network > Interfaces: the interface cell is no Card (none in a card).
+   Text first, markers after (G4, COMPONENTS.md 0.1): the name, then its
+   StatusDot (success, or neutral when LuCI's icon is _disabled), then its
+   zone as a Badge, each 8 apart; under it the device name in supporting
+   text, then its 16 icon and its bridge ports' (details on hover). */
 [data-page="admin-network-network"] #view .ifacebox {
   --card-border-width: 0;
   --card-radius: 0;
@@ -503,12 +505,11 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     font-weight: var(--text-label-weight);
     line-height: var(--text-label-leading);
     & > strong { font-weight: inherit; }
-    &::before, &::after { content: ""; flex: none; inline-size: var(--spacing-2); block-size: var(--spacing-2); }
-    /* The dot centred in the device icon's slot under it, so the name and
-       the device name start on one line. */
-    &::before { margin-inline: calc((var(--aster-icon-md) - var(--spacing-2)) / 2); border-radius: var(--radius-full); background: var(--color-icon-success); }
+    &::before, &::after { content: ""; flex: none; order: 1; inline-size: var(--spacing-2); block-size: var(--spacing-2); }
+    &::before { border-radius: var(--radius-full); background: var(--color-icon-success); }
     /* The zone, in words (LuCI's title: "Part of zone lan"), as its Badge. */
     &::after {
+      order: 2;
       content: attr(title);
       inline-size: auto;
       block-size: auto;
@@ -533,22 +534,27 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     padding: 0;
     color: var(--color-text-secondary);
     & > br { display: none; }
-    & > small { font-size: inherit; }
-    /* A bridge's ports, " (" icon… ")" after its own icon: one line,
-       every icon centred on the name as the bridge's is. */
-    & > span:has(> .cbi-tooltip-container) { display: inline-flex; align-items: center; gap: var(--spacing-1); }
+    & > small { order: -1; font-size: inherit; }
+    /* A bridge's ports after its own icon, 8 apart, without LuCI's
+       " (" … ")" (font-size 0 hides those words, the tooltips keep theirs). */
+    & > span:has(> .cbi-tooltip-container) { display: inline-flex; align-items: center; font-size: 0; }
+    & > span > .cbi-tooltip-container { font-size: var(--text-supporting-size); }
+    & > span > .cbi-tooltip-container + .cbi-tooltip-container { margin-inline-start: var(--spacing-2); }
   }
   & :is(.ifacebox-body, .ifacebox-body > span) > .cbi-tooltip-container:has(> img) {
     display: inline-flex;
     color: var(--color-icon-secondary);
     &::before {
       content: "";
-      inline-size: var(--aster-icon-md);
-      block-size: var(--aster-icon-md);
+      inline-size: var(--aster-icon-sm);
+      block-size: var(--aster-icon-sm);
       background: currentColor;
       mask: var(--icon-server) center / contain no-repeat;
     }
     &:has(> img[src*="wifi"])::before { mask-image: var(--icon-wifi); }
+    &:has(> img[src*="/bridge"])::before { mask-image: var(--icon-bridge); }
+    &:has(> img[src*="/vlan"])::before { mask-image: var(--icon-vlan); }
+    &:has(> img[src*="/alias"])::before { mask-image: var(--icon-alias); }
     & > img { display: none; }
   }
 }
@@ -612,34 +618,59 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   color: var(--color-text-secondary);
 }
 /* WireGuard status: a key in a peer's chip is the chip's words, not a
-   chip of its own (one 8 inset, the Badge's size); the instance line's
-   key wraps anywhere (base64 has no break), each line keeping its inset. */
+   chip of its own. */
 .ifacebadge > code { padding: 0; background: none; font-size: inherit; line-height: inherit; }
-/* The instance line is one line of metadata, not a chip and text (owner
-   2026-11-21: the chip's words sat 4-5 above the port's baseline and
-   started 45 in): the device icon (components.css) on the content edge,
-   centred on the line, then the name in body text and LuCI's
-   " · port · key" after it, all on one baseline. */
-#view > p > .ifacebadge {
-  display: inline;
-  padding: 0;
-  border-radius: 0;
-  background: none;
-  color: var(--color-text-primary);
-  font: inherit;
-  &::before { display: inline-block; margin-inline-end: var(--spacing-1); vertical-align: middle; }
-}
-#view > p:has(> .ifacebadge) code { overflow-wrap: anywhere; box-decoration-break: clone; }
+/* An instance's port and key are a MetadataList (C8, theme-aster.js): the
+   name is the heading, the icon and " · " go; the public key is one token
+   (G5), one line cut with an ellipsis (its full text is the details
+   dialog's). */
+.aster-kv code { display: block; padding: 0; background: none; font-size: inherit; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ifacebox-body > div > .ifacebadge { display: flex; }
 .ifacebox-body > div > .ifacebadge + .ifacebadge { margin-block-start: var(--spacing-2); }
 .network-status-table { display: flex; flex-wrap: wrap; gap: var(--spacing-3); }
 .network-status-table + .table { margin-block-start: var(--spacing-4); }
 /* Firewall rules: a two-line action aligns its row to the top. */
 .nft-rules .td { vertical-align: top; }
-/* A rule's badges fill the body line box (20 + 2 + 2), so a row of them
-   is a text row's height; LuCI's own .125em margins are replaced, and they
-   sit at the line's top (on the baseline they pushed it down 1-5 px). */
-.nft-rules .td > .ifacebadge { margin: var(--spacing-0-5) var(--spacing-1) var(--spacing-0-5) 0; vertical-align: top; }
+/* A rule's clauses are text (C13): one body line each, 8 apart on a line;
+   LuCI's own .125em margins are replaced. */
+.nft-rules .td > .ifacebadge { margin: 0 var(--spacing-2) 0 0; vertical-align: top; }
+/* A chain's hook line and nlbw's summary are MetadataLists (C8):
+   theme-aster.js splits LuCI's "Hook: input (…), Priority: 0", "Policy:
+   drop (…)" and "主機數: <big>17</big>" into rows. A summary row stays
+   hidden until nlbw shows it (it marks the value's parent list-item); a
+   sentence with no "label:" (English "17 hosts") is one line. */
+.kpi li.aster-row:not(:has(> [style*="list-item"])):has(> .aster-k) { display: none; }
+.kpi li.aster-row:not(:has(> .aster-k)) { grid-column: 1 / -1; }
+.head { gap: var(--spacing-6); }
+.head > .kpi { padding: 0; justify-content: start; }
+:is(.nft-chain-hook, .kpi) > ul, .aster-kv {
+  display: grid;
+  grid-template-columns: fit-content(50%) minmax(0, 1fr);
+  gap: var(--spacing-2) var(--spacing-4);
+  align-items: baseline;
+  margin: 0;
+  padding: 0;
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-leading);
+  text-align: start;
+  list-style: none;
+  & > li { display: contents; }
+  & .aster-k { grid-column: 1; color: var(--color-text-secondary); font-weight: var(--text-label-weight); }
+  & .aster-v { grid-column: 2; display: block !important; color: var(--color-text-primary); & :is(strong, big) { font-size: inherit; font-weight: inherit; } }
+}
+/* A set in a clause ("{ eth0, br-lan }") sits on its line's baseline:
+   nftables.js centres it (middle), which grew the row 1-2 px. */
+.nft-rules :is(.nft-set, .nft-set-items) { vertical-align: baseline; }
+/* Realtime graphs' legends (load, bandwidth, wireless, connections) are
+   MetadataLists (C8): labels without colons (theme-aster.js), values on
+   their labels' baseline; the columns as wide as their words, not LuCI's
+   fixed sixths, where a nowrap label ran over its value ("訊號:" over
+   "-45 dBm", audit #4). */
+[data-page^="admin-status-realtime"] #view .table:not(:has(.th)) {
+  table-layout: auto !important; /* inline table-layout:fixed */
+  & .td { vertical-align: baseline; }
+  & .td:first-child { inline-size: auto; } /* a list key's 1 %: a grid track on a phone */
+}
 .nft-comment { --badge-bg: transparent; cursor: help; }
 /* nftables.js's own style pads a badge's tooltip .5em on every side; it
    keeps the Tooltip's 4 / 8. */
@@ -735,7 +766,6 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   /* Icon slots: the port and radio heads, the device and SSID chips inside a
      box (.ifacebox-body > div > .ifacebadge) and the chips in the station
      table (.td > .ifacebadge). The chips in tooltips keep LuCI's images. */
-  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head:first-child::before,
   & .ifacebox:has(img[src*="/signal-"]) > .ifacebox-head::before,
   & .ifacebox-body > div > .ifacebadge:has(> img)::before,
   & .td > .ifacebadge:has(> img)::before {
@@ -745,7 +775,6 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     block-size: var(--aster-icon-md);
     background-color: var(--color-icon-secondary);
   }
-  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) > .ifacebox-head:first-child::before,
   & .ifacebox-body > div > .ifacebadge:has(> img:not([src*="/signal-"], [src*="/wifi"]))::before,
   & .td > .ifacebadge:has(> img:not([src*="/signal-"], [src*="/wifi"]))::before {
     mask: var(--icon-server) center / contain no-repeat;
@@ -771,88 +800,69 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   & :is(.ifacebox-body > div, .td) > .ifacebadge:has(> img:is([src*="/signal-000-000"], [src*="/signal-none"]))::before { background-color: var(--color-icon-secondary); }
   & .ifacebox > .ifacebox-body > img,
   & :is(.ifacebox-body > div, .td) > .ifacebadge > img { display: none; }
-  /* Port tiles, the reference's port band. The Port status card is the
-     reference's section: its title over the tiles, no card around them. Its
-     title and Hide/Show sit 16 in, on the line where every other card's
-     title and chevron sit (and where the tiles' text starts and ends). */
-  & > .cbi-section:has(img[src*="/port_"]) {
+  /* Port tiles (C25, Astryx Item stacked in a Grid): no border, no fill
+     (G8), in the Port status Card like any card's content. The label is
+     the port name 15/500 and its trailing StatusDot (success with a
+     carrier, neutral without: LuCI says so only in port_up/port_down);
+     the description LuCI's words ("2.5 GbE", "no link") in supporting
+     text; then the traffic. 29_ports.js writes a 70 px grid and box sizes
+     inline (!important to override). LuCI lists lan ports before wan; the
+     uplink comes first (firewall.js getColorForName's wan colour). */
+  & div[style*="grid-template-columns"]:has(> .ifacebox) {
+    grid-template-columns: repeat(auto-fit, minmax(max(var(--aster-port-min), (100% - 4 * var(--spacing-4)) / 5), 1fr)) !important;
+    gap: var(--spacing-4) !important;
+    margin: 0 !important;
+  }
+  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) {
     --card-pad: 0;
     --card-border-width: 0;
     --card-radius: 0;
     --card-bg: transparent;
-    & > :is(.cbi-title, h3) { padding-inline: var(--spacing-4); } /* 24.10: a bare h3 */
-  }
-  /* 29_ports.js writes a 70 px grid and box sizes inline (!important to
-     override). The tiles wrap 16 apart, at least 160 each, and the tiles of
-     a row share it, the last row's included: no row ends half empty (a
-     lone wan tile beside three empty tracks, owner 2026-11-21). */
-  & div[style*="grid-template-columns"]:has(> .ifacebox) {
-    display: flex !important;
-    flex-wrap: wrap;
-    gap: var(--spacing-4);
-    margin: 0 !important;
-  }
-  /* A tile is a metric tile: the name (Heading 4), the link state, then the
-     traffic as its value (body, primary ink). LuCI lists lan ports before
-     wan; the uplink comes first (its zone badge is LuCI's wan colour,
-     firewall.js getColorForName). */
-  & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) {
-    flex: 1 1 var(--aster-port-min);
+    gap: 0;
     min-inline-size: 0 !important;
     max-inline-size: none !important;
     margin: 0 !important;
     &:has(.zonebadge[style*="240, 144, 144"]) { order: -1; }
     & > .ifacebox-head:first-child {
-      font-size: var(--text-heading-4-size);
-      font-weight: var(--text-heading-4-weight) !important;
-      line-height: var(--text-heading-4-leading);
+      font-size: var(--text-label-size);
+      font-weight: var(--text-label-weight) !important;
+      line-height: var(--text-label-leading);
+      &::after {
+        content: "";
+        flex: none;
+        inline-size: var(--spacing-2);
+        block-size: var(--spacing-2);
+        border-radius: var(--radius-full);
+        background-color: var(--color-icon-success);
+      }
     }
-    & > .ifacebox-body { text-align: start; }
-    /* The link state: a StatusDot (8, success with a carrier, neutral
-       without) and LuCI's words ("10 GbE", "no link"), supporting text on
-       one line; state is never the colour alone. The dot and the traffic
-       arrows sit centred in the head icon's slot, so every line's text
-       starts where the name does. The <br> after the hidden image would
-       leave an empty line. */
     & > .ifacebox-body:nth-child(2) {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       & > br { display: none; }
-      &::before {
-        content: "";
-        display: inline-block;
-        inline-size: var(--spacing-2);
-        block-size: var(--spacing-2);
-        margin-inline: calc((var(--aster-icon-md) - var(--spacing-2)) / 2) calc((var(--aster-icon-md) - var(--spacing-2)) / 2 + var(--spacing-2));
-        border-radius: var(--radius-full);
-        background-color: var(--color-icon-success);
-        vertical-align: middle;
-      }
     }
-    /* No carrier (LuCI says so only in the image: port_down, port_pse_down):
-       the same surface and edge, muted ink, a neutral dot. */
-    &:has(> .ifacebox-body > img[src*="_down."]) {
-      & > .ifacebox-head:first-child { color: var(--color-text-secondary); }
-      & > .ifacebox-body:nth-child(2)::before { background-color: var(--color-icon-secondary); }
-      & > .ifacebox-body > .cbi-tooltip-container { color: var(--color-text-secondary); }
-    }
-    /* LuCI's zone bars are colour only and the wan one reads as an error;
-       the link state is the dot above. */
+    &:has(> .ifacebox-body > img[src*="_down."]) > .ifacebox-head:first-child::after { background-color: var(--color-icon-secondary); }
+    /* LuCI's zone bars are colour only. */
     & > .ifacebox-head.cbi-tooltip-container { display: none !important; }
-    /* Traffic: "↑ sent", "↓ received", body text in primary ink, two lines
-       4 apart; the arrows (.aster-glyph, ArrowUp / ArrowDown) at text size,
-       centred on the digits (cap height 0.7 em: the icon's middle 0.35 em
-       above the baseline; the glyph's own size is 0). The 80 % size is inline. A port with no link
-       shows its counts too (0 B), in secondary ink: a stat tile always has
-       its value, and the tiles of a row stay one height with no hole. */
+    /* Traffic, 4 under the description: the count, then its arrow
+       (.aster-glyph, ArrowUp / ArrowDown 16) trailing it 8 apart (G4), a
+       line each; the 80 % size is inline. */
     & > .ifacebox-body > .cbi-tooltip-container {
+      display: grid;
+      grid-template-columns: auto auto;
+      grid-auto-flow: dense;
+      justify-content: start;
+      align-items: center;
+      column-gap: var(--spacing-2);
+      margin-block-start: var(--spacing-1);
       color: var(--color-text-primary);
       font-size: var(--text-body-size) !important;
+      line-height: var(--text-body-leading);
       font-variant-numeric: tabular-nums;
-      line-height: calc(var(--text-body-size) * var(--text-body-leading) + var(--spacing-1));
-      & > .aster-glyph { margin-inline: calc((var(--aster-icon-md) - var(--text-body-size)) / 2) calc((var(--aster-icon-md) - var(--text-body-size)) / 2 + var(--spacing-2) - var(--text-body-size) * 0.2); vertical-align: calc(var(--text-body-size) * -0.15); }
-      & > .aster-glyph::before { inline-size: var(--text-body-size); block-size: var(--text-body-size); }
+      & > br { display: none; }
+      & > .aster-glyph { grid-column: 2; color: var(--color-icon-secondary); }
+      & > .aster-glyph::before { inline-size: var(--aster-icon-sm); block-size: var(--aster-icon-sm); }
     }
   }
   /* PoE: inline black, grey and red, picked for a white page; black on a dark
@@ -869,7 +879,7 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
      after them (the rows' subgrids keep the gap), rows 8 apart, its device and MAC rows in the same list (the
      chip's wrappers dissolve into it), so every value of the group starts
      on one line. theme-aster.js drops LuCI's colons, as the list has none. */
-  & .network-status-table > .ifacebox:not(:has(img[src*="/signal-"])) > .ifacebox-body {
+  & .network-status-table > .ifacebox > .ifacebox-body {
     --ifacebox-body-fg: var(--color-text-primary);
     --ifacebox-body-size: var(--text-body-size);
     --ifacebox-body-leading: var(--text-body-leading);
@@ -898,60 +908,30 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
      measured before a group or a font settles (the router's DHCPv6
      statistics label wrapped in a 123 column) it would break a label. A
      label is one line up to the form's label column. */
-  & .network-status-table[style*="--aster-kv-w"] > .ifacebox:not(:has(img[src*="/signal-"])) > .ifacebox-body {
+  & .network-status-table[style*="--aster-kv-w"] > .ifacebox > .ifacebox-body {
     grid-template-columns: minmax(min(var(--aster-kv-w), var(--aster-form-label-w)), max-content) minmax(0, 1fr);
     & .nowrap:not(.cbi-tooltip *) > strong { max-inline-size: var(--aster-form-label-w); }
   }
   & .network-status-table > .ifacebox > .ifacebox-body > span:first-child > br,
   & .ifacebox-body > div > .ifacebadge > span > br { display: none; }
-  /* A chip in a radio box (its SSID) is the plain Badge as a group under the
-     box's own lines, apart by a divider. */
-  & .ifacebox:has(img[src*="/signal-"]) .ifacebox-body > div > .ifacebadge {
-    align-items: flex-start;
-    gap: var(--spacing-3);
-    margin-block-start: var(--spacing-2);
-    padding-block-start: var(--spacing-3);
-    border-block-start: var(--border-width) solid var(--color-border);
-  }
-  & .ifacebox-body > div > .ifacebadge::before {
-    margin-block-start: calc(var(--text-body-size) * var(--text-body-leading) / 2 + var(--spacing-1) - var(--aster-icon-md) / 2);
-  }
-  & .ifacebox-body > div > .ifacebadge > span { flex: 1; min-inline-size: 0; }
-  /* A radio box is the reference's radio card: the Wifi icon in the accent,
-     the radio's name, and at the end a dot, green while the radio is up (LuCI
-     marks the head .active). Under it the radio's facts and one group per
-     SSID, aligned with the name. */
+  /* A radio box: the radio's name, its dot (green while the radio is up:
+     LuCI marks the head .active), then the Wifi icon 16 (G4). Under it the
+     radio's facts and one group per SSID, on the name's x. */
   & .ifacebox:has(img[src*="/signal-"]) {
-    & > .ifacebox-head::before { background-color: var(--color-icon-accent); }
+    & > .ifacebox-head::before { order: 2; inline-size: var(--aster-icon-sm); block-size: var(--aster-icon-sm); }
     & > .ifacebox-head::after {
       content: "";
       flex: none;
-      margin-inline-start: auto;
+      order: 1;
       inline-size: var(--spacing-2);
       block-size: var(--spacing-2);
       border-radius: var(--radius-full);
       background-color: var(--color-icon-secondary);
     }
     & > .ifacebox-head.active::after { background-color: var(--color-icon-success); }
-    & > .ifacebox-body { padding-inline-start: calc(var(--aster-icon-md) + var(--spacing-2)); }
-    /* The facts are the reference's muted detail line: one run that wraps, the
-       items a gap apart. */
-    & > .ifacebox-body > span:first-child,
-    & .ifacebadge > span {
-      display: flex;
-      flex-wrap: wrap;
-      column-gap: var(--spacing-3);
-    }
-    & .nowrap > strong { font-weight: inherit; }
-    /* The SSID leads its group as the reference's SSID does: body text, 600. */
-    & .ifacebadge > span > .nowrap:first-child {
-      flex-basis: 100%;
-      color: var(--color-text-primary);
-      font-size: var(--text-body-size);
-      font-weight: var(--font-weight-semibold);
-      line-height: var(--text-body-leading);
-    }
-    & .ifacebadge { gap: var(--spacing-2); }
+    /* An SSID's rows follow the radio's in the box's one list (C8), 8
+       further apart. */
+    & .ifacebadge > span > .nowrap:first-child { margin-block-start: var(--spacing-2); }
   }
   & .td > .ifacebadge small { color: var(--color-text-secondary); }
 }

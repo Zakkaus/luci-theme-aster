@@ -1067,19 +1067,16 @@ html :where(#view .table:is(.leases, .lases, .leases6, .assoclist)[data-fold="fo
 /* ── MetadataList ────────────────────────────────────────────────
    A table with no header row: Astryx's single-column list (auto
    minmax(0, 1fr), 8 16 apart): the key column as wide as the widest key
-   (on a phone at most --aster-label-w, wrapping), secondary at label
+   at every width (C8; a phone's fixed 112 broke keys), secondary at label
    weight, value 16 after it in primary, no rules, 8 between rows. */
 
-html :where(.cbi-section .table:not(:has(.th)) > .tr > .td) { padding-block: var(--spacing-1); border-block-end: 0; }
+html :where(.cbi-section .table:not(:has(.th)) > .tr > .td) { padding-block: var(--spacing-1); border-block-end: 0; vertical-align: baseline; }
 html :where(.cbi-section .table:not(:has(.th)) > .tr > .td:first-child) {
   inline-size: 1%;
   padding-inline: 0;
   white-space: nowrap;
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-medium);
-}
-@media (max-width: 48rem) {
-  html :where(.cbi-section .table:not(:has(.th)) > .tr > .td:first-child) { inline-size: var(--aster-label-w); white-space: normal; }
 }
 
 /* ── Tabs ────────────────────────────────────────────────────────
@@ -1256,22 +1253,25 @@ html :where(.label:not(.cbi-section .label[data-style]), .badge, .zonebadge, .if
 html :where(.label.success) { --badge-bg: var(--color-success-muted); --badge-fg: var(--color-on-success-muted); }
 html :where(.label.warning) { --badge-bg: var(--color-warning-muted); --badge-fg: var(--color-on-warning-muted); }
 html :where(.label.danger) { --badge-bg: var(--color-error-muted); --badge-fg: var(--color-on-error-muted); }
-/* A device chip or a firewall clause: the muted fill, its icon 16. */
-html :where(.ifacebadge) { --badge-bg: var(--color-background-muted); border-radius: var(--radius-inner); }
+/* A device, SSID, station, WireGuard peer or firewall clause (.ifacebadge)
+   is text, not a Badge (C13: Badges only for zones and states that need
+   action): no fill, no border, no pill, the surrounding size and face; an
+   icon 16 a gap before its words. */
+html :where(.ifacebadge) {
+  --badge-bg: transparent;
+  gap: var(--spacing-2);
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
 html :where(.ifacebadge img) { inline-size: var(--aster-icon-sm); block-size: var(--aster-icon-sm); }
 html :where(.ifacebadge) :is(var, strong, a) { font-style: normal; }
 html :where(.ifacebadge var) { color: var(--color-text-secondary); }
-/* Plain variant (the overview's device, SSID and station chips): an icon
-   and its text in the surrounding size and face, no fill, no pill. */
-html :where([data-page="admin-status-overview"] #view :is(.ifacebox-body > div, .td) > .ifacebadge) {
-  --badge-bg: transparent;
-  gap: var(--spacing-2);
-  padding: 0;
-  border-radius: 0;
-  font-family: inherit;
-  font-size: inherit;
-}
-html :where([data-page="admin-status-overview"] #view :is(.ifacebox-body > div, .td) > .ifacebadge :is(var, strong, a)) { font-family: inherit; }
+html :where(.ifacebadge) :is(var, strong, a) { font-family: inherit; }
 
 /* ── Banner ──────────────────────────────────────────────────────
    The status-muted fill and the matching on-muted text, container
