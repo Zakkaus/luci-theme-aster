@@ -224,6 +224,13 @@ return baseclass.extend({
 
 			tip.style.left = `${x + window.pageXOffset}px`;
 			tip.style.top = `${y + window.pageYOffset}px`;
+
+			/* nlbwmon moves its bubble after this: back into the window (G6). */
+			requestAnimationFrame(() => {
+				const b = tip.getBoundingClientRect();
+
+				tip.style.left = `${parseFloat(tip.style.left) + (Math.min(0, document.documentElement.clientWidth - inset - b.right) || Math.max(0, inset - b.left))}px`;
+			});
 		});
 	},
 

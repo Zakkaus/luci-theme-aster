@@ -1551,6 +1551,17 @@ html :where(.cbi-tooltip .nowrap > strong:first-child) {
   font-weight: var(--font-weight-medium);
   white-space: nowrap;
 }
+/* A tooltip holding a table (nlbwmon's per-host breakdown: six columns, an
+   IPv6 source) is as wide as the table, up to the window less its inset; a
+   wider table scrolls inside it. Never wider than the window: laid out past
+   it, the box widened the page and the whole page scrolled sideways (G6).
+   Its addresses and sizes stay whole. */
+html :where(.cbi-tooltip:has(table, .table)) {
+  max-inline-size: calc(100vw - var(--tooltip-inset) * 2);
+  overflow-x: auto;
+  overflow-wrap: normal;
+}
+html :where(.cbi-tooltip :is(td, .td)) { white-space: nowrap; }
 /* Chips inside take the tooltip's colours. */
 html :where(.cbi-tooltip) :is(.ifacebadge, .zonebadge, .ifacebox, .ifacebox-head, .label) {
   --badge-bg: color-mix(in srgb, currentColor 16%, transparent);
