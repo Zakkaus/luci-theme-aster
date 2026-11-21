@@ -91,12 +91,13 @@ function collect(cfg) {
   }
 
   // Boundaries: the border over the control's own fill, or the fill,
-  // against what surrounds the control; the stronger of the two counts. A
-  // split button (.cbi-dropdown.btn, Save & Apply) is a ui control: its
-  // edge shows where to press and that its chevron is part of it, so its
-  // fill or border (a filled accent button passes on its fill) is held to
-  // --ui like a checkbox's.
-  const SPLIT = '.cbi-dropdown:is(.btn, .cbi-button)';
+  // against what surrounds the control; the stronger of the two counts. The
+  // save bar's split button (.cbi-dropdown.btn, Save & Apply) is a ui
+  // control: its edge shows where to press and that its chevron is part of
+  // it, so its fill or border (a filled accent button passes on its fill)
+  // is held to --ui like a checkbox's. A split button elsewhere (Diagnostics'
+  // tools) is a secondary Button (C9), and no Button is measured here.
+  const SPLIT = '.cbi-page-actions .cbi-dropdown:is(.btn, .cbi-button)';
   for (const el of scope.querySelectorAll(`${FIELD}, input[type="checkbox"], input[type="radio"], ${SPLIT}`)) {
     if (!inScope(el) || !visible(el) || disabled(el) || el.parentElement.closest('.cbi-dropdown')) continue;
     const s = getComputedStyle(el);
