@@ -476,6 +476,9 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
    owns the gap. */
 #content_syslog > div[style*="padding"] { padding: 0 !important; } /* inline padding-bottom: 20px */
 #view .pager { gap: var(--spacing-2); }
+/* Realtime Connections' filter and DNS switch (inline display:flex): a
+   toolbar, 8 apart where the field shrinks too (C1, G7; audit3 B3). */
+#settings-row { gap: var(--spacing-2); }
 
 /* ── Dropdown, dynlist, filebrowser [ported] ────────────────── */
 

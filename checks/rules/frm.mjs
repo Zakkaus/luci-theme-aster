@@ -25,7 +25,7 @@ const RULES = {
   'g.nested': 'G8: no box or fill inside a card but controls, Badges, Banners, code',
   'g.textx': 'G3: headings, descriptions, form labels and button rows start on the card content edge',
   'g.label': 'G10: a label (form row, toolbar, nft clause, dialog legend) has no trailing colon',
-  'c1.header': 'C1: no actions in the title line; a card title does not repeat the page title or the selected tab',
+  'c1.header': 'C1: no actions in the title line; a card title does not repeat the page title or the selected tab; a toolbar\'s controls 8 apart',
   'c1.descr': 'C1/C3: page description body 15/24, card description supporting 13/20, both secondary',
   'c2.card': 'C2: radius 16, border 1, card fill, padding 16',
   'c3.heading': 'C3: page 26/600, card 18/600, inner 16/600; heading box -> content 16; actions (a section\'s Remove, C10) on the heading\'s row, ending on the content end',
@@ -479,6 +479,17 @@ export function collect(cfg) {
       for (const b of all(BTN)) if (!pinned(b) && box(b).top < hb.bottom - 0.5 && box(b).bottom > hb.top + 0.5) fail('c1.header', 'action in title line', b.textContent.trim(), 'none', b);
     }
     for (const h of all('.cbi-section > h3')) { count('c1.header'); if (said.includes(h.textContent.trim())) fail('c1.header', 'repeats', h.textContent.trim(), 'hidden', h); }
+    // A toolbar's controls on one line keep 8 apart, also where a field
+    // shrinks (Connections' filter and DNS switch: audit3 B3).
+    for (const t of all('#settings-row, #view div:has(> [id^="invert"])')) {
+      const cs = [...t.querySelectorAll(`${BTN}, ${FIELD}`)].filter((e) => visible(e) && !e.parentElement.closest(`${BTN}, .cbi-dropdown`)).sort((a, b) => box(a).left - box(b).left);
+      for (let i = 1; i < cs.length; i++) {
+        const a = box(cs[i - 1]), b = box(cs[i]);
+        if (b.top >= a.bottom - 0.5 || a.top >= b.bottom - 0.5) continue;
+        count('c1.header');
+        if (b.left - a.right < 7.5) fail('c1.header', 'toolbar gap', b.left - a.right, 8, cs[i]);
+      }
+    }
     // A type style as the page computes it: [size, line height].
     const type = (n) => {
       const p = document.body.appendChild(document.createElement('div'));

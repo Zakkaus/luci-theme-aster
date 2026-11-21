@@ -24,6 +24,7 @@ printf 'admin/system/crontab require=c1.descr\n' >"$tmp/frm-cron.txt"
 printf 'admin/system/admin/dropbear require=c3.heading\n' >"$tmp/frm-drop.txt"
 printf 'admin/network/firewall/zones require=c9.button\n' >"$tmp/frm-zones.txt"
 printf 'admin/status/routes require=c3.heading\n' >"$tmp/frm-routes.txt"
+printf 'admin/status/realtime/connections require=c1.header\n' >"$tmp/frm-conn.txt"
 expect uniform 0 "" "System: every frame rule measures and holds" -- "$url" "$password" --pages "$tmp/frm-sys.txt" --viewports desktop,phone
 
 # G1: a form row's gap off the spacing scale.
@@ -117,6 +118,9 @@ expect uniform 1 "c3.heading conform,heading.card *" "routing table headings at 
 # G5, audit3 B2: a dialog title broken inside a word.
 expect uniform 1 "c18.dialog conform" "dialog title broken in a word (G5, audit3 B2)" "title word" -- "$url" "$password" --pages "$tmp/frm-dialog.txt" --viewports phone \
 	--debug-css 'admin/network/network=#modal_overlay > .modal > h4 { inline-size: 24px; word-break: break-all !important }'
+# C1, audit3 B3: Connections' filter against its DNS switch (phone).
+expect uniform 1 "c1.header conform" "toolbar controls touching (C1, audit3 B3)" "toolbar gap" -- "$url" "$password" --pages "$tmp/frm-conn.txt" --viewports phone \
+	--debug-css 'admin/status/realtime/connections=#settings-row { gap: 0 !important }'
 
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true
