@@ -962,7 +962,22 @@ html #view > p.center {
    actions is 32 + 16 + 1 = 49); numbers end-aligned in their column
    (LuCI's .right), the header with them. */
 html :where(:is(.td, td).cbi-section-actions, .tr > .td:not([data-title]):has(> .cbi-button:only-child)) { padding-block: var(--spacing-2); }
+/* A row's field (a zone's policy select) keeps 8 off the row lines too (G7):
+   36 + 16 + 1 = 53. */
+html :where([data-fold="wide"] .td.cbi-value-field:has(select, .cbi-dropdown, textarea, input:not([type="hidden"], [type="checkbox"], [type="radio"]))) { padding-block: var(--spacing-2); }
 html :where(:is(.td, .th, td, th).right) { text-align: end; }
+/* An identifier in a cell is one line (G5): a package's name, a mount's
+   device (its UUID), a <var> in LuCI's words (an unbound zone, a server, a
+   rule's address); a station's rate: luci.css. A hyphen is a break chance
+   CSS cannot take away, so the identifier does not wrap at all; folded, a
+   name wider than its slot ends in an ellipsis. Around them a cell's prose
+   wraps: a package's description where it must (a URL in it), a command
+   line (Processes) at its spaces, not anywhere as LuCI's inline
+   break-word asks. */
+html #view :is(#packages .td:first-child, .td[data-name="_device"], .td var) { white-space: nowrap; }
+html #view [data-fold="fold"] :is(#packages .td:first-child, .td[data-name="_device"]) { overflow: hidden; text-overflow: ellipsis; }
+html #view #packages .td.col-10 { overflow-wrap: anywhere; }
+html #view .td > span[style*="word-break"] { word-break: normal !important; }
 /* Wide, a table keeps its words whole (G5), and theme-aster.js measures
    its narrowest so: CJK breaks where words do, not after any character,
    and a name (Allow-DHCP-Renew) not at its hyphens. Where whole words do
