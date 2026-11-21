@@ -631,9 +631,12 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
    stays one line while wide, as CSS cannot keep it from breaking at its
    hyphens (G5); folded, it wraps after its commas (C7). A lease's host
    name wraps at its spaces (Overview, below), as on DHCP's page: the same
-   leases fit there, so they fit here (C7). */
+   leases fit there, so they fit here (C7). Folded, a station's host is
+   its title, one line, ending in an ellipsis where it is wider than the
+   line beside Disconnect (AUDIT4 A1: "switchbot-hubminimatter-" over
+   "6847c8.lan"); its addresses wrap under it. */
 #view .assoclist[data-fold="wide"] .td { white-space: nowrap; }
-#view .assoclist[data-fold="wide"] .td .hide-xs { white-space: normal; }
+#view .assoclist .td .hide-xs { white-space: normal; }
 #view .assoclist .td :is(.hide-xs, .ifacebadge small) { display: block; }
 /* An interface row: cells to the top, the box column as narrow as the box,
    the status column the rest. Folded, the box is the title line and takes

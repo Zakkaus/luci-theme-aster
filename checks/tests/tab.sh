@@ -149,5 +149,12 @@ expect uniform 1 "g.break.table word" "nftables set members broken at their hyph
 # B4: a description's URL one line, clipped with its title.
 expect uniform 0 "" "Packages: URLs one line on a phone" -- "$url" "$password" --pages "$tmp/tab-pkg0.txt" --viewports phone
 
+# R7 (AUDIT4): a wide lease's identifiers whole (A1: 25.12's host broke
+# in "(switchbot-hubminimatter-" over "6847c8.lan)").
+# A1: the host column 64 wide, so its name breaks at its hyphens while the
+# table stays wide.
+expect uniform 1 "g.break.table token,g.break.table word" "a wide lease's host broken at its hyphens (AUDIT4 A1)" -- "$url" "$password" --pages "$tmp/tab-leases.txt" --viewports desktop \
+	--debug-css 'admin/status/overview=#view #status_leases .td:first-child { white-space: normal !important; max-width: 64px }'
+
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true
