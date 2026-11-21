@@ -51,9 +51,10 @@ expect uniform 1 "c7.when state,g.overflow conform,overflow excess,table.row.tex
 printf '%s\n' 'admin/status/overview require=c7.when' >"$tmp/tab-ov.txt"
 expect uniform 1 "c7.when state" "lease host names measured unbroken (audit 2)" -- "$url" "$password" --pages "$tmp/tab-ov.txt" --viewports desktop \
 	--debug-css 'admin/status/overview=html #view .table:is(.leases, .lases) .td:first-child { white-space: nowrap !important } html #view .table:is(.leases, .lases) .td:first-child::after { content: " wraps at every space of this long host name like a lease with its DNS name in parentheses, which DHCP shows wide and Overview should too (example.lan)" }'
-# C6: LuCI's 60 % / 40 % nftables columns (audit 2, C6 B).
+# C6: LuCI's 60 % / 40 % nftables columns (audit 2, C6 B); squeezed, a
+# rule's cells wrap and its row grows past one text line.
 printf '%s\n' 'admin/status/nftables require=c6.table' >"$tmp/tab-nft-wide.txt"
-expect uniform 1 "c6.table inlineWidth" "nftables columns split 60 / 40 (audit 2)" -- "$url" "$password" --pages "$tmp/tab-nft-wide.txt" --viewports desktop \
+expect uniform 1 "c6.table inlineWidth,table.row.text height" "nftables columns split 60 / 40 (audit 2)" -- "$url" "$password" --pages "$tmp/tab-nft-wide.txt" --viewports desktop \
 	--debug-css 'admin/status/nftables=html body #view .nft-rules :is(.th, .td)[style*="60%"]:not(.cbi-section-actions) { width: 60% !important } html body #view .nft-rules :is(.th, .td)[style*="40%"]:not(.cbi-section-actions) { width: 40% !important }'
 # Zones: "lan => wan REJECT all others" as LuCI's column of boxes, three
 # lines in a 360 column (c).

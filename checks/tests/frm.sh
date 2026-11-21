@@ -73,10 +73,13 @@ expect uniform 1 "c22.divider conform" "Divider 2 thick (C22)" -- "$url" "$passw
 expect uniform 1 "c22.divider conform" "Flash Divider 24 under the row above (C22)" "above" -- "$url" "$password" --pages "$tmp/frm-flash.txt" \
 	--debug-css 'admin/system/flash=#view .cbi-value:has(> .cbi-section) + .cbi-value > .cbi-section { margin-block-start: 0 !important }'
 # C2/G8, audit R5: nftables' chains framed again inside the table's card.
-expect uniform 1 "g.nested conform,frame nested" "nft chain framed in its table card (C2, G8)" -- "$url" "$password" --pages "$tmp/frm-nft.txt" \
+# 25.12's chain is a padded section, so its border also puts its padding
+# off the scale (g.px); 24.10's is not (g.* conform admits both).
+expect uniform 1 "g.nested conform,g.* conform,frame nested" "nft chain framed in its table card (C2, G8)" -- "$url" "$password" --pages "$tmp/frm-nft.txt" \
 	--debug-css 'admin/status/nftables=#view .nft-chain { border: 1px solid rgb(200, 0, 0) !important; border-radius: 16px !important }'
-# C1, audit #14 / R5: a card title repeating the selected tab drawn again.
-expect uniform 1 "c1.header conform" "card title repeats the tab (C1)" "repeats" -- "$url" "$password" --pages "$tmp/frm-net.txt" \
+# C1, audit #14 / R5: a card title repeating the selected tab drawn again;
+# it is no SectionHeading either, nor spaced as one from the content.
+expect uniform 1 "c1.header conform,c3.heading conform,space.heading.content gap" "card title repeats the tab (C1)" "repeats" -- "$url" "$password" --pages "$tmp/frm-net.txt" \
 	--debug-css 'admin/network/network=#view .cbi-section > h3.aster-said { display: block !important }'
 # C1, audit R5: the page description at the card description's size.
 expect uniform 1 "c1.descr conform" "page description 13/20 (C1)" "page size" -- "$url" "$password" --pages "$tmp/frm-cron.txt" \
