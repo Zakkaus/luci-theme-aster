@@ -194,6 +194,11 @@ return baseclass.extend({
 				v.prepend(h);
 			}
 
+			/* A card title repeating the page title or tab is not drawn (C1). */
+			const said = [...document.querySelectorAll('.shell-inner h2, .cbi-tab, .tab[data-active]')].map((e) => e.textContent.trim());
+
+			root.querySelectorAll('.cbi-section > h3').forEach((h) => h.classList.toggle('aster-said', said.includes(h.textContent.trim())));
+
 			root.querySelectorAll('span:not(.aster-error) > strong:first-child').forEach((s) => {
 				if (s.textContent.trim().replace(/[:：]$/, '') === error)
 					s.parentNode.classList.add('aster-error');
@@ -276,6 +281,13 @@ return baseclass.extend({
 
 			tip.style.left = `${x + window.pageXOffset}px`;
 			tip.style.top = `${y + window.pageYOffset}px`;
+
+			/* nlbwmon moves its bubble after this: back into the window (G6). */
+			requestAnimationFrame(() => {
+				const b = tip.getBoundingClientRect();
+
+				tip.style.left = `${parseFloat(tip.style.left) + (Math.min(0, document.documentElement.clientWidth - inset - b.right) || Math.max(0, inset - b.left))}px`;
+			});
 		});
 	},
 

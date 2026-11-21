@@ -24,7 +24,7 @@
 }
 /* In a table row every action is the secondary Button, small (doona's
    row actions; Astryx ActionGroup: one primary at most, on the page, not
-   repeated down the rows). Diagnostics' tools are the page's own actions. */
+   repeated down the rows). Diagnostics' tools: below, with the form rows. */
 :is(.td, td) :is(.cbi-button-positive, .cbi-button-apply, .cbi-button-save, .cbi-button-action, .cbi-button-primary, .btn.primary, .btn.important):not(.diag-action *) {
   --button-bg: var(--color-neutral);
   --button-fg: var(--color-text-primary);
@@ -38,6 +38,9 @@
    primary. */
 :is(.cbi-value-field, .controls .control-group, .cbi-page-actions:has(.cbi-dropdown) > *) :is(.cbi-button-positive, .cbi-button-apply, .cbi-button-save, .cbi-button-action, .cbi-button-primary, .btn.primary, .btn.important):not(.cbi-dropdown),
 .cbi-page-actions:has(.cbi-dropdown) > .cbi-button-save,
+/* Diagnostics: three tools, each a field and its action (a ComboButton
+   with IPv4/IPv6): no tool is the page's one main action. */
+.diag-action > :is(.btn, .cbi-button, .cbi-dropdown),
 .toggle-lookups {
   --button-bg: var(--color-neutral);
   --button-fg: var(--color-text-primary);
@@ -68,6 +71,11 @@
   gap: var(--spacing-2);
 }
 .right:not(td, th, .td, .th) { justify-content: flex-end; }
+/* A card's own button row (Add, Force reload, a key list's Add, a
+   section's Remove) is the sm size of a card (C9) and starts on the card's
+   content edge like the rest of the card (C10); toolbars, form rows, the
+   save bar and dialogs keep md. */
+:is(.cbi-section, .cbi-section-node):not(#modal_overlay *) > :is(.right:not(td, th, .td, .th), .cbi-section-remove) { --button-h: var(--size-element-sm); justify-content: flex-start; }
 :is(.right:not(td, th, .td, .th), .cbi-page-actions, .btn-group, .cbi-section-create) > * { margin-inline: 0; }
 :is(td, th, .td, .th).right { text-align: end; }
 /* An actions cell stays a table cell; its buttons sit 8 apart. */
@@ -94,7 +102,7 @@
    count); form rows abut (each pads 8 above and below); controls on one
    line keep their line. The html weight puts it over an app's own
    margins (Software's <style>). */
-html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([class]), form, .cbi-map, .cbi-section, .cbi-section-node, .cbi-tabcontainer, [data-tab]:not(li), :has(> [data-tab]:not(li)), :has(> .cbi-tabmenu + div > [data-tab]), #content_syslog, .nft-table, .nft-chains, .cbi-section > div:has(> :is(h3, h4, table, .table)), .cbi-value:has(> :is(h3, h4))) {
+html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([class]), form, .cbi-map, .cbi-section, .cbi-section-node, .cbi-tabcontainer, [data-tab]:not(li), :has(> [data-tab]:not(li)), :has(> .cbi-tabmenu + div > [data-tab]), #content_syslog, .nft-table, .nft-chains, .nft-chain, .cbi-section > div:has(> :is(h3, h4, table, .table)), .cbi-value:has(> :is(h3, h4))) {
   & > * { margin-block: 0; }
   & > * + * { margin-block-start: var(--aster-space-region); }
   & > :nth-child(1 of :not(script, style, template, noscript, [hidden], input[type="hidden"], :empty, [style*="display: none"], [style*="display:none"], [data-tab-active="false"], [data-tab-title]:not([data-tab-active="true"]))),
@@ -238,6 +246,9 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
   }
   :root[data-rail] .cbi-page-actions { inset-inline-start: var(--aster-rail-w); }
   body:not([data-page="admin-system-flash"]:has([data-tab="actions" i][data-tab-active="true"])) .shell:has(.cbi-page-actions:not([hidden])) > .shell-main { margin-block-end: calc(var(--size-element-md) + 2 * var(--spacing-3) + var(--border-width)); }
+  /* The save bar is the page's footer (Astryx LayoutFooter): the version
+     line is not wedged between the content and the bar (audit #19). */
+  body:not([data-page="admin-system-flash"]:has([data-tab="actions" i][data-tab-active="true"])) .shell:has(.cbi-page-actions:not([hidden])) .shell-footer { display: none; }
 }
 /* A card's own save bar (Startup's Local Startup, Backup's Configuration;
    on 24.10 Local Startup's tab pane is the card)

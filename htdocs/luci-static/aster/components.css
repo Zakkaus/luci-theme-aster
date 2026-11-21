@@ -137,7 +137,7 @@ html :where(.cbi-section :is(h2, h3), .cbi-section > legend) {
    card has no title of its own (24.10's leases), its first heading is the
    title and only the ones after it are Heading 3. A heading a field writes
    (.cbi-value > h4: DHCP's Active DHCPv4 Leases) is one too. */
-html :where(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div:not(.cbi-title) > h3, .cbi-section > div:not(.cbi-title) > h3 ~ h3, .cbi-value > h4) {
+html :where(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div:not(.cbi-title) > h3, .cbi-section > div:not(.cbi-title) > h3 ~ h3, .cbi-value > h4, .cbi-value > .cbi-section > h3, .cbi-section > h3 ~ h3) {
   font-size: var(--text-heading-4-size);
   font-weight: var(--text-heading-4-weight);
   line-height: var(--text-heading-4-leading);
@@ -187,6 +187,11 @@ html :where(kbd) {
   line-height: var(--text-supporting-leading);
   user-select: none;
 }
+
+/* Emphasis in CJK text is never slanted (the fonts have no italic, so the
+   browser shears the glyphs): LuCI's placeholders ("無", "此部份還未包含
+   任何值") are upright, in secondary ink. */
+html :where(:lang(zh), :lang(ja), :lang(ko)) :where(em, i:not([class])) { font-style: normal; color: var(--color-text-secondary); }
 
 /* ── Button ──────────────────────────────────────────────────────
    Secondary md by default: 36 high, pill, 12 inline, label weight, the
@@ -305,6 +310,14 @@ html :where(textarea) {
    output; the code face replaces it (an inline style yields only to
    !important). */
 html :where(textarea[style*="monospace"]) { font-family: var(--font-family-code) !important; }
+/* A read-only log or command output (System and Kernel Log, Diagnostics)
+   is Astryx's CodeBlock: muted fill, no border, 12 16 inside, scrolling in
+   itself. Editable code (crontab, rc.local) stays a TextArea field (C24). */
+html :where(textarea[readonly]) {
+  padding: var(--spacing-3) var(--spacing-4);
+  border-width: 0;
+  background-color: var(--color-background-muted);
+}
 html :where(select[multiple]) { block-size: auto; padding-block: var(--spacing-1); }
 html :where(select > option) { background: var(--color-background-popover); color: var(--color-text-primary); }
 @media (hover: hover) {
@@ -705,6 +718,14 @@ html :where(.cbi-value > .cbi-value-field) {
   min-block-size: var(--size-element-md);
 }
 html :where(.cbi-value > .cbi-value-field > *) { min-inline-size: 0; }
+/* A select is 256 wide, wider when its chosen option needs it, up to the
+   row: an option is never cut (audit #13). Text fields keep 256 (they
+   scroll as typed; a read-only value already sizes to itself). */
+html :where(.cbi-value > .cbi-value-field) :where(select):not(.cbi-dynlist *, .td *) {
+  field-sizing: content;
+  inline-size: auto;
+  min-inline-size: var(--field-w);
+}
 /* A Button option whose label repeats the button's words (theme-aster.js
    marks the row): the label is read, not drawn, and the button keeps the
    field column. */
@@ -771,6 +792,25 @@ html :where(.cbi-section, .cbi-section-node) :where(.cbi-section, .cbi-section-n
   --card-border-width: 0;
   --card-radius: 0;
   --card-bg: transparent;
+}
+/* A section that only says something (Firewall: "Your device runs
+   firewall4.") is its description under the page header, not a card that
+   holds one line (audit #18). */
+html :where(.cbi-map > .cbi-section:has(> .cbi-section-descr):not(:has(> :not(.cbi-section-descr)))) {
+  --card-pad: 0;
+  --card-border-width: 0;
+  --card-bg: transparent;
+}
+/* Sections that form options hold (Backup / Flash Firmware: Backup,
+   Restore, Flash image) are flat sections of their card too: Heading 4
+   (above), a Divider 16 under the one before and 16 over the next. */
+/* A card holding several headed groups straight in it (Routes: a
+   family's neighbours, routes and rules) is titled by the first; each
+   later one is a flat section under a Divider. */
+html :where(.cbi-section > h3 ~ h3),
+html :where(.cbi-value:has(> .cbi-section) + .cbi-value > .cbi-section) {
+  padding-block-start: var(--aster-space-region);
+  border-block-start: var(--border-width) solid var(--color-border);
 }
 html :where(.cbi-section, .cbi-section-node) :where(.cbi-section + .cbi-section, .cbi-section-node + .cbi-section-node) {
   padding-block-start: var(--aster-space-region);
@@ -1176,20 +1216,21 @@ html :where(.tabs, .cbi-tabmenu) {
 }
 html :where(.tabs > li, .cbi-tabmenu > li) { flex: none; }
 html :where(.tab[data-active], .cbi-tabmenu > .cbi-tab) { scroll-initial-target: nearest; }
-/* A list that scrolls fades out 32 at the end that has more (both ends
-   in the middle), so a tab cut at the edge reads as more to scroll. A
-   scroll timeline runs only while the list overflows. */
-html :where(.tabs, .cbi-tabmenu) {
-  mask: linear-gradient(to right, transparent, black var(--tabs-fade-s) calc(100% - var(--tabs-fade-e)), transparent);
-  animation: aster-tabs-fade linear both;
-  animation-timeline: scroll(self inline);
+/* A second tab level (a view's tabs under the page's, nlbwmon; a tabbed
+   section inside a tab, DHCP) is Astryx's sm TabList: 32 high, 8 inline,
+   label in supporting text, so the two rows never read as one menu. */
+html :where(#view:has(> #tabmenu, > .cbi-map > #tabmenu) .cbi-tabmenu, [data-tab] .cbi-tabmenu) > li > a {
+  min-block-size: var(--size-element-sm);
+  padding-inline: var(--spacing-2);
+  font-size: var(--text-supporting-size);
+  line-height: var(--text-supporting-leading);
 }
-@property --tabs-fade-s { syntax: "<length>"; inherits: false; initial-value: 0; }
-@property --tabs-fade-e { syntax: "<length>"; inherits: false; initial-value: 0; }
-@keyframes aster-tabs-fade {
-  from { --tabs-fade-s: 0; --tabs-fade-e: var(--spacing-8); }
-  to { --tabs-fade-s: var(--spacing-8); --tabs-fade-e: 0; }
-}
+html :where(#view:has(> #tabmenu, > .cbi-map > #tabmenu) .cbi-tabmenu, [data-tab] .cbi-tabmenu) > .cbi-tab > a::before { inset-inline: var(--spacing-2); }
+
+/* A card heading that repeats the page title or the selected tab
+   (theme-aster.js marks it) is not drawn: the page names it once. */
+html :where(.cbi-section > h3.aster-said) { display: none; }
+.cbi-section > h3.aster-said + * { margin-block-start: 0; }
 
 /* ── ProgressBar ─────────────────────────────────────────────────
    An 8 track in the muted fill, the value in the accent, both round; the
@@ -1545,6 +1586,17 @@ html :where(.cbi-tooltip .nowrap > strong:first-child) {
   font-weight: var(--font-weight-medium);
   white-space: nowrap;
 }
+/* A tooltip holding a table (nlbwmon's per-host breakdown: six columns, an
+   IPv6 source) is as wide as the table, up to the window less its inset; a
+   wider table scrolls inside it. Never wider than the window: laid out past
+   it, the box widened the page and the whole page scrolled sideways (G6).
+   Its addresses and sizes stay whole. */
+html :where(.cbi-tooltip:has(table, .table)) {
+  max-inline-size: calc(100vw - var(--tooltip-inset) * 2);
+  overflow-x: auto;
+  overflow-wrap: normal;
+}
+html :where(.cbi-tooltip :is(td, .td)) { white-space: nowrap; }
 /* Chips inside take the tooltip's colours. */
 html :where(.cbi-tooltip) :is(.ifacebadge, .zonebadge, .ifacebox, .ifacebox-head, .label) {
   --badge-bg: color-mix(in srgb, currentColor 16%, transparent);
