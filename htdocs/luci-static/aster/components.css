@@ -890,6 +890,34 @@ html :where(.tr.placeholder > .td) {
   color: var(--color-text-secondary);
   text-align: center;
 }
+/* The actions cell keeps its buttons 8 off the row lines (a row with
+   actions is 32 + 16 + 1 = 49); numbers end-aligned in their column
+   (LuCI's .right), the header with them. */
+html :where(:is(.td, td).cbi-section-actions, .tr > .td:not([data-title]):has(> .cbi-button:only-child)) { padding-block: var(--spacing-2); }
+html :where(:is(.td, .th, td, th).right) { text-align: end; }
+/* In a data table a device, network or nftables chip is plain text (a
+   Badge is for zones and states only): no fill, no pill, the cell's own
+   type; its icon follows its words (text first, marker after). */
+html #view :is(.td, td) .ifacebadge:not(.large) {
+  --badge-bg: transparent;
+  gap: var(--spacing-2);
+  min-block-size: 0;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  white-space: normal;
+  &::before, & > img { order: 1; }
+}
+/* A station's signal is its words, the Signal icon after them in the
+   quality's ink (no StatusDot in a value). */
+html [data-page] #view .td > .ifacebadge:has(> img[src*="/signal-"])::before { /* one heavier than the overview StatusDot slot */
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
+  border-radius: 0;
+  mask: var(--icon-signal) center / contain no-repeat;
+}
 /* Inside a row a button is the small one (Button sm, 32). */
 html :where(td, .td) :where(.btn, .cbi-button, button) { --button-h: var(--size-element-sm); }
 /* Sorting by drag: the moved row fades, the drop line is the accent. */
