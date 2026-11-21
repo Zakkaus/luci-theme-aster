@@ -218,8 +218,11 @@ function collect(cfg) {
       // A dynlist's add field shares its row with the + (Dynlist): the
       // list is the field, as wide as any other.
       const list = el.closest('.cbi-dynlist');
+      // A read-only value (System's Local Time) sizes to itself, never
+      // narrower than a field (C5): read its floor, not its text.
+      const w = box(list ?? el).width;
       if (cfg.device === 'phone') add(cls, 'formFill', px(lineFill(list ?? el, field)), el);
-      else add(cls, 'formWidth', px(box(list ?? el).width), el);
+      else add(cls, 'formWidth', px(el.matches('input[readonly]') ? Math.min(w, parseFloat(s.minInlineSize) || w) : w), el);
       if (list && el.parentElement.matches('.add-item')) {
         const b = el.parentElement.querySelector(':scope > .cbi-button-add');
         if (b && visible(b)) add('dynlist', 'add', box(b).top < box(el).bottom - 1 ? 'beside' : 'below', b);
