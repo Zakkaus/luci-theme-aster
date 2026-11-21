@@ -77,6 +77,33 @@
    save bar and dialogs keep md. */
 :is(.cbi-section, .cbi-section-node):not(#modal_overlay *) > :is(.right:not(td, th, .td, .th), .cbi-section-remove) { --button-h: var(--size-element-sm); justify-content: flex-start; }
 :is(.right:not(td, th, .td, .th), .cbi-page-actions, .btn-group, .cbi-section-create) > * { margin-inline: 0; }
+/* The save bar reads Reset, Save, Save & Apply: the primary ComboButton
+   last, at the end (C11); a dialog's footer likewise ends on its primary
+   ComboButton (the changes dialog's Close, Revert, Save & Apply). LuCI
+   writes them the other way round. */
+.cbi-page-actions > .cbi-button-reset { order: -1; }
+.cbi-page-actions > .cbi-button-apply,
+#modal_overlay :is(.right, .button-row) > .cbi-dropdown.important { order: 1; }
+/* A section's Remove ends its heading's row (C10, C3 actions). LuCI
+   writes it before an instance's heading (uHTTPd) or after the section's
+   (Dropbear); a grid puts the pair on one row, the rest spanning it. The
+   heading's box is the Remove's 32 (C3: a heading row with actions is 32),
+   its line centred in it, so both start 16 under the card border and end
+   16 above what follows. */
+:is(.cbi-section, .cbi-section-node):not(#modal_overlay *):has(> h3 + .cbi-section-remove, > .cbi-section-remove + h3) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-auto-flow: row dense;
+  column-gap: var(--aster-space-row);
+  & > * { grid-column: 1 / -1; min-inline-size: 0; }
+  & > :is(h3:has(+ .cbi-section-remove), .cbi-section-remove + h3) {
+    grid-column: 1;
+    align-self: end;
+    padding-block: calc((var(--size-element-sm) - var(--text-heading-3-size) * var(--text-heading-3-leading)) / 2);
+  }
+  & > :is(h3 + .cbi-section-remove, .cbi-section-remove:has(+ h3)) { grid-column: 2; align-self: end; }
+  & > :is(h3 + .cbi-section-remove, .cbi-section-remove + h3) { margin-block-start: 0; }
+}
 :is(td, th, .td, .th).right { text-align: end; }
 /* An actions cell stays a table cell; its buttons sit 8 apart. */
 :is(.td, .th).cbi-section-actions { text-align: end; white-space: nowrap; }
