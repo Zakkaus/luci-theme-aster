@@ -233,7 +233,7 @@ export function collect(cfg) {
 
   /* C3: headings by role; a heading's box to what follows 16; a heading
      row's actions end on the content end. */
-  const H1 = f(tok('fontSize', 'var(--text-heading-1-size)')), H3 = f(tok('fontSize', 'var(--text-heading-3-size)')), H4 = f(tok('fontSize', 'var(--text-heading-4-size)'));
+  const H1 = f(tok('fontSize', 'var(--text-heading-1-size)')), H3 = f(tok('fontSize', 'var(--text-heading-3-size)'));
   const HEAD = cfg.modal ? [] : all(':is(#view, .cbi-map) > h2, .aster-title');
   for (const h of HEAD) {
     if (h.closest(CARD_SEL)) continue;
@@ -252,7 +252,8 @@ export function collect(cfg) {
       // Without a title, a table's own heading is one (the routing tables,
       // 24.10's leases: audit3 B1), as in components.css.
       const top = (h === hs[0] || h.matches(':is(.cbi-section > div:not(.cbi-title), .cbi-section) > h3 ~ h3:has(+ :is(table, .table)):not(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div > h3)')) && h.matches('h3') && (h.parentElement.matches('.nft-table > .cbi-section') ? c : h.parentElement.closest(CARD_SEL)) === c;
-      const want = top ? H3 : H4;
+      // G2: an inner heading is 16, a step over the body (audit4 C1).
+      const want = top ? H3 : 16;
       check('c3.heading', top ? 'card size' : 'inner size', f(s.fontSize), want, h);
       check('c3.heading', 'weight', s.fontWeight, '600', h);
       const row = h.parentElement.matches('.cbi-title') ? h.parentElement : h;

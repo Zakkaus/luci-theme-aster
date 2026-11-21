@@ -42,9 +42,11 @@ html[data-theme="dark"] { color-scheme: dark; }
   --text-heading-3-size: var(--font-size-lg);
   --text-heading-3-weight: var(--font-weight-semibold);
   --text-heading-3-leading: 1.5556;
-  --text-heading-4-size: var(--font-size-base);
+  /* Heading 4 is 16 (COMPONENTS G2): a step over the body's 15, under the
+     card title's 18; the scale has no 16, and its line stays 24. */
+  --text-heading-4-size: calc(var(--font-size-base) * 16 / 15);
   --text-heading-4-weight: var(--font-weight-semibold);
-  --text-heading-4-leading: 1.6;
+  --text-heading-4-leading: 1.5;
   --text-heading-5-size: var(--font-size-sm);
   --text-heading-5-weight: var(--font-weight-semibold);
   --text-heading-5-leading: 1.5385;
