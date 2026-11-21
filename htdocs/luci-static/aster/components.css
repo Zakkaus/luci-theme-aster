@@ -1182,8 +1182,13 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
 /* nftables' <style> pads its cells .25em with !important (one id heavier). */
 html #view .nft-rules[data-fold="fold"] tr > td { padding: 0 !important; }
 /* Folded, an nftables match is a sentence that wraps at its spaces; as a
-   flex row its parts shrank into columns, one glyph a line. */
-html #view .nft-rules[data-fold="fold"] .td .ifacebadge:not(.large) { display: inline; }
+   flex row its parts shrank into columns, one glyph a line. Its clauses
+   stay 8 apart (C13), a line may break between them (a zero-width space):
+   "0 B" and "fe80::/10" ran into the clause after them. */
+html #view .nft-rules[data-fold="fold"] .td .ifacebadge:not(.large) { display: inline; margin-inline-end: var(--spacing-2); &::after { content: "\200b"; } }
+/* Its set is words in the sentence too, wrapping between its members and
+   closed after the last ("}" ended the first line of LuCI's 200 box). */
+html #view .nft-rules[data-fold="fold"] .td :is(.nft-set, .nft-set-items) { display: inline; }
 /* A chain's rules span the table's card, border to border (C6); 24.10's
    chain is no .cbi-section, which luci.css's bleed reads (its 1px margin
    for a table outside a card is one class lighter). */

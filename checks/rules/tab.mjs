@@ -17,6 +17,7 @@ export const canonical = {
   'card.table': {_source: 'COMPONENTS.md C2/C6: a wide table that is the Card (WireGuard peers, 24.10 Processes) pads 15 + border above and below; its cells own the inline 16, so rows run border to border', padding: [15, 0, 15, 0]},
   'table.td.field': {_source: 'COMPONENTS.md G7, C6: a cell holding a field (a zone\'s policy select) pads 8, so the field keeps 8 from the row lines (row 53)', paddingBlock: 8, paddingInlineStart: 16, fontSize: 15},
   'g.break.table': {_source: 'COMPONENTS.md G5: an identifier in a cell (a one-word cell while wide, a package name, a mount device, a <var>, a station rate) is one line, or ends in an ellipsis; never broken at a hyphen', token: 'whole'},
+  'c7.clause': {_source: 'COMPONENTS.md C7, C13 (AUDIT3 A2): a folded nftables match is a sentence of clauses 8 apart on a line', gap: 8},
   'c7.when': {_source: 'COMPONENTS.md C7: a table is folded iff its min-content is wider than its room (unfolds with 16 to spare); every data table is measured', state: 'ok'},
   'c7.sig': {
     _source: 'COMPONENTS.md C7: one folded signature: subgrid, gap 16 / 8, blocks 12 / 12, flush at the ends, label 15/500 secondary, value 15/400 primary, title 15/500 primary, Divider 1 on the content box',
@@ -224,6 +225,17 @@ export async function collect(cfg) {
           }
         }
         add('g.break.table', 'token', bad && !cut ? bad : 'whole', e);
+      }
+    }
+
+    // C7 / C13 (AUDIT3 A2): a folded nftables match is one sentence of
+    // clauses 8 apart: a counter or an address runs into the clause after
+    // it no more (a clause after a line break starts the line).
+    if (fold === 'fold' && t.matches('.nft-rules')) for (const r of rows) for (const c of cellsOf(r)) {
+      const bs = [...c.querySelectorAll('.ifacebadge:not(.large)')].filter((b) => !b.closest('.cbi-tooltip') && shown(b));
+      for (let i = 1; i < bs.length; i++) {
+        const a = [...bs[i - 1].getClientRects()].pop(), b = bs[i].getClientRects()[0];
+        if (a && b && Math.abs(a.top - b.top) < 2) add('c7.clause', 'gap', px(b.left - a.right), bs[i]);
       }
     }
 
