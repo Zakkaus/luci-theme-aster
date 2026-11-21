@@ -29,7 +29,7 @@ export const canonical = {
   'c14.token': {_source: 'COMPONENTS.md C14: Astryx Token md, dynamic lists only', height: 28, radius: 8, stray: 0},
   'c7.keys': {_source: 'COMPONENTS.md section 3 system/admin/sshkeys: C7 title-line-only blocks (name the title, type + key its subline, the key cut with an ellipsis before the remove mark), not Tokens', lines: 'name/sub', key: 'cut', fill: 'none', width: 'full'},
   'c15.dot': {_source: 'COMPONENTS.md C15: StatusDot 8 px; up = success, down = neutral, on every page', size: '8x8', ink: 'ok'},
-  'c16.icon': {_source: 'COMPONENTS.md C16: no LuCI image from /resources/icons/ visible; icon glyphs 16 or 20; an interface\'s port icons all shown (they wrap)', legacy: 0, size: 'ok', clipped: 0},
+  'c16.icon': {_source: 'COMPONENTS.md C16: no LuCI image from /resources/icons/ visible, no colour emoji in a status box; icon glyphs 16 or 20; an interface\'s port icons all shown (they wrap)', legacy: 0, size: 'ok', clipped: 0, emoji: 0},
 };
 
 /* In the page (after gate.mjs installHelpers). */
@@ -420,5 +420,20 @@ export function collect(cfg) {
     }
   }
   add('c16.icon', 'legacy', legacy, named('legacy', scope));
+  /* C16: no colour emoji drawn in a status box (LuCI's chart before the
+     overview's DHCPv6 counters); a glyph that takes no room is not drawn. */
+  let emoji = 0;
+  scope.querySelectorAll('.ifacebox').forEach((b) => {
+    const w = document.createTreeWalker(b, NodeFilter.SHOW_TEXT);
+    for (let n; (n = w.nextNode());) {
+      const m = /\p{Emoji_Presentation}/u.exec(n.data);
+      if (!m || !shown(n.parentNode) || n.parentNode.closest('.cbi-tooltip')) continue;
+      const r = document.createRange();
+      r.setStart(n, m.index);
+      r.setEnd(n, m.index + m[0].length);
+      if (r.getBoundingClientRect().width > 0.5) { emoji++; note('emoji', m[0], n.parentNode); }
+    }
+  });
+  if (scope.querySelector('.ifacebox')) add('c16.icon', 'emoji', emoji, named('emoji', scope));
   return out;
 }

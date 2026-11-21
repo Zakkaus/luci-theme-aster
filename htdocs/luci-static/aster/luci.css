@@ -1220,6 +1220,10 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
         word-break: keep-all;
         text-overflow: ellipsis;
       }
+      /* No colour emoji (C16): LuCI's chart glyph before the DHCPv6
+         counters takes no room (theme-aster.js made it the value's first
+         letter). */
+      & > .aster-v[title^="\1F4CA"]::first-letter { font-size: 0; }
     }
   }
   /* --aster-kv-w is the narrowest the label column may be, not its width:
