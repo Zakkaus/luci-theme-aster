@@ -25,7 +25,7 @@ const RULES = {
   'g.nested': 'G8: no box or fill inside a card but controls, Badges, Banners, code',
   'g.textx': 'G3: headings, descriptions, form labels and button rows start on the card content edge',
   'g.label': 'G10: a label (form row, toolbar, nft clause, dialog legend) has no trailing colon',
-  'c1.header': 'C1: no actions in the title line; a card title does not repeat the page title or the selected tab; a toolbar\'s controls 8 apart',
+  'c1.header': 'C1: no actions in the title line; a card title does not repeat the page title or the selected tab; a toolbar\'s controls 8 apart; a pager\'s arrows on one line (AUDIT4 C2)',
   'c1.descr': 'C1/C3: page description body 15/24, card description supporting 13/20, both secondary',
   'c2.card': 'C2: radius 16, border 1, card fill, padding 16',
   'c3.heading': 'C3: page 26/600, card 18/600, inner 16/600; heading box -> content 16; actions (a section\'s Remove, C10) on the heading\'s row, ending on the content end',
@@ -489,6 +489,13 @@ export function collect(cfg) {
         count('c1.header');
         if (b.left - a.right < 7.5) fail('c1.header', 'toolbar gap', b.left - a.right, 8, cs[i]);
       }
+    }
+    // A pager's arrows wrap as one pair, never Next alone (audit4 C2).
+    for (const p of all('.pager')) {
+      const [a, b] = [...p.querySelectorAll(':scope > .prev, :scope > .next')].filter(visible).map(box);
+      if (!b) continue;
+      count('c1.header');
+      if (Math.abs(a.top - b.top) > 0.5) fail('c1.header', 'pager arrows', 'split', 'one line', p);
     }
     // A type style as the page computes it: [size, line height].
     const type = (n) => {
