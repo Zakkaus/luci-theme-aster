@@ -895,9 +895,11 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
    hidden until nlbw shows it (it marks the value's parent list-item); a
    sentence with no "label:" (English "17 hosts") is one line. */
 .kpi li.aster-row:not(:has(> [style*="list-item"])):has(> .aster-k) { display: none; }
-.kpi li.aster-row:not(:has(> .aster-k)) { grid-column: 1 / -1; }
+.kpi li.aster-row:not(:has(> .aster-k)) { grid-column: 1 / -1; margin: 0; }
 .head { gap: var(--spacing-6); }
-.head > .kpi { padding: 0; justify-content: start; }
+/* Beats nlbw.css's later ".head .kpi" (centred, 5 padding): on a phone the
+   summary below the pies starts at the card's content edge. */
+.head > div.kpi { padding: 0; justify-content: start; }
 :is(.nft-chain-hook, .kpi) > ul, .aster-kv {
   display: grid;
   grid-template-columns: fit-content(50%) minmax(0, 1fr);

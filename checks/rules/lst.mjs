@@ -15,7 +15,7 @@ export const canonical = {
     _source: 'COMPONENTS.md C8: Astryx MetadataList columns=single, label start (grid auto minmax(0,1fr), gap 8 16); label 15/500 secondary, value 15/400 primary, baseline; no underline on a label or value that is not a link',
     layout: 'rows', columnGap: 16, rowGap: 8, labelSize: 15, labelWeight: '500', labelInk: 'secondary', valueSize: 15, valueInk: 'primary', align: 'baseline', underline: 'none',
   },
-  'c8.x': {_source: 'COMPONENTS.md C8: one value x per list (Interfaces: per table, the label column at least --aster-label-w); label column = longest label, capped at 50% (nlbw\'s shrink-wrapped summary: uncapped)', valueXs: 1, tableXs: 1, labelFit: 0},
+  'c8.x': {_source: 'COMPONENTS.md C8: one value x per list (Interfaces: per table, the label column at least --aster-label-w); label column = longest label, capped at 50% (nlbw\'s shrink-wrapped summary: uncapped); nlbw\'s summary on a line of its own starts at the card content edge (AUDIT4 B4)', valueXs: 1, tableXs: 1, labelFit: 0, edge: 0},
   'c8.bar': {_source: 'COMPONENTS.md C19 in C8: label | value text at the value column\'s start, the bar under it as wide as the value column; one value x per list; label 500 secondary', layout: 'value column', valueXs: 1, labelWeight: '500', labelInk: 'secondary'},
   'c8.tracks': {_source: 'COMPONENTS.md C8: no value column narrower than its longest token (unless truncated with a title)', narrow: 0},
   'c8.ifstatus': {
@@ -139,6 +139,10 @@ export function collect(cfg) {
     const texts = (nodes) => nodes.flatMap((n) => (n.nodeType === 3 ? [n] : textNodes(n)));
     const lr = pairs.map(([k]) => range(texts([k])));
     const vr = pairs.map(([, v]) => (texts(v).length ? range(texts(v)) : []));
+    // nlbw's summary wrapped below its pies starts at their row's edge.
+    const pies = kind === 'nlbw' && el.closest('.head'), kb = el.parentNode.getBoundingClientRect();
+    if (pies && ![...pies.children].some((p) => { const b = p.getBoundingClientRect(); return p !== el.parentNode && b.bottom > kb.top + 1 && b.top < kb.bottom - 1; }))
+      add('c8.x', 'edge', px(Math.min(...lr.map((r) => r[0]?.left ?? Infinity)) - pies.getBoundingClientRect().left), el);
     if (vr.some((r) => !r.length)) { add('c8.kv', 'layout', 'inline', el); continue; }
     const lx = lr.map((r) => r[0].left), vx = vr.map((r) => r[0].left);
     const rows = pairs.every((p, i) => Math.abs(lr[i][0].bottom - vr[i][0].bottom) <= 1 && vx[i] > Math.max(...lr[i].map((r) => r.right)));

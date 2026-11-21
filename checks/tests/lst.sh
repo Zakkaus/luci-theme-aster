@@ -109,5 +109,17 @@ expect uniform 1 "font.body fontFamily,frame nested" "Changes dialog: values who
 expect uniform 1 "font.body fontFamily,frame nested,g.break value" "Changes dialog value split at its hyphen (audit4 B5)" -- "$url" "$password" --pages "$tmp/lst-chg.txt" --viewports phone \
 	--debug-css "$chg" --debug-css 'admin/network/network=html body .uci-change-list strong { display: inline !important }'
 
+# nlbw's summary below its pies on a phone starts at the card content edge
+# (audit4 B4), not centred 114 px in. Only on a box with luci-app-nlbwmon;
+# the page is in no page list yet, so its host table is hidden here, and
+# English's "4 hosts" sentences are an inline list.
+if [[ $(curl -s -o /dev/null -w '%{http_code}' "$url/luci-static/resources/view/nlbw.css") = 200 ]]; then
+	nlbw='admin/services/nlbw/display=html body #view :is(table, .table) { display: none !important }'
+	printf '%s\n' 'admin/services/nlbw/display require=c8.x' >"$tmp/lst-nlbw.txt"
+	expect uniform 1 "c8.kv layout" "nlbw summary on the card edge" -- "$url" "$password" --pages "$tmp/lst-nlbw.txt" --viewports phone --debug-css "$nlbw"
+	expect uniform 1 "c8.kv layout,c8.x edge" "nlbw summary centred below the pies (audit4 B4)" -- "$url" "$password" --pages "$tmp/lst-nlbw.txt" --viewports phone \
+		--debug-css "$nlbw" --debug-css 'admin/services/nlbw/display=html body .head > div.kpi { justify-content: center !important }'
+fi
+
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true
