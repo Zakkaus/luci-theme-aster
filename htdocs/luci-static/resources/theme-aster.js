@@ -154,6 +154,11 @@ return baseclass.extend({
 				v.prepend(h);
 			}
 
+			/* A card title repeating the page title or tab is not drawn (C1). */
+			const said = [...document.querySelectorAll('.shell-inner h2, .cbi-tab, .tab[data-active]')].map((e) => e.textContent.trim());
+
+			root.querySelectorAll('.cbi-section > h3').forEach((h) => h.classList.toggle('aster-said', said.includes(h.textContent.trim())));
+
 			root.querySelectorAll('span:not(.aster-error) > strong:first-child').forEach((s) => {
 				if (s.textContent.trim().replace(/[:：]$/, '') === error)
 					s.parentNode.classList.add('aster-error');

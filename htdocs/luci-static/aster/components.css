@@ -137,7 +137,7 @@ html :where(.cbi-section :is(h2, h3), .cbi-section > legend) {
    card has no title of its own (24.10's leases), its first heading is the
    title and only the ones after it are Heading 3. A heading a field writes
    (.cbi-value > h4: DHCP's Active DHCPv4 Leases) is one too. */
-html :where(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div:not(.cbi-title) > h3, .cbi-section > div:not(.cbi-title) > h3 ~ h3, .cbi-value > h4) {
+html :where(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div:not(.cbi-title) > h3, .cbi-section > div:not(.cbi-title) > h3 ~ h3, .cbi-value > h4, .cbi-value > .cbi-section > h3, .cbi-section > h3 ~ h3) {
   font-size: var(--text-heading-4-size);
   font-weight: var(--text-heading-4-weight);
   line-height: var(--text-heading-4-leading);
@@ -771,6 +771,25 @@ html :where(.cbi-section, .cbi-section-node) :where(.cbi-section, .cbi-section-n
   --card-radius: 0;
   --card-bg: transparent;
 }
+/* A section that only says something (Firewall: "Your device runs
+   firewall4.") is its description under the page header, not a card that
+   holds one line (audit #18). */
+html :where(.cbi-map > .cbi-section:has(> .cbi-section-descr):not(:has(> :not(.cbi-section-descr)))) {
+  --card-pad: 0;
+  --card-border-width: 0;
+  --card-bg: transparent;
+}
+/* Sections that form options hold (Backup / Flash Firmware: Backup,
+   Restore, Flash image) are flat sections of their card too: Heading 4
+   (above), a Divider 16 under the one before and 16 over the next. */
+/* A card holding several headed groups straight in it (Routes: a
+   family's neighbours, routes and rules) is titled by the first; each
+   later one is a flat section under a Divider. */
+html :where(.cbi-section > h3 ~ h3),
+html :where(.cbi-value:has(> .cbi-section) + .cbi-value > .cbi-section) {
+  padding-block-start: var(--aster-space-region);
+  border-block-start: var(--border-width) solid var(--color-border);
+}
 html :where(.cbi-section, .cbi-section-node) :where(.cbi-section + .cbi-section, .cbi-section-node + .cbi-section-node) {
   padding-block-start: var(--aster-space-region);
   border-block-start: var(--border-width) solid var(--color-border);
@@ -1164,6 +1183,12 @@ html :where(#view:has(> #tabmenu, > .cbi-map > #tabmenu) .cbi-tabmenu, [data-tab
   font-size: var(--text-supporting-size);
   line-height: var(--text-supporting-leading);
 }
+html :where(#view:has(> #tabmenu, > .cbi-map > #tabmenu) .cbi-tabmenu, [data-tab] .cbi-tabmenu) > .cbi-tab > a::before { inset-inline: var(--spacing-2); }
+
+/* A card heading that repeats the page title or the selected tab
+   (theme-aster.js marks it) is not drawn: the page names it once. */
+html :where(.cbi-section > h3.aster-said) { display: none; }
+.cbi-section > h3.aster-said + * { margin-block-start: 0; }
 
 /* ── ProgressBar ─────────────────────────────────────────────────
    An 8 track in the muted fill, the value in the accent, both round; the
