@@ -396,10 +396,11 @@ html :where(.cbi-dropdown[multiple] > ul) { gap: var(--spacing-1); padding-inlin
 html :where(.cbi-dropdown[multiple] > ul > li[display]) { flex: none; padding: 0; }
 html :where(.cbi-dropdown > ul > li img) { block-size: var(--aster-icon-sm); inline-size: var(--aster-icon-sm); }
 /* LuCI's device images (resources/icons/*.svg, a bitmap look, grey
-   squares in dark) in a list row, a device chip (Devices) and the
-   editor's Status: the Heroicons ServerStack, Wifi for a radio (luci.css
-   --icon-*), 16 in the secondary icon colour; 20 beside the Status. */
-html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip)):has(> img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"]))::before {
+   squares in dark) in a list row, a device chip (Devices), WireGuard's
+   instance chip and the editor's Status: the Heroicons ServerStack, Wifi
+   for a radio (luci.css --icon-*), 16 in the secondary icon colour; 20
+   beside the Status. */
+html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip), #view > p > .ifacebadge):has(> img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"]))::before {
   content: "";
   display: block;
   flex: none;
@@ -408,9 +409,9 @@ html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifac
   background-color: var(--color-icon-secondary);
   mask: var(--icon-server) center / contain no-repeat;
 }
-html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip)):has(> img[src*="/wifi"])::before { mask-image: var(--icon-wifi); }
+html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip), #view > p > .ifacebadge):has(> img[src*="/wifi"])::before { mask-image: var(--icon-wifi); }
 html :where(.ifacebadge.large:not(.cbi-tooltip))::before { inline-size: var(--aster-icon-md); block-size: var(--aster-icon-md); }
-html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip)) > img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"]) { display: none; }
+html :where(.cbi-dropdown > ul > li, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip), #view > p > .ifacebadge) > img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"]) { display: none; }
 /* The chevron segment: a Select's ends 12 inside the border, in the
    secondary icon colour (a ComboButton's is the button's own, above). */
 html :where(.cbi-dropdown > :is(.open, .more)) {
@@ -1278,7 +1279,8 @@ html :where([data-page="admin-status-overview"] #view :is(.ifacebox-body > div, 
    before the text
    (Heroicons 2.2.0 outline, MIT, path data verbatim: InformationCircle,
    ExclamationTriangle, ExclamationCircle, CheckCircle) as a mask, so it
-   takes the text colour. A notification is a Banner with a Dismiss button;
+   takes the text colour. A notification is a Banner with a Dismiss button
+   (the standard Button, 36);
    ui.js removes it when the .fade-out transition ends, so that transition
    always runs. */
 
@@ -1344,7 +1346,6 @@ html :where(.alert-message h4) {
   line-height: var(--text-body-leading);
 }
 html :where(.alert-message pre) { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--text-supporting-size); }
-html :where(.alert-message :is(.btn, .cbi-button, button)) { --button-h: var(--size-element-sm); }
 html :where(.alert-message.fade-out) { opacity: 0; }
 
 /* ── Dialog ──────────────────────────────────────────────────────

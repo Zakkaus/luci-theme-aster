@@ -819,7 +819,20 @@ function collect(cfg) {
     d.remove();
     return h;
   })();
-  const isToken = (el, s) => el.matches('.cbi-dynlist > .item') && parseFloat(s.paddingTop) === 0 && parseFloat(s.paddingBottom) === 0 && box(el).height <= tokenH + 0.5;
+  // An Astryx Token or Badge inside a field (a dynlist value, a chip in a
+  // cell) has its own fill or border by design, as a Badge does: no block
+  // padding, no taller than the md Token, and as wide as its words (a
+  // Token's icon or remove mark adds less than its height). A filled row
+  // (padded, taller, or the field's width around short words) is a frame
+  // in the card. A flex item's display is blockified, so the width, not
+  // the display, tells a chip from a row.
+  const isToken = (el, s) => {
+    if (!el.closest('.cbi-value-field, .cbi-dynlist, td, .td') || parseFloat(s.paddingTop) !== 0 || parseFloat(s.paddingBottom) !== 0 || box(el).height > tokenH + 0.5) return false;
+    const r = document.createRange();
+    r.selectNodeContents(el);
+    const inner = ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth'].reduce((w, k) => w + parseFloat(s[k]), r.getBoundingClientRect().width);
+    return box(el).width <= inner + tokenH;
+  };
   const edgeOf = new Map();
   const edge = (el) => {
     if (edgeOf.has(el)) return edgeOf.get(el);

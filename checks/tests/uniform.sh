@@ -214,9 +214,13 @@ expect uniform 1 "frame nested" "a form row framed inside its card" -- "$url" "$
 printf 'admin/system/system tab=timesync\n' >"$tmp/timesync.txt"
 expect uniform 1 "frame nested" "dynlist value as a filled row" -- "$url" "$password" --pages "$tmp/timesync.txt" \
 	--debug-css 'admin/system/system=html .cbi-dynlist > .item { display: block !important; block-size: auto !important; min-block-size: 32px !important; padding: 4px 36px 4px 12px !important }'
+# The same value as a filled row the field's width, with no block padding
+# and the Token's height: still a frame (a Token is as wide as its words).
+expect uniform 1 "frame nested" "dynlist value as a full-width row" -- "$url" "$password" --pages "$tmp/timesync.txt" \
+	--debug-css 'admin/system/system=html .cbi-dynlist > .item { display: flex !important; flex: 1 0 100% !important }'
 printf 'admin/status/realtime/load\n' >"$tmp/load.txt"
 expect uniform 1 "frame nested" "graph framed inside its card" -- "$url" "$password" --pages "$tmp/load.txt" \
-	--debug-css 'admin/status/realtime/load=#view#view#view div[style*="border:1px solid #000"] { border-color: rgb(0, 0, 0) !important }'
+	--debug-css 'admin/status/realtime/load=#view#view#view div[style*="border:1px solid #000"] { border: 1px solid rgb(0, 0, 0) !important }'
 printf 'admin/system/startup tab=rc\n' >"$tmp/startup-rc.txt"
 expect uniform 1 "frame nested" "card's save bar a band on a phone" -- "$url" "$password" --pages "$tmp/startup-rc.txt" --viewports phone \
 	--debug-css 'admin/system/startup=#view .cbi-page-actions { border-block-start: 1px solid rgb(0, 0, 0) !important }'
