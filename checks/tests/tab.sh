@@ -41,9 +41,10 @@ expect uniform 1 "c7.when state,overflow excess,g.overflow conform" "wide table 
 	--debug-css 'admin/status/routes=#view .table:not([style*="min-content"]) .tr > .td:nth-child(2) { min-inline-size: 1600px }'
 # C7 when, G5: nftables on a phone measured with CJK breaking after any
 # character, so its tables "fit" and stay wide, one glyph a line (a); its
-# clauses may wrap too (wide, they are one line). The chain's 1px ::after
+# clauses may wrap too (wide, they are one line). The table overflows its
+# card and the broken rows grow past one text line. The chain's 1px ::after
 # resizes it, so theme-aster.js measures again.
-expect uniform 1 "c7.when state,g.overflow conform,overflow excess" "table measured with words broken (CJK)" -- "$url" "$password" --pages "$tmp/tab-nft.txt" --viewports phone \
+expect uniform 1 "c7.when state,g.overflow conform,overflow excess,table.row.text height" "table measured with words broken (CJK)" -- "$url" "$password" --pages "$tmp/tab-nft.txt" --viewports phone \
 	--debug-css 'admin/status/nftables=html #view .table[style*="min-content"] :is(.td, .th, .td .ifacebadge) { word-break: break-all !important; white-space: normal !important } html #view .nft-chain::after { content: ""; display: block; block-size: 1px }'
 # C7 when (audit 2, C7 A): Overview's leases kept on one line, so a host
 # name that wraps at its spaces on DHCP's page folds the table here.
