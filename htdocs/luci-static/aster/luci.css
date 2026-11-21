@@ -58,6 +58,8 @@
 .cbi-button-link { --button-bg: transparent; --button-decoration: underline; }
 /* The overview's Hide/Show: a small ghost chevron IconButton. */
 .cbi-section .label[data-style] { --button-h: var(--size-element-sm); --button-bg: transparent; }
+/* The drag handle is icon-only chrome: a ghost IconButton (C9). */
+.drag-handle { --button-bg: transparent; }
 
 /* A row of buttons: 8 apart, wrapping; LuCI's own margins go. On a table
    cell .right only aligns the cell's text: the cell stays a cell. */
