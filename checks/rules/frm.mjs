@@ -250,7 +250,8 @@ export function collect(cfg) {
       const row = h.parentElement.matches('.cbi-title') ? h.parentElement : h;
       let next = row.nextElementSibling;
       while (next && (!visible(next) || css(next).position === 'absolute')) next = next.nextElementSibling;
-      if (next) check('c3.heading', 'next gap', box(next).top - box(row).bottom, 16, h);
+      // From the heading's own box: 25.12's title row grows with its margin.
+      if (next) check('c3.heading', 'next gap', box(next).top - box(h).bottom, 16, h);
       if (row !== h) {
         const acts = [...row.querySelectorAll(BTN)].filter(visible);
         if (acts.length) check('c3.heading', 'actions end', content(cardOf(row) ?? row).r - Math.max(...acts.map((a) => box(a).right)), 0, row);

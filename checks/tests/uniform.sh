@@ -36,7 +36,7 @@ expect uniform 0 "" "valid page, valid list" -- "$url" "$password" --pages "$tmp
 
 # A canonical value and a stylesheet: one component off on one page.
 expect uniform 1 "card radius" "canonical card radius changed to 20" -- "$url" "$password" --pages "$tmp/overview.txt" --canonical "$tmp/canonical.json"
-expect uniform 1 "button.*.md height" "one button 50px high on one page" "50px (want 36px)" -- "$url" "$password" --pages "$tmp/reboot.txt" \
+expect uniform 1 "button.*.md height,c9.button conform" "one button 50px high on one page" "50px (want 36px)" -- "$url" "$password" --pages "$tmp/reboot.txt" \
 	--debug-css 'admin/system/reboot=#view button:is(.cbi-button, .btn):not(td *, .td *) { block-size: 50px !important; min-block-size: 50px !important }'
 
 # A valid page that does not draw a class the list requires.
@@ -44,18 +44,18 @@ expect uniform 1 "missing checkbox" "required class the page lacks" -- "$url" "$
 
 # Phone: a table with data rows whose rows the phone CSS hides is missing
 # its table (table@rows), though an empty table would be exempt.
-expect uniform 1 "missing table" "phone hides a table's data rows" "the page's tables hold" -- "$url" "$password" --pages "$tmp/rules.txt" --viewports phone \
+expect uniform 1 "missing table,space.card.pad padding" "phone hides a table's data rows" "the page's tables hold" -- "$url" "$password" --pages "$tmp/rules.txt" --viewports phone \
 	--debug-css 'admin/network/firewall/rules=#view .table .tr:not(.placeholder):has(> .td) { display: none !important }'
 
 # Dark: a card fill that only dark mode gets wrong. (Not the overview: a
 # fill there would turn its frameless port band into a card as well.)
-expect uniform 1 "card background" "dark card fill changed" -- "$url" "$password" --pages "$tmp/dropbear.txt" --modes dark \
+expect uniform 1 "card background,c2.card conform" "dark card fill changed" -- "$url" "$password" --pages "$tmp/dropbear.txt" --modes dark \
 	--debug-css 'admin/system/admin/dropbear=#view .cbi-section { background-color: rgb(0, 0, 0) !important }'
 
 # Content wider than its card: the rule 26d0959 dropped, put back. It made
 # the interfaces table 15,200 px wide inside its card; the page itself did
 # not overflow, so only the overflow rule sees it.
-expect uniform 1 "overflow excess" "interfaces table wider than its card" -- "$url" "$password" --pages "$tmp/network.txt" \
+expect uniform 1 "overflow excess,g.overflow conform" "interfaces table wider than its card" -- "$url" "$password" --pages "$tmp/network.txt" \
 	--debug-css 'admin/network/network=.table:has([style*="min-width"]) { min-inline-size: max-content; }'
 
 # A rule under a card's last row: Diagnostics' tool cells (one row in a
@@ -77,12 +77,14 @@ expect uniform 1 "glyph raw" "raw ▲ glyph shown" -- "$url" "$password" --pages
 # The save bar over the page again: the main column runs under it.
 expect uniform 1 "footer overlap" "save bar covering the page" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=.shell-main { margin-block-end: 0 !important }'
-# The last line 9 above the save bar: the footer's bottom padding cut (the
+# The last line 9 above the save bar: the content's bottom inset cut (the
 # router measure's 9-9.6 was a viewport artifact, normal and read-only
-# sessions alike; this is the fault it would be). The margin keeps the
-# column scrolling, so the check applies.
-expect uniform 1 "space.page.bar gap" "last block 9 above the save bar" "(want 24px)" -- "$url" "$password" --pages "$tmp/system.txt" \
-	--debug-css 'admin/system/system=.shell-footer { padding-block-end: 9px !important; margin-block-start: 1000px !important }'
+# sessions alike; this is the fault it would be). The version line is not
+# drawn over a save bar, so the last block ends the column and the page's
+# bottom inset is the same 9; the padding keeps the column scrolling, so the
+# check applies.
+expect uniform 1 "space.page.bar gap,space.page.inset padding" "last block 9 above the save bar" "(want 24px)" -- "$url" "$password" --pages "$tmp/system.txt" \
+	--debug-css 'admin/system/system=.shell-content { padding-block-end: 9px !important } #view { padding-block-start: 1000px }'
 
 # Side nav: rows set flush again (the hovered row touched the selected one).
 expect uniform 1 "nav.item gap" "side nav rows with no gap" "0px (want 2px)" -- "$url" "$password" --pages "$tmp/reboot.txt" \
@@ -113,9 +115,9 @@ expect uniform 1 "space.title.desc gap" "page title 12 over its description" -- 
 	--debug-css 'admin/system/system=.cbi-map-descr { margin-block-start: 12px !important }'
 expect uniform 1 "space.title.next gap" "page title 40 over the first block" -- "$url" "$password" --pages "$tmp/overview.txt" \
 	--debug-css 'admin/status/overview=.shell-inner > h2 { margin-block-end: 40px !important }'
-expect uniform 1 "space.tabs.content gap" "tabs 24 over their content" -- "$url" "$password" --pages "$tmp/system.txt" \
+expect uniform 1 "space.tabs.content gap,c4.tabs conform" "tabs 24 over their content" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=.cbi-tabmenu { margin-block-end: 24px !important }'
-expect uniform 1 "space.tabs.item gap" "tabs 8 apart" -- "$url" "$password" --pages "$tmp/system.txt" \
+expect uniform 1 "space.tabs.item gap,c4.tabs conform" "tabs 8 apart" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=.cbi-tabmenu { gap: 8px !important }'
 expect uniform 1 "space.block gap" "a Remove row 24 over its section" -- "$url" "$password" --pages "$tmp/dropbear.txt" \
 	--debug-css 'admin/system/admin/dropbear=.cbi-section-remove { margin-block-end: 24px !important }'
@@ -133,21 +135,21 @@ expect uniform 1 "space.title.desc gap" "Routing's description 12 under the titl
 	--debug-css 'admin/status/routes=#view > h2 + p { margin-block-start: 12px !important }'
 # 25.12 puts the card's h3 in a title row (24 inside it), 24.10 not (24
 # under it, over the content's 16).
-expect uniform 1 "space.heading.content gap" "card title keeps a margin" -- "$url" "$password" --pages "$tmp/overview.txt" \
+expect uniform 1 "space.heading.content gap,c3.heading conform" "card title keeps a margin" -- "$url" "$password" --pages "$tmp/overview.txt" \
 	--debug-css 'admin/status/overview=#view > .cbi-section > .cbi-title > h3, #view > .cbi-section > h3 { margin-block-end: 24px !important }'
 expect uniform 1 "space.descr.content gap" "section description 24 over its content" -- "$url" "$password" --pages "$tmp/flash.txt" \
 	--debug-css 'admin/system/flash=.cbi-section .cbi-section-descr { margin-block-end: 24px !important }'
-expect uniform 1 "space.formrow.pad padding" "form rows pad 12" -- "$url" "$password" --pages "$tmp/system.txt" \
+expect uniform 1 "space.formrow.pad padding,c5.form conform" "form rows pad 12" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=.cbi-value { padding-block: 12px !important }'
-expect uniform 1 "space.label.field inline" "label 24 before its field" -- "$url" "$password" --pages "$tmp/system.txt" \
+expect uniform 1 "space.label.field inline,c5.form conform" "label 24 before its field" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=.cbi-value { column-gap: 24px !important }'
-expect uniform 1 "space.label.field stacked" "phone: label 8 over its field" -- "$url" "$password" --pages "$tmp/system.txt" --viewports phone \
+expect uniform 1 "space.label.field stacked,c5.form conform" "phone: label 8 over its field" -- "$url" "$password" --pages "$tmp/system.txt" --viewports phone \
 	--debug-css 'admin/system/system=.cbi-value > .cbi-value-title { margin-block-end: 8px !important }'
-expect uniform 1 "space.field.help gap" "help 8 under its field" -- "$url" "$password" --pages "$tmp/dropbear.txt" \
+expect uniform 1 "space.field.help gap,c5.form conform" "help 8 under its field" -- "$url" "$password" --pages "$tmp/dropbear.txt" \
 	--debug-css 'admin/system/admin/dropbear=.cbi-value-description { margin-block-start: 8px !important }'
 expect uniform 1 "space.control.row gap" "save bar buttons 16 apart" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=.cbi-page-actions { gap: 16px !important }'
-expect uniform 1 "space.dialog gap" "dialog footer 8 under the form" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
+expect uniform 1 "space.dialog gap,c18.dialog conform" "dialog footer 8 under the form" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
 	--debug-css 'admin/network/network=#modal_overlay .button-row { margin-block-start: 8px !important }'
 
 # Tooltip contents: a key/value list (the DHCPv6 statistics; the gate
@@ -166,7 +168,7 @@ expect uniform 1 "tabs.pane shown" "every tab pane shown" -- "$url" "$password" 
 	--debug-css 'admin/system/system=[data-tab-title]:not([data-tab-active="true"]) { display: block !important }'
 
 # Tabs: the strip wrapping onto two lines (24.10 DHCP's 14 at 1440).
-expect uniform 1 "tabs.list lines" "the tab strip on two lines" -- "$url" "$password" --pages "$tmp/system.txt" \
+expect uniform 1 "tabs.list lines,c4.tabs conform" "the tab strip on two lines" -- "$url" "$password" --pages "$tmp/system.txt" \
 	--debug-css 'admin/system/system=.cbi-tabmenu { flex-wrap: wrap !important; max-inline-size: 240px }'
 
 # Dynlist: the + under its field (the add row wrapping).
@@ -192,7 +194,7 @@ expect uniform 1 "table.actions lines" "phone: Startup's five wrapped, no more m
 # Headings: a size outside Astryx's levels; an <abbr>'s dotted rule.
 printf 'admin/status/nftables\n' >"$tmp/nftables.txt"
 printf 'admin/system/leds\n' >"$tmp/leds.txt"
-expect uniform 1 "heading level" "a chain title at 17" -- "$url" "$password" --pages "$tmp/nftables.txt" \
+expect uniform 1 "heading level,c3.heading conform" "a chain title at 17" -- "$url" "$password" --pages "$tmp/nftables.txt" \
 	--debug-css 'admin/status/nftables=.nft-chain h4 { font-size: 17px !important }'
 expect uniform 1 "heading abbr" "a dotted <abbr> in the LED title" -- "$url" "$password" --pages "$tmp/leds.txt" \
 	--debug-css 'admin/system/leds=h2 abbr { text-decoration: underline dotted !important }'
@@ -212,21 +214,21 @@ expect uniform 1 "frame nested" "a form row framed inside its card" -- "$url" "$
 # box), not a Token; a graph's black frame back inside its card; a card's
 # own save bar keeping its divider and fill on a phone (Startup).
 printf 'admin/system/system tab=timesync\n' >"$tmp/timesync.txt"
-expect uniform 1 "frame nested" "dynlist value as a filled row" -- "$url" "$password" --pages "$tmp/timesync.txt" \
+expect uniform 1 "frame nested,g.px conform" "dynlist value as a filled row" -- "$url" "$password" --pages "$tmp/timesync.txt" \
 	--debug-css 'admin/system/system=html .cbi-dynlist > .item { display: block !important; block-size: auto !important; min-block-size: 32px !important; padding: 4px 36px 4px 12px !important }'
 # The same value as a filled row the field's width, with no block padding
 # and the Token's height: still a frame (a Token is as wide as its words).
 expect uniform 1 "frame nested" "dynlist value as a full-width row" -- "$url" "$password" --pages "$tmp/timesync.txt" \
 	--debug-css 'admin/system/system=html .cbi-dynlist > .item { display: flex !important; flex: 1 0 100% !important }'
 printf 'admin/status/realtime/load\n' >"$tmp/load.txt"
-expect uniform 1 "frame nested" "graph framed inside its card" -- "$url" "$password" --pages "$tmp/load.txt" \
+expect uniform 1 "frame nested,g.nested conform" "graph framed inside its card" -- "$url" "$password" --pages "$tmp/load.txt" \
 	--debug-css 'admin/status/realtime/load=#view#view#view div[style*="border:1px solid #000"] { border: 1px solid rgb(0, 0, 0) !important }'
 printf 'admin/system/startup tab=rc\n' >"$tmp/startup-rc.txt"
-expect uniform 1 "frame nested" "card's save bar a band on a phone" -- "$url" "$password" --pages "$tmp/startup-rc.txt" --viewports phone \
+expect uniform 1 "frame nested,g.inset conform" "card's save bar a band on a phone" -- "$url" "$password" --pages "$tmp/startup-rc.txt" --viewports phone \
 	--debug-css 'admin/system/startup=#view .cbi-page-actions { border-block-start: 1px solid rgb(0, 0, 0) !important }'
 
 # Dialog: a tall one runs past the window; the save bar over the scrim.
-expect uniform 1 "dialog fits" "dialog taller than the window" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
+expect uniform 1 "dialog fits,c18.dialog conform" "dialog taller than the window" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
 	--debug-css 'admin/network/network=#modal_overlay > .modal { max-block-size: none !important }'
 expect uniform 1 "dialog scrim" "save bar over the dialog's scrim" -- "$url" "$password" --pages "$tmp/iface-edit.txt" \
 	--debug-css 'admin/network/network=.cbi-page-actions { z-index: 200 !important }'
