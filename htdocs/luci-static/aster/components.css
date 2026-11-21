@@ -999,7 +999,7 @@ html #view :is(.td, td) .ifacebadge:not(.large) {
   white-space: normal;
   margin: 0; /* nftables' <style>: .125em */
   vertical-align: top; /* a line of text, not a box on its baseline (row 33) */
-  &::before, & > img { order: 1; }
+  &::before, & > img, & > .cbi-tooltip-container { order: 1; } /* Devices: the name, then its icon */
 }
 /* nftables' set (its items a tooltip trigger) is a run of words on the line. */
 html #view :is(.td, td) :is(.nft-set, .nft-set-items) { vertical-align: top; }
@@ -1638,10 +1638,11 @@ html :where(.cbi-tooltip) :is(.ifacebadge, .zonebadge, .ifacebox, .ifacebox-head
   --card-border: color-mix(in srgb, currentColor 24%, transparent);
   color: inherit;
 }
-/* A cell's "#" with a data-tooltip (more detail behind a row) is an
+/* A cell's "#" with a data-tooltip (more detail behind a route) is an
    InfoTip: the 16 info icon (the Banner's) in a 20 box; the character
-   stays for screen readers. */
-html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button)) {
+   stays for screen readers. A value with a tooltip (a device's link speed,
+   an overridden MAC or MTU) keeps its words. */
+html :where(.td > div[data-tooltip]) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1651,7 +1652,7 @@ html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button
   font-size: 0;
   cursor: help;
 }
-html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button))::after {
+html :where(.td > div[data-tooltip])::after {
   content: "";
   inline-size: var(--aster-icon-sm);
   block-size: var(--aster-icon-sm);
