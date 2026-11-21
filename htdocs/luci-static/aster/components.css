@@ -884,12 +884,28 @@ html :where(.tbody:not(tbody) > .tr.placeholder) { display: block; }
 /* Lua CBI tables are real <table>s: the parser's <tbody> holds the title row
    and the placeholder; dissolve it so the caption is the table's own. */
 html :where(tbody:has(> .tr.placeholder)) { display: contents; }
+/* Compact EmptyState (Astryx): the table's message, 16 above and below,
+   centred, secondary; folded, it stands in for the blocks (no Divider). */
 html :where(.tr.placeholder > .td) {
   display: block;
-  padding-block: var(--spacing-6);
+  padding-block: var(--spacing-4);
   border-block-end: 0;
   color: var(--color-text-secondary);
   text-align: center;
+}
+/* Page EmptyState: a view with nothing to show (WireGuard's "No WireGuard
+   interfaces configured.", its loading line): centred, 32 24, its words
+   360 wide, secondary, upright; LuCI's margin-top:5em is dropped. */
+html #view > p.center {
+  box-sizing: border-box;
+  max-inline-size: var(--aster-empty-max-w);
+  margin: 0 auto !important;
+  padding: var(--spacing-8) var(--spacing-6);
+  color: var(--color-text-secondary);
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-leading);
+  text-align: center;
+  & > em { font-style: normal; }
 }
 /* The actions cell keeps its buttons 8 off the row lines (a row with
    actions is 32 + 16 + 1 = 49); numbers end-aligned in their column
@@ -1193,9 +1209,9 @@ html :where(.cbi-progressbar)::before {
   white-space: nowrap;
 }
 html :where(.cbi-progressbar .bar-ink) { display: none; }
-/* Indeterminate: a status line (.spinning) leads with a short track whose
-   accent segment (40 %) slides end to end and back; stopped (reduced
-   motion, a still capture) it rests in the middle, never off the track. */
+/* Spinner (Astryx): a status line (.spinning) leads with a 16 ring, its
+   accent arc (3/8 of the ring) turning on the muted track, 8 before the
+   loading words; stopped (reduced motion, a still capture) it rests. */
 html :where(.spinning:not(.btn, .cbi-button, .cbi-dropdown, button)) {
   display: flex;
   align-items: center;
@@ -1203,7 +1219,18 @@ html :where(.spinning:not(.btn, .cbi-button, .cbi-dropdown, button)) {
   color: var(--color-text-secondary);
   font-size: var(--text-supporting-size);
 }
-html :where(.spinning:not(.btn, .cbi-button, .cbi-dropdown, button))::before,
+html :where(.spinning:not(.btn, .cbi-button, .cbi-dropdown, button, #modal_overlay > .alert-message))::before {
+  content: "";
+  flex: none;
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
+  border-radius: var(--radius-full);
+  background: conic-gradient(var(--color-accent) 0 37.5%, var(--color-background-muted) 0);
+  mask: radial-gradient(farthest-side, transparent calc(100% - var(--spacing-0-5)), black calc(100% - var(--spacing-0-5)));
+  animation: aster-spin 0.8s linear infinite;
+}
+@keyframes aster-spin { to { rotate: 1turn; } }
+/* A dialog's busy line keeps the indeterminate track under its words. */
 html :where(#modal_overlay > .alert-message.spinning)::after {
   content: "";
   flex: none;
