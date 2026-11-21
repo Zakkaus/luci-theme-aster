@@ -596,7 +596,6 @@ html :where(#aster-more-menu:popover-open) { position: fixed; inset: auto; posit
 html :where(.aster-more[aria-expanded="true"]) { anchor-name: --aster-more; }
 html :where(#aster-more-menu > li.negative) { --menu-item-fg: var(--color-text-error); }
 html :where(#aster-more-menu > li[role="separator"]) { block-size: 0; min-block-size: 0; margin-block: var(--spacing-1); padding: 0; border-block-start: var(--border-width) solid var(--color-border); pointer-events: none; }
-html :where(#aster-more-menu > li[aria-disabled="true"]) { opacity: 0.5; cursor: default; }
 html :where(.palette-menu [role="menu"] small) { color: var(--color-text-secondary); font-size: var(--text-supporting-size); }
 html :where(.palette-swatch) {
   flex: none;
@@ -654,7 +653,7 @@ html :where(input[type="checkbox"], input[type="radio"]):checked::before { trans
     background-image: linear-gradient(var(--color-overlay-hover) 0 0);
   }
 }
-html :where(:is(input[type="checkbox"], input[type="radio"]):disabled) { opacity: 0.5; cursor: default; }
+html :where(:is(input[type="checkbox"], input[type="radio"]):disabled, #aster-more-menu > li[aria-disabled="true"]) { opacity: 0.5; cursor: default; }
 html :where(input[type="checkbox"].cbi-input-invalid) { border-color: var(--color-border-error); }
 /* The tap target grows around the box on a touch screen. */
 @media (pointer: coarse) {
@@ -721,8 +720,6 @@ html :where(.cbi-dynlist) > .item::after {
 }
 html :where(.cbi-dynlist > .item > span) { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
 html :where(.cbi-dynlist > .item code) { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--color-text-secondary); }
-html :where(.cbi-dynlist > .item.dragging) { opacity: 0.5; }
-html :where(.cbi-dynlist) > :is(.item, .add-item > *).drag-over { box-shadow: inset 0 calc(var(--border-width) * 2) 0 var(--color-accent); }
 /* The add row keeps its button on the field's line (a control group that
    never wraps); the field takes what the button leaves. */
 html :where(.cbi-dynlist > .add-item) { display: flex; flex: 1 0 100%; flex-wrap: nowrap; gap: var(--spacing-2); min-inline-size: 0; }
@@ -984,10 +981,10 @@ html :where(th, .th) {
   line-height: var(--text-heading-5-leading);
   white-space: nowrap;
 }
-html :where(.tr.placeholder) { display: table-caption; caption-side: bottom; }
-/* A form section (form.js) puts the message row in a tbody of its own,
-   where a caption cannot sit: the tbody becomes the caption. */
-html :where(.tbody:not(tbody):has(> .tr.placeholder:only-child)) { display: table-caption; caption-side: bottom; }
+/* The message row is the table's caption; a form section (form.js) puts
+   it in a tbody of its own, where a caption cannot sit: the tbody becomes
+   the caption. */
+html :where(.tr.placeholder, .tbody:not(tbody):has(> .tr.placeholder:only-child)) { display: table-caption; caption-side: bottom; }
 html :where(.tbody:not(tbody) > .tr.placeholder) { display: block; }
 /* Lua CBI tables are real <table>s: the parser's <tbody> holds the title row
    and the placeholder; dissolve it so the caption is the table's own. */
@@ -1016,12 +1013,10 @@ html #view > p.center {
   & > em { font-style: normal; }
 }
 /* The actions cell keeps its buttons 8 off the row lines (a row with
-   actions is 32 + 16 + 1 = 49); numbers end-aligned in their column
+   actions is 32 + 16 + 1 = 49), as does a row's field (a zone's policy
+   select, G7: 36 + 16 + 1 = 53); numbers end-aligned in their column
    (LuCI's .right), the header with them. */
-html :where(:is(.td, td).cbi-section-actions, .tr > .td:not([data-title]):has(> .cbi-button:only-child)) { padding-block: var(--spacing-2); }
-/* A row's field (a zone's policy select) keeps 8 off the row lines too (G7):
-   36 + 16 + 1 = 53. */
-html :where([data-fold="wide"] .td.cbi-value-field:has(select, .cbi-dropdown, textarea, input:not([type="hidden"], [type="checkbox"], [type="radio"]))) { padding-block: var(--spacing-2); }
+html :where(:is(.td, td).cbi-section-actions, .tr > .td:not([data-title]):has(> .cbi-button:only-child), [data-fold="wide"] .td.cbi-value-field:has(select, .cbi-dropdown, textarea, input:not([type="hidden"], [type="checkbox"], [type="radio"]))) { padding-block: var(--spacing-2); }
 html :where(:is(.td, .th, td, th).right) { text-align: end; }
 /* An identifier in a cell is one line (G5): a package's name, a mount's
    device (its UUID), a <var> in LuCI's words (an unbound zone, a server, a
@@ -1046,8 +1041,15 @@ html #view .td > span[style*="word-break"] { word-break: normal !important; }
    its spaces: a host whole with its "(name.lan)" folded 25.12's leases at
    1440. */
 html #view :is(:is(.table, table)[id*="lease"] .td:not(:nth-child(2)), .nft-set-item, .nft-rules .td strong:not(:has(.nft-set))) { white-space: nowrap; }
-html #view [data-fold="fold"] :is([id*="lease"] .td, .td.cbi-section-table-titles) > .aster-v { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html #view [data-fold="fold"] :is([id*="lease"] .td, .td.cbi-section-table-titles, .assoclist [data-head]) > .aster-v { white-space: nowrap; }
 html #view [data-fold="fold"] .tr:has(> * > div:not([data-collapsed]) > .aster-more) > [data-head] > .aster-v { overflow: visible; }
+/* Wide, 25.12's host after its interface (eight or seven cells with the
+   Reserve button) is one line too, its "(name.lan)" ending in an ellipsis,
+   in the room the other columns leave (AUDIT4 A1: "(switchbot-
+   hubminimatter-" over "6847c8.lan)"). theme-aster.js measures the table
+   (width: min-content) with the host wrapping, as before, so the leases
+   stay wide at 1440. */
+[data-fold="wide"]:not([style*="min-content"]) :is(#status_leases .td:nth-last-child(7), #status_leases6 .td:nth-last-child(6)):nth-child(2) { max-width: 0; width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 /* A URL in a cell's prose (a package's description) is theme-aster.js's
    .aster-id: it does not widen its table, breaks anywhere and shows its
    first line, its full text the title (B4). */
@@ -1095,7 +1097,7 @@ html :where(:is(.td, td).cbi-value-field > small) { font-size: inherit; line-hei
 html :where(td, .td) :where(.btn, .cbi-button, button) { --button-h: var(--size-element-sm); }
 /* Sorting by drag: the moved row fades, the drop line is the accent. */
 html :where(.dragging) { opacity: 0.5; }
-html :where(.drag-over-above) { box-shadow: inset 0 calc(var(--border-width) * 2) 0 var(--color-accent); }
+html :where(.cbi-dynlist) > :is(.item, .add-item > *).drag-over, html :where(.drag-over-above) { box-shadow: inset 0 calc(var(--border-width) * 2) 0 var(--color-accent); }
 html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -2) 0 var(--color-accent); }
 /* ── FoldedBlock ─────────────────────────────────────────────────
    A data table that does not fit its card folds, at any window width
@@ -1184,6 +1186,10 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
   }
   & :where(.tr:has(> .cbi-section-actions :is(.btn, .cbi-button, button), > :not([data-title]) > .cbi-button:only-child)) { --aster-title-line: var(--size-element-sm); }
   & :where(.tr > :is(.td, td) .ifacebox-head) { min-block-size: var(--aster-title-line, auto); align-items: center; }
+  /* So is a radio's badge and a network's name (Wireless, AUDIT4 B3):
+     4.5 above the buttons' centre, on a line of their own (the badge
+     inherits its line's). */
+  & :where(.tr > [data-head] > div:has(> .ifacebadge), .tr > [data-head] > div > .nowrap:first-child) { line-height: var(--aster-title-line, inherit); }
   /* The title's second line (a device under its interface, a station's
      addresses under its host): supporting text, no marker before it. */
   & :where(.tr > :is(.td, td) :is(.hide-xs, .ifacebox-body)) {

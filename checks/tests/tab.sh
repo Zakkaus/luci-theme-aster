@@ -149,5 +149,22 @@ expect uniform 1 "g.break.table word" "nftables set members broken at their hyph
 # B4: a description's URL one line, clipped with its title.
 expect uniform 0 "" "Packages: URLs one line on a phone" -- "$url" "$password" --pages "$tmp/tab-pkg0.txt" --viewports phone
 
+# R7 (AUDIT4): a wide lease's identifiers whole (A1: 25.12's host broke
+# in "(switchbot-hubminimatter-" over "6847c8.lan)"), a folded network's
+# title its name, not its "SSID" label (B3).
+# The lab's radios are absent, so their short rows fit a phone: a wide
+# status 400 wide folds the table.
+printf '%s\n' 'admin/network/wireless require=c7.title' >"$tmp/tab-wifi.txt"
+fold='#view [data-fold="wide"] .td[data-name="_stat"] > div { min-width: 400px }'
+expect uniform 0 "" "Wireless: a network's title is its name on a phone" -- "$url" "$password" --pages "$tmp/tab-wifi.txt" --viewports phone \
+	--debug-css "admin/network/wireless=$fold"
+# A1: the host column 64 wide, so its name breaks at its hyphens while the
+# table stays wide.
+expect uniform 1 "g.break.table token,g.break.table word" "a wide lease's host broken at its hyphens (AUDIT4 A1)" -- "$url" "$password" --pages "$tmp/tab-leases.txt" --viewports desktop \
+	--debug-css 'admin/status/overview=#view #status_leases .td:first-child { white-space: normal !important; max-width: 64px }'
+# B3: the "SSID" label back before the name.
+expect uniform 1 "c7.title lead" "a network's title led by its SSID label (AUDIT4 B3)" -- "$url" "$password" --pages "$tmp/tab-wifi.txt" --viewports phone \
+	--debug-css "admin/network/wireless=$fold #view .td[data-name=\"_stat\"] .nowrap > strong { display: inline !important }"
+
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true

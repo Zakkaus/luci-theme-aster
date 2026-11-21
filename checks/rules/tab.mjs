@@ -16,7 +16,7 @@ export const canonical = {
   },
   'card.table': {_source: 'COMPONENTS.md C2/C6: a wide table that is the Card (WireGuard peers, 24.10 Processes) pads 15 + border above and below; its cells own the inline 16, so rows run border to border', padding: [15, 0, 15, 0]},
   'table.td.field': {_source: 'COMPONENTS.md G7, C6: a cell holding a field (a zone\'s policy select) pads 8, so the field keeps 8 from the row lines (row 53)', paddingBlock: 8, paddingInlineStart: 16, fontSize: 15},
-  'g.break.table': {_source: 'COMPONENTS.md G5: an identifier in a cell (a one-word cell while wide, a package name, a mount device, a <var>, a station rate) is one line, or ends in an ellipsis; never broken at a hyphen; so is a lease\'s host, address and interface, a rule\'s name, an nftables value or set member (AUDIT3 A1, A2), clipped only with an ellipsis, and a URL in a cell, clipped with its title (B4)', token: 'whole', word: 'whole'},
+  'g.break.table': {_source: 'COMPONENTS.md G5: an identifier in a cell (a one-word cell while wide, a package name, a mount device, a <var>, a station rate) is one line, or ends in an ellipsis; never broken at a hyphen; so is a lease\'s host, address and interface (25.12\'s host wide too, AUDIT4 A1), a station\'s host in its folded title (AUDIT4 A1), a rule\'s name, an nftables value or set member (AUDIT3 A1, A2), clipped only with an ellipsis, and a URL in a cell, clipped with its title (B4)', token: 'whole', word: 'whole'},
   'c7.clause': {_source: 'COMPONENTS.md C7, C13 (AUDIT3 A2): a folded nftables match is a sentence of clauses 8 apart on a line', gap: 8},
   'c7.when': {_source: 'COMPONENTS.md C7: a table is folded iff its min-content is wider than its room (unfolds with 16 to spare); every data table is measured', state: 'ok'},
   'c7.sig': {
@@ -25,7 +25,7 @@ export const canonical = {
     label: '15/500 secondary', value: '15/400 primary', title: '15/500 primary', divider: '1 border', divStart: 0, divEnd: 0, titleMargin: 0,
   },
   'c7.x': {_source: 'COMPONENTS.md C7: per folded table one label x (= title x) and one value x (counts are strings: a count read as px would pass 2 within the 1px tolerance)', labelXs: 'one', valueXs: 'one', labelToTitle: 0},
-  'c7.title': {_source: 'COMPONENTS.md C7: the title is the column that names the row: the first that is not the row\'s interface, network, device or (start) priority, nor one LuCI hides on phones (hide-xs); the same table folds by the same column on every page', column: 'names the row'},
+  'c7.title': {_source: 'COMPONENTS.md C7: the title is the column that names the row: the first that is not the row\'s interface, network, device or (start) priority, nor one LuCI hides on phones (hide-xs); the same table folds by the same column on every page; it leads with the name, not a field label (AUDIT4 B3: a network\'s "SSID")', column: 'names the row', lead: 'name'},
   'c7.labelw': {_source: 'COMPONENTS.md C7: the label column is the longest label, at most half the content width', fit: 0},
   'c7.actions': {_source: 'COMPONENTS.md C7/C10: a folded row\'s actions are on its title line, one line, ending on the content edge, centred on the title line', lines: 'one', end: 0, centre: 0},
   'c10.actions': {_source: 'COMPONENTS.md C10 (doona ActionGroup, Astryx MoreMenu): buttons 8 apart, at most one More menu per row', gap: 8, menus: 'ok'},
@@ -230,7 +230,7 @@ export async function collect(cfg) {
       // A1, A2: br-lan, a host's "(x-y.lan)", Allow-WireGuard-wgserver, a
       // set member), and a URL in any cell (B4): one line; where it is
       // clipped, with an ellipsis, a URL also with its full text as title.
-      const idc = `${fold == 'wide' ? '[id*="lease"] .td:not(:nth-child(2))' : '[id*="lease"] .td'}, .td.cbi-section-table-titles, .nft-set-item, .nft-rules .td strong`;
+      const idc = '[id*="lease"] .td, .assoclist [data-head], .td.cbi-section-table-titles, .nft-set-item, .nft-rules .td strong';
       for (const r of rows) for (const c of cellsOf(r)) {
         let bad = '', n = 0;
         const w = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
@@ -366,6 +366,14 @@ export async function collect(cfg) {
       }
       const tc = titleOf(r);
       add('c7.title', 'column', tc && tc === r.children[head(r)] ? 'names the row' : `column ${[...r.children].indexOf(tc) + 1}, not ${head(r) + 1}`, tc || r);
+      // AUDIT4 B3: a network's title led with its "SSID" label, the name
+      // beside it 61 in; the title's first word is the name.
+      if (tc) {
+        const w = document.createTreeWalker(tc, NodeFilter.SHOW_TEXT);
+        let lead = null;
+        while (!lead && w.nextNode()) if (w.currentNode.data.trim() && shown(w.currentNode.parentNode)) lead = w.currentNode.parentNode;
+        if (lead) add('c7.title', 'lead', lead.matches('.nowrap > strong:first-child') ? `label "${lead.textContent.trim()}"` : 'name', tc);
+      }
       const tf = tc && firstText(tc);
       if (tc && tf) {
         add('c7.sig', 'title', font(cs(tc)), tc);
