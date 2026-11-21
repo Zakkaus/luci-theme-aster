@@ -678,6 +678,28 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
 /* A set in a clause ("{ eth0, br-lan }") sits on its line's baseline:
    nftables.js centres it (middle), which grew the row 1-2 px. */
 .nft-rules :is(.nft-set, .nft-set-items) { vertical-align: baseline; }
+/* Wireless: a radio's and a network's description (LuCI's "頻道: 6 |
+   位元速率: …" prose) is a MetadataList (C8); theme-aster.js drops the
+   colons and the " | ". A radio's model is the cell's title line (C7
+   title 15/500), not a card title. */
+#view .td[data-name="_stat"] {
+  & big { display: block; margin-block-end: var(--spacing-2); font-size: inherit; line-height: inherit; }
+  & big > strong { color: var(--color-text-primary); font-weight: var(--text-label-weight); }
+  & div:has(> .nowrap) {
+    display: grid;
+    grid-template-columns: fit-content(50%) minmax(0, 1fr);
+    gap: var(--spacing-2) var(--spacing-4);
+    align-items: baseline;
+    color: var(--color-text-primary);
+    text-align: start;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    & > br { display: none; }
+  }
+  & .nowrap { display: contents; white-space: normal; }
+  & .nowrap > strong { grid-column: 1; color: var(--color-text-secondary); font-weight: var(--text-label-weight); }
+  & .nowrap:not(:has(> strong)) { display: block; grid-column: 1 / -1; }
+}
 /* Realtime graphs' legends (load, bandwidth, wireless, connections) are
    MetadataLists (C8): labels without colons (theme-aster.js), values on
    their labels' baseline; the columns as wide as their words, not LuCI's

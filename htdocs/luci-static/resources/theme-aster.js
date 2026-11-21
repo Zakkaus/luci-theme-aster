@@ -161,7 +161,7 @@ return baseclass.extend({
 	 *    longest label (--aster-kv-w; luci.css caps it); an interface's
 	 *    value is .aster-v, "(N 封包)" kept whole by a no-break space;
 	 *  - "K: <b>v</b>, …" (nft hook, nlbw kpi) and WireGuard's " · Port N
-	 *    · key" become rows. */
+	 *    · key", wireless' "K: v | K: v" become rows. */
 	marks() {
 		const roots = ['view', 'modal_overlay'].map((id) => document.getElementById(id)).filter(Boolean);
 		const error = _('Error');
@@ -204,16 +204,12 @@ return baseclass.extend({
 
 			root.querySelectorAll('.cbi-section > h3').forEach((h) => h.classList.toggle('aster-said', said.includes(h.textContent.trim())));
 
-			root.querySelectorAll('span:not(.aster-error) > strong:first-child').forEach((s) => {
-				if (s.textContent.trim().replace(/[:：]$/, '') === error)
-					s.parentNode.classList.add('aster-error');
-			});
+			root.querySelectorAll('span:not(.aster-error) > strong:first-child').forEach((s) => s.textContent.trim().replace(/[:：]$/, '') == error && s.parentNode.classList.add('aster-error'));
 
-			root.querySelectorAll('.ifacebox-body .nowrap > strong:first-child, [id$="-ifc-description"] > .nowrap > strong:first-child, .ifacebadge.large > span > .nowrap > strong:first-child, .table:not(:has(.th)) .td > strong:only-child').forEach((s) => {
+			root.querySelectorAll('.ifacebox-body .nowrap > strong:first-child, [id$="-ifc-description"] > .nowrap > strong:first-child, .ifacebadge.large > span > .nowrap > strong:first-child, .table:not(:has(.th)) .td > strong:only-child, [data-name="_stat"] .nowrap > strong').forEach((s) => {
 				const t = s.textContent.replace(/\s*[:：]\s*$/, '');
 
-				if (t !== s.textContent)
-					s.textContent = t;
+				t != s.textContent && (s.textContent = t);
 
 				const p = s.parentNode, v = p.textContent.slice(t.length).replace(/\((\S+) /g, '($1\xa0');
 
@@ -237,8 +233,7 @@ return baseclass.extend({
 				n.style.removeProperty('--aster-kv-w');
 				const w = Math.max(...[...n.querySelectorAll('.nowrap > strong:first-child')].map((s) => s.getBoundingClientRect().width));
 
-				if (w > 0)
-					n.style.setProperty('--aster-kv-w', `${Math.ceil(w)}px`);
+				w > 0 && n.style.setProperty('--aster-kv-w', `${Math.ceil(w)}px`);
 			});
 		});
 		let queued = false;
