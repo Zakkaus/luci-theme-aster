@@ -474,7 +474,9 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     line-height: var(--text-label-leading);
     & > strong { font-weight: inherit; }
     &::before, &::after { content: ""; flex: none; inline-size: var(--spacing-2); block-size: var(--spacing-2); }
-    &::before { margin-inline: var(--spacing-1); border-radius: var(--radius-full); background: var(--color-icon-success); }
+    /* The dot centred in the device icon's slot under it, so the name and
+       the device name start on one line. */
+    &::before { margin-inline: calc((var(--aster-icon-md) - var(--spacing-2)) / 2); border-radius: var(--radius-full); background: var(--color-icon-success); }
     /* The zone, in words (LuCI's title: "Part of zone lan"), as its Badge. */
     &::after {
       content: attr(title);
@@ -498,8 +500,11 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     color: var(--color-text-secondary);
     & > br { display: none; }
     & > small { font-size: inherit; }
+    /* A bridge's ports, " (" icon… ")" after its own icon: one line,
+       every icon centred on the name as the bridge's is. */
+    & > span:has(> .cbi-tooltip-container) { display: inline-flex; align-items: center; gap: var(--spacing-1); }
   }
-  & .ifacebox-body > .cbi-tooltip-container:has(> img) {
+  & :is(.ifacebox-body, .ifacebox-body > span) > .cbi-tooltip-container:has(> img) {
     display: inline-flex;
     color: var(--color-icon-secondary);
     &::before {
