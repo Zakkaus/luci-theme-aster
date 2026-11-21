@@ -32,6 +32,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {CHECKS, parseArgs, readPages, parseDebugCss, classMatches, openPage, eachCombo, show, writeOut, die} from './lib/gate.mjs';
+import * as lst from './rules/lst.mjs';
 
 const usage = 'usage: node checks/uniform.mjs <base url> <password> [--user root] [--pages <file>]... [--canonical <json>] [--viewports desktop,phone] [--modes light,dark] [--palette aster] [--tolerance 1] [--json <file>] [--out <file>] [--timeout ms] [--settle ms] [--width-test n] [--debug-css <page>=<css>]...';
 const opt = parseArgs(process.argv.slice(2), {
@@ -53,6 +54,7 @@ try {
 } catch (e) {
   die(`--canonical ${opt.canonical}: ${e.message}`);
 }
+Object.assign(canonical, lst.canonical);
 
 /* ── In the page ─────────────────────────────────────────────── */
 
@@ -1020,6 +1022,7 @@ await eachCombo(opt, async (ctx, device, mode, combo) => {
     }
     const samples = await r.page.evaluate(collect, {modal: !!entry.modal, device});
     samples.push(...await r.page.evaluate(widthTest, {modal: !!entry.modal, limit: +opt['width-test']}));
+    samples.push(...await r.page.evaluate(lst.collect, {modal: !!entry.modal, device}));
     const rows = await r.page.evaluate(dataRows, {modal: !!entry.modal});
     await r.page.close();
     results.push({entry, device, mode, combo, samples, rows, note: r.note, pageErrors: r.errors});
