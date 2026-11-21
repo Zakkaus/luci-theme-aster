@@ -116,5 +116,38 @@ expect uniform 1 "c6.table numAlign" "CPU and memory shares start-aligned (AUDIT
 expect uniform 1 "c6.table fieldGap,table.td.field paddingBlock" "zone selects 6 from the row lines (AUDIT2 G7)" -- "$url" "$password" --pages "$tmp/tab-zones.txt" --viewports desktop \
 	--debug-css 'admin/network/firewall/zones=#view .td.cbi-value-field { padding-block: 4px !important }'
 
+# R6 (AUDIT3): an identifier whole in its cell (G5: A1 a lease's br-lan,
+# a rule's name; A2 an nftables set member), a URL clipped to one line
+# with its title (B4), a folded nftables match's clauses 8 apart (A2).
+printf '%s\n' 'admin/status/overview require=g.break.table' >"$tmp/tab-leases.txt"
+printf '%s\n' 'admin/network/firewall/rules require=g.break.table' >"$tmp/tab-fwr.txt"
+printf '%s\n' 'admin/status/nftables require=g.break.table,c7.clause' >"$tmp/tab-nft-phone.txt"
+expect uniform 0 "" "Leases: hosts and interfaces whole" -- "$url" "$password" --pages "$tmp/tab-leases.txt" --viewports desktop,phone
+expect uniform 0 "" "Traffic rules: names whole on a phone" -- "$url" "$password" --pages "$tmp/tab-fwr.txt" --viewports phone
+expect uniform 0 "" "nftables: clauses apart, set members whole on a phone" -- "$url" "$password" --pages "$tmp/tab-nft-phone.txt" --viewports phone
+# A1: br-lan as "br-" over "lan", Pixel-10-Pro at its hyphens (spaced out
+# so they do not fit their line).
+expect uniform 1 "g.break.table word" "a lease's identifiers broken at their hyphens (AUDIT3 A1)" -- "$url" "$password" --pages "$tmp/tab-leases.txt" --viewports phone \
+	--debug-css 'admin/status/overview=#view [id*="lease"] .td > .aster-v { white-space: normal !important; letter-spacing: 40px }'
+# 25.12 only (it ships uqr.js): 24.10's rules have no names and its
+# package descriptions no URL.
+if curl -fsI "$url/luci-static/resources/uqr.js" >/dev/null 2>&1; then
+	# A1: Allow-ICMPv6-Forward as "Allow-ICMPv6-" over "Forward" (the
+	# owner's Allow-WireGuard-wgserver; spaced out so it does not fit).
+	expect uniform 1 "g.break.table word" "a rule's name broken at its hyphens (AUDIT3 A1)" -- "$url" "$password" --pages "$tmp/tab-fwr.txt" --viewports phone \
+		--debug-css 'admin/network/firewall/rules=#view [data-fold="fold"] .td.cbi-section-table-titles > .aster-v { white-space: normal !important; letter-spacing: 6px }'
+	# B4: a description's URL broken inside its last path segment
+	# (".../uci/ne" over "twork").
+	expect uniform 1 "g.break.table word" "a URL broken inside a path segment (AUDIT3 B4)" -- "$url" "$password" --pages "$tmp/tab-pkg0.txt" --viewports phone \
+		--debug-css 'admin/system/package-manager=#view .aster-id { display: inline !important; -webkit-line-clamp: none !important }'
+fi
+# A2: "0 B" run into the clause after it, set members broken after "mld-".
+expect uniform 1 "c7.clause gap" "nftables clauses run together (AUDIT3 A2)" -- "$url" "$password" --pages "$tmp/tab-nft-phone.txt" --viewports phone \
+	--debug-css 'admin/status/nftables=html #view .nft-rules[data-fold="fold"] .td .ifacebadge:not(.large) { margin-inline-end: 0 !important } html #view .nft-rules[data-fold="fold"] .td .ifacebadge:not(.large)::after { content: none !important }'
+expect uniform 1 "g.break.table word" "nftables set members broken at their hyphens (AUDIT3 A2)" -- "$url" "$password" --pages "$tmp/tab-nft-phone.txt" --viewports phone \
+	--debug-css 'admin/status/nftables=#view .nft-set-item { white-space: normal !important }'
+# B4: a description's URL one line, clipped with its title.
+expect uniform 0 "" "Packages: URLs one line on a phone" -- "$url" "$password" --pages "$tmp/tab-pkg0.txt" --viewports phone
+
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true

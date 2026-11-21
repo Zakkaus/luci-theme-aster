@@ -148,6 +148,7 @@ return baseclass.extend({
 	/* Marks for what LuCI says only in its words, kept as views re-render:
 	 *  - ▲ / ▼ before a traffic count become an .aster-glyph span, drawn
 	 *    as the ArrowUp / ArrowDown icon (components.css);
+	 *  - a URL in a cell is an .aster-id (G5);
 	 *  - a view with no title (Interfaces, nftables) gets an h2 with its
 	 *    menu entry's name;
 	 *  - a card title repeating the page title or a tab is .aster-said, not
@@ -164,38 +165,22 @@ return baseclass.extend({
 		const roots = ['view', 'modal_overlay'].map((id) => document.getElementById(id)).filter(Boolean);
 		const error = _('Error');
 		const row = (k, v) => E('li', { class: 'aster-row' }, [E('span', { class: 'aster-k' }, [k]), E('span', { class: 'aster-v' }, v)]);
-		const glyph = (s) => {
-			const g = document.createElement('span');
-
-			g.className = 'aster-glyph';
-			g.dataset.glyph = (s === '▲') ? 'up' : 'down';
-			g.textContent = s;
-
-			return g;
-		};
+		const glyph = (s) => E('span', { class: 'aster-glyph', 'data-glyph': s == '▲' ? 'up' : 'down' }, s), id = /(\S+:\/\/\S+)/;
 		const run = () => roots.forEach((root) => {
-			const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
-				acceptNode: (n) => (/[▲▼]/.test(n.data) && !n.parentNode.closest('.aster-glyph, .cbi-tooltip')) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
-			});
-			const hits = [];
+			const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), hits = [];
 
-			while (walk.nextNode())
-				hits.push(walk.currentNode);
+			for (let n; n = walk.nextNode();)
+				(/[▲▼]/.test(n.data) || id.test(n.data) && n.parentNode.closest('.td, td')) && !n.parentNode.closest('.aster-glyph, .aster-id, .cbi-tooltip, textarea, option') && hits.push(n);
 
-			hits.forEach((n) => n.replaceWith(...n.data.split(/([▲▼])/).filter(Boolean).map((s) => /^[▲▼]$/.test(s) ? glyph(s) : s.trim())));
+			hits.forEach((n) => n.replaceWith(...(/[▲▼]/.test(n.data) ? n.data.split(/([▲▼])/).filter(Boolean).map((s) => /^[▲▼]$/.test(s) ? glyph(s) : s.trim()) : n.data.split(id).map((s, i) => i % 2 ? E('span', { class: 'aster-id', title: s }, [s]) : s))));
 
 			const v = document.getElementById('view');
 			const cur = [...document.querySelectorAll('#mainmenu [aria-current="page"]')].pop();
 
 			if (root === v && document.querySelector('.shell-inner h2:not(.aster-title)'))
 				v.querySelectorAll(':scope > .aster-title').forEach((h) => h.remove());
-			else if (root === v && cur && v.firstElementChild && !document.querySelector('.aster-title, #view .spinning')) {
-				const h = document.createElement('h2');
-
-				h.className = 'aster-title';
-				h.textContent = cur.textContent.trim();
-				v.prepend(h);
-			}
+			else if (root === v && cur && v.firstElementChild && !document.querySelector('.aster-title, #view .spinning'))
+				v.prepend(E('h2', { class: 'aster-title' }, [cur.textContent.trim()]));
 
 			const said = [...document.querySelectorAll('.shell-inner h2, .cbi-tabmenu > li, .tab[data-active]')].map((e) => e.textContent.trim());
 
