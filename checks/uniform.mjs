@@ -389,7 +389,10 @@ function collect(cfg) {
       // (MetadataList); the value cells are table cells. A stacked legend's
       // pairs sit on the card's content edge; an actions cell pads 8 (C6).
       const cls = c.matches('th, .th') ? `${base}.th` : wrapped ? 'table.kv.wrap.td' : base === 'table.kv' && c === cells[0] && cells.length > 1 ? 'table.kv.td.key'
-        : c.matches('.cbi-section-actions, :not([data-title]):has(> .cbi-button:only-child)') ? `${base}.td.actions` : `${base}.td`;
+        : c.matches('.cbi-section-actions, :not([data-title]):has(> .cbi-button:only-child)') ? `${base}.td.actions`
+        // A cell aligned to the top of a row of buttons (Interfaces) puts its
+        // first line where the middle of a 49 row would (C6).
+        : s.verticalAlign === 'top' && row.querySelector(BTN) ? `${base}.td.top` : `${base}.td`;
       add(cls, 'paddingBlock', [px(s.paddingTop), px(s.paddingBottom)], c);
       add(cls, 'paddingInlineStart', px(s.paddingInlineStart), c);
       add(cls, 'fontSize', px(s.fontSize), c);

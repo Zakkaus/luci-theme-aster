@@ -51,6 +51,11 @@ expect uniform 1 "c6.table run" "zone forwards stacked (c)" -- "$url" "$password
 printf '%s\n' 'admin/network/network require=c7.sig' >"$tmp/tab-net.txt"
 expect uniform 1 "c7.actions centre,c7.sig titleMargin" "title box with margins (e)" -- "$url" "$password" --pages "$tmp/tab-net.txt" --viewports phone \
 	--debug-css 'admin/network/network=html #view [data-fold="fold"] .td > .ifacebox { margin-block: 15px !important }'
+# Interfaces wide (b): the row's text 4 under its line beside buttons 8
+# under it, so the row is 4 above its first line and 12 under its last.
+printf '%s\n' 'admin/network/network' >"$tmp/tab-net-wide.txt"
+expect uniform 1 "table.td.top paddingBlock" "interface row text off the buttons' centre (b)" -- "$url" "$password" --pages "$tmp/tab-net-wide.txt" --viewports desktop \
+	--debug-css 'admin/network/network=html #view .tr:has(> .td > .ifacebox) > .td:not(.cbi-section-actions) { padding-block: 4px !important }'
 # G9: a media query laying out table rows.
 expect uniform 1 "g.mq blocks" "table layout by a media query" -- "$url" "$password" --pages "$tmp/tab-proc.txt" \
 	--debug-css 'admin/status/processes=@media (min-width: 1px) { #view .table .tr { color: inherit } }'

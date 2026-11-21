@@ -453,6 +453,10 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
   &:first-child { inline-size: 1%; white-space: nowrap; }
   &:nth-child(2) { inline-size: 100%; }
 }
+/* Wide, every cell's first line sits on the buttons' centre and the row
+   ends as far below its last line: 12 above and below the text, 8 around
+   the buttons (C6: 8 + 32 + 8). */
+[data-fold="wide"] .tr:has(> .td > .ifacebox) > .td:not(.cbi-section-actions) { padding-block: var(--spacing-3); }
 
 /* ── Tabs written by luci-base [ported] ─────────────────────── */
 
