@@ -1024,12 +1024,12 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
     &::before { content: none; }
     & > * { grid-column: 1 / -1; }
   }
-  /* The title line: the identifier (the first cell, or the column a table
-     names its rows by), its markers after it, the actions at the end. */
-  & :where(.tr > :is(.td, td):first-child),
-  &:where(.assoclist) :where(.tr > .td:nth-child(3)),
-  &:where(#status_leases6:has(.th:nth-child(7))) :where(.tr > .td:nth-child(2)),
-  &:where([data-page^="admin-status-route"] .table:has(.th:nth-child(6))) :where(.tr > .td:nth-child(2)) {
+  /* The title line: the identifier, its markers after it, the actions at
+     the end. The identifier is the column that names the row (data-head,
+     theme-aster.js: the first column that is not the row's interface,
+     network, device or priority, nor one LuCI hides on phones; a station's
+     host, a lease's host, a script, a route's target), else the first. */
+  & :where(.tr > :is(.td, td):is([data-head], :first-child:not(:has(~ [data-head])))) {
     display: block;
     grid-row: 1;
     grid-column: 1 / -2;
@@ -1042,14 +1042,6 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
   }
   & :where(.tr:has(> .cbi-section-actions :is(.btn, .cbi-button, button), > :not([data-title]) > .cbi-button:only-child)) { --aster-title-line: var(--size-element-sm); }
   & :where(.tr > :is(.td, td) .ifacebox-head) { min-block-size: var(--aster-title-line, auto); align-items: center; }
-  &:where(.assoclist, #status_leases6:has(.th:nth-child(7)), [data-page^="admin-status-route"] .table:has(.th:nth-child(6))) :where(.tr > :is(.td, td):first-child) {
-    display: grid;
-    grid-row: auto;
-    grid-column: 1 / -1;
-    align-self: auto;
-    font-weight: var(--text-body-weight);
-    &::before { content: attr(data-title); }
-  }
   /* The title's second line (a device under its interface, a station's
      addresses under its host): supporting text, no marker before it. */
   & :where(.tr > :is(.td, td) :is(.hide-xs, .ifacebox-body)) {
@@ -1074,7 +1066,7 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
   }
   /* A cell with nothing in it (LuCI's "-" too, theme-aster.js) takes no
      row; nor do actions with no button. */
-  & :where(.tr > :is(.td, td):not(:first-child):is(:empty, [data-empty]), .tr > .cbi-section-actions:not(:has(button, .btn, .cbi-button))) { display: none; }
+  & :where(.tr > :is(.td, td):not([data-head], :first-child:not(:has(~ [data-head]))):is(:empty, [data-empty]), .tr > .cbi-section-actions:not(:has(button, .btn, .cbi-button))) { display: none; }
 }
 /* nftables' <style> pads its cells .25em with !important (one id heavier). */
 html #view .nft-rules[data-fold="fold"] tr > td { padding: 0 !important; }

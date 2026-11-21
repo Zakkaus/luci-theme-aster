@@ -21,6 +21,7 @@ export const canonical = {
     label: '15/500 secondary', value: '15/400 primary', title: '15/500 primary', divider: '1 border', divStart: 0, divEnd: 0,
   },
   'c7.x': {_source: 'COMPONENTS.md C7: per folded table one label x (= title x) and one value x (counts are strings: a count read as px would pass 2 within the 1px tolerance)', labelXs: 'one', valueXs: 'one', labelToTitle: 0},
+  'c7.title': {_source: 'COMPONENTS.md C7: the title is the column that names the row: the first that is not the row\'s interface, network, device or (start) priority, nor one LuCI hides on phones (hide-xs); the same table folds by the same column on every page', column: 'names the row'},
   'c7.labelw': {_source: 'COMPONENTS.md C7: the label column is the longest label, at most half the content width', fit: 0},
   'c7.actions': {_source: 'COMPONENTS.md C7/C10: a folded row\'s actions are on its title line, one line, ending on the content edge, centred on the title line', lines: 'one', end: 0, centre: 0},
   'c10.actions': {_source: 'COMPONENTS.md C10 (doona ActionGroup, Astryx MoreMenu): buttons 8 apart, at most one More menu per row', gap: 8, menus: 'ok'},
@@ -204,6 +205,10 @@ export async function collect(cfg) {
     const titleOf = (r) => cellsOf(r).find((c) => cs(c).gridRowStart === '1' && !c.matches('.cbi-section-actions') && !(cs(c).gridColumnStart === '-2'));
     const actsOf = (r) => cellsOf(r).find((c) => c.matches('.cbi-section-actions') || cs(c).gridColumnStart === '-2');
     const labelled = (r) => cellsOf(r).filter((c) => c !== titleOf(r) && c !== actsOf(r) && !/^(none|normal)$/.test(cs(c, '::before').content));
+    // C7 title: read from the header as COMPONENTS.md words it.
+    const ths = [...(t.querySelector('.tr:has(> .th)')?.children || [])];
+    const skip = ['Interface', 'Network', 'Device', 'Priority', 'Start priority'].map((x) => (typeof _ === 'function' ? _(x) : x));
+    const head = Math.max(0, ths.findIndex((c) => !c.matches('.hide-xs') && !skip.includes(c.textContent.trim())));
     const contentL = box(t).left + parseFloat(ts.paddingLeft), contentR = box(t).right - parseFloat(ts.paddingRight);
     const lxs = new Set(), vxs = new Set();
     let titleX = null, labelW = 0, longest = 0;
@@ -224,6 +229,7 @@ export async function collect(cfg) {
         add('c7.sig', 'divEnd', px(contentR - box(r).right), r);
       }
       const tc = titleOf(r);
+      add('c7.title', 'column', tc && tc === r.children[head] ? 'names the row' : `column ${[...r.children].indexOf(tc) + 1}, not ${head + 1}`, tc || r);
       const tf = tc && firstText(tc);
       if (tc && tf) {
         add('c7.sig', 'title', font(cs(tc)), tc);
