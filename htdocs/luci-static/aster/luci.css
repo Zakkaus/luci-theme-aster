@@ -246,6 +246,9 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
   }
   :root[data-rail] .cbi-page-actions { inset-inline-start: var(--aster-rail-w); }
   body:not([data-page="admin-system-flash"]:has([data-tab="actions" i][data-tab-active="true"])) .shell:has(.cbi-page-actions:not([hidden])) > .shell-main { margin-block-end: calc(var(--size-element-md) + 2 * var(--spacing-3) + var(--border-width)); }
+  /* The save bar is the page's footer (Astryx LayoutFooter): the version
+     line is not wedged between the content and the bar (audit #19). */
+  body:not([data-page="admin-system-flash"]:has([data-tab="actions" i][data-tab-active="true"])) .shell:has(.cbi-page-actions:not([hidden])) .shell-footer { display: none; }
 }
 /* A card's own save bar (Startup's Local Startup, Backup's Configuration;
    on 24.10 Local Startup's tab pane is the card)
