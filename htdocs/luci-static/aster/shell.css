@@ -139,35 +139,31 @@
 /* Heroicons 2.2.0 outline ArrowPath (MIT), path data verbatim. */
 .shell-header { --icon-refresh: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99'/></svg>"); }
 
-/* The appearance control: the button draws the scheme in force
-   (data-scheme on the root, set before the first paint) and opens one
-   Menu (components.css) with a Theme section and a Palette section, each
-   under a heading (Astryx DropdownMenu section heading: supporting text,
-   secondary, 4 8) and divided by a rule 4 above and below. The menu drops
-   from the button, its end edge on the button's, so it stays on screen. */
+/* The appearance controls: the scheme button draws the scheme in force
+   (data-scheme on the root, set before the first paint); it and the
+   palette button each open one Menu (components.css), one plain row per
+   choice. The menu is a popover in the top layer, so no page element
+   (a card's header, a sticky bar) can be drawn over it; it drops from
+   its button, end edges aligned, flipped above at the viewport's foot. */
 .appearance > .ico { display: none; }
 :root:not([data-scheme="light"], [data-scheme="dark"]) .appearance > [data-scheme="auto"],
 :root[data-scheme="light"] .appearance > [data-scheme="light"],
 :root[data-scheme="dark"] .appearance > [data-scheme="dark"] { display: block; }
-.palette-menu { position: relative; display: flex; }
-.palette-menu > [role="menu"] { inset-block-start: 100%; inset-inline: auto 0; }
-.palette-menu > [role="menu"] > li:is(.menu-heading, [role="separator"]) {
-  min-block-size: 0;
-  background: none;
-  cursor: default;
+.palette-menu { display: flex; }
+.palette-menu > [role="menu"]:popover-open {
+  position: fixed;
+  inset: auto;
+  position-area: block-end span-inline-start;
+  position-try-fallbacks: flip-block;
+  min-inline-size: 0;
+  margin: var(--spacing-1) 0;
+  border: 0;
+  transform: none;
 }
-.palette-menu > [role="menu"] > .menu-heading {
-  padding: var(--spacing-1) var(--spacing-2);
-  color: var(--color-text-secondary);
-  font-size: var(--text-supporting-size);
-  line-height: var(--text-supporting-leading);
-  user-select: none;
-}
-.palette-menu > [role="menu"] > [role="separator"] {
-  margin-block: var(--spacing-1);
-  padding: 0;
-  border-block-start: var(--border-width) solid var(--color-border);
-}
+.appearance { anchor-name: --aster-scheme; }
+.appearance + [role="menu"] { position-anchor: --aster-scheme; }
+.palette-btn { anchor-name: --aster-palette; }
+.palette-btn + [role="menu"] { position-anchor: --aster-palette; }
 .palette-menu > [role="menu"] > li > .ico { color: var(--color-icon-secondary); }
 
 /* The drawer toggle and the drawer's own head exist only on a phone. */

@@ -267,13 +267,13 @@ return baseclass.extend({
 		document.querySelectorAll('form > .cbi-map').forEach((m) => observer.observe(m, { childList: true, subtree: true }));
 	},
 
-	/* The appearance control (header.ut): one button, the scheme in force
-	 * on it, and one Menu with a Theme section (Auto, Light, Dark) and a
-	 * Palette section, in the top bar and in the login page's corner. Menu
-	 * pattern: the button opens the list (Enter, Space or a click) and
-	 * focuses the checked row of the first section; arrows, Home and End
-	 * move, Enter or Space picks, Escape or Tab closes, a click outside
-	 * closes; a pick closes and puts the focus back on the button.
+	/* The appearance controls (header.ut): the scheme button, the scheme in
+	 * force on it, with a Menu of Auto, Light and Dark, and the palette
+	 * button with a Menu of the palettes, in the top bar and in the login
+	 * page's corner. Menu pattern: a button opens its list (Enter, Space or
+	 * a click) and focuses the checked row; arrows, Home and End move, Enter
+	 * or Space picks, Escape or Tab closes, a click outside closes; a pick
+	 * or Escape closes and puts the focus back on the button.
 	 *
 	 * Two layers for the scheme, and the difference matters:
 	 *   - the device default, from which of the three media paths served the
@@ -359,52 +359,50 @@ return baseclass.extend({
 			},
 		};
 
-		/* The button's tooltip gives way to the open menu. */
-		const close = (m, refocus) => {
-			const btn = m.querySelector('button');
-
-			if (!m.hasAttribute('open'))
-				return;
-
-			m.removeAttribute('open');
-			m.querySelector('[role="menu"]').hidden = true;
-			btn.setAttribute('aria-expanded', 'false');
-			btn.setAttribute('data-tooltip', btn.getAttribute('aria-label'));
-
-			if (refocus)
-				btn.focus();
-		};
-
-		const pick = (m, r) => {
-			set[r.dataset.group](r.dataset.value);
-			reflect();
-			bar();
-			close(m, true);
-		};
-
+		/* Each menu is a popover (header.ut): the browser keeps it in the top
+		   layer, closes it on Escape or a click outside, closes the other one
+		   when it opens, and puts the focus back on its button. Opening
+		   focuses the checked row. The button's tooltip gives way to the
+		   open menu. Without CSS anchor positioning the menu is placed under
+		   its button here. */
 		menus.forEach((m) => {
 			const btn = m.querySelector('button');
 			const list = m.querySelector('[role="menu"]');
 			const rows = Array.from(list.querySelectorAll('[role="menuitemradio"]'));
+			const label = btn.getAttribute('aria-label');
 
-			btn.addEventListener('click', () => {
-				if (m.hasAttribute('open'))
-					return close(m, false);
+			list.addEventListener('beforetoggle', (ev) => {
+				const open = ev.newState === 'open';
 
-				menus.forEach((o) => close(o, false));
+				const on = rows.find((r) => r.getAttribute('aria-checked') === 'true') || rows[0];
+
+				m.toggleAttribute('open', open);
+				btn.setAttribute('aria-expanded', String(open));
+				rows.forEach((r) => r.toggleAttribute('autofocus', open && r === on));
+
+				if (!open)
+					return btn.setAttribute('data-tooltip', label);
+
 				btn.removeAttribute('data-tooltip');
 				window.L?.hideTooltip?.({});
-				m.setAttribute('open', '');
-				list.hidden = false;
-				btn.setAttribute('aria-expanded', 'true');
-				(rows.find((r) => r.getAttribute('aria-checked') === 'true') || rows[0]).focus();
+
+				if (!CSS.supports('position-area', 'block-end')) {
+					const r = btn.getBoundingClientRect();
+					list.style.inset = `${r.bottom}px ${document.documentElement.clientWidth - r.right}px auto auto`;
+				}
 			});
 
 			list.addEventListener('click', (ev) => {
 				const r = ev.target.closest('[role="menuitemradio"]');
 
-				if (r)
-					pick(m, r);
+				if (!r)
+					return;
+
+				set[r.dataset.group](r.dataset.value);
+				reflect();
+				bar();
+				list.hidePopover();
+				btn.focus();
 			});
 
 			list.addEventListener('keydown', (ev) => {
@@ -414,23 +412,13 @@ return baseclass.extend({
 				if (go !== undefined)
 					rows[(go + rows.length) % rows.length].focus();
 				else if ((ev.key === 'Enter' || ev.key === ' ') && i >= 0)
-					pick(m, rows[i]);
-				else if (ev.key === 'Escape')
-					close(m, true);
-				else if (ev.key === 'Tab')
-					close(m, false);
+					rows[i].click();
 				else
-					return;
+					return ev.key === 'Tab' && list.hidePopover();
 
-				if (ev.key !== 'Tab')
-					ev.preventDefault();
+				ev.preventDefault();
 			});
 		});
-
-		document.addEventListener('click', (ev) => menus.forEach((m) => {
-			if (!m.contains(ev.target))
-				close(m, false);
-		}));
 
 		reflect();
 		this.icon();
