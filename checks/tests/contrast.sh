@@ -65,13 +65,14 @@ expect contrast 1 focus,waived:field-border "double focus ring on a field" "doub
 expect contrast 1 separator,waived:field-border "bright separator in dark mode" -- "$url" "$password" --pages "$tmp/base.txt" --modes dark \
 	--debug-css 'admin/status/overview=#view .td { border-block-end: 1px solid #fff !important }'
 
-# The notices fixture (gate.mjs FIXTURES): its banners, WireGuard line and
-# code pass; LuCI's own 80 % fade on the WireGuard line (port 4.2:1, the
+# The notices fixture (gate.mjs FIXTURES): its banners, WireGuard line (the
+# theme's Port / Public key list) and code pass; LuCI's own 80 % fade on
+# that line (port 4.2:1, the
 # key 4.0:1 on its fill), and the Dawn info and error inks the router
 # measure found (4.4:1 on their fills over the body), fail.
 expect contrast 0 waived:field-border "baseline: banners, WireGuard line, code" -- "$url" "$password" --pages "$tmp/notices.txt"
 expect contrast 1 text,waived:field-border "WireGuard line at LuCI's 80 % fade" "#787290 on #faf4ed" -- "$url" "$password" --pages "$tmp/notices.txt" \
-	--debug-css 'admin/status/routes=html body #view > p:has(> .ifacebadge) > span[style*="opacity"] { opacity: .8 !important; color: inherit !important }'
+	--debug-css 'admin/status/routes=html body #view > p > .aster-kv { opacity: .8 !important }'
 expect contrast 1 text,waived:field-border "notice banner ink" "#6d5d80 on #e5dcdf" -- "$url" "$password" --pages "$tmp/notices.txt" \
 	--debug-css 'admin/status/routes=:root { --color-on-info-muted: light-dark(#6D5D80, #C4A7E7) !important }'
 expect contrast 1 text,waived:field-border "error banner pre ink" "#8f4f61 on #ead6d5" -- "$url" "$password" --pages "$tmp/notices.txt" \

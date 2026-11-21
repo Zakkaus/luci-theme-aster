@@ -265,7 +265,8 @@ export function collect(cfg) {
   /* C13 / C14: filled pills and Tokens. */
   let stray = 0, tokens = 0;
   for (const e of all) {
-    if (e.closest('button, .btn, .cbi-button, input, select, textarea, .cbi-dropdown, [role="button"], .cbi-tooltip, .shell-nav')) continue;
+    // Inline code (C24's face in a sentence) is not a Badge.
+    if (e.closest('button, .btn, .cbi-button, input, select, textarea, .cbi-dropdown, [role="button"], .cbi-tooltip, .shell-nav, code, kbd, samp')) continue;
     const s = cs(e);
     if (clear(s.backgroundColor) || !shown(e)) continue;
     const r = e.getBoundingClientRect();
@@ -294,7 +295,11 @@ export function collect(cfg) {
     for (const p of ['::before', '::after']) {
       const q = cs(e, p);
       if (q.content === 'none' || q.display === 'none' || q.maskImage === 'none' || !q.maskImage) continue;
-      const w = px(q.width), h = px(q.height);
+      // A Token's remove glyph is the Token's own (C14: xsm 12 in its strip).
+      if (p === '::after' && e.matches('.cbi-dynlist > .item')) continue;
+      // The glyph is the mask's size when the mask is sized, else the box's.
+      const ms = q.maskSize.split(' ').map(parseFloat);
+      const w = /px/.test(q.maskSize) ? px(ms[0]) : px(q.width), h = /px/.test(q.maskSize) ? px(ms[1] ?? ms[0]) : px(q.height);
       if (!e.getClientRects().length || w === 0) continue;
       add('c16.icon', 'size', [16, 20].includes(w) && w === h ? 'ok' : `${w}x${h}`, e);
     }
