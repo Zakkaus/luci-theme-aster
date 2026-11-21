@@ -1192,6 +1192,10 @@ html #view .nft-chain > .nft-rules.cbi-section-table {
   --aster-bleed: var(--card-bleed);
   margin-inline: calc(var(--card-bleed) * -1);
 }
+/* Folded, a chain's hook list and its rules are two groups of its card:
+   a Divider 16 under the list and 16 over the first rule (C22), as the
+   rules have one between them. */
+html #view .nft-chain-hook:has(+ .nft-rules[data-fold="fold"]) { padding-block-end: var(--aster-space-region); border-block-end: var(--border-width) solid var(--color-border); }
 /* Wide, a clause is one line (its set clipped by LuCI, items in the set's
    tooltip): a chain where a clause and its action do not fit folds, small
    or large (C7), instead of shrinking the clause into a column. (Measured
