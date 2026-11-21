@@ -1504,8 +1504,14 @@ html :where(#modal_overlay > * > :is(.right, .button-row, div:has(> .left + .rig
   padding: var(--spacing-4) var(--spacing-4) 0;
   border-block-start: var(--border-width) solid var(--color-border);
 }
-/* A Banner inside a dialog drops its fill: the dialog is the surface. */
-html :where(#modal_overlay > * > .alert-message) { --banner-bg: transparent; padding-inline-end: 0; }
+/* A Banner inside a dialog drops its fill: the dialog is the surface. The
+   body rule above gives every body child the dialog's 16 inline padding and
+   comes later than the Banner's, so the Banner's own start padding (room
+   for its icon) is set again here: text starts 8 after the icon. */
+html :where(#modal_overlay > * > .alert-message) {
+  --banner-bg: transparent;
+  padding-inline: calc(var(--banner-pad-inline) + var(--aster-icon-md) + var(--spacing-2)) var(--banner-pad-inline);
+}
 /* A dialog that is itself a status (ui.js displayStatus: the apply
    countdown) is the sm dialog, its progress full width under the text. */
 html :where(#modal_overlay > .alert-message) {
