@@ -1005,7 +1005,22 @@ html #view > p.center {
    actions is 32 + 16 + 1 = 49); numbers end-aligned in their column
    (LuCI's .right), the header with them. */
 html :where(:is(.td, td).cbi-section-actions, .tr > .td:not([data-title]):has(> .cbi-button:only-child)) { padding-block: var(--spacing-2); }
+/* A row's field (a zone's policy select) keeps 8 off the row lines too (G7):
+   36 + 16 + 1 = 53. */
+html :where([data-fold="wide"] .td.cbi-value-field:has(select, .cbi-dropdown, textarea, input:not([type="hidden"], [type="checkbox"], [type="radio"]))) { padding-block: var(--spacing-2); }
 html :where(:is(.td, .th, td, th).right) { text-align: end; }
+/* An identifier in a cell is one line (G5): a package's name, a mount's
+   device (its UUID), a <var> in LuCI's words (an unbound zone, a server, a
+   rule's address); a station's rate: luci.css. A hyphen is a break chance
+   CSS cannot take away, so the identifier does not wrap at all; folded, a
+   name wider than its slot ends in an ellipsis. Around them a cell's prose
+   wraps: a package's description where it must (a URL in it), a command
+   line (Processes) at its spaces, not anywhere as LuCI's inline
+   break-word asks. */
+html #view :is(#packages .td:first-child, .td[data-name="_device"], .td var) { white-space: nowrap; }
+html #view [data-fold="fold"] :is(#packages .td:first-child, .td[data-name="_device"]) { overflow: hidden; text-overflow: ellipsis; }
+html #view #packages .td.col-10 { overflow-wrap: anywhere; }
+html #view .td > span[style*="word-break"] { word-break: normal !important; }
 /* Wide, a table keeps its words whole (G5), and theme-aster.js measures
    its narrowest so: CJK breaks where words do, not after any character,
    and a name (Allow-DHCP-Renew) not at its hyphens. Where whole words do
@@ -1027,7 +1042,7 @@ html #view :is(.td, td) .ifacebadge:not(.large) {
   white-space: normal;
   margin: 0; /* nftables' <style>: .125em */
   vertical-align: top; /* a line of text, not a box on its baseline (row 33) */
-  &::before, & > img { order: 1; }
+  &::before, & > img, & > .cbi-tooltip-container { order: 1; } /* Devices: the name, then its icon */
 }
 /* nftables' set (its items a tooltip trigger) is a run of words on the line. */
 html #view :is(.td, td) :is(.nft-set, .nft-set-items) { vertical-align: top; }
@@ -1672,10 +1687,12 @@ html :where(.cbi-tooltip) :is(.ifacebadge, .zonebadge, .ifacebox, .ifacebox-head
   --card-border: color-mix(in srgb, currentColor 24%, transparent);
   color: inherit;
 }
-/* A cell's "#" with a data-tooltip (more detail behind a row) or the
-   "#" of an nftables rule's comment is an InfoTip: the 16 info icon (the Banner's) in a 20 box; the character
-   stays for screen readers. */
-html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button), .nft-comment > var) {
+/* A cell's "#" with a data-tooltip (more detail behind a route) or the
+   "#" of an nftables rule's comment is an InfoTip: the 16 info icon (the
+   Banner's) in a 20 box; the character stays for screen readers. A value
+   with a tooltip (a device's link speed, an overridden MAC or MTU) keeps
+   its words. */
+html :where(.td > div[data-tooltip], .nft-comment > var) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1685,7 +1702,7 @@ html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button
   font-size: 0;
   cursor: help;
 }
-html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button), .nft-comment > var)::after {
+html :where(.td > div[data-tooltip], .nft-comment > var)::after {
   content: "";
   inline-size: var(--aster-icon-sm);
   block-size: var(--aster-icon-sm);

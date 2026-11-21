@@ -42,7 +42,7 @@ expect uniform 1 "c7.when state,overflow excess,g.overflow conform" "wide table 
 # C7 when, G5: nftables on a phone measured with CJK breaking after any
 # character, so its tables "fit" and stay wide, one glyph a line (a). The
 # chain's 1px ::after resizes it, so theme-aster.js measures again.
-expect uniform 1 "c7.when state,overflow excess,table.row.text height" "table measured with words broken (CJK)" -- "$url" "$password" --pages "$tmp/tab-nft.txt" --viewports phone \
+expect uniform 1 "c7.when state,g.overflow conform,overflow excess" "table measured with words broken (CJK)" -- "$url" "$password" --pages "$tmp/tab-nft.txt" --viewports phone \
 	--debug-css 'admin/status/nftables=html #view .table[style*="min-content"] :is(.td, .th) { word-break: break-all !important } html #view .nft-chain::after { content: ""; display: block; block-size: 1px }'
 # Zones: "lan => wan REJECT all others" as LuCI's column of boxes, three
 # lines in a 360 column (c).
@@ -91,6 +91,18 @@ expect uniform 1 "c7.actions *" "actions on their own line (defects 4, 8)" -- "$
 # C20: the table's message 24 above and below, start-aligned.
 expect uniform 1 "c20.empty *" "EmptyState padded 24, start-aligned" -- "$url" "$password" --pages "$tmp/tab-empty.txt" \
 	--debug-css 'admin/network/firewall/ipsets=#view .tr.placeholder > .td { padding-block: 24px !important; text-align: start !important }'
+
+# R5 (AUDIT2): identifiers whole in cells (G5), numbers end-aligned (C6),
+# fields 8 off the row lines (G7).
+printf '%s\n' 'admin/system/package-manager require=g.break.table,c6.table' >"$tmp/tab-pkg.txt"
+printf '%s\n' 'admin/system/package-manager require=g.break.table' >"$tmp/tab-pkg0.txt"
+expect uniform 0 "" "Packages: names whole" -- "$url" "$password" --pages "$tmp/tab-pkg0.txt" --viewports desktop
+expect uniform 1 "g.break.table token" "package names broken at their hyphens (AUDIT2 G5)" -- "$url" "$password" --pages "$tmp/tab-pkg.txt" --viewports desktop \
+	--debug-css 'admin/system/package-manager=#view #packages .td:first-child { white-space: normal !important } #view #packages .td.col-10 { overflow-wrap: normal !important }'
+expect uniform 1 "c6.table numAlign" "CPU and memory shares start-aligned (AUDIT2 C6)" -- "$url" "$password" --pages "$tmp/tab-proc.txt" --viewports desktop \
+	--debug-css 'admin/status/processes=#view .tr > .td:nth-child(4) { text-align: start !important }'
+expect uniform 1 "c6.table fieldGap,table.td.field paddingBlock" "zone selects 6 from the row lines (AUDIT2 G7)" -- "$url" "$password" --pages "$tmp/tab-zones.txt" --viewports desktop \
+	--debug-css 'admin/network/firewall/zones=#view .td.cbi-value-field { padding-block: 4px !important }'
 
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true

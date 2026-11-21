@@ -219,14 +219,15 @@ export function collect(cfg) {
 
   /* C2: one card signature: radius 16, a 1 border in the border colour, the
      card fill, 16 from the outer edge to the content on every side. A table
-     that bleeds to the border owns that 16 in its cells. */
+     that bleeds to the border, or a wide table that is the card, owns that
+     16 in its cells. */
   for (const c of cards) {
     if (cfg.modal) break;
     const s = css(c);
     check('c2.card', 'radius', f(s.borderTopLeftRadius), 16, c);
     for (const d of SIDES) check('c2.card', `border-${d.toLowerCase()}`, `${f(s[`border${d}Width`])} ${s[`border${d}Style`]} ${s[`border${d}Color`]}`, `1 solid ${borderCol}`, c);
     check('c2.card', 'background', s.backgroundColor, cardBg, c);
-    const bleed = c.querySelector(':scope > :is(table, .table), :scope > .cbi-section-node > :is(table, .table)');
+    const bleed = c.matches(':is(table, .table)[data-fold="wide"]') || c.querySelector(':scope > :is(table, .table), :scope > .cbi-section-node > :is(table, .table)');
     for (const d of ['Top', 'Bottom', ...(bleed ? [] : ['Left', 'Right'])]) check('c2.card', `padding-${d.toLowerCase()}`, f(s[`padding${d}`]) + f(s[`border${d}Width`]), 16, c);
   }
 

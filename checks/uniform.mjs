@@ -393,6 +393,8 @@ function collect(cfg) {
       // pairs sit on the card's content edge; an actions cell pads 8 (C6).
       const cls = c.matches('th, .th') ? `${base}.th` : wrapped ? 'table.kv.wrap.td' : base === 'table.kv' && c === cells[0] && cells.length > 1 ? 'table.kv.td.key'
         : c.matches('.cbi-section-actions, :not([data-title]):has(> .cbi-button:only-child)') ? `${base}.td.actions`
+        // A cell holding a field pads 8 too (G7: 8 off the row lines).
+        : c.matches('.cbi-value-field:has(select, .cbi-dropdown, textarea, input:not([type="hidden"], [type="checkbox"], [type="radio"]))') ? `${base}.td.field`
         // A cell aligned to the top of a row of buttons (Interfaces) puts its
         // first line where the middle of a 49 row would (C6).
         : s.verticalAlign === 'top' && row.querySelector(BTN) ? `${base}.td.top` : `${base}.td`;
@@ -434,7 +436,8 @@ function collect(cfg) {
       if (border(s) === 'none' && rgba(s.backgroundColor)[3] === 0) continue;
       framed.add(el);
       add('card', 'radius', radius(el, s), el);
-      add('card', 'padding', [px(s.paddingTop), px(s.paddingRight), px(s.paddingBottom), px(s.paddingLeft)], el);
+      // A wide table that is the card leaves the inline 16 to its cells (C2).
+      add(el.matches(':is(table, .table)[data-fold="wide"]') ? 'card.table' : 'card', 'padding', [px(s.paddingTop), px(s.paddingRight), px(s.paddingBottom), px(s.paddingLeft)], el);
       add('card', 'background', col(s.backgroundColor), el);
       add('card', 'border', border(s), el);
       lastRule(el);
