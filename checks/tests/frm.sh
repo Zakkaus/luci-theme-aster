@@ -123,13 +123,13 @@ expect uniform 1 "c1.header conform" "toolbar controls touching (C1, audit3 B3)"
 	--debug-css 'admin/status/realtime/connections=#settings-row { gap: 0 !important }'
 
 # C1, audit4 C2: a range as wide as the pager less one arrow (zh-TW on a
-# phone): on its own line the arrows stay a pair; in LuCI's order Next
-# wraps alone.
+# phone) takes its own line and the arrows wrap as a pair; without Prev's
+# reserve, Next wraps alone.
 printf '%s\n' 'admin/system/package-manager require=c1.header' >"$tmp/frm-pager.txt"
 pager='admin/system/package-manager=#view .pager > .text { min-inline-size: calc(100% - 60px) }'
 expect uniform 0 "" "pager arrows wrap as a pair" -- "$url" "$password" --pages "$tmp/frm-pager.txt" --viewports phone --debug-css "$pager"
 expect uniform 1 "c1.header conform" "Next page alone under Previous (audit4 C2)" "pager arrows" -- "$url" "$password" --pages "$tmp/frm-pager.txt" --viewports phone \
-	--debug-css "$pager" --debug-css 'admin/system/package-manager=#view .pager > .text { order: 0 !important; flex-basis: auto !important }'
+	--debug-css "$pager" --debug-css 'admin/system/package-manager=#view .pager > :is(.prev, .next) { margin-inline: 0 !important }'
 
 # C3, audit4 C1: an inner heading (the overview's leases and stations) is
 # 16, not the body's 15 (Heading 4 as the scale's base size).

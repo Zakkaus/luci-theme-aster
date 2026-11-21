@@ -466,9 +466,16 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
 /* On a phone the value (about 340 wide in English) wraps onto a second
    line over the track instead of losing its end to an ellipsis. */
 @media (max-width: 30rem) {
-  /* The pager: its range on a line of its own, the arrow pair under its
-     start, never Next alone (audit4 C2). */
-  #view .pager > .text { order: -1; flex-basis: 100%; }
+  /* The pager: its range first, the arrow pair after it at the end; a range
+     too wide for both takes its own line (audit4 C2). Prev reserves Next's
+     room, so the pair wraps as one. */
+  #view .pager {
+    --aster-pager-r: calc(var(--size-element-md) + var(--spacing-2));
+    justify-content: end;
+    & > .text { order: -1; text-align: start; }
+    & > .prev { margin-inline-end: var(--aster-pager-r); }
+    & > .next { margin-inline-start: calc(-1 * var(--aster-pager-r)); }
+  }
   /* Channel Analysis: a scale of 16 channels or more (5 and 6 GHz; after
      its four dBm labels) labels every other channel, so three-digit numbers
      keep apart (audit4 B1). */
