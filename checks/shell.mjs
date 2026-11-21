@@ -24,11 +24,16 @@
  *               top bar and the side nav carry their view-transition names
  *               and the cross-document @view-transition sits in a media
  *               rule that does not match under reduced motion;
- *   appearance  the top bar's and the login page's appearance control, by
- *               keyboard only: Tab reaches the button, Enter opens it with
- *               the checked row focused, arrows move, Enter and Space pick
- *               a scheme and a palette (attributes and storage follow,
- *               focus returns to the button), Escape and Tab close;
+ *   appearance  the top bar's and the login page's scheme and palette
+ *               controls, by keyboard only: Tab reaches the scheme button,
+ *               Enter opens its menu with the checked row focused, arrows
+ *               move, Enter and Space pick (attributes and storage follow,
+ *               focus returns to the button), Escape and Tab close; Tab
+ *               goes on to the palette button, whose menu works the same;
+ *   stack       each top-bar menu, opened by a click, is the topmost
+ *               element (elementFromPoint) at every point of every row, on
+ *               a 4 px grid: on every --pages page on a desktop and the
+ *               first one on a phone;
  *   rail-tip    in the collapsed rail, hovering a row shows its label in a
  *               tooltip at the row's end side.
  * --debug-css and --debug-js are for the negative tests (checks/tests/
@@ -234,58 +239,115 @@ async function transitions(browser) {
   }
 }
 
-/* appearance: the control in `scope`, keyboard only. */
+/* appearance: the scheme and palette controls in `scope`, keyboard only. */
 async function keyboard(page, scope, where) {
-  const sel = `${scope} .palette-menu`;
-  const btn = page.locator(`${sel} > button`);
-  const state = () => page.evaluate((s) => {
-    const m = document.querySelector(s);
+  const state = (kind) => page.evaluate(([sc, k]) => {
+    const b = document.querySelector(`${sc} .palette-menu > .${k}`);
+    const m = b?.parentNode.querySelector('[role="menu"]');
     const a = document.activeElement;
     let store = {};
     try { store = {theme: localStorage.getItem('aster-theme'), palette: localStorage.getItem('aster-palette')}; } catch (e) {}
     return {
-      open: !!m && !m.querySelector('[role="menu"]').hidden && getComputedStyle(m.querySelector('[role="menu"]')).display !== 'none' && m.querySelector('[role="menu"]').getBoundingClientRect().height > 0,
-      expanded: m?.querySelector('button').getAttribute('aria-expanded'),
-      onButton: a === m?.querySelector('button'),
+      open: !!m && getComputedStyle(m).display !== 'none' && m.getBoundingClientRect().height > 0,
+      expanded: b?.getAttribute('aria-expanded'),
+      onButton: !!b && a === b,
       focus: a?.getAttribute('data-value') ?? null,
       scheme: document.documentElement.getAttribute('data-scheme'),
       theme: document.documentElement.getAttribute('data-theme'),
       palette: document.documentElement.getAttribute('data-palette') ?? 'rose-pine',
       store,
     };
-  }, sel);
-  const want = async (label, test) => {
-    const s = await state();
+  }, [scope, kind]);
+  const want = async (kind, label, test) => {
+    const s = await state(kind);
     if (!test(s)) { fail('appearance', `${where}: ${label} (${JSON.stringify(s)})`); return false; }
     return true;
   };
-  if (!(await btn.count())) { fail('appearance', `${where}: no appearance button`); return; }
+  const press = (k) => page.keyboard.press(k);
+  for (const k of ['appearance', 'palette-btn'])
+    if (!(await page.locator(`${scope} .palette-menu > .${k}`).count())) { fail('appearance', `${where}: no ${k} button`); return; }
   await page.evaluate(() => document.activeElement?.blur());
   let reached = false;
   for (let i = 0; i < 12 && !reached; i++) {
-    await page.keyboard.press('Tab');
-    reached = (await state()).onButton;
+    await press('Tab');
+    reached = (await state('appearance')).onButton;
   }
-  if (!reached) { fail('appearance', `${where}: Tab never reached the button`); return; }
-  await page.keyboard.press('Enter');
-  if (!(await want('Enter opens the menu on the checked scheme', (s) => s.open && s.expanded === 'true' && s.focus === 'auto'))) return;
-  await page.keyboard.press('ArrowDown');
-  if (!(await want('ArrowDown moves to Light', (s) => s.focus === 'light'))) return;
-  await page.keyboard.press('Enter');
-  if (!(await want('Enter picks Light, closes and refocuses', (s) => !s.open && s.onButton && s.scheme === 'light' && s.theme === 'light' && s.store.theme === 'light'))) return;
-  await page.keyboard.press('Space');
-  if (!(await want('Space opens on Light', (s) => s.open && s.focus === 'light'))) return;
-  await page.keyboard.press('End');
-  await page.keyboard.press('ArrowUp');
-  if (!(await want('End, ArrowUp reach the next-to-last palette', (s) => s.focus === 'teal'))) return;
-  await page.keyboard.press(' ');
-  if (!(await want('Space picks the palette, closes and refocuses', (s) => !s.open && s.onButton && s.palette === 'teal' && s.store.palette === 'teal'))) return;
-  await page.keyboard.press('Enter');
-  await page.keyboard.press('Escape');
-  if (!(await want('Escape closes and refocuses', (s) => !s.open && s.expanded === 'false' && s.onButton))) return;
-  await page.keyboard.press('Enter');
-  await page.keyboard.press('Tab');
-  await want('Tab closes', (s) => !s.open && s.expanded === 'false');
+  if (!reached) { fail('appearance', `${where}: Tab never reached the scheme button`); return; }
+  await press('Enter');
+  if (!(await want('appearance', 'Enter opens the scheme menu on the checked scheme', (s) => s.open && s.expanded === 'true' && s.focus === 'auto'))) return;
+  await press('ArrowDown');
+  if (!(await want('appearance', 'ArrowDown moves to Light', (s) => s.focus === 'light'))) return;
+  await press('Enter');
+  if (!(await want('appearance', 'Enter picks Light, closes and refocuses', (s) => !s.open && s.onButton && s.scheme === 'light' && s.theme === 'light' && s.store.theme === 'light'))) return;
+  await press('Space');
+  if (!(await want('appearance', 'Space opens on Light', (s) => s.open && s.focus === 'light'))) return;
+  await press('Escape');
+  if (!(await want('appearance', 'Escape closes the scheme menu and refocuses', (s) => !s.open && s.expanded === 'false' && s.onButton))) return;
+  await press('Enter');
+  await press('Tab');
+  if (!(await want('appearance', 'Tab closes the scheme menu', (s) => !s.open && s.expanded === 'false'))) return;
+  if (!(await want('palette-btn', 'Tab from the scheme menu reaches the palette button', (s) => s.onButton))) return;
+  await press('Enter');
+  if (!(await want('palette-btn', 'Enter opens the palette menu on the checked palette', (s) => s.open && s.expanded === 'true' && s.focus === 'rose-pine'))) return;
+  await press('End');
+  await press('ArrowUp');
+  if (!(await want('palette-btn', 'End, ArrowUp reach the next-to-last palette', (s) => s.focus === 'teal'))) return;
+  await press(' ');
+  if (!(await want('palette-btn', 'Space picks the palette, closes and refocuses', (s) => !s.open && s.onButton && s.palette === 'teal' && s.store.palette === 'teal'))) return;
+  await press('Enter');
+  if (!(await want('palette-btn', 'Enter opens on the picked palette', (s) => s.open && s.focus === 'teal'))) return;
+  await press('Escape');
+  if (!(await want('palette-btn', 'Escape closes the palette menu and refocuses', (s) => !s.open && s.expanded === 'false' && s.onButton))) return;
+  await press('Enter');
+  await press('Tab');
+  await want('palette-btn', 'Tab closes the palette menu', (s) => !s.open && s.expanded === 'false');
+}
+
+/* stack: each top-bar menu, opened by a click, is the topmost element all
+ * over every row (a point every 4 px, not only the centre: the card
+ * header's chevron that once covered the Dark row sat off its centre), on
+ * every page (desktop) and on the first page on a phone: no card header,
+ * sticky bar or table head is drawn over it. */
+async function stack(browser) {
+  for (const device of ['desktop', 'phone']) {
+    const ctx = await session(browser, opt, device, 'dark');
+    await ctx.addInitScript(probe, [debugCss, '']);
+    for (const p of device === 'desktop' ? pages : pages.slice(0, 1)) {
+      const page = await ctx.newPage();
+      await page.goto(opt.base + p, {waitUntil: 'load', timeout: opt.timeout});
+      await page.waitForTimeout(opt.settle);
+      await dismiss(page);
+      for (const k of ['appearance', 'palette-btn']) {
+        const btn = page.locator(`.shell-header .palette-menu > .${k}`);
+        if (!(await btn.count())) { fail('stack', `${device} ${p}: no ${k} button`); continue; }
+        await btn.click();
+        await page.waitForTimeout(250);
+        const r = await page.evaluate((kind) => {
+          const m = document.querySelector(`.shell-header .palette-menu > .${kind}`).parentNode.querySelector('[role="menu"]');
+          const name = (e) => (e ? e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (typeof e.className === 'string' && e.className ? '.' + e.className.trim().split(/\s+/).join('.') : '') : 'nothing');
+          const rows = [...m.querySelectorAll('[role="menuitemradio"]')];
+          if (!m.getBoundingClientRect().height) return {shown: false, bad: []};
+          return {shown: true, rows: rows.length, bad: rows.map((row) => {
+            const b = row.getBoundingClientRect();
+            const over = new Set();
+            for (let y = b.top + 1; y < b.bottom - 1; y += 4)
+              for (let x = b.left + 1; x < b.right - 1; x += 4) {
+                const hit = document.elementFromPoint(x, y);
+                if (!m.contains(hit)) over.add(name(hit));
+              }
+            return over.size ? `${row.dataset.value} under ${[...over].join(' ')}` : null;
+          }).filter(Boolean)};
+        }, k);
+        if (!r.shown) fail('stack', `${device} ${p}: the ${k} menu did not open`);
+        else if (r.bad.length) fail('stack', `${device} ${p}: the ${k} menu is overlapped: ${r.bad.join(', ')}`);
+        else note(`stack ${device} ${p} ${k}: ${r.rows} rows on top`);
+        await page.keyboard.press('Escape');
+        await page.waitForTimeout(150);
+      }
+      await page.close();
+    }
+    await ctx.close();
+  }
 }
 
 async function appearance(browser) {
@@ -347,7 +409,7 @@ async function railTip(browser) {
 
 const browser = await launch();
 try {
-  for (const [name, fn] of [['walk', walk], ['transitions', transitions], ['appearance', appearance], ['rail', railTip]]) {
+  for (const [name, fn] of [['walk', walk], ['transitions', transitions], ['appearance', appearance], ['stack', stack], ['rail', railTip]]) {
     try { await fn(browser); } catch (e) { errors.push(`${name}: ${String(e.message).split('\n')[0]}`); }
   }
 } finally {
