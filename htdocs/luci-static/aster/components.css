@@ -925,8 +925,12 @@ html #view :is(.td, td) .ifacebadge:not(.large) {
   font-weight: inherit;
   line-height: inherit;
   white-space: normal;
+  margin: 0; /* nftables' <style>: .125em */
+  vertical-align: top; /* a line of text, not a box on its baseline (row 33) */
   &::before, & > img { order: 1; }
 }
+/* nftables' set (its items a tooltip trigger) is a run of words on the line. */
+html #view :is(.td, td) :is(.nft-set, .nft-set-items) { vertical-align: top; }
 /* A station's signal is its words, the Signal icon after them in the
    quality's ink (no StatusDot in a value). */
 html [data-page] #view .td > .ifacebadge:has(> img[src*="/signal-"])::before { /* one heavier than the overview StatusDot slot */
@@ -935,6 +939,9 @@ html [data-page] #view .td > .ifacebadge:has(> img[src*="/signal-"])::before { /
   border-radius: 0;
   mask: var(--icon-signal) center / contain no-repeat;
 }
+/* A form table's cell writes its text in <small> (Traffic Rules' match):
+   it is the cell's text, body size. */
+html :where(:is(.td, td).cbi-value-field > small) { font-size: inherit; line-height: inherit; }
 /* Inside a row a button is the small one (Button sm, 32). */
 html :where(td, .td) :where(.btn, .cbi-button, button) { --button-h: var(--size-element-sm); }
 /* Sorting by drag: the moved row fades, the drop line is the accent. */
@@ -966,6 +973,7 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
   & > :where(.thead, .tbody, .tfoot, thead, tbody, tfoot) { display: contents; }
   & :where(.tr:has(> :is(.th, th)), .tr.cbi-section-table-descr) { display: none; }
   & :where(.tr.placeholder) { display: block; grid-column: 1 / -1; }
+  & :where(.tr.placeholder > :is(.td, td)) { display: block; padding-block: var(--spacing-4); text-align: center; color: var(--color-text-secondary); &::before { content: none; } }
   & :where(.tr:not(.placeholder):has(> :is(.td, td))) {
     display: grid;
     grid-column: 1 / -1;
@@ -978,7 +986,7 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
   & :where(.tr:nth-last-child(1 of .tr:not(.placeholder):has(> :is(.td, td)))) { padding-block-end: 0; }
   & :where(.tr:not(.placeholder):has(> :is(.td, td)) ~ .tr:not(.placeholder):has(> :is(.td, td))) { border-block-start: var(--border-width) solid var(--color-border); }
   /* A label/value row. */
-  & :where(.tr > :is(.td, td)) {
+  & :where(.tr:not(.placeholder) > :is(.td, td)) {
     display: grid;
     grid-column: 1 / -1;
     grid-template-columns: subgrid;
@@ -1018,10 +1026,15 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
     display: block;
     grid-row: 1;
     grid-column: 1 / -2;
-    align-self: center;
+    align-self: start;
     font-weight: var(--text-label-weight);
     &::before { content: none; }
+    /* With actions the title line is the buttons' height, the identifier
+       centred in it; a subline follows under it. */
+    &::first-line { line-height: var(--aster-title-line, inherit); }
   }
+  & :where(.tr:has(> .cbi-section-actions :is(.btn, .cbi-button, button), > :not([data-title]) > .cbi-button:only-child)) { --aster-title-line: var(--size-element-sm); }
+  & :where(.tr > :is(.td, td) .ifacebox-head) { min-block-size: var(--aster-title-line, auto); align-items: center; }
   &:where(.assoclist, #status_leases6:has(.th:nth-child(7)), [data-page^="admin-status-route"] .table:has(.th:nth-child(6))) :where(.tr > :is(.td, td):first-child) {
     display: grid;
     grid-row: auto;
@@ -1045,7 +1058,7 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
     display: block;
     grid-row: 1;
     grid-column: -2;
-    align-self: center;
+    align-self: start;
     justify-self: end;
     inline-size: auto;
     &::before { content: none; }
@@ -1058,6 +1071,9 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
 }
 /* nftables' <style> pads its cells .25em with !important (one id heavier). */
 html #view .nft-rules[data-fold="fold"] tr > td { padding: 0 !important; }
+/* An interface's box is the title line itself (luci.css spaces it 8 in a
+   wide row). */
+html [data-page] #view [data-fold="fold"] .td > .ifacebox { margin-block: 0; vertical-align: top; }
 /* A Lua button table (one action per cell, Commit and Apply) stacks
    its buttons 8 apart: the cell, or the option's div in it, which may
    carry the button's script beside it (OpenClash's Create). (:has()

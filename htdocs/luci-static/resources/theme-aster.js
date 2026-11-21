@@ -63,9 +63,10 @@ return baseclass.extend({
 			}));
 		};
 		const ro = new ResizeObserver(() => frame ||= requestAnimationFrame(() => (frame = 0, view.querySelectorAll(sel).forEach(fit))));
-		/* Only the tables a change is in, or under (a view re-rendered). */
+		/* Only the tables a change is in, or under (a view re-rendered); a
+		 * table's own size too (its text grows when the web font lands). */
 		const run = (rs) => new Set((rs || [{ target: view }]).flatMap((r) => r.target.closest(sel) || [...r.target.querySelectorAll(sel)]))
-			.forEach((t) => (seen.has(t.parentNode) || (seen.add(t.parentNode), ro.observe(t.parentNode)), fit(t)));
+			.forEach((t) => (seen.has(t.parentNode) || (seen.add(t.parentNode), ro.observe(t.parentNode)), ro.observe(t), fit(t)));
 
 		run();
 		new MutationObserver(run).observe(view, { childList: true, subtree: true });
