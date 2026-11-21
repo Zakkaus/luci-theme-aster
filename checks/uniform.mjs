@@ -113,7 +113,7 @@ function collect(cfg) {
   };
   // 24.10 writes the log view, a view's tab panes and an nftables chain
   // without the .cbi-section 25.12 gives them; the theme frames them alike.
-  const CARD = '.cbi-section, .cbi-section-node, #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], .nft-chain';
+  const CARD = '.cbi-section, .cbi-section-node, #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], .nft-chain, .nft-table';
   const FRAME = `${CARD}, #view > :is(table, .table), #view > .cbi-map > :is(table, .table)`;
   const BTN = 'button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button';
   // A data table folds where it does not fit its card, at any width

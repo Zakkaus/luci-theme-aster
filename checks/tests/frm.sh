@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Negative tests for the frm rules (checks/rules/frm.mjs: C1-C5, C9, C17-C19,
-# C22, G1, G3, G6, G7, G8), run inside checks/tests/uniform.sh or alone:
+# Negative tests for the frm rules (checks/rules/frm.mjs: C1-C5, C9, C17-C20,
+# C22, G1, G3, G6, G7, G8, G10), run inside checks/tests/uniform.sh or alone:
 #
 #   checks/tests/frm.sh <base url> <password>
 #
@@ -19,6 +19,8 @@ printf 'admin/status/realtime/bandwidth require=c4.tabs\n' >"$tmp/frm-bw.txt"
 printf 'admin/status/overview require=c19.progress\n' >"$tmp/frm-ov.txt"
 printf 'admin/system/flash require=c22.divider\n' >"$tmp/frm-flash.txt"
 printf 'admin/network/network modal=interface-edit require=c18.dialog\n' >"$tmp/frm-dialog.txt"
+printf 'admin/status/nftables require=c2.card,g.nested\n' >"$tmp/frm-nft.txt"
+printf 'admin/system/crontab require=c1.descr\n' >"$tmp/frm-cron.txt"
 expect uniform 0 "" "System: every frame rule measures and holds" -- "$url" "$password" --pages "$tmp/frm-sys.txt" --viewports desktop,phone
 
 # G1: a form row's gap off the spacing scale.
@@ -64,6 +66,21 @@ expect uniform 1 "c19.progress conform" "progress bar 12 high (C19)" -- "$url" "
 # C22: a Divider drawn 2 thick.
 expect uniform 1 "c22.divider conform" "Divider 2 thick (C22)" -- "$url" "$password" --pages "$tmp/frm-flash.txt" \
 	--debug-css 'admin/system/flash=#view .cbi-value + .cbi-value > .cbi-section { border-block-start-width: 2px }'
+# C22, audit R5: the Divider of Flash's flat sections back 24 under the
+# row above (its row's 8 not taken back).
+expect uniform 1 "c22.divider conform" "Flash Divider 24 under the row above (C22)" "above" -- "$url" "$password" --pages "$tmp/frm-flash.txt" \
+	--debug-css 'admin/system/flash=#view .cbi-value:has(> .cbi-section) + .cbi-value > .cbi-section { margin-block-start: 0 !important }'
+# C2/G8, audit R5: nftables' chains framed again inside the table's card.
+expect uniform 1 "g.nested conform,frame nested" "nft chain framed in its table card (C2, G8)" -- "$url" "$password" --pages "$tmp/frm-nft.txt" \
+	--debug-css 'admin/status/nftables=#view .nft-chain { border: 1px solid rgb(200, 0, 0) !important; border-radius: 16px !important }'
+# C1, audit #14 / R5: a card title repeating the selected tab drawn again.
+expect uniform 1 "c1.header conform" "card title repeats the tab (C1)" "repeats" -- "$url" "$password" --pages "$tmp/frm-net.txt" \
+	--debug-css 'admin/network/network=#view .cbi-section > h3.aster-said { display: block !important }'
+# C1, audit R5: the page description at the card description's size.
+expect uniform 1 "c1.descr conform" "page description 13/20 (C1)" "page size" -- "$url" "$password" --pages "$tmp/frm-cron.txt" \
+	--debug-css 'admin/system/crontab=#view h2 + .cbi-section-descr { font-size: 13px !important; line-height: 20px !important }'
+# G10 (g.label) and C20 (c20.upright) have no negative here: the colon is
+# text theme-aster.js removes, and the lab pages are English.
 
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true

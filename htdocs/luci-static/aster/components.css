@@ -29,8 +29,8 @@
      .cbi-value-error, .control-group, .aster-same-label (theme-aster.js)
    Card: .cbi-section, .cbi-section-node, .ifacebox (+
      .ifacebox-head/-body), a table straight in the view, #content_syslog,
-     a tab pane straight in a view, .nft-chain (24.10 writes these without
-     .cbi-section) (--card-*); Card variant of .ifacebox: the overview's
+     a tab pane straight in a view, .nft-table (its chains are flat
+     sections) (--card-*); Card variant of .ifacebox: the overview's
      boxes (--ifacebox-body-*)
    MetadataList: .cbi-section .table without a header row
    Table: table, .table, .tr, .th, .td
@@ -152,7 +152,7 @@ html :where(h1, .shell-content h2:not(.cbi-section *)) {
   line-height: var(--text-heading-1-leading);
 }
 /* Supporting text: descriptions and help. */
-html :where(.cbi-map-descr, .cbi-section-descr, .cbi-value-description) {
+html :where(.cbi-map-descr, .cbi-section-descr, .cbi-tab-descr, .cbi-value-description) {
   color: var(--color-text-secondary);
   font-size: var(--text-supporting-size);
   line-height: var(--text-supporting-leading);
@@ -192,6 +192,9 @@ html :where(kbd) {
    browser shears the glyphs): LuCI's placeholders ("無", "此部份還未包含
    任何值") are upright, in secondary ink. */
 html :where(:lang(zh), :lang(ja), :lang(ko)) :where(em, i:not([class])) { font-style: normal; color: var(--color-text-secondary); }
+/* A <var> (a firewall rule's protocol and verdict, Unbound's zone names)
+   is upright too, in the ink of its text. */
+html :where(:lang(zh), :lang(ja), :lang(ko)) :where(var) { font-style: normal; }
 
 /* ── Button ──────────────────────────────────────────────────────
    Secondary md by default: 36 high, pill, 12 inline, label weight, the
@@ -771,7 +774,7 @@ html :where(.control-group:not(.cbi-dynlist > .add-item)) { display: flex; flex-
 @property --card-radius { syntax: "*"; inherits: false; }
 @property --card-shadow { syntax: "*"; inherits: false; }
 
-html :where(.cbi-section, .cbi-section-node, .ifacebox, #view > :is(table, .table), #view > .cbi-map > :is(table, .table), #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], #view > div:not(.cbi-map) > div:has(> .cbi-tabmenu) > div > [data-tab], .nft-chain) {
+html :where(.cbi-section, .cbi-section-node, .ifacebox, #view > :is(table, .table), #view > .cbi-map > :is(table, .table), #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], #view > div:not(.cbi-map) > div:has(> .cbi-tabmenu) > div > [data-tab], .nft-table) {
   --card-pad: calc(var(--aster-space-region) - var(--border-width));
   --card-bleed: var(--card-pad);
   box-sizing: border-box;
@@ -786,7 +789,7 @@ html :where(.cbi-section, .cbi-section-node, .ifacebox, #view > :is(table, .tabl
 /* A card inside a card is a group of it: no frame. Two groups in a row
    are divided by a rule 16 under the first (the region's gap) and 16 over
    the second. */
-html :where(.cbi-section, .cbi-section-node) :where(.cbi-section, .cbi-section-node) {
+html :where(.cbi-section, .cbi-section-node, .nft-table) :where(.cbi-section, .cbi-section-node, .nft-chain) {
   --card-pad: 0;
   --card-bleed: inherit;
   --card-border-width: 0;
@@ -812,7 +815,7 @@ html :where(.cbi-value:has(> .cbi-section) + .cbi-value > .cbi-section) {
   padding-block-start: var(--aster-space-region);
   border-block-start: var(--border-width) solid var(--color-border);
 }
-html :where(.cbi-section, .cbi-section-node) :where(.cbi-section + .cbi-section, .cbi-section-node + .cbi-section-node) {
+html :where(.cbi-section, .cbi-section-node, .nft-table) :where(.cbi-section + .cbi-section, .cbi-section-node + .cbi-section-node, .nft-chain + .nft-chain) {
   padding-block-start: var(--aster-space-region);
   border-block-start: var(--border-width) solid var(--color-border);
 }
@@ -1123,8 +1126,14 @@ html #view .nft-rules[data-fold="fold"] tr > td { padding: 0 !important; }
 /* Folded, an nftables match is a sentence that wraps at its spaces; as a
    flex row its parts shrank into columns, one glyph a line. */
 html #view .nft-rules[data-fold="fold"] .td .ifacebadge:not(.large) { display: inline; }
-/* 24.10: a chain outside a card; LuCI's 1px margin set the table 2 past it. */
-html #view .nft-chain:not(.cbi-section) > .nft-rules { margin-inline: 0; }
+/* A chain's rules span the table's card, border to border (C6); 24.10's
+   chain is no .cbi-section, which luci.css's bleed reads (its 1px margin
+   for a table outside a card is one class lighter). */
+html #view .nft-chain > .nft-rules.cbi-section-table {
+  inline-size: calc(100% + 2 * var(--card-bleed));
+  --aster-bleed: var(--card-bleed);
+  margin-inline: calc(var(--card-bleed) * -1);
+}
 /* An interface's box is the title line itself (luci.css spaces it 8 in a
    wide row). */
 html [data-page] #view [data-fold="fold"] .td > .ifacebox { margin-block: 0; vertical-align: top; }

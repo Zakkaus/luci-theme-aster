@@ -145,21 +145,18 @@ return baseclass.extend({
 	},
 
 	/* Marks for what LuCI says only in its words, kept as views re-render:
-	 *  - a ▲ or ▼ before a traffic count (the overview's ports) goes into a
-	 *    .aster-glyph span, which components.css draws as the ArrowUp or
-	 *    ArrowDown icon (Icon glyphs);
-	 *  - a view that draws no title (Interfaces, nftables) gets an h2 with
-	 *    its menu entry's name, as every other page has one;
-	 *  - an interface's Error entry (interfaces.js render_status: a
-	 *    "<strong>Error:</strong> text" item) gets .aster-error, set in the
-	 *    error ink (luci.css, Network pages);
-	 *  - a key in an interface's list ("<strong>Protocol:</strong>": the
-	 *    overview's boxes, Interfaces' status, realtime legends) loses
-	 *    LuCI's colon: all are
-	 *    drawn as a MetadataList, whose labels carry no colons; the
-	 *    overview's upstreams share one label column, as wide as their
-	 *    longest label (--aster-kv-w; luci.css caps it); an interface's
-	 *    value is .aster-v, "(N 封包)" kept whole by a no-break space;
+	 *  - ▲ / ▼ before a traffic count become an .aster-glyph span, drawn
+	 *    as the ArrowUp / ArrowDown icon (components.css);
+	 *  - a view with no title (Interfaces, nftables) gets an h2 with its
+	 *    menu entry's name;
+	 *  - a card title repeating the page title or a tab is .aster-said, not
+	 *    drawn (C1; a pane shows only under its own tab);
+	 *  - an interface's "<strong>Error:</strong>" entry is .aster-error;
+	 *  - list keys ("<strong>Protocol:</strong>": overview boxes, Interfaces,
+	 *    realtime legends) and labels (fields, toolbars, nft clauses, the
+	 *    changes legend) lose LuCI's colon (G10); the overview's upstreams
+	 *    share one label column (--aster-kv-w); an interface's value is
+	 *    .aster-v, "(N 封包)" kept whole by a no-break space;
 	 *  - "K: <b>v</b>, …" (nft hook, nlbw kpi) and WireGuard's " · Port N
 	 *    · key" become rows. */
 	marks() {
@@ -199,10 +196,10 @@ return baseclass.extend({
 				v.prepend(h);
 			}
 
-			/* A card title repeating the page title or tab is not drawn (C1). */
-			const said = [...document.querySelectorAll('.shell-inner h2, .cbi-tab, .tab[data-active]')].map((e) => e.textContent.trim());
+			const said = [...document.querySelectorAll('.shell-inner h2, .cbi-tabmenu > li, .tab[data-active]')].map((e) => e.textContent.trim());
 
 			root.querySelectorAll('.cbi-section > h3').forEach((h) => h.classList.toggle('aster-said', said.includes(h.textContent.trim())));
+			root.querySelectorAll('label, .cbi-value-title, .nft-rules .ifacebadge, .modal .cbi-section > strong').forEach((l) => l.childNodes.forEach((n) => /[:：]\s*$/.test(n.data) && (n.data = n.data.replace(/\s*[:：]\s*$/, ''))));
 
 			root.querySelectorAll('span:not(.aster-error) > strong:first-child').forEach((s) => {
 				if (s.textContent.trim().replace(/[:：]$/, '') === error)

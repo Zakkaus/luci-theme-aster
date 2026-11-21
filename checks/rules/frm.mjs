@@ -24,6 +24,9 @@ const RULES = {
   'g.inset': 'G7: controls keep 8 from every line and 16 from a card border',
   'g.nested': 'G8: no box or fill inside a card but controls, Badges, Banners, code',
   'g.textx': 'G3: headings, descriptions, form labels and button rows start on the card content edge',
+  'g.label': 'G10: a label (form row, toolbar, nft clause, dialog legend) has no trailing colon',
+  'c1.header': 'C1: no actions in the title line; a card title does not repeat the page title or the selected tab',
+  'c1.descr': 'C1/C3: page description body 15/24, card description supporting 13/20, both secondary',
   'c2.card': 'C2: radius 16, border 1, card fill, padding 16',
   'c3.heading': 'C3: page 26/600, card 18/600, inner 16/600; heading box -> content 16; actions end on the content end',
   'c4.tabs': 'C4: tabs 36 (second level 32), 2 apart, one line, 2 accent bar, list -> pane 16',
@@ -32,7 +35,8 @@ const RULES = {
   'c17.banner': 'C17: padding 12, radius 12, icon gap 8',
   'c18.dialog': 'C18: padding 16, title/footer gaps 16, button gap 8, width 400/560/800 or window - 32, fits',
   'c19.progress': 'C19: bar 8 high, 4 under its text',
-  'c22.divider': 'C22: 1 thick, spans the card content box',
+  'c20.upright': 'C20: CJK text is never slanted (em, i, var upright)',
+  'c22.divider': 'C22: 1 thick, spans the card content box; 16 under the last control of the form row above',
 };
 export const canonical = Object.fromEntries(Object.entries(RULES).map(([id, src]) => [id, {_source: `COMPONENTS.md ${src}`, conform: 'ok'}]));
 // uniform.mjs's tab rule: a second tab level is Astryx TabList sm (C4).
@@ -243,7 +247,8 @@ export function collect(cfg) {
       const s = css(h);
       // The card's title: its first heading, unless that names a flat section
       // inside it (24.10's leases card has no title but its first heading).
-      const top = h === hs[0] && h.matches('h3') && h.parentElement.closest(CARD_SEL) === c;
+      // nftables' table title sits in a section of its own (25.12).
+      const top = h === hs[0] && h.matches('h3') && (h.parentElement.matches('.nft-table > .cbi-section') ? c : h.parentElement.closest(CARD_SEL)) === c;
       const want = top ? H3 : H4;
       check('c3.heading', top ? 'card size' : 'inner size', f(s.fontSize), want, h);
       check('c3.heading', 'weight', s.fontWeight, '600', h);
@@ -400,6 +405,66 @@ export function collect(cfg) {
       check('c22.divider', 'start', box(hr).left - k.l, 0, hr);
       check('c22.divider', 'end', k.r - box(hr).right, 0, hr);
     }
+  }
+
+  /* C22: a flat section a field row holds (Backup / Flash) has its
+     Divider 16 under what the row above shows last (a control or text,
+     not the rows' padding). */
+  for (const sec of all('.cbi-value:has(> .cbi-section) + .cbi-value > .cbi-section')) {
+    const prev = sec.parentElement.previousElementSibling;
+    const ink = prev ? [...prev.querySelectorAll('*')].filter((q) => visible(q) && inScope(q) && (q.matches(CTRL) || [...q.childNodes].some((n) => n.nodeType === 3 && n.data.trim()))) : [];
+    if (ink.length && side(css(sec), 'Top')) check('c22.divider', 'above', box(sec).top - Math.max(...ink.map((q) => box(q).bottom)), 16, sec);
+  }
+
+  /* C1: the title line holds the title only; a card title that repeats
+     the page title or the selected tab is not drawn. Descriptions by
+     role: the page's body 15/24, a card's (or a tab pane's leading
+     paragraph) supporting 13/20, both secondary. */
+  if (!cfg.modal) {
+    const sec = tok('color', 'var(--color-text-secondary)');
+    const said = all('.shell-inner h2, .cbi-tabmenu > li.cbi-tab, .tab[data-active]').map((e) => e.textContent.trim());
+    for (const h of all(':is(#view, .cbi-map) h2:not(.cbi-section *)')) {
+      count('c1.header');
+      const hb = box(h);
+      for (const b of all(BTN)) if (!pinned(b) && box(b).top < hb.bottom - 0.5 && box(b).bottom > hb.top + 0.5) fail('c1.header', 'action in title line', b.textContent.trim(), 'none', b);
+    }
+    for (const h of all('.cbi-section > h3')) { count('c1.header'); if (said.includes(h.textContent.trim())) fail('c1.header', 'repeats', h.textContent.trim(), 'hidden', h); }
+    // A type style as the page computes it: [size, line height].
+    const type = (n) => {
+      const p = document.body.appendChild(document.createElement('div'));
+      p.style.cssText = `position:absolute;visibility:hidden;font-size:var(--text-${n}-size);line-height:var(--text-${n}-leading)`;
+      const t = [f(css(p).fontSize), f(css(p).lineHeight)];
+      p.remove();
+      return t;
+    };
+    const descr = (el, n, role) => {
+      const s = css(el), [size, lead] = type(n);
+      check('c1.descr', `${role} size`, f(s.fontSize), size, el);
+      check('c1.descr', `${role} leading`, f(s.lineHeight), lead, el);
+      check('c1.descr', `${role} ink`, s.color, sec, el);
+    };
+    const PAGE = ':is(#view, .cbi-map, #view > div) > h2:not(.cbi-section *) + :is(.cbi-map-descr, .cbi-section-descr, p), .cbi-map > .cbi-map-descr';
+    for (const d of all(PAGE)) if (d.textContent.trim()) descr(d, 'body', 'page');
+    for (const d of all('.cbi-section .cbi-section-descr, .cbi-tab-descr, [data-tab]:not(li) > p:first-child:not(:has(input, select, textarea, button))')) if (d.textContent.trim() && !d.matches(PAGE)) descr(d, 'supporting', 'card');
+  }
+
+  /* C20: CJK text has no italic: an em, i or var holding it is upright
+     (the gates run in English, where this only counts). */
+  {
+    const cjk = /[\u3400-\u9fff\u3040-\u30ff\uac00-\ud7af]/;
+    for (const el of all('em, i, var, cite, dfn')) {
+      if (!el.textContent.trim()) continue;
+      count('c20.upright');
+      if (css(el).fontStyle !== 'normal' && cjk.test(el.textContent)) fail('c20.upright', 'font-style', css(el).fontStyle, 'normal', el);
+    }
+  }
+
+  /* G10: a label keeps no trailing colon of LuCI's. */
+  for (const l of all('label, .cbi-value-title, .nft-rules .ifacebadge, .modal .cbi-section > strong')) {
+    const own = [...l.childNodes].filter((n) => n.nodeType === 3 && n.data.trim());
+    if (!own.length) continue;
+    count('g.label');
+    if (own.some((n) => /[:：]\s*$/.test(n.data))) fail('g.label', 'trailing colon', l.textContent.trim().slice(-24), 'none', l);
   }
 
   /* G3: in a card, headings, descriptions, form labels and button rows
