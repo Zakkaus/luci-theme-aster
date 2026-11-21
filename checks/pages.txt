@@ -16,17 +16,17 @@
 # is required on a phone only while it holds a row (table@rows).
 
 # Status
-admin/status/overview                require=font.body,heading.page,heading.card,card,table.kv
+admin/status/overview                require=font.body,heading.page,heading.card,card,table.kv,c8.kv,c8.x,g.colon,g.marker,c15.dot,c16.icon,c13.badge
 admin/status/routes                  require=font.body,heading.page,card,table
 # Banners, WireGuard's faded instance line and inline code, which the lab
 # boxes never draw (checks/lib/gate.mjs FIXTURES).
 admin/status/routes fixture=notices  require=font.body,banner.icon
-admin/status/nftables                require=font.body,card,table
+admin/status/nftables                require=font.body,card,table,c8.kv,c8.x,g.colon,c13.badge,c16.icon
 admin/status/logs/syslog             require=font.body,heading.page,card,button,field.input,tab
 admin/status/logs/dmesg              require=font.body,heading.page,card,button,field.input,tab
 admin/status/processes               require=font.body,heading.page,card,table,button
-admin/status/realtime/load           require=font.body,heading.page,card,tab
-admin/status/realtime/bandwidth      require=font.body,heading.page,card,tab
+admin/status/realtime/load           require=font.body,heading.page,card,tab,c8.kv,g.colon
+admin/status/realtime/bandwidth      require=font.body,heading.page,card,tab,c8.kv,g.colon
 admin/status/realtime/connections    require=font.body,heading.page,card,table,tab
 
 # System
@@ -51,7 +51,7 @@ admin/system/reboot modal=status-notice    require=banner.icon
 admin/system/reboot modal=status-warning   require=banner.icon
 
 # Network
-admin/network/network                require=font.body,card,button,table,c8.ifstatus,c8.kv,c8.x,c8.tracks,g.break,g.colon,c15.dot,c16.icon,c13.badge,c14.token
+admin/network/network                require=font.body,card,button,table,c8.ifstatus,c8.kv,c8.x,c8.tracks,g.break,g.colon,g.marker,c15.dot,c16.icon,c13.badge,c14.token
 admin/network/network modal=interface-edit  require=font.body,button,field,checkbox,form.label,tab
 admin/network/routes                 require=font.body,heading.page,card,button,table@rows,tab
 # DHCP: on 25.12 the page opens on its Active Leases tab, with the

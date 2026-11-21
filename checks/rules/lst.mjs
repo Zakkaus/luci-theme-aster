@@ -114,6 +114,11 @@ export function collect(cfg) {
       return v.length && textNodes(c[0]).length ? [c[0], [c[1]]] : null;
     }).filter(Boolean);
     if (pairs.length && pairs.length === rows.length) lists.push({el: t, kind: 'table', pairs});
+    // A realtime legend: label | value pairs, several to a row.
+    else if (rows.length && rows.every((r) => r.children.length > 2 && r.children.length % 2 === 0)) {
+      const lp = rows.flatMap((r) => [...r.children].flatMap((c, i, a) => (i % 2 ? [] : [[c, [a[i + 1]]]])));
+      lists.push({el: t, kind: 'legend', pairs: lp});
+    }
   });
   scope.querySelectorAll('.nft-chain-hook > ul, .kpi > ul, .aster-kv').forEach((el) => {
     if (!shown(el)) return;
@@ -150,10 +155,24 @@ export function collect(cfg) {
       const r0 = pairs[0][1][0], k = pairs[0][0];
       add('c8.kv', 'columnGap', px(cs(r0).paddingInlineStart) + px(cs(k).paddingInlineEnd), r0);
       if (pairs.length > 1) add('c8.kv', 'rowGap', px(cs(k).paddingBlockEnd) + px(cs(pairs[1][0]).paddingBlockStart), k);
+    } else if (kind === 'legend') {
+      // Cells pad the gaps (table rows, or LuCI's phone grid of pairs).
+      const tr = cs(pairs[0][0].parentNode), g = (v) => (/grid/.test(tr.display) ? px(v) : 0);
+      const [k, [v]] = pairs[0], k2 = pairs[1]?.[0];
+      add('c8.kv', 'columnGap', px(cs(k).paddingInlineEnd) + px(cs(v).paddingInlineStart) + g(tr.columnGap), el);
+      if (k2) add('c8.kv', 'rowGap', px(cs(k).paddingBlockEnd) + px(cs(k2).paddingBlockStart) + g(tr.rowGap), el);
     } else if (/grid/.test(s.display)) {
       add('c8.kv', 'columnGap', px(s.columnGap), el);
       if (pairs.length > 1) add('c8.kv', 'rowGap', px(s.rowGap), el);
     } else add('c8.kv', 'columnGap', `display ${s.display}`, el);
+    if (kind === 'legend') {
+      pairs.forEach(([k]) => add('g.colon', 'trailing', /[:：]\s*$/.test(k.textContent) ? 'colon' : 'none', k));
+      let broken = 0;
+      pairs.forEach(([, v]) => v.forEach((n) => { broken += brokenTokens(n); }));
+      add('g.break', 'broken', broken, named('break', el));
+      delete seen.break;
+      continue;
+    }
     const xs = new Set(vx.map((x) => Math.round(x)));
     add('c8.x', 'valueXs', xs.size, el);
     const box = el.getBoundingClientRect();
@@ -194,6 +213,17 @@ export function collect(cfg) {
   }
   // An unsplit label/value sentence ("主機數: 17") is a list of no rows.
   for (const {el, pairs} of lists) if (pairs.some(([, v]) => !v.length)) add('g.colon', 'trailing', /[:：]/.test(el.textContent) ? 'colon' : 'none', el);
+
+  /* G4: an interface's, port's or radio's name starts on its head's
+     content edge and its device name on its body's (dot, Badge and icons
+     trail them). */
+  if (document.querySelector('[data-page="admin-status-overview"], [data-page="admin-network-network"]')) {
+    const edge = (e) => e.getBoundingClientRect().left + parseFloat(cs(e).paddingLeft) + parseFloat(cs(e).borderLeftWidth);
+    scope.querySelectorAll('.ifacebox > .ifacebox-head:first-child, .td > .ifacebox > .ifacebox-body > small').forEach((h) => {
+      if (!shown(h) || h.closest('.cbi-tooltip') || !textNodes(h).length) return;
+      add('g.marker', 'offset', px(range(textNodes(h))[0].left - edge(h.matches('small') ? h.parentNode : h)), h);
+    });
+  }
 
   /* C8 Interfaces: the dot is the interface's own device. */
   if (document.body.dataset.page === 'admin-network-network' || document.querySelector('[data-page="admin-network-network"]')) {

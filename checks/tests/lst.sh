@@ -31,5 +31,33 @@ expect uniform 1 "c15.dot size" "StatusDot 10 px" -- "$url" "$password" --pages 
 expect uniform 1 "c16.icon legacy,icon legacy" "legacy device image shown (defect 8)" -- "$url" "$password" --pages "$tmp/lst-net.txt" \
 	--debug-css 'admin/network/network=#view .ifacebox-body > .cbi-tooltip-container > img { display: inline !important; inline-size: 16px }'
 
+# G4 (defects 5, 8): the interface's dot before its name again.
+expect uniform 1 "g.marker offset" "Interfaces dot before the name (G4)" -- "$url" "$password" --pages "$tmp/lst-net.txt" \
+	--debug-css 'admin/network/network=#view .ifacebox > .ifacebox-head::before { order: -1 !important }'
+
+ov='admin/status/overview require=c8.kv,c8.x,g.colon,g.marker,c15.dot,c16.icon,c13.badge'
+printf '%s\n' "$ov" >"$tmp/lst-ov.txt"
+expect uniform 0 "" "Overview: port tiles, upstream and radio lists" -- "$url" "$password" --pages "$tmp/lst-ov.txt"
+# C25 / G4 (defect 10): a port's and a radio's dot before the name.
+expect uniform 1 "g.marker offset" "Overview dot before a port or radio name (G4)" -- "$url" "$password" --pages "$tmp/lst-ov.txt" \
+	--debug-css 'admin/status/overview=#view .ifacebox > .ifacebox-head:first-child::after { order: -1 !important }'
+
+nft='admin/status/nftables require=c8.kv,c8.x,g.colon,c13.badge,c16.icon'
+printf '%s\n' "$nft" >"$tmp/lst-nft.txt"
+expect uniform 0 "" "nftables: hook list, clauses as text" -- "$url" "$password" --pages "$tmp/lst-nft.txt"
+# Defect 3: every clause a filled pill.
+expect uniform 1 "c13.badge *" "nftables clauses as filled pills (defect 3)" -- "$url" "$password" --pages "$tmp/lst-nft.txt" \
+	--debug-css 'admin/status/nftables=.nft-rules .td > .ifacebadge { background: var(--color-background-muted) !important; border-radius: 999px !important }'
+# Defect 7's shape: the hook line as one sentence, no label column.
+expect uniform 1 "c8.kv *,c8.x *" "nftables hook as one line (C8)" -- "$url" "$password" --pages "$tmp/lst-nft.txt" \
+	--debug-css 'admin/status/nftables=.nft-chain-hook > ul { display: block !important }'
+
+bw='admin/status/realtime/bandwidth require=c8.kv,g.colon'
+printf '%s\n' "$bw" >"$tmp/lst-bw.txt"
+expect uniform 0 "" "Realtime legend as a list" -- "$url" "$password" --pages "$tmp/lst-bw.txt"
+# Audit #4: a legend value off its label's line.
+expect uniform 1 "c8.kv layout,c8.kv align" "Realtime legend value off its label (audit #4)" -- "$url" "$password" --pages "$tmp/lst-bw.txt" \
+	--debug-css 'admin/status/realtime/bandwidth=#view .table:not(:has(.th)) .td:nth-child(even) { position: relative; top: 12px }'
+
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true
