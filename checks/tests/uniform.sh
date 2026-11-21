@@ -44,7 +44,7 @@ expect uniform 1 "missing checkbox" "required class the page lacks" -- "$url" "$
 
 # Phone: a table with data rows whose rows the phone CSS hides is missing
 # its table (table@rows), though an empty table would be exempt.
-expect uniform 1 "missing table" "phone hides a table's data rows" "the page's tables hold" -- "$url" "$password" --pages "$tmp/rules.txt" --viewports phone \
+expect uniform 1 "missing table,space.heading.content gap" "phone hides a table's data rows" "the page's tables hold" -- "$url" "$password" --pages "$tmp/rules.txt" --viewports phone \
 	--debug-css 'admin/network/firewall/rules=#view .table .tr:not(.placeholder):has(> .td) { display: none !important }'
 
 # Dark: a card fill that only dark mode gets wrong. (Not the overview: a
@@ -55,8 +55,10 @@ expect uniform 1 "card background" "dark card fill changed" -- "$url" "$password
 # Content wider than its card: the rule 26d0959 dropped, put back. It made
 # the interfaces table 15,200 px wide inside its card; the page itself did
 # not overflow, so only the overflow rule sees it.
-expect uniform 1 "overflow excess" "interfaces table wider than its card" -- "$url" "$password" --pages "$tmp/network.txt" \
-	--debug-css 'admin/network/network=.table:has([style*="min-width"]) { min-inline-size: max-content; }'
+# (theme-aster.js measures a table with an inline min-content width, so
+# the stretch hides from it and the table stays wide.)
+expect uniform 1 "overflow excess,c7.when state" "interfaces table wider than its card" -- "$url" "$password" --pages "$tmp/network.txt" \
+	--debug-css 'admin/network/network=.table:not([style*="min-content"]):has([style*="min-width"]) { min-inline-size: max-content; }'
 
 # A rule under a card's last row: Diagnostics' tool cells (one row in a
 # card-framed table) drawing their row rule again.
@@ -186,7 +188,7 @@ printf 'admin/status/processes\n' >"$tmp/processes.txt"
 expect uniform 1 "table.actions lines" "a row's actions on two lines" -- "$url" "$password" --pages "$tmp/processes.txt" \
 	--debug-css 'admin/status/processes=.td > div:has(> :is(.btn, .cbi-button)) { flex-wrap: wrap !important; max-inline-size: 100px }'
 printf 'admin/system/startup\n' >"$tmp/startup.txt"
-expect uniform 1 "table.actions lines" "phone: Startup's five wrapped, no more menu" -- "$url" "$password" --pages "$tmp/startup.txt" --viewports phone \
+expect uniform 1 "table.actions lines,c7.actions lines" "phone: Startup's five wrapped, no more menu" -- "$url" "$password" --pages "$tmp/startup.txt" --viewports phone \
 	--debug-css 'admin/system/startup=#view .cbi-section-actions > div { flex-wrap: wrap !important } #view .cbi-section-actions > div > * { display: inline-flex !important } #view .aster-more { display: none !important }'
 
 # Headings: a size outside Astryx's levels; an <abbr>'s dotted rule.
@@ -251,4 +253,5 @@ if [[ ${APPS:-0} = 1 ]]; then
 		--debug-css 'admin/services/openclash/proxy-providers-file-manage=form > .cbi-map .table .tr:has(> .td) { display: flex !important; flex-direction: column }'
 fi
 source "$(dirname "$0")/lst.sh"
+source "$(dirname "$0")/tab.sh"
 finish

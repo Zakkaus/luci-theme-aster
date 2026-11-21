@@ -33,6 +33,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {CHECKS, parseArgs, readPages, parseDebugCss, classMatches, openPage, eachCombo, show, writeOut, die} from './lib/gate.mjs';
 import * as lst from './rules/lst.mjs';
+import * as tab from './rules/tab.mjs';
 
 const usage = 'usage: node checks/uniform.mjs <base url> <password> [--user root] [--pages <file>]... [--canonical <json>] [--viewports desktop,phone] [--modes light,dark] [--palette aster] [--tolerance 1] [--json <file>] [--out <file>] [--timeout ms] [--settle ms] [--width-test n] [--debug-css <page>=<css>]...';
 const opt = parseArgs(process.argv.slice(2), {
@@ -55,6 +56,7 @@ try {
   die(`--canonical ${opt.canonical}: ${e.message}`);
 }
 Object.assign(canonical, lst.canonical);
+Object.assign(canonical, tab.canonical);
 
 /* ── In the page ─────────────────────────────────────────────── */
 
@@ -112,10 +114,11 @@ function collect(cfg) {
   const CARD = '.cbi-section, .cbi-section-node, #content_syslog, #view > div:not(.cbi-map) > div > [data-tab], .nft-chain';
   const FRAME = `${CARD}, #view > :is(table, .table), #view > .cbi-map > :is(table, .table)`;
   const BTN = 'button, input[type="button"], input[type="submit"], input[type="reset"], .btn, .cbi-button';
-  // The Table component folds a table with a header row on a phone
-  // (components.css, Table: Collapsible), in a JS view and in a Lua CBI
-  // map (form > .cbi-map), whose parser writes real <thead>/<tbody>.
-  const FOLD = ':is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th)';
+  // A data table folds where it does not fit its card, at any width
+  // (theme-aster.js data-fold, components.css FoldedBlock), in a JS view
+  // and in a Lua CBI map (form > .cbi-map), whose parser writes real
+  // <thead>/<tbody>.
+  const FOLD = ':is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]';
   // The card a node is drawn in: its outermost frame; in a dialog, the dialog.
   const frameOf = (el) => {
     if (cfg.modal) return scope;
@@ -291,11 +294,10 @@ function collect(cfg) {
     // value over a track), not a table row: its cells are read, its height
     // is not.
     const progress = !!row.querySelector('.cbi-progressbar');
-    // A header table on a phone folds (the Table component's collapsible
-    // table, spec.md Phone layout): each row a grid, the first cell in body
-    // text, the dropped columns stacked under it as supporting text, the
-    // actions on a line of their own. Which tables fold is the viewport and
-    // the component's selector, not how the row happens to be drawn, so a
+    // A folded table (COMPONENTS.md C7 FoldedBlock): each row a grid, its
+    // cells on the card's content edge in body text, the actions on the
+    // title line (checks/rules/tab.mjs reads the block). Which tables fold
+    // is their fit (data-fold), not how the row happens to be drawn, so a
     // fold that breaks is read as one. Row heights vary with the number of
     // columns and are not read.
     // A row's actions share one line (doona ActionGroup), never stacked:
@@ -306,7 +308,7 @@ function collect(cfg) {
       const n = new Set(acts.map((b) => Math.round(box(b).top))).size; // a string: a count read as px would pass 2 within the 1px tolerance
       add('table.actions', 'lines', n === 1 ? 'one' : `${n} lines`, c);
     }
-    if (!progress && cfg.device === 'phone' && table.matches(FOLD)) {
+    if (!progress && table.matches(FOLD)) {
       add('table.fold.row', 'display', getComputedStyle(row).display, row);
       // Nothing under the row's last line but its padding: an empty cell
       // (an actions cell with no button, LuCI's "-") or a height kept from
@@ -384,8 +386,10 @@ function collect(cfg) {
     for (const c of cells) {
       const s = getComputedStyle(c);
       // A key/value list's first cell is the key, flush with the card
-      // (MetadataList); the value cells are table cells.
-      const cls = c.matches('th, .th') ? `${base}.th` : base === 'table.kv' && c === cells[0] && cells.length > 1 ? 'table.kv.td.key' : `${base}.td`;
+      // (MetadataList); the value cells are table cells. A stacked legend's
+      // pairs sit on the card's content edge; an actions cell pads 8 (C6).
+      const cls = c.matches('th, .th') ? `${base}.th` : wrapped ? 'table.kv.wrap.td' : base === 'table.kv' && c === cells[0] && cells.length > 1 ? 'table.kv.td.key'
+        : c.matches('.cbi-section-actions, :not([data-title]):has(> .cbi-button:only-child)') ? `${base}.td.actions` : `${base}.td`;
       add(cls, 'paddingBlock', [px(s.paddingTop), px(s.paddingBottom)], c);
       add(cls, 'paddingInlineStart', px(s.paddingInlineStart), c);
       add(cls, 'fontSize', px(s.fontSize), c);
@@ -1020,7 +1024,10 @@ await eachCombo(opt, async (ctx, device, mode, combo) => {
       process.stderr.write(`${combo} ${entry.id}: ERROR ${r.error}\n`);
       continue;
     }
-    const samples = await r.page.evaluate(collect, {modal: !!entry.modal, device});
+    // The tab rules first: the collectors after them open tooltips in
+    // markup, which grows the tables they measure.
+    const samples = await r.page.evaluate(tab.collect, {modal: !!entry.modal, device});
+    samples.push(...await r.page.evaluate(collect, {modal: !!entry.modal, device}));
     samples.push(...await r.page.evaluate(widthTest, {modal: !!entry.modal, limit: +opt['width-test']}));
     samples.push(...await r.page.evaluate(lst.collect, {modal: !!entry.modal, device}));
     const rows = await r.page.evaluate(dataRows, {modal: !!entry.modal});

@@ -365,23 +365,27 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
   gap: var(--aster-space-row);
   & > * { margin: 0; }
 }
-/* A row's actions keep one line: form.js sizes the cell to the widest
-   row's buttons, and a fraction of a pixel short wrapped Delete under the
-   rest (Traffic Rules). The Table fold wraps them (components.css). */
-@container aster-page (min-width: 48.0625rem) {
-  #view .td.cbi-section-actions > div { flex-wrap: nowrap; white-space: nowrap; }
-}
+/* A row's actions keep one line, wide or folded (RowActions): form.js
+   sizes the cell to the widest row's buttons, and a fraction of a pixel
+   short wrapped Delete under the rest (Traffic Rules). */
+#view .td.cbi-section-actions > div { flex-wrap: nowrap; white-space: nowrap; }
 /* A row's actions that do not fit (theme-aster.js data-collapsed): the
-   first, then the "more" button; the rest are its menu's rows. */
-:is(.td, td) > div[data-collapsed] > :not(.drag-handle, .aster-more) ~ :not(.aster-more),
+   edit action (or the first), then the "more" button; the rest are its
+   menu's rows (RowActions). */
+:is(.td, td) > div[data-collapsed] > :not(.drag-handle, .aster-more, [data-keep]),
 :is(.td, td) > div:not([data-collapsed]) > .aster-more { display: none; }
+/* Sorting by drag: the handle is the actions' last item. */
+:is(.td, td) > div > .drag-handle { order: 1; }
 /* The diagnostics page lays three tools out as three cells of one row. */
 .table:has(.diag-action) { table-layout: fixed; }
 .td > input + .diag-action { display: block; margin: var(--spacing-2) 0 0; }
 /* 24.10 writes Processes, Startup, the logs and others as a table straight
    in the view; the table is the Card. A collapsed table takes no padding or
    radius, so it keeps its borders separate. */
-#view > :is(table, .table), #view > .cbi-map > :is(table, .table) { border-collapse: separate; }
+#view > :is(table, .table), #view > .cbi-map > :is(table, .table) {
+  border-collapse: separate;
+  --aster-bleed: var(--card-pad); /* folded, it keeps the card's padding */
+}
 /* A table that does not fit scrolls inside its card, not the page; in a
    Lua CBI map (form > .cbi-map) also when an app wraps it deeper. */
 :is(.cbi-section, .cbi-section-node) > div:not(.cbi-section-node, .cbi-value):has(> .table),
@@ -399,6 +403,7 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
 :is(.cbi-section, .cbi-section-node) > div:not(.cbi-value, .cbi-section-node):has(> .table .th) > .table,
 [data-tab]:not(.cbi-section *) > .table:has(.th) {
   inline-size: calc(100% + 2 * var(--card-bleed));
+  --aster-bleed: var(--card-bleed);
   margin-inline: calc(var(--card-bleed) * -1);
 }
 /* A table under a field sits in a group (no pad of its own): it bleeds by
@@ -411,6 +416,7 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
   flex: none; /* a field row is a flex line: its width, not the row's */
   box-sizing: border-box;
   inline-size: calc(100% + 2 * var(--card-bleed));
+  --aster-bleed: var(--card-bleed);
   margin-inline: calc(var(--card-bleed) * -1);
 }
 .cbi-value > .cbi-section.cbi-tblsection { padding-inline: var(--card-bleed); }
@@ -430,39 +436,9 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
    interface under the SSID. Where the lines do not fit the card the table
    folds (components.css, Table) instead of breaking them: theme-aster.js
    measures it unbroken (data-fold "wide") and folds it where it is wider
-   than its card. Without the script the page decides: the 1440 desktop
-   keeps the rows, a station's address list and rates breaking after a
-   comma where they would run past the card's edge. */
+   than its card. */
 #view :is(.leases, .lases, .leases6, .assoclist)[data-fold="wide"] .td { white-space: nowrap; }
-@container aster-page (min-width: 72rem) {
-  #view :is(.leases, .lases, .leases6, .assoclist):not([data-fold]) .td { white-space: nowrap; }
-  #view .assoclist:not([data-fold]) .td :is(.hide-xs, .td > span:not(.ifacebadge) > span) { white-space: normal; }
-}
 #view .assoclist .td :is(.hide-xs, .ifacebadge small) { display: block; }
-/* Wireless: a radio's or a network's row (badge, status, actions) folds
-   where it is wider than its card (theme-aster.js, data-fold): the badge
-   is the title, the actions at the end of its line, the status under both
-   in supporting text. */
-#view .table:has(.tr > [data-name="_badge"])[data-fold="fold"] {
-  display: block;
-  & > tbody { display: contents; }
-  & .tr {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    padding-block: var(--spacing-1);
-    border-block-end: var(--border-width) solid var(--color-border);
-    &:last-child { border-block-end: 0; }
-  }
-  & .tr > .td { display: block; inline-size: auto; padding: 0 var(--spacing-4); border: 0; }
-  & .tr > [data-name="_stat"] {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    color: var(--color-text-secondary);
-    font-size: var(--text-supporting-size);
-    line-height: var(--text-supporting-leading);
-  }
-}
 /* An interface row: cells to the top, the box column as narrow as the box,
    the status column the rest. */
 .tr:has(> .td > .ifacebox) > .td {
@@ -482,6 +458,7 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
    ServerStack for a wired device or a port, Wifi for a radio, Squares2X2
    for a bridge, Tag for a VLAN, Link for an alias (C16). */
 html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M5.25 14.25h13.5m-13.5 0a3 3 0 0 1-3-3m3 3a3 3 0 1 0 0 6h13.5a3 3 0 1 0 0-6m-16.5-3a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3m-19.5 0a4.5 4.5 0 0 1 .9-2.7L5.737 5.1a3.375 3.375 0 0 1 2.7-1.35h7.126c1.062 0 2.062.5 2.7 1.35l2.587 3.45a4.5 4.5 0 0 1 .9 2.7m0 0a3 3 0 0 1-3 3m0 3h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Zm-3 6h.008v.008h-.008v-.008Zm0-6h.008v.008h-.008v-.008Z'/></svg>"); --icon-wifi: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z'/></svg>"); --icon-bridge: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z'/></svg>"); --icon-vlan: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z'/><path d='M6 6h.008v.008H6V6Z'/></svg>"); --icon-alias: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244'/></svg>"); }
+html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M9.348 14.652a3.75 3.75 0 0 1 0-5.304m5.304 0a3.75 3.75 0 0 1 0 5.304m-7.425 2.121a6.75 6.75 0 0 1 0-9.546m9.546 0a6.75 6.75 0 0 1 0 9.546M5.106 18.894c-3.808-3.807-3.808-9.98 0-13.788m13.788 0c3.808 3.807 3.808 9.98 0 13.788M12 12h.008v.008H12V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z'/></svg>"); }
 .shell-content .ifacebox { min-inline-size: 8rem; }
 /* Network > Interfaces: the interface cell is no Card (none in a card).
    Text first, markers after (G4, COMPONENTS.md 0.1): the name, then its
@@ -948,8 +925,6 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   .cbi-value-field { --field-w: 100%; flex-basis: auto; }
   /* CBI wraps a widget in a bare div, which must span the row too. */
   .cbi-value-field > :not(button, .btn, .cbi-button, .cbi-checkbox) { flex-basis: 100%; }
-  /* A wide table without a header row scrolls inside its card. */
-  .table:not(:has(> .tr > .th, > .thead > .tr > .th)) { display: block; overflow-x: auto; }
   /* A dialog fits the screen. */
   #modal_overlay { padding: var(--spacing-4); }
   /* An interface's status reads as the Table fold's rows (components.css):
@@ -964,45 +939,22 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   }
 }
 
-/* The page's tables fold where the page is narrow, not only on a phone
-   (the Table fold, components.css): rows that complete it. */
-@container aster-page (max-width: 48rem) {
-  /* The diagnostics tools stack instead of sharing a row (layout). */
-  .table:has(.diag-action) > .tr { display: flex; flex-direction: column; gap: var(--spacing-4); }
-  .table:has(.diag-action) > .tr > .td { display: block; padding-inline: 0; border: 0; }
-  /* form.js writes the widest row's measured width inline on every actions
-     cell; on a phone the cell takes the width its row gives it. */
-  #view .cbi-section-actions[style*="width"] {
-    min-inline-size: 0 !important; /* inline min-width */
-    inline-size: auto !important; /* inline width */
-  }
-  /* Network > Interfaces has no header row, so the Table fold skips it: the
-     box, its status and the actions stack (layout). */
-  #view .tr:has(> .td > .ifacebox) {
-    display: flex;
-    flex-direction: column;
-    & > .td { display: block; inline-size: auto; white-space: normal; }
-    & > .td:not(:last-child) { border: 0; }
-    & > .td.cbi-section-actions > * { display: flex; gap: var(--spacing-2); }
-  }
-  /* The table is a block here; a row group left as a table shrinks to its
-     content and the rules stop short of the card edge (layout). */
-  #view .tbody:has(> .tr > .td > .ifacebox) { display: block; }
-  /* Actions on a footer line (here and in the Table fold) are spaced by
-     the gap alone, not also by the button-after-button margin. */
-  #view .tr:has(> .td > .ifacebox) > .td.cbi-section-actions > * > *,
-  #view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions > div > * { margin-inline-start: 0; }
-  /* Under the stack the actions start where the stacked text does. */
-  #view .table:has(> .tr > .th, > .thead > .tr > .th) .tr > .td.cbi-section-actions { text-align: start; }
-  /* nftables: a rule's long badges wrap inside their cell (layout). */
-  #view .nft-rules .ifacebadge { flex-wrap: wrap; max-inline-size: 100%; }
-  #view .nft-rules .ifacebadge,
-  #view .nft-rules .ifacebadge > * { white-space: normal; }
-  /* Realtime graphs: a legend row holds three label and value pairs, six
-     cells too wide for a phone; the pairs stack, value beside label (layout). */
-  [data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr { display: grid; grid-template-columns: auto minmax(0, 1fr); }
-  [data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr > .td { display: block; }
+/* The diagnostics page lays three tools out as three cells of one row,
+   which wrap under each other where they do not fit (no query: the row
+   measures its own room). */
+.table:has(.diag-action) > .tr { display: flex; flex-wrap: wrap; gap: var(--spacing-4); }
+.table:has(.diag-action) > .tr > .td { display: block; flex: 1 1 16rem; padding-inline: 0; border: 0; }
+/* A folded table (components.css, Table): form.js writes the widest row's
+   measured width inline on every actions cell; folded, the cell takes the
+   width its row gives it. */
+#view .table[data-fold="fold"] .cbi-section-actions[style*="width"] {
+  min-inline-size: 0 !important; /* inline min-width */
+  inline-size: auto !important; /* inline width */
 }
+/* Realtime graphs: a legend row holds three label and value pairs; where
+   six cells do not fit, the pairs stack, value beside label. */
+[data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr { display: grid; grid-template-columns: repeat(auto-fit, minmax(min-content, max-content) minmax(6rem, 1fr)); column-gap: var(--spacing-4); }
+[data-page^="admin-status-realtime"] #view .table:not(:has(.th)) > .tr > .td { display: block; padding-inline: 0; }
 
 /* ── Realtime graphs [ported] ───────────────────────────────── */
 
@@ -1157,19 +1109,22 @@ html body[data-page^="admin-services-passwall"] {
   & #_passwall_status_fieldset .red { color: var(--color-text-error); }
   & #_passwall_status_fieldset .yellow { color: var(--color-text-warning); }
 }
-/* On a phone the node table folds like every other table: node_list.htm
-   draws its rows as flex rows under 1152 (layout), and pads the actions
-   cell 5 a side (!important there) where the fold insets it 16. */
-@media (max-width: 48rem) {
-  html body[data-page^="admin-services-passwall"] {
-    & .table:has(> :is(.thead, thead, tbody) > .tr > .th) .tr.cbi-section-table-row { display: grid; }
-    & .table .tr > .pw-actions { padding-inline: var(--spacing-4) !important; } /* node_list.htm padding 5px !important */    /* A folded row reads from the start like every fold: node_list.htm
-         centres its cells and right-aligns the actions (!important there). */
-    & .table .tr > :is(.td, td) { text-align: start; }
-    & .table .tr > .pw-actions { text-align: start !important; } /* node_list.htm text-align:right !important */    /* app_version.htm centres its rows' items; the label spans the stacked
-         row like every form row's (layout). */
-    & #app_version > .cbi-value { align-items: stretch; }
+/* PassWall's node table folds like every other table (Table, data-fold):
+   node_list.htm draws its rows as flex rows under 1152 (layout), pads the
+   actions cell 5 a side (!important there) where the fold insets it 16,
+   centres its cells and right-aligns the actions (!important there). */
+html body[data-page^="admin-services-passwall"] .table[data-fold="fold"] {
+  & .tr.cbi-section-table-row { display: grid; }
+  & .tr > :is(.td, td) { text-align: start; }
+  & .tr > .pw-actions {
+    padding-inline: var(--spacing-4) !important; /* node_list.htm padding 5px !important */
+    text-align: start !important; /* node_list.htm text-align:right !important */
   }
+}
+/* app_version.htm centres its rows' items; the label spans the stacked
+   row like every form row's (layout). */
+@media (max-width: 48rem) {
+  html body[data-page^="admin-services-passwall"] #app_version > .cbi-value { align-items: stretch; }
 }
 /* The Running Status tiles go one a row on a narrow phone: two a row
    (status.htm's own) leave a tile narrower than its icon and label. */

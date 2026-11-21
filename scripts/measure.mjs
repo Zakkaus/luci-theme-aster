@@ -105,7 +105,8 @@ const FIELDS = [
   // reference draws as a MetadataList row (24 + 8, within the 33's tolerance).
   {name: 'table row height', from: ['components', 'Table body row', 'height'], devices: ['desktop'], sel: '#view .table:has(.th) > .tr:has(> .td):not(.placeholder, :has(button, .btn))', fallback: '#view .table:not(:has(.th)) > .tr:not(:has(.cbi-progressbar))', prop: 'height'},
   // A data row holding a button (DHCP's Reserve IP, a station's Disconnect).
-  {name: 'table row height (button)', from: ['components', 'Table body row with sm Button', 'height'], devices: ['desktop'], sel: '#view .table:has(.th) > .tr:has(> .td > :is(button, .btn))', prop: 'height'},
+  // COMPONENTS.md C6 (owner Q1 = A): the actions cell pads 8, a row 32 + 16 + 1.
+  {name: 'table row height (button)', from: ['components', 'Table body row with sm Button', 'height'], want: '49px', devices: ['desktop'], sel: '#view .table:has(.th) > .tr:has(> .td > :is(button, .btn))', prop: 'height'},
   // The brand mark is the logo at its own size, not an sm icon.
   {name: 'icon size', from: ['components', 'Icon sm', 'width'], sel: '.shell-header .icon-btn:not([hidden]) svg', prop: 'width', visible: true},
   // Port tiles (Port status): the first tile with a link.

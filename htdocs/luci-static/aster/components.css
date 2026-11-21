@@ -231,14 +231,14 @@ html :where(button, input[type="button"], input[type="submit"], input[type="rese
 }
 /* The "more" IconButton after a row's first action (theme-aster.js
    actions(), doona ActionGroup): square at the Button's height, Heroicons
-   2.2.0 EllipsisVertical (MIT) at 20. */
+   2.2.0 EllipsisHorizontal (MIT) at 16 (RowActions). */
 html :where(.aster-more) { --button-px: 0; inline-size: var(--button-h, var(--size-element-md)); }
 html :where(.aster-more)::before {
   content: "";
-  inline-size: var(--aster-icon-md);
-  block-size: var(--aster-icon-md);
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
   background-color: currentColor;
-  mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z'/></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z'/></svg>") center / contain no-repeat;
 }
 /* IconButton (Astryx isIconOnly): a button drawing one glyph (pager
    arrows, drag handle, dynlist add, a field's reveal or CIDR switch, a Lua
@@ -531,6 +531,7 @@ html :where(.palette-menu[open] > [role="menu"] > li, #aster-more-menu > li) { c
 html :where(#aster-more-menu:popover-open) { position: fixed; inset: auto; position-anchor: --aster-more; position-area: block-end span-inline-start; position-try-fallbacks: flip-block; min-inline-size: 0; margin: var(--spacing-1) 0; border: 0; transform: none; }
 html :where(.aster-more[aria-expanded="true"]) { anchor-name: --aster-more; }
 html :where(#aster-more-menu > li.negative) { --menu-item-fg: var(--color-text-error); }
+html :where(#aster-more-menu > li[role="separator"]) { block-size: 0; min-block-size: 0; margin-block: var(--spacing-1); padding: 0; border-block-start: var(--border-width) solid var(--color-border); pointer-events: none; }
 html :where(#aster-more-menu > li[aria-disabled="true"]) { opacity: 0.5; cursor: default; }
 html :where(.palette-menu [role="menu"] small) { color: var(--color-text-secondary); font-size: var(--text-supporting-size); }
 html :where(.palette-swatch) {
@@ -859,7 +860,7 @@ html :where(th, td, .th, .td) {
   text-align: start;
   vertical-align: middle;
 }
-html :where(th, td, .th, .td):last-child { padding-inline-end: var(--spacing-4); }
+html :where(:is(th, td, .th, .td):last-child) { padding-inline-end: var(--spacing-4); }
 /* No rule under the last row: the card's edge closes the table (Astryx
    TableCell drops the last body row's divider). */
 html :where(:is(tr, .tr):last-child > :is(td, .td)) { border-block-end: 0; }
@@ -883,186 +884,209 @@ html :where(.tbody:not(tbody) > .tr.placeholder) { display: block; }
 /* Lua CBI tables are real <table>s: the parser's <tbody> holds the title row
    and the placeholder; dissolve it so the caption is the table's own. */
 html :where(tbody:has(> .tr.placeholder)) { display: contents; }
+/* Compact EmptyState (Astryx): the table's message, 16 above and below,
+   centred, secondary; folded, it stands in for the blocks (no Divider). */
 html :where(.tr.placeholder > .td) {
   display: block;
-  padding-block: var(--spacing-6);
+  padding-block: var(--spacing-4);
   border-block-end: 0;
   color: var(--color-text-secondary);
   text-align: center;
 }
+/* Page EmptyState: a view with nothing to show (WireGuard's "No WireGuard
+   interfaces configured.", its loading line): centred, 32 24, its words
+   360 wide, secondary, upright; LuCI's margin-top:5em is dropped. */
+html #view > p.center {
+  box-sizing: border-box;
+  max-inline-size: var(--aster-empty-max-w);
+  margin: 0 auto !important;
+  padding: var(--spacing-8) var(--spacing-6);
+  color: var(--color-text-secondary);
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-leading);
+  text-align: center;
+  & > em { font-style: normal; }
+}
+/* The actions cell keeps its buttons 8 off the row lines (a row with
+   actions is 32 + 16 + 1 = 49); numbers end-aligned in their column
+   (LuCI's .right), the header with them. */
+html :where(:is(.td, td).cbi-section-actions, .tr > .td:not([data-title]):has(> .cbi-button:only-child)) { padding-block: var(--spacing-2); }
+html :where(:is(.td, .th, td, th).right) { text-align: end; }
+/* In a data table a device, network or nftables chip is plain text (a
+   Badge is for zones and states only): no fill, no pill, the cell's own
+   type; its icon follows its words (text first, marker after). */
+html #view :is(.td, td) .ifacebadge:not(.large) {
+  --badge-bg: transparent;
+  gap: var(--spacing-2);
+  min-block-size: 0;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  white-space: normal;
+  margin: 0; /* nftables' <style>: .125em */
+  vertical-align: top; /* a line of text, not a box on its baseline (row 33) */
+  &::before, & > img { order: 1; }
+}
+/* nftables' set (its items a tooltip trigger) is a run of words on the line. */
+html #view :is(.td, td) :is(.nft-set, .nft-set-items) { vertical-align: top; }
+/* A station's signal is its words, the Signal icon after them in the
+   quality's ink (no StatusDot in a value). */
+html [data-page] #view .td > .ifacebadge:has(> img[src*="/signal-"])::before { /* one heavier than the overview StatusDot slot */
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
+  border-radius: 0;
+  mask: var(--icon-signal) center / contain no-repeat;
+}
+/* A form table's cell writes its text in <small> (Traffic Rules' match):
+   it is the cell's text, body size. */
+html :where(:is(.td, td).cbi-value-field > small) { font-size: inherit; line-height: inherit; }
 /* Inside a row a button is the small one (Button sm, 32). */
 html :where(td, .td) :where(.btn, .cbi-button, button) { --button-h: var(--size-element-sm); }
 /* Sorting by drag: the moved row fades, the drop line is the accent. */
 html :where(.dragging) { opacity: 0.5; }
 html :where(.drag-over-above) { box-shadow: inset 0 calc(var(--border-width) * 2) 0 var(--color-accent); }
 html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -2) 0 var(--color-accent); }
-/* Collapsible: in a page under 768 wide (the aster-page container,
-   luci.css: a phone, or a narrow window beside the side nav) a table with
-   a header row folds each row into a stack (the reference's lease table):
-   the first cell primary, the rest supporting text under it with their
-   column names (data-title), the actions last. Rows in thead/tbody
-   (form.js), straight in the table (ui.Table) or in a Lua table's <tbody>
-   are all reached. A table theme-aster.js measures (data-fold) folds by
-   its fit alone. */
-@container aster-page (max-width: 48rem) {
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th):not([data-fold="wide"])) {
-    display: block;
-    overflow: visible;
-    /* Nested rules keep the parent's one element of weight (& is :is()). */
-    & > :where(.thead, .tbody, .tfoot, thead, tbody, tfoot) { display: contents; }
-    & :where(.tr:has(> .th)) { display: none; }
-    & :where(.tr.placeholder) { display: block; }
-    & :where(.tr:not(:has(> .th), .placeholder)) {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      padding-block: var(--spacing-1);
-      border-block-end: var(--border-width) solid var(--color-border);
-    }
-    & :where(.tr:last-child) { border-block-end: 0; }
-    & :where(.tr > :is(.td, td)) {
-      display: block;
-      grid-column: 1;
-      padding: 0 var(--spacing-2) 0 var(--spacing-4);
-      border: 0;
-      color: var(--color-text-secondary);
-      font-size: var(--text-supporting-size);
-      line-height: var(--text-supporting-leading);
-      overflow-wrap: anywhere;
-      text-align: start;
-    }
-    & :where(.tr > :is(.td, td):first-child, .tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child) + :is(.td, td)) {
-      color: var(--color-text-primary);
-      font-size: var(--text-body-size);
-      line-height: var(--text-body-leading);
-    }
-    & :where(.tr > :is(.td, td)[data-title]:not(:first-child, .cbi-section-actions))::before {
-      content: attr(data-title);
-      margin-inline-end: var(--spacing-2);
-      font-weight: var(--font-weight-medium);
-    }
-    & :where(.tr > :is(.td, td):has(> :is(input:not([type="checkbox"]), select, .cbi-dropdown, .cbi-dynlist)))::before { display: block; }
-    /* A row that opens with a lone selection checkbox (PassWall's node
-       list): the checkbox sits before the title, which is the cell after it;
-       the rest stack under the title. */
-    & :where(.tr:has(> :is(.td, td):first-child > input[type="checkbox"]:only-child)) { grid-template-columns: auto minmax(0, 1fr); }
-    & :where(.tr:has(> :is(.td, td):first-child > input[type="checkbox"]:only-child) > :is(.td, td)) { grid-column: 2; }
-    & :where(.tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child)) { grid-column: 1; grid-row: 1; padding-inline-end: 0; }
-    & :where(.tr > :is(.td, td):first-child:has(> input[type="checkbox"]:only-child) + :is(.td, td))::before { content: none; }
-    /* The actions take a line of their own under the stack, so the data
-       keeps the row's full width (a column beside it left long values a
-       narrow one); 8 apart on one line, the rest in the "more" menu where
-       it is too short (Startup's five; theme-aster.js). */
-    & :where(.tr > :is(.td, td).cbi-section-actions) { padding: var(--spacing-2) var(--spacing-4) 0; }
-    & :where(.tr > :is(.td, td).cbi-section-actions > div) { display: flex; gap: var(--spacing-2); }
-  }
-  html #view .nft-rules tr > td { padding-block: 0 !important; } /* nftables' <style>, as above */
-  /* A Lua button table (one action per cell, Commit and Apply) stacks
-     its buttons 8 apart: the cell, or the option's div in it, which may
-     carry the button's script beside it (OpenClash's Create). (:has()
-     does not nest, hence the div is the box.) */
-  html :where(form > .cbi-map .table .tr > :is(.td, td):has(> :is(.btn, .cbi-button):only-child), form > .cbi-map .table .tr > :is(.td, td) > div:only-child:has(> :is(.btn, .cbi-button)):not(:has(> :not(script, .btn, .cbi-button)))) {
-    padding-block: var(--spacing-1);
-  }
-}
-/* Leases and stations never break a line (luci.css): a table whose lines
-   do not fit its card folds as above, as the reference's compact
-   columns: the first cell the title, its one action (Disconnect, Reserve
-   IP; Wireless' Disconnect cell has no class or title) at the end of the
-   title line, not a line of its own; under it every value in one column
-   after a key column of --aster-label-w (MetadataList on a phone: keys
-   wrap, 16 to the value),
-   so a value's second line (the addresses, the TX rate) starts under its
-   first. A cell with nothing in it (no action, LuCI's "-") takes no
-   line. theme-aster.js measures the unbroken table (data-fold); without
-   it the page decides (under the 1440 desktop's). */
-html :where(#view .table:is(.leases, .lases, .leases6, .assoclist)[data-fold="fold"]) {
-  display: block;
-  & > :where(.thead, .tbody, thead, tbody) { display: contents; }
-  & :where(.tr.table-titles) { display: none; }
-  & :where(.tr:not(.table-titles, .placeholder)) {
+/* ── FoldedBlock ─────────────────────────────────────────────────
+   A data table that does not fit its card folds, at any window width
+   (theme-aster.js measures it and sets data-fold; no media or container
+   query decides a table's layout). One layout for every table on every
+   page: each row is a block, its identifier the title line (trailing
+   markers, the actions at its end), under it one MetadataList row per
+   other cell (label = the column's name, data-title). The table is a
+   grid of three tracks (labels, values, actions); every block and every
+   label/value row is a subgrid of it, so the label column is as wide as
+   the table's longest label (at most half) and every value starts on one
+   x. Blocks are 12 + 12 apart with a Divider between them on the card's
+   content box; the first starts and the last ends flush. Rows in
+   thead/tbody (form.js), straight in the table (ui.Table) or in a Lua
+   table's <tbody> are all reached. theme-aster.js puts a cell's mixed
+   content in one .aster-v box, so it is one grid item. */
+html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
+  display: grid;
+  grid-template-columns: fit-content(50%) minmax(0, 1fr) auto;
+  column-gap: var(--spacing-4);
+  box-sizing: border-box;
+  padding-inline: var(--aster-bleed, 0);
+  /* Nested rules keep the parent's one element of weight (& is :is()). */
+  & > :where(.thead, .tbody, .tfoot, thead, tbody, tfoot) { display: contents; }
+  & :where(.tr:has(> :is(.th, th)), .tr.cbi-section-table-descr) { display: none; }
+  & :where(.tr.placeholder) { display: block; grid-column: 1 / -1; }
+  & :where(.tr.placeholder > :is(.td, td)) { display: block; padding-block: var(--spacing-4); text-align: center; color: var(--color-text-secondary); &::before { content: none; } }
+  & :where(.tr:not(.placeholder):has(> :is(.td, td))) {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    padding-block: var(--spacing-1);
-    border-block-end: var(--border-width) solid var(--color-border);
-  }
-  & :where(.tr:last-child) { border-block-end: 0; }
-  & :where(.tr > .td) {
-    display: block;
     grid-column: 1 / -1;
-    padding: 0 var(--spacing-2) 0 var(--spacing-4);
+    grid-template-columns: subgrid;
+    row-gap: var(--spacing-2);
+    align-items: first baseline;
+    padding-block: var(--spacing-3);
+  }
+  & :where(.tr:nth-child(1 of .tr:not(.placeholder):has(> :is(.td, td)))) { padding-block-start: 0; }
+  & :where(.tr:nth-last-child(1 of .tr:not(.placeholder):has(> :is(.td, td)))) { padding-block-end: 0; }
+  & :where(.tr:not(.placeholder):has(> :is(.td, td)) ~ .tr:not(.placeholder):has(> :is(.td, td))) { border-block-start: var(--border-width) solid var(--color-border); }
+  /* A label/value row. */
+  & :where(.tr:not(.placeholder) > :is(.td, td)) {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    align-items: first baseline;
+    min-inline-size: 0;
+    padding: 0;
     border: 0;
+    color: var(--color-text-primary);
+    font-size: var(--text-body-size);
+    font-weight: var(--text-body-weight);
+    line-height: var(--text-body-leading);
+    text-align: start;
+    white-space: normal;
+    /* A token wider than the value column ends in an ellipsis, never
+       breaks (identifiers wrap at spaces only). */
+    & > * { grid-column: 2 / -1; justify-self: start; min-inline-size: 0; max-inline-size: 100%; margin: 0; overflow-x: clip; text-overflow: ellipsis; }
+    & > .aster-v { justify-self: stretch; }
+    &::before {
+      content: attr(data-title);
+      grid-column: 1;
+      color: var(--color-text-secondary);
+      font-weight: var(--text-label-weight);
+      overflow-wrap: normal;
+      word-break: keep-all;
+    }
+  }
+  & :where(.tr > :is(.td, td):not([data-title]), .tr > :is(.td, td)[data-title=""]) {
+    &::before { content: none; }
+    & > * { grid-column: 1 / -1; }
+  }
+  /* The title line: the identifier (the first cell, or the column a table
+     names its rows by), its markers after it, the actions at the end. */
+  & :where(.tr > :is(.td, td):first-child),
+  &:where(.assoclist) :where(.tr > .td:nth-child(3)),
+  &:where(#status_leases6:has(.th:nth-child(7))) :where(.tr > .td:nth-child(2)),
+  &:where([data-page^="admin-status-route"] .table:has(.th:nth-child(6))) :where(.tr > .td:nth-child(2)) {
+    display: block;
+    grid-row: 1;
+    grid-column: 1 / -2;
+    align-self: start;
+    font-weight: var(--text-label-weight);
+    &::before { content: none; }
+    /* With actions the title line is the buttons' height, the identifier
+       centred in it; a subline follows under it. */
+    &::first-line { line-height: var(--aster-title-line, inherit); }
+  }
+  & :where(.tr:has(> .cbi-section-actions :is(.btn, .cbi-button, button), > :not([data-title]) > .cbi-button:only-child)) { --aster-title-line: var(--size-element-sm); }
+  & :where(.tr > :is(.td, td) .ifacebox-head) { min-block-size: var(--aster-title-line, auto); align-items: center; }
+  &:where(.assoclist, #status_leases6:has(.th:nth-child(7)), [data-page^="admin-status-route"] .table:has(.th:nth-child(6))) :where(.tr > :is(.td, td):first-child) {
+    display: grid;
+    grid-row: auto;
+    grid-column: 1 / -1;
+    align-self: auto;
+    font-weight: var(--text-body-weight);
+    &::before { content: attr(data-title); }
+  }
+  /* The title's second line (a device under its interface, a station's
+     addresses under its host): supporting text, no marker before it. */
+  & :where(.tr > :is(.td, td) :is(.hide-xs, .ifacebox-body)) {
+    display: block;
     color: var(--color-text-secondary);
     font-size: var(--text-supporting-size);
+    font-weight: var(--text-body-weight);
     line-height: var(--text-supporting-leading);
-    white-space: normal;
-    overflow-wrap: anywhere;
   }
-  & :where(.tr > .td:first-child) { grid-column: 1; color: var(--color-text-primary); font-size: var(--text-body-size); line-height: var(--text-body-leading); }
-  & :where(.tr > .td[data-title]:not(:first-child, .cbi-section-actions)) {
-    display: flow-root;
-    margin-inline-start: calc(var(--aster-label-w) + var(--spacing-4));
-  }
-  & :where(.tr > .td[data-title]:not(:first-child, .cbi-section-actions))::before {
-    content: attr(data-title);
-    float: inline-start;
-    inline-size: var(--aster-label-w);
-    margin-inline: calc((var(--aster-label-w) + var(--spacing-4)) * -1) 0;
-    font-weight: var(--font-weight-medium);
-    word-break: keep-all; /* "接收速率 /" over "發送速率", not "發送速" over "率" */
-  }
-  & :where(.tr > .td:is(.cbi-section-actions, :not([data-title]):has(> .cbi-button:only-child))) { grid-column: 2; grid-row: 1; align-self: center; padding: 0 var(--spacing-4); }
-  & :where(.tr > .td:is(:empty, .cbi-section-actions:not(:has(button, .btn, .cbi-button)), :not(:first-child, [data-title]):not(:has(*)))) { display: none; }
-}
-@container aster-page (max-width: 71.9375rem) {
-  html :where(#view .table:is(.leases, .lases, .leases6, .assoclist):not([data-fold])) {
+  /* The actions (RowActions): on the title line, at its end. A lone
+     button in an untitled cell (Wireless' Disconnect) is one too. */
+  & :where(.tr > :is(.td, td):is(.cbi-section-actions, :not([data-title]):has(> .cbi-button:only-child))) {
     display: block;
-    & > :where(.thead, .tbody, thead, tbody) { display: contents; }
-    & :where(.tr.table-titles) { display: none; }
-    & :where(.tr:not(.table-titles, .placeholder)) {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      padding-block: var(--spacing-1);
-      border-block-end: var(--border-width) solid var(--color-border);
-    }
-    & :where(.tr:last-child) { border-block-end: 0; }
-    & :where(.tr > .td) {
-      display: block;
-      grid-column: 1 / -1;
-      padding: 0 var(--spacing-2) 0 var(--spacing-4);
-      border: 0;
-      color: var(--color-text-secondary);
-      font-size: var(--text-supporting-size);
-      line-height: var(--text-supporting-leading);
-      white-space: normal;
-      overflow-wrap: anywhere;
-    }
-    & :where(.tr > .td:first-child) { grid-column: 1; color: var(--color-text-primary); font-size: var(--text-body-size); line-height: var(--text-body-leading); }
-    & :where(.tr > .td[data-title]:not(:first-child, .cbi-section-actions)) {
-      display: flow-root;
-      margin-inline-start: calc(var(--aster-label-w) + var(--spacing-4));
-    }
-    & :where(.tr > .td[data-title]:not(:first-child, .cbi-section-actions))::before {
-      content: attr(data-title);
-      float: inline-start;
-      inline-size: var(--aster-label-w);
-      margin-inline: calc((var(--aster-label-w) + var(--spacing-4)) * -1) 0;
-      font-weight: var(--font-weight-medium);
-      word-break: keep-all; /* "接收速率 /" over "發送速率", not "發送速" over "率" */
-    }
-    & :where(.tr > .td:is(.cbi-section-actions, :not([data-title]):has(> .cbi-button:only-child))) { grid-column: 2; grid-row: 1; align-self: center; padding: 0 var(--spacing-4); }
-    & :where(.tr > .td:is(:empty, .cbi-section-actions:not(:has(button, .btn, .cbi-button)), :not(:first-child, [data-title]):not(:has(*)))) { display: none; }
+    grid-row: 1;
+    grid-column: -2;
+    align-self: start;
+    justify-self: end;
+    inline-size: auto;
+    &::before { content: none; }
+    & > div { display: flex; gap: var(--spacing-2); }
+    & > div > * { margin: 0; }
   }
+  /* A cell with nothing in it (LuCI's "-" too, theme-aster.js) takes no
+     row; nor do actions with no button. */
+  & :where(.tr > :is(.td, td):not(:first-child):is(:empty, [data-empty]), .tr > .cbi-section-actions:not(:has(button, .btn, .cbi-button))) { display: none; }
 }
-/* On a phone the ids that never break (a full IPv6 address, about 290
-   wide) do not fit beside the key column: each key goes above its value
-   (as a folded field's label), the pairs 4 apart. From 480 the column
-   leaves the value 330 or more. */
-@container aster-page (max-width: 30rem) {
-  html :where(#view .table:is(.leases, .lases, .leases6, .assoclist):not([data-fold="wide"])) {
-    & :where(.tr > .td[data-title]:not(:first-child, .cbi-section-actions)) { margin-block-start: var(--spacing-1); margin-inline-start: 0; }
-    & :where(.tr > .td[data-title]:not(:first-child, .cbi-section-actions))::before { display: block; float: none; inline-size: auto; margin-inline: 0; }
-  }
+/* nftables' <style> pads its cells .25em with !important (one id heavier). */
+html #view .nft-rules[data-fold="fold"] tr > td { padding: 0 !important; }
+/* 24.10: a chain outside a card; LuCI's 1px margin set the table 2 past it. */
+html #view .nft-chain:not(.cbi-section) > .nft-rules { margin-inline: 0; }
+/* An interface's box is the title line itself (luci.css spaces it 8 in a
+   wide row). */
+html [data-page] #view [data-fold="fold"] .td > .ifacebox { margin-block: 0; vertical-align: top; }
+/* A Lua button table (one action per cell, Commit and Apply) stacks
+   its buttons 8 apart: the cell, or the option's div in it, which may
+   carry the button's script beside it (OpenClash's Create). (:has()
+   does not nest, hence the div is the box.) */
+html :where(form > .cbi-map .table[data-fold="fold"] .tr > :is(.td, td):has(> :is(.btn, .cbi-button):only-child), form > .cbi-map .table[data-fold="fold"] .tr > :is(.td, td) > div:only-child:has(> :is(.btn, .cbi-button)):not(:has(> :not(script, .btn, .cbi-button)))) {
+  padding-block: var(--spacing-1);
 }
+/* Wide, a cell's mixed content is the cell's own (theme-aster.js keeps
+   the box it adds for the fold). */
+html :where(.aster-v) { display: contents; }
+html :where([data-fold="fold"] .aster-v) { display: block; }
 
 /* ── MetadataList ────────────────────────────────────────────────
    A table with no header row: Astryx's single-column list (auto
@@ -1203,9 +1227,9 @@ html :where(.cbi-progressbar)::before {
   white-space: nowrap;
 }
 html :where(.cbi-progressbar .bar-ink) { display: none; }
-/* Indeterminate: a status line (.spinning) leads with a short track whose
-   accent segment (40 %) slides end to end and back; stopped (reduced
-   motion, a still capture) it rests in the middle, never off the track. */
+/* Spinner (Astryx): a status line (.spinning) leads with a 16 ring, its
+   accent arc (3/8 of the ring) turning on the muted track, 8 before the
+   loading words; stopped (reduced motion, a still capture) it rests. */
 html :where(.spinning:not(.btn, .cbi-button, .cbi-dropdown, button)) {
   display: flex;
   align-items: center;
@@ -1213,7 +1237,18 @@ html :where(.spinning:not(.btn, .cbi-button, .cbi-dropdown, button)) {
   color: var(--color-text-secondary);
   font-size: var(--text-supporting-size);
 }
-html :where(.spinning:not(.btn, .cbi-button, .cbi-dropdown, button))::before,
+html :where(.spinning:not(.btn, .cbi-button, .cbi-dropdown, button, #modal_overlay > .alert-message))::before {
+  content: "";
+  flex: none;
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
+  border-radius: var(--radius-full);
+  background: conic-gradient(var(--color-accent) 0 37.5%, var(--color-background-muted) 0);
+  mask: radial-gradient(farthest-side, transparent calc(100% - var(--spacing-0-5)), black calc(100% - var(--spacing-0-5)));
+  animation: aster-spin 0.8s linear infinite;
+}
+@keyframes aster-spin { to { rotate: 1turn; } }
+/* A dialog's busy line keeps the indeterminate track under its words. */
 html :where(#modal_overlay > .alert-message.spinning)::after {
   content: "";
   flex: none;

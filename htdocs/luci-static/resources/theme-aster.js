@@ -18,16 +18,15 @@ return baseclass.extend({
 		this.fold();
 	},
 
-	/* Tables whose lines never break (leases, stations, Wireless' radios)
-	 * fold where they do not fit their card (components.css, luci.css):
-	 * each is measured unfolded (data-fold "wide") at its narrowest
-	 * (min-content) and folds when that is wider than its room; folded, it
-	 * opens again only with 16 to spare, so the scroll bar a taller fold
-	 * brings does not flip it back. Resizes are read on the next frame, as a
-	 * fold resizes the card being observed. */
+	/* Every data table (Table, components.css) folds where it does not fit
+	 * its card, whatever the window: each is measured unfolded (data-fold
+	 * "wide") at its narrowest (min-content) and folds when that is wider
+	 * than its room; folded, it opens again only with 16 to spare, so the
+	 * scroll bar a taller fold brings does not flip it back. Resizes are
+	 * read on the next frame, as a fold resizes the card being observed. */
 	fold() {
-		const view = document.getElementById('view'), seen = new WeakSet(),
-			sel = '.table:is(.leases, .lases, .leases6, .assoclist, :has(.tr > [data-name="_badge"]))';
+		const view = document.getElementById('maincontent'), seen = new WeakSet(),
+			sel = ':is(#view, form > .cbi-map) :is(.table, table):is(:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th), .cbi-section-table):not(:has(.diag-action))';
 		let frame;
 
 		if (!view)
@@ -45,9 +44,29 @@ return baseclass.extend({
 			const need = t.scrollWidth, room = p.clientWidth - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight) - parseFloat(ts.marginLeft) - parseFloat(ts.marginRight);
 			t.style.width = w;
 			t.dataset.fold = need > room + 0.5 - (was ? 16 : 0) ? 'fold' : 'wide';
+			/* nftables' comment mark follows the rule's words (text first). */
+			t.querySelectorAll('.td > .nft-comment:not(:last-child)').forEach((c) => c.parentNode.append(c));
+
+			/* Folded, a cell is a label and a value: it takes its column's
+			 * name where LuCI gives none (nftables, Lua maps), an empty one
+			 * ("-") is marked, and mixed content goes into one box. */
+			if (t.dataset.fold == 'wide')
+				return t.querySelectorAll('.aster-v').forEach((v) => v.replaceWith(...v.childNodes));
+
+			const h = [...(t.querySelector('.tr:has(> .th)')?.children || [])].map((c) => c.textContent.trim());
+			t.querySelectorAll('.tr:not(:has(> .th))').forEach((r) => [...r.children].forEach((c, i) => {
+				const n = [...c.childNodes].filter((x) => x.nodeType == 1 || x.data.trim());
+
+				c.hasAttribute('data-title') || !h[i] || c.setAttribute('data-title', h[i]);
+				c.toggleAttribute('data-empty', /^-?$/.test(c.textContent.trim()) && !c.querySelector('input, select, button, img'));
+				(n[1] || n[0]?.nodeType == 3) && !c.matches('.cbi-section-actions') && c.replaceChildren(E('div', { class: 'aster-v' }, n));
+			}));
 		};
 		const ro = new ResizeObserver(() => frame ||= requestAnimationFrame(() => (frame = 0, view.querySelectorAll(sel).forEach(fit))));
-		const run = () => view.querySelectorAll(sel).forEach((t) => (seen.has(t.parentNode) || (seen.add(t.parentNode), ro.observe(t.parentNode)), fit(t)));
+		/* Only the tables a change is in, or under (a view re-rendered); a
+		 * table's own size too (its text grows when the web font lands). */
+		const run = (rs) => new Set((rs || [{ target: view }]).flatMap((r) => r.target.closest(sel) || [...r.target.querySelectorAll(sel)]))
+			.forEach((t) => (seen.has(t.parentNode) || (seen.add(t.parentNode), ro.observe(t.parentNode)), ro.observe(t), fit(t)));
 
 		run();
 		new MutationObserver(run).observe(view, { childList: true, subtree: true });
@@ -68,13 +87,16 @@ return baseclass.extend({
 		const menu = document.body.appendChild(E('ul', { id: 'aster-more-menu', role: 'menu', popover: 'auto',
 			beforetoggle: (ev) => {
 				owner.ariaExpanded = ev.newState == 'open';
-				ev.newState == 'open' && menu.replaceChildren(...[...acts(owner.parentNode)].slice(1).sort((x, y) => x.matches(neg) - y.matches(neg)).map((b, i) =>
+				/* The rest in DOM order, Remove/Negative last in red after a Divider. */
+				ev.newState == 'open' && menu.replaceChildren(...[...acts(owner.parentNode)].filter((b) => !b.hasAttribute('data-keep')).sort((x, y) => x.matches(neg) - y.matches(neg)).flatMap((b, i, l) => [
+					...(b.matches(neg) && i && !l[i - 1].matches(neg) ? [E('li', { role: 'separator' })] : []),
 					E('li', { role: 'menuitem', tabindex: -1, class: b.matches(neg) ? 'negative' : null, 'aria-disabled': b.disabled || null, autofocus: !i || null,
-						click: b.disabled ? null : () => (menu.hidePopover(), b.click()) }, (b.textContent || b.value).trim())));
+						click: b.disabled ? null : () => (menu.hidePopover(), b.click()) }, (b.textContent || b.value).trim())]));
 			},
 			keydown: (ev) => {
-				const k = ev.key, a = ev.target, f = menu.firstChild, l = menu.lastChild,
-					go = { ArrowDown: a.nextSibling || f, ArrowUp: a.previousSibling || l, Home: f, End: l }[k];
+				const k = ev.key, a = ev.target, f = menu.firstChild, l = menu.lastChild;
+				let go = { ArrowDown: a.nextSibling || f, ArrowUp: a.previousSibling || l, Home: f, End: l }[k];
+				go?.role == 'separator' && (go = k == 'ArrowUp' ? go.previousSibling : go.nextSibling);
 				if (go)
 					go.focus();
 				else if (k == 'Enter' || k == ' ')
@@ -85,20 +107,33 @@ return baseclass.extend({
 			}
 		}));
 		const fit = (t) => {
-			const gs = groups(t), on = (v) => gs.forEach((g) => g.toggleAttribute('data-collapsed', v));
+			const gs = groups(t), on = (v) => gs.forEach((g) => {
+				const a = [...acts(g)];
 
+				g.toggleAttribute('data-collapsed', v);
+				a.forEach((b) => b.toggleAttribute('data-keep', b == (a.find((b) => b.matches('.cbi-button-edit, .important')) || a.find((b) => !b.matches(neg)) || a[0])));
+			});
+
+			/* Collapsed where the line does not fit; folded, also where that
+			 * saves a title line a wrap (the actions collapse before the
+			 * title wraps; they never take a line of their own). */
 			if (t.offsetWidth) {
+				on(true);
+				const h = t.offsetHeight;
 				on(false);
-				on(wide(t.parentNode) || wide(t) || gs.some((g) => wide(g) || g.offsetWidth > g.parentNode.clientWidth));
+				on(wide(t.parentNode) || wide(t) || [...t.querySelectorAll('.tr > *')].some(wide) || gs.some((g, r, b) => (r = g.getBoundingClientRect(), b = t.getBoundingClientRect(), wide(g) || g.offsetWidth > g.parentNode.clientWidth || r.left < b.left - 1 || r.right > b.right + 1)) || t.dataset.fold == 'fold' && h < t.offsetHeight);
 			}
 		};
-		const ro = new ResizeObserver((es) => es.forEach((e) => e.target.querySelectorAll(':scope > :is(.table, table)').forEach(fit)));
+		/* The parent's room, or the table's own size (it folds), read on the
+		 * next frame. */
+		const q = new Set();
+		const ro = new ResizeObserver((es) => (q.size || requestAnimationFrame(() => (q.forEach(fit), q.clear())), es.forEach((e) => (e.target.matches('.table, table') ? [e.target] : e.target.querySelectorAll(':scope > :is(.table, table)')).forEach((t) => q.add(t)))));
 		const run = () => new Set(groups(view).map((g) => {
 			g.querySelector('.aster-more') || g.appendChild(E('button', { type: 'button', class: 'btn cbi-button aster-more',
 				'aria-haspopup': 'menu', 'aria-expanded': false, 'aria-label': _('Actions'), popovertarget: 'aster-more-menu',
 				click: (ev) => owner = ev.currentTarget }));
 			return g.closest('.table, table');
-		})).forEach((t) => (ro.observe(t.parentNode), fit(t)));
+		})).forEach((t) => (ro.observe(t.parentNode), ro.observe(t), fit(t)));
 
 		run();
 		new MutationObserver(run).observe(view, { childList: true, subtree: true });
@@ -246,17 +281,12 @@ return baseclass.extend({
 
 	/* Lua CBI pages (a <form> around the .cbi-map) are in the document by
 	 * the time this runs; form.js views render later and need none of it.
-	 *  - A Button option whose label repeats the button's words (PassWall's
-	 *    "Delete All Subscribe Node" over the same button) is marked
-	 *    .aster-same-label: the label is kept for screen readers and not
-	 *    drawn, so the row shows the button once (components.css, Form row).
-	 *  - A table cell with no data-title takes its column header's own words,
-	 *    which the phone fold prints before it, as form.js tables carry;
-	 *    again when the page's own script moves rows (PassWall's node
-	 *    groups). */
+	 * A Button option whose label repeats the button's words (PassWall's
+	 * "Delete All Subscribe Node" over the same button) is marked
+	 * .aster-same-label: the label is kept for screen readers and not
+	 * drawn, so the row shows the button once (components.css, Form row).
+	 * (A table cell's column name: fold().) */
 	lua() {
-		const words = (el) => Array.from(el.childNodes).filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim();
-
 		document.querySelectorAll('form > .cbi-map .cbi-value').forEach((row) => {
 			const label = row.querySelector(':scope > .cbi-value-title');
 			const ctl = row.querySelectorAll(':scope > .cbi-value-field :is(input:not([type="hidden"]), select, textarea, button)');
@@ -265,28 +295,6 @@ return baseclass.extend({
 			    (ctl[0].value || ctl[0].textContent).trim() === label.textContent.trim())
 				row.classList.add('aster-same-label');
 		});
-
-		const titles = () => document.querySelectorAll('form > .cbi-map :is(table, .table)').forEach((t) => {
-			const head = Array.from(t.querySelectorAll(':scope > .tr, :scope > :is(.thead, thead, tbody) > .tr')).find((r) => r.querySelector(':scope > .th'));
-
-			if (!head)
-				return;
-
-			const names = Array.from(head.children).map(words);
-
-			t.querySelectorAll(':scope > .tr, :scope > :is(.tbody, tbody) > .tr').forEach((r) => Array.from(r.children).forEach((c, i) => {
-				if (c.matches('.td, td') && !c.hasAttribute('data-title') && names[i])
-					c.setAttribute('data-title', names[i]);
-			}));
-		});
-		let queued = false;
-		const observer = new MutationObserver(() => {
-			if (!queued)
-				queued = requestAnimationFrame(() => { queued = false; titles(); });
-		});
-
-		titles();
-		document.querySelectorAll('form > .cbi-map').forEach((m) => observer.observe(m, { childList: true, subtree: true }));
 	},
 
 	/* The appearance controls (header.ut): the scheme button, the scheme in
