@@ -188,6 +188,11 @@ html :where(kbd) {
   user-select: none;
 }
 
+/* Emphasis in CJK text is never slanted (the fonts have no italic, so the
+   browser shears the glyphs): LuCI's placeholders ("無", "此部份還未包含
+   任何值") are upright, in secondary ink. */
+html :where(:lang(zh), :lang(ja), :lang(ko)) :where(em, i:not([class])) { font-style: normal; color: var(--color-text-secondary); }
+
 /* ── Button ──────────────────────────────────────────────────────
    Secondary md by default: 36 high, pill, 12 inline, label weight, the
    neutral fill. Hover and press lay the overlay over whatever fill the
