@@ -49,6 +49,10 @@ expect uniform 1 "c7.when state,overflow excess,table.row.text height" "table me
 printf '%s\n' 'admin/status/overview require=c7.when' >"$tmp/tab-ov.txt"
 expect uniform 1 "c7.when state" "lease host names measured unbroken (audit 2)" -- "$url" "$password" --pages "$tmp/tab-ov.txt" --viewports desktop \
 	--debug-css 'admin/status/overview=html #view .table.leases .td:first-child { white-space: nowrap !important } html #view .table.leases .td:first-child::after { content: " wraps at every space of this long host name like a lease with its DNS name in parentheses, which DHCP shows wide and Overview should too (example.lan)" }'
+# C6: LuCI's 60 % / 40 % nftables columns (audit 2, C6 B).
+printf '%s\n' 'admin/status/nftables require=c6.table' >"$tmp/tab-nft-wide.txt"
+expect uniform 1 "c6.table inlineWidth" "nftables columns split 60 / 40 (audit 2)" -- "$url" "$password" --pages "$tmp/tab-nft-wide.txt" --viewports desktop \
+	--debug-css 'admin/status/nftables=html #view .nft-rules :is(.th, .td)[style*="60%"] { width: 60% !important } html #view .nft-rules :is(.th, .td)[style*="40%"] { width: 40% !important }'
 # Zones: "lan => wan REJECT all others" as LuCI's column of boxes, three
 # lines in a 360 column (c).
 expect uniform 1 "c6.table run" "zone forwards stacked (c)" -- "$url" "$password" --pages "$tmp/tab-zones.txt" \

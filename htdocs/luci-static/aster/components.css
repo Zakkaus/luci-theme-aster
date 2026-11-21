@@ -967,6 +967,9 @@ html :where(:is(.td, .th, td, th).right) { text-align: end; }
    its narrowest so: CJK breaks where words do, not after any character,
    and a name (Allow-DHCP-Renew) not at its hyphens. Where whole words do
    not fit, the table folds. */
+/* LuCI's inline column widths (nftables' 60 % / 40 %, SWAP's 90 %) are
+   not the Table's: a column is as wide as its content (C6). */
+html :is(#view, form > .cbi-map) :is(.table, table) :is(.td, .th, td, th):not(.cbi-section-actions)[style*="width"] { width: auto !important; }
 html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="wide"] :is(.td, .th, td, th)) { word-break: keep-all; }
 html :where(:is(#view, form > .cbi-map) .cbi-section-table[data-fold="wide"] .td:is(.cbi-section-table-titles, [data-name="name"], [data-name="filename"])) { white-space: nowrap; }
 /* In a data table a device, network or nftables chip is plain text (a
@@ -1123,6 +1126,11 @@ html #view .nft-rules[data-fold="fold"] tr > td { padding: 0 !important; }
 /* Folded, an nftables match is a sentence that wraps at its spaces; as a
    flex row its parts shrank into columns, one glyph a line. */
 html #view .nft-rules[data-fold="fold"] .td .ifacebadge:not(.large) { display: inline; }
+/* Wide, a clause is one line (its set clipped by LuCI, items in the set's
+   tooltip): a chain where a clause and its action do not fit folds, small
+   or large (C7), instead of shrinking the clause into a column. (Measured
+   from a fold, a clause is still in its .aster-v.) */
+html #view .nft-rules[data-fold="wide"] .td .ifacebadge:not(.cbi-tooltip *) { white-space: nowrap; }
 /* 24.10: a chain outside a card; LuCI's 1px margin set the table 2 past it. */
 html #view .nft-chain:not(.cbi-section) > .nft-rules { margin-inline: 0; }
 /* An interface's box is the title line itself (luci.css spaces it 8 in a

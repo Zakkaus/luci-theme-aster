@@ -11,8 +11,8 @@
 
 export const canonical = {
   'c6.table': {
-    _source: 'COMPONENTS.md C6 (owner Q1 = A): the actions cell pads 8 (a row with sm buttons 49); its last button ends 16 from the card border; LuCI .right columns end-aligned',
-    actionsPad: [8, 8], actionsEnd: 16, rowActions: 49, numAlign: 'end', run: 'ok', headLine: 0, read: 'whole',
+    _source: 'COMPONENTS.md C6 (owner Q1 = A): the actions cell pads 8 (a row with sm buttons 49); its last button ends 16 from the card border; LuCI .right columns end-aligned; LuCI inline column widths (nftables 60 %) take no effect',
+    actionsPad: [8, 8], actionsEnd: 16, rowActions: 49, numAlign: 'end', run: 'ok', headLine: 0, read: 'whole', inlineWidth: 0,
   },
   'c7.when': {_source: 'COMPONENTS.md C7: a table is folded iff its min-content is wider than its room (unfolds with 16 to spare); every data table is measured', state: 'ok'},
   'c7.sig': {
@@ -128,11 +128,12 @@ export async function collect(cfg) {
         // CJK breaks only where words do, a rule's name not at a hyphen.
         const cells = [...t.querySelectorAll('.td, .th, td, th')].filter((c) => c.closest('.table, table') === t);
         // A list (", ": a station's addresses and rates) breaks after its
-        // commas, whatever nowrap the theme puts on it (C7, f). The title
+        // commas, whatever nowrap the theme puts on it (C7, f); an nftables
+        // set is one clipped line (its items in its tooltip). The title
         // (a lease's host) wraps at its spaces (C7): the same leases fit on
         // Overview as on DHCP's page (audit 2, C7 A).
         const titles = rowsOf(t).map((r) => r.children[head(r)]).filter((c) => c && !c.matches('.cbi-section-table .td:is(.cbi-section-table-titles, [data-name="name"])'));
-        const lists = [...titles, ...cells.flatMap((c) => [c, ...c.querySelectorAll('*')]).filter((e) => !e.closest('.cbi-section-actions') && [...e.childNodes].some((n) => n.nodeType === 3 && n.data.includes(', ')))];
+        const lists = [...titles, ...cells.flatMap((c) => [c, ...c.querySelectorAll('*')]).filter((e) => !e.closest('.cbi-section-actions, .nft-set, .nft-list') && [...e.childNodes].some((n) => n.nodeType === 3 && n.data.includes(', ')))];
         const set = (on) => cells.forEach((c) => {
           on ? c.style.setProperty('word-break', 'keep-all', 'important') : c.style.removeProperty('word-break');
           c.matches('.cbi-section-table .td:is(.cbi-section-table-titles, [data-name="name"])') && (on ? c.style.setProperty('white-space', 'nowrap', 'important') : c.style.removeProperty('white-space'));
@@ -199,6 +200,17 @@ export async function collect(cfg) {
       // also over an actions column with no header cell of its own.
       const head = [...t.querySelectorAll('.tr')].find((r) => r.closest('.table, table') === t && r.querySelector(':scope > :is(.th, th)') && shown(r));
       const rowEnd = rows.length ? Math.max(...cellsOf(rows[0]).filter(shown).map((c) => box(c).right)) : 0;
+      // C6: LuCI's inline column widths (nftables' 60 % / 40 %) change
+      // nothing: the columns are as wide with every such cell at auto.
+      const fixed = [...t.querySelectorAll(':is(.td, .th, td, th)[style*="width"]:not(.cbi-section-actions)')].filter((c) => c.closest('.table, table') === t && shown(c));
+      if (fixed.length) {
+        const ws = () => fixed.map((c) => box(c).width);
+        const before = ws(), styles = fixed.map((c) => c.getAttribute('style'));
+        fixed.forEach((c) => c.style.setProperty('width', 'auto', 'important'));
+        const moved = Math.max(...ws().map((w, i) => Math.abs(w - before[i])));
+        fixed.forEach((c, i) => c.setAttribute('style', styles[i]));
+        add('c6.table', 'inlineWidth', moved > 1 ? px(moved) : 0, fixed[0]);
+      }
       if (head && rowEnd) {
         const ruled = [...head.children].filter((c) => shown(c) && parseFloat(cs(c).borderBottomWidth) > 0);
         const after = getComputedStyle(head, '::after');
