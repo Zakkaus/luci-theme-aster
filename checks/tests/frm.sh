@@ -114,6 +114,9 @@ expect uniform 1 "c9.button conform" "drag handle filled (C9, audit2)" "drag han
 # two sizes (Neighbours 18, Routes and Rules 15).
 expect uniform 1 "c3.heading conform,heading.card *" "routing table headings at two sizes (C3, audit3 B1)" "card size" -- "$url" "$password" --pages "$tmp/frm-routes.txt" \
 	--debug-css 'admin/status/routes=#view .cbi-section > h3 ~ h3 { font-size: 15px !important }'
+# G5, audit3 B2: a dialog title broken inside a word.
+expect uniform 1 "c18.dialog conform" "dialog title broken in a word (G5, audit3 B2)" "title word" -- "$url" "$password" --pages "$tmp/frm-dialog.txt" --viewports phone \
+	--debug-css 'admin/network/network=#modal_overlay > .modal > h4 { inline-size: 24px; word-break: break-all !important }'
 
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true

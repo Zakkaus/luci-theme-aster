@@ -33,7 +33,7 @@ const RULES = {
   'c5.form': 'C5: label 200 + 16 (stacked 4), row padding 8, fields 36, a labelled text area 256, a read-only value whole, buttons wrapped 8 under their field, help 4',
   'c9.button': 'C9: md 36 in toolbars/forms/save bar/dialogs, sm 32 in tables/cards/heading rows; one primary; red only in a dialog; the drag handle ghost; C11: the save bar reads Reset, Save, Save & Apply',
   'c17.banner': 'C17: padding 12, radius 12, icon gap 8',
-  'c18.dialog': 'C18: padding 16, title/footer gaps 16, button gap 8, the confirm last, width 400/560/800 or window - 32, fits',
+  'c18.dialog': 'C18: padding 16, title/footer gaps 16, button gap 8, the confirm last, width 400/560/800 or window - 32, fits; G5: the title breaks between words',
   'c19.progress': 'C19: bar 8 high, 4 under its text',
   'c20.upright': 'C20: CJK text is never slanted (em, i, var upright)',
   'c22.divider': 'C22: 1 thick, spans the card content box; 16 under the last control of the form row above',
@@ -396,6 +396,18 @@ export function collect(cfg) {
     const kids = [...scope.children].filter(visible);
     const title = kids.find((k) => k.matches('h4, h3'));
     if (title && kids[kids.indexOf(title) + 1]) check('c18.dialog', 'title gap', box(kids[kids.indexOf(title) + 1]).top - box(title).bottom, 16, title);
+    // G5: the title wraps between words, never inside one (a rule's name:
+    // audit3 B2).
+    if (title) {
+      let cut = 'none';
+      for (let w = document.createTreeWalker(title, NodeFilter.SHOW_TEXT), t; (t = w.nextNode());) for (const m of t.data.matchAll(/\S+/g)) {
+        const r = document.createRange();
+        r.setStart(t, m.index);
+        r.setEnd(t, m.index + m[0].length);
+        if (new Set([...r.getClientRects()].map((x) => Math.round(x.top))).size > 1) cut = m[0];
+      }
+      check('c18.dialog', 'title word', cut, 'none', title);
+    }
     const foot = kids.find((k) => k.matches('.button-row, .right:last-child'));
     if (foot && kids[kids.indexOf(foot) - 1]) {
       check('c18.dialog', 'footer gap', box(foot).top - box(kids[kids.indexOf(foot) - 1]).bottom, 16, foot);
