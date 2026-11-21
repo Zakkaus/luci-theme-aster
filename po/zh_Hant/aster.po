@@ -1,0 +1,97 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: luci-aster\n"
+"MIME-Version: 1.0\n"
+"Language: zh_Hant\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: luci-theme-aster/htdocs/luci-static/resources/view/aster/sysauth.js:43
+msgid "Logging in…"
+msgstr "登入中…"
+
+#: luci-theme-aster/ucode/template/themes/aster/footer.ut:21
+msgid "Lua compatibility mode active"
+msgstr "Lua 相容模式啟動"
+
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:183 luci-theme-aster/ucode/template/themes/aster/header.ut:191
+msgid "Navigation"
+msgstr "導覽"
+
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:205 luci-theme-aster/ucode/template/themes/aster/sysauth.ut:25
+msgid "Theme"
+msgstr "主題"
+
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:206 luci-theme-aster/ucode/template/themes/aster/header.ut:206 luci-theme-aster/ucode/template/themes/aster/sysauth.ut:26
+msgid "Auto"
+msgstr "自動"
+
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:209 luci-theme-aster/ucode/template/themes/aster/header.ut:209 luci-theme-aster/ucode/template/themes/aster/sysauth.ut:29
+msgid "Light"
+msgstr "淺色"
+
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:212 luci-theme-aster/ucode/template/themes/aster/header.ut:212 luci-theme-aster/ucode/template/themes/aster/sysauth.ut:32
+msgid "Dark"
+msgstr "深色"
+
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:233 luci-theme-aster/ucode/template/themes/aster/header.ut:268
+msgid "Palette"
+msgstr "調色盤"
+
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:240 luci-theme-aster/ucode/template/themes/aster/header.ut:275
+msgid "Default"
+msgstr "預設"
+
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:223
+msgid "No password set!"
+msgstr "未設定密碼！"
+
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:224
+msgid "There is no password set on this router. Please configure a root password to protect the web interface."
+msgstr "此路由器尚未設定密碼。請為 root 設定密碼以保護網頁管理介面。"
+
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:226
+msgid "Go to password configuration..."
+msgstr "前往密碼配置..."
+
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:233
+msgid "System running in recovery (initramfs) mode."
+msgstr "系統在復原 (initramfs) 模式下執行。"
+
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:234
+msgid "No changes to settings will be stored and are lost after rebooting. This mode should only be used to install a firmware upgrade"
+msgstr "此模式下的設定變更不會儲存，重新開機後即遺失。此模式只應用於安裝韌體升級"
+
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:236
+msgid "Go to firmware upgrade..."
+msgstr "前往韌體升級..."
+
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:243
+msgid "JavaScript required!"
+msgstr "需要 JavaScript！"
+
+#: luci-theme-aster/ucode/template/themes/aster/header.ut:244
+msgid "You must enable JavaScript in your browser or LuCI will not work properly."
+msgstr "請在瀏覽器中啟用 JavaScript，否則 LuCI 無法正常運作。"
+
+#: luci-theme-aster/ucode/template/themes/aster/sysauth.ut:41
+msgid "Authorization Required"
+msgstr "需要授權"
+
+#: luci-theme-aster/ucode/template/themes/aster/sysauth.ut:54
+msgid "Invalid username and/or password! Please try again."
+msgstr "無效使用者名稱和 (或) 密碼！再試一次。"
+
+#: luci-theme-aster/ucode/template/themes/aster/sysauth.ut:67
+msgid "Username"
+msgstr "使用者名稱"
+
+#: luci-theme-aster/ucode/template/themes/aster/sysauth.ut:73
+msgid "Password"
+msgstr "密碼"
+
+#: luci-theme-aster/ucode/template/themes/aster/sysauth.ut:113
+msgid "Log in"
+msgstr "登入"
+
