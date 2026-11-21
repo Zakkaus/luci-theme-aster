@@ -250,4 +250,5 @@ if [[ ${APPS:-0} = 1 ]]; then
 	expect uniform 1 "table.fold.row display" "Lua table row not the fold's grid" -- "$url" "$password" --pages "$tmp/lua.txt" --viewports phone \
 		--debug-css 'admin/services/openclash/proxy-providers-file-manage=form > .cbi-map .table .tr:has(> .td) { display: flex !important; flex-direction: column }'
 fi
+source "$(dirname "$0")/lst.sh"
 finish

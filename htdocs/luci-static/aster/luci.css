@@ -521,7 +521,11 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
       line-height: var(--text-supporting-leading);
     }
   }
-  &:has(img[src*="_disabled"]) > .ifacebox-head::before { background: var(--color-icon-secondary); }
+  /* The dot is the interface's own device (render_ifacebox_status draws
+     it first, then one icon per bridge port): neutral when that one is
+     _disabled or missing, whatever a bridge member says (owner: lan grey
+     while up because lan2 was down). */
+  &:not(:has(> .ifacebox-body > .cbi-tooltip-container:first-child > img:not([src$="_disabled.svg"]))) > .ifacebox-head::before { background: var(--color-icon-secondary); }
   & > .ifacebox-body {
     display: flex;
     align-items: center;
@@ -548,24 +552,44 @@ html { --icon-server: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     & > img { display: none; }
   }
 }
-/* An interface's status (Interfaces, the editor's Status): a multi-column
-   MetadataList, each label on top in the secondary ink. */
+/* An interface's status (Interfaces, the editor's Status): one
+   MetadataList, a single column of label | value rows at every width; the
+   label column as wide as the longest label, capped at half the list.
+   Values wrap at spaces only (identifiers stay whole; theme-aster.js joins
+   "(432089 封包)" with a no-break space and keep-all holds the words), a
+   value wider than its column ends in an ellipsis with its text in title. */
 :is([id$="-ifc-description"], .ifacebadge.large:not(.cbi-tooltip) > span) {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  grid-template-columns: fit-content(50%) minmax(0, 1fr);
   gap: var(--spacing-2) var(--spacing-4);
+  align-items: baseline;
+  color: var(--color-text-primary);
+  font-size: var(--text-body-size);
+  font-weight: var(--text-body-weight);
+  line-height: var(--text-body-leading);
   & > br { display: none; }
-  & > .nowrap { display: block; white-space: normal; overflow-wrap: anywhere; }
+  & > .nowrap { display: contents; }
   & > .nowrap > strong {
-    display: block;
+    margin: 0;
     color: var(--color-text-secondary);
-    font-size: var(--text-supporting-size);
+    font-size: var(--text-label-size);
     font-weight: var(--text-label-weight);
-    line-height: var(--text-supporting-leading);
+    line-height: var(--text-label-leading);
+  }
+  & > .nowrap > .aster-v {
+    grid-column: 2;
+    color: var(--color-text-primary);
+    font-size: var(--text-body-size);
+    min-inline-size: 0;
+    overflow: hidden;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    white-space: normal;
+    text-overflow: ellipsis;
   }
   /* The Error entry (.aster-error, theme-aster.js): label and words in the
      error ink. */
-  & > .aster-error, & > .aster-error > strong { color: var(--color-text-error); }
+  & > .aster-error > :is(strong, .aster-v) { color: var(--color-text-error); }
 }
 /* The editor's Status: icon, then the list. */
 .ifacebadge.large:not(.cbi-tooltip) { --badge-bg: transparent; display: flex; align-items: flex-start; justify-content: start; gap: var(--spacing-3); padding: 0; white-space: normal; }

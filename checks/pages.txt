@@ -51,7 +51,7 @@ admin/system/reboot modal=status-notice    require=banner.icon
 admin/system/reboot modal=status-warning   require=banner.icon
 
 # Network
-admin/network/network                require=font.body,card,button,table
+admin/network/network                require=font.body,card,button,table,c8.ifstatus,c8.kv,c8.x,c8.tracks,g.break,g.colon,c15.dot,c16.icon,c13.badge,c14.token
 admin/network/network modal=interface-edit  require=font.body,button,field,checkbox,form.label,tab
 admin/network/routes                 require=font.body,heading.page,card,button,table@rows,tab
 # DHCP: on 25.12 the page opens on its Active Leases tab, with the

@@ -164,6 +164,12 @@ return baseclass.extend({
 
 				if (t !== s.textContent)
 					s.textContent = t;
+
+				/* An interface's value, wrapped to truncate; "(N 封包)" kept whole. */
+				const p = s.parentNode, t2 = p.textContent.slice(t.length).replace(/\((\S+) /g, '($1\xa0');
+
+				if (p.matches('[id$="-ifc-description"] > *') && !p.querySelector('.aster-v'))
+					p.replaceChildren(s, E('span', { class: 'aster-v', title: t2 }, t2));
 			});
 
 			root.querySelectorAll('.network-status-table').forEach((n) => {
