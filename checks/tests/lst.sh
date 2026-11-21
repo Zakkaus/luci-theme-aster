@@ -59,5 +59,24 @@ expect uniform 0 "" "Realtime legend as a list" -- "$url" "$password" --pages "$
 expect uniform 1 "c8.kv layout,c8.kv align" "Realtime legend value off its label (audit #4)" -- "$url" "$password" --pages "$tmp/lst-bw.txt" \
 	--debug-css 'admin/status/realtime/bandwidth=#view .table:not(:has(.th)) .td:nth-child(even) { position: relative; top: 12px }'
 
+ssh='admin/system/admin/sshkeys require=c7.keys'
+printf '%s\n' "$ssh" >"$tmp/lst-ssh.txt"
+expect uniform 0 "" "SSH keys: C7 blocks, name over type and key" -- "$url" "$password" --pages "$tmp/lst-ssh.txt" --viewports desktop,phone
+# Audit2 (A): each key a Token chip, name glued to its type, the key to the
+# chip's edge, chips as wide as their words.
+expect uniform 1 "c7.keys *" "SSH keys as Tokens (audit2 A)" -- "$url" "$password" --pages "$tmp/lst-ssh.txt" \
+	--debug-css 'admin/system/admin/sshkeys=[data-page] .cbi-dynlist > .item { display: inline-flex !important; align-self: start !important; background: var(--color-background-muted) !important } [data-page] .cbi-dynlist > .item > small > code { text-overflow: clip !important; overflow: visible !important }'
+
+fw='admin/network/firewall/zones require=c13.badge
+admin/network/firewall/rules require=c13.badge'
+printf '%s\n' "$fw" >"$tmp/lst-fw.txt"
+expect uniform 0 "" "Firewall: verdicts and this device as text" -- "$url" "$password" --pages "$tmp/lst-fw.txt"
+# Audit2 (B): "REJECT all others" and "this device" drawn as zone pills.
+head -1 "$tmp/lst-fw.txt" >"$tmp/lst-fwz.txt"; tail -1 "$tmp/lst-fw.txt" >"$tmp/lst-fwr.txt"
+expect uniform 1 "c13.badge stray" "Firewall zone verdicts as pills (audit2 B)" -- "$url" "$password" --pages "$tmp/lst-fwz.txt" \
+	--debug-css 'admin/network/firewall/zones=html body .zonebadge.zonebadge.zonebadge-empty { background: var(--color-neutral) !important; padding-inline: 8px !important }'
+expect uniform 1 "c13.badge stray" "Firewall rules' this device as a pill (audit2 B)" -- "$url" "$password" --pages "$tmp/lst-fwr.txt" \
+	--debug-css 'admin/network/firewall/rules=html body .zonebadge.zonebadge:has(> em:only-child) { background: var(--color-neutral) !important; padding-inline: 8px !important }'
+
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true

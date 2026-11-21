@@ -24,8 +24,9 @@ export const canonical = {
   'g.break': {_source: 'COMPONENTS.md G5: an identifier or value token never breaks across lines (or is truncated with a title)', broken: 0},
   'g.colon': {_source: 'COMPONENTS.md G10: labels carry no trailing colon', trailing: 'none'},
   'g.marker': {_source: 'COMPONENTS.md G4 / 0.1: a box title (name) starts at its list labels\' x; markers trail the text', offset: 0},
-  'c13.badge': {_source: 'COMPONENTS.md C13: filled pills only for zones, action-needed status, Tokens, buttons; .ifacebadge is text (no fill, no border)', stray: 0, ifacebadge: 'plain'},
+  'c13.badge': {_source: 'COMPONENTS.md C13: filled pills only for zones (a verdict, "this device" or "any zone" is text), action-needed status, Tokens, buttons; .ifacebadge is text (no fill, no border)', stray: 0, ifacebadge: 'plain'},
   'c14.token': {_source: 'COMPONENTS.md C14: Astryx Token md, dynamic lists only', height: 28, radius: 8, stray: 0},
+  'c7.keys': {_source: 'COMPONENTS.md section 3 system/admin/sshkeys: C7 title-line-only blocks (name the title, type + key its subline, the key cut with an ellipsis before the remove mark), not Tokens', lines: 'name/sub', key: 'cut', fill: 'none', width: 'full'},
   'c15.dot': {_source: 'COMPONENTS.md C15: StatusDot 8 px; up = success, down = neutral, on every page', size: '8x8', ink: 'ok'},
   'c16.icon': {_source: 'COMPONENTS.md C16: no LuCI image from /resources/icons/ visible; icon glyphs 16 or 20', legacy: 0, size: 'ok'},
 };
@@ -271,7 +272,7 @@ export function collect(cfg) {
     if (clear(s.backgroundColor) || !shown(e)) continue;
     const r = e.getBoundingClientRect();
     const rad = parseFloat(s.borderTopLeftRadius) || 0;
-    if (r.height >= 12 && r.height <= 24 && r.width > r.height && rad >= r.height / 2 - 0.5 && !e.matches('.zonebadge, .label:is(.warning, .error, .important), .cbi-dynlist > .item, .cbi-progressbar, .cbi-progressbar *')) { stray++; note('pill', `${px(r.height)} ${e.className}`.trim(), e); }
+    if (r.height >= 12 && r.height <= 24 && r.width > r.height && rad >= r.height / 2 - 0.5 && !e.matches('.zonebadge:not(.zonebadge-empty, :has(> em:only-child)), .label:is(.warning, .error, .important), .cbi-dynlist > .item, .cbi-progressbar, .cbi-progressbar *')) { stray++; note('pill', `${px(r.height)} ${e.className}`.trim(), e); }
     if (s.backgroundColor === fills.muted && Math.abs(r.height - 28) <= 1 && Math.abs(rad - 8) <= 0.5 && !e.closest('.cbi-dynlist, .cbi-dropdown')) { tokens++; note('token', e.className || e.tagName, e); }
   }
   add('c13.badge', 'stray', stray, named('pill', scope));
@@ -281,11 +282,37 @@ export function collect(cfg) {
     const s = cs(e);
     add('c13.badge', 'ifacebadge', clear(s.backgroundColor) && !parseFloat(s.borderTopWidth) ? 'plain' : `fill ${s.backgroundColor} border ${s.borderTopWidth}`, e);
   });
-  scope.querySelectorAll('.cbi-dynlist > .item').forEach((e) => {
+  scope.querySelectorAll('.cbi-dynlist > .item:not([data-key])').forEach((e) => {
     if (!shown(e)) return;
     add('c14.token', 'height', px(e.getBoundingClientRect().height), e);
     add('c14.token', 'radius', px(cs(e).borderTopLeftRadius), e);
   });
+
+  /* Section 3, SSH keys: C7 blocks, not Tokens. LuCI's items
+   * (sshkeys.js renderKeyItem) are measured; on a box with no key a probe
+   * of the same markup stands in and is removed again. */
+  const keys = scope.querySelector('[data-page="admin-system-admin-sshkeys"] .cbi-dynlist');
+  if (keys) {
+    let fake;
+    if (!keys.querySelector(':scope > .item')) {
+      fake = document.createElement('div');
+      fake.className = 'item';
+      fake.dataset.key = 'probe';
+      fake.innerHTML = `<strong>probe</strong><br><small>EdDSA, Curve25519<br><code>${'AAAAC3NzaC1lZDI1NTE5AAAAI'.repeat(8)}</code></small>`;
+      keys.insertBefore(fake, keys.querySelector(':scope > .add-item'));
+    }
+    const lw = keys.getBoundingClientRect().width;
+    keys.querySelectorAll(':scope > .item').forEach((e) => {
+      const n = e.querySelector(':scope > strong'), sub = e.querySelector(':scope > small'), k = sub?.querySelector(':scope > code:last-child');
+      if (!n || !sub || !k || !shown(e)) return;
+      const r = e.getBoundingClientRect(), s = cs(e), ks = cs(k);
+      add('c7.keys', 'lines', sub.getBoundingClientRect().top >= n.getBoundingClientRect().bottom - 0.5 ? 'name/sub' : 'glued', e);
+      add('c7.keys', 'key', ks.textOverflow === 'ellipsis' && ks.whiteSpace === 'nowrap' && k.getBoundingClientRect().right <= r.right - parseFloat(s.paddingInlineEnd) + 0.5 ? 'cut' : `${ks.textOverflow} ${ks.whiteSpace} to ${px(r.right - k.getBoundingClientRect().right)} from the end`, e);
+      add('c7.keys', 'fill', clear(s.backgroundColor) && !parseFloat(s.borderTopLeftRadius) ? 'none' : `${s.backgroundColor} radius ${s.borderTopLeftRadius}`, e);
+      add('c7.keys', 'width', Math.abs(r.width - lw) <= 1 ? 'full' : `${px(r.width)} of ${px(lw)}`, e);
+    });
+    fake?.remove();
+  }
 
   /* C16: no legacy image shown; glyphs drawn by mask are 16 or 20. */
   let legacy = 0;

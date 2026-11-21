@@ -286,8 +286,59 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
   align-items: start;
   &::before { margin-block-start: calc(var(--spacing-1) + var(--border-width) + (var(--text-supporting-size) - var(--text-body-size)) * var(--text-body-leading) / 2); }
 }
-/* The SSH keys list holds whole keys: full width. */
-[data-page="admin-system-admin-sshkeys"] .cbi-dynlist { --field-w: 100%; }
+/* SSH keys (COMPONENTS.md section 3: C7 title-line-only blocks): a key is
+   a name, its type and the key, not one value, so it is a block, not a
+   Token. The name is the title (label type), the type and the key its
+   subline (supporting, secondary; the key one line cut with an ellipsis,
+   whole in the remove dialog), the remove mark the title line's IconButton
+   sm at its end, 8 after the text, centred on the name (it overhangs the
+   line by 4 each side). Blocks 12 / 12, a Divider between, the first 0 on
+   top, the last 0 under; the add row 16 below. */
+[data-page="admin-system-admin-sshkeys"] .cbi-dynlist {
+  --field-w: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  & > .item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--size-element-sm);
+    column-gap: var(--spacing-2);
+    block-size: auto;
+    padding: var(--spacing-3) 0;
+    border-radius: 0;
+    background: none;
+    font-size: var(--text-label-size);
+    font-weight: var(--text-label-weight);
+    line-height: var(--text-label-leading);
+    overflow: visible;
+    cursor: pointer;
+    &:first-child { padding-block-start: 0; }
+    &:not(:has(~ .item)) { padding-block-end: 0; }
+    & + .item { border-block-start: var(--border-width) solid var(--color-border); }
+    & br { display: none; }
+    & > strong { font-weight: inherit; overflow: hidden; text-overflow: ellipsis; }
+    & > small {
+      grid-column: 1;
+      display: flex;
+      gap: var(--spacing-2);
+      color: var(--color-text-secondary);
+      font-size: var(--text-supporting-size);
+      font-weight: var(--text-supporting-weight);
+      line-height: var(--text-supporting-leading);
+    }
+    & > small > code { flex: 1 1 0; min-inline-size: 0; font-size: inherit; }
+    &::after {
+      position: static;
+      grid-area: 1 / 2;
+      block-size: var(--size-element-sm);
+      inline-size: var(--size-element-sm);
+      margin-block: calc(0px - var(--spacing-1));
+      mask-size: var(--aster-icon-sm);
+    }
+  }
+  & > .add-item { margin-block-start: var(--spacing-4); }
+}
 /* System and Kernel Log's filter rows (layout): a wrapping toolbar, each label on its
    control's centre line, 8 apart, the controls sharing what is left; the
    inline 5 / 10 px margins go (only !important beats them). */
@@ -626,6 +677,19 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
 [style*="238, 238, 238"] { --zone-bg: var(--color-neutral); }
 .zonebadge[style*="--zone-color-rgb"]:not(.cbi-tooltip *) { --badge-bg: var(--zone-bg); --badge-fg: var(--zone-fg); }
 .zonebadge[style*="--zone-color-rgb"] { background-color: var(--badge-bg) !important; /* inline zone fill */ }
+/* A verdict ("REJECT", "REJECT all others": .zonebadge-empty) and a place
+   that is no zone ("this device", "any zone", "unspecified": an em alone)
+   are text in LuCI's zone chip (C13: verdicts are text, Badges are zones). */
+html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
+  min-inline-size: 0;
+  min-block-size: 0;
+  margin-inline: 0 !important; /* a chip's 4 in a cell (the zone forwards' 8 kept) */
+  padding: 0;
+  background: none !important; /* inline zone fill */
+  color: inherit;
+  font: inherit;
+  & > strong { font-weight: inherit; }
+}
 /* A device that is down: LuCI fades its name to half opacity inline
    (2.2:1 on the badge), WireGuard its instance line's port and key to 80 %
    (4.2:1, the key 3.9:1 on its fill); the secondary text colour says the
@@ -642,6 +706,40 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
    (G5), one line cut with an ellipsis (its full text is the details
    dialog's). */
 .aster-kv code { display: block; padding: 0; background: none; font-size: inherit; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* An instance is one Card (C2, C8): LuCI writes its heading and that list
+   on the page, over its peers table (the table is the Card), so they are
+   the top of the table's frame: the heading 16 in, the list 16 under it,
+   the peers 16 under the list. */
+#view > h3:has(+ p + .table) {
+  padding: calc(var(--spacing-4) - var(--border-width)) calc(var(--spacing-4) - var(--border-width)) 0;
+  border: var(--border-width) solid var(--color-border);
+  border-block-end: 0;
+  border-start-start-radius: var(--radius-container);
+  border-start-end-radius: var(--radius-container);
+  background: var(--color-background-surface);
+  & + p {
+    margin: 0;
+    padding: var(--spacing-4) calc(var(--spacing-4) - var(--border-width)) 0;
+    border-inline: var(--border-width) solid var(--color-border);
+    background: var(--color-background-surface);
+  }
+  & + p + .table {
+    margin-block-start: 0;
+    padding-block-start: var(--spacing-4);
+    border-block-start: 0;
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+  }
+}
+/* A peer that never shook hands needs the user (C13: a warning Badge).
+   Folded, the value has its box (.aster-v); wide, the cell holds bare
+   text, which no stylesheet can draw as a Badge. */
+#view .table[id^="peers-"] .td[data-value="0"]:last-child > .aster-v {
+  --badge-bg: var(--color-warning-muted);
+  --badge-fg: var(--color-on-warning-muted);
+  justify-self: start;
+  align-self: center;
+}
 .ifacebox-body > div > .ifacebadge { display: flex; }
 .ifacebox-body > div > .ifacebadge + .ifacebadge { margin-block-start: var(--spacing-2); }
 .network-status-table { display: flex; flex-wrap: wrap; gap: var(--spacing-3); }
