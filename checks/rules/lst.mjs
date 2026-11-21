@@ -22,7 +22,7 @@ export const canonical = {
     _source: 'COMPONENTS.md C8 Interfaces status cell: one single-column list (2 tracks); values wrap at spaces only (keep-all holds CJK words: "(432089 封包)" stays whole); dot neutral iff the own device image is _disabled or missing',
     tracks: 2, valueWrap: 'normal/keep-all', dot: 'ok',
   },
-  'g.break': {_source: 'COMPONENTS.md G5: an identifier or value token never breaks across lines (or is truncated with a title)', broken: 0},
+  'g.break': {_source: 'COMPONENTS.md G5: an identifier or value token never breaks across lines (or is truncated with a title); a changes dialog value that fits its line is on one line (AUDIT4 B5)', broken: 0, value: 'whole'},
   'g.colon': {_source: 'COMPONENTS.md G10: labels carry no trailing colon', trailing: 'none'},
   'g.marker': {_source: 'COMPONENTS.md G4 / 0.1: a box title (name) starts at its list labels\' x; markers trail the text', offset: 0},
   'c13.badge': {_source: 'COMPONENTS.md C13: filled pills only for zones (a verdict, "this device" or "any zone" is text), action-needed status, Tokens, buttons; .ifacebadge is text (no fill, no border); an interface\'s zone Badge is never cut (ellipsis inside it)', stray: 0, ifacebadge: 'plain', clipped: 0},
@@ -435,5 +435,15 @@ export function collect(cfg) {
     }
   });
   if (scope.querySelector('.ifacebox')) add('c16.icon', 'emoji', emoji, named('emoji', scope));
+  /* G5 in the changes dialog: a value that fits its line is on one line. */
+  scope.querySelectorAll('.uci-change-list strong').forEach((el) => {
+    const t = textNodes(el)[0], room = el.closest('ins, del, var')?.clientWidth ?? 0;
+    if (!t || !shown(el)) return;
+    const r = document.createRange();
+    r.selectNodeContents(t);
+    const rs = [...r.getClientRects()].filter((x) => x.width > 0.5);
+    const split = new Set(rs.map((x) => Math.round(x.top))).size > 1 && rs.reduce((a, x) => a + x.width, 0) <= room;
+    add('g.break', 'value', split ? `split: ${t.data}` : 'whole', el);
+  });
   return out;
 }

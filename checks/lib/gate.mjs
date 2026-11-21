@@ -136,6 +136,17 @@ export const MODALS = {
   'status-spinning': (page, timeout) => status(page, timeout, 'notice spinning', 'Applying configuration changes… 9s'),
   'status-notice': (page, timeout) => status(page, timeout, 'notice', 'Changes have been reverted.'),
   'status-warning': (page, timeout) => status(page, timeout, 'warning', 'Revert request failed with status <code>500</code>'),
+  // ui.js's pending changes dialog over a fixed change list; nothing is saved.
+  'changes': async (page, timeout) => {
+    await page.waitForFunction(() => window.L && window.E, null, {timeout});
+    await page.evaluate(async () => {
+      const c = (L.ui ?? await L.require('ui')).changes;
+      c.changes = {firewall: [['set', 'cfg0592bd', 'name', 'Allow-Audit']], network: [['set', 'lan', 'ipaddr', '192.168.8.1']]};
+      c.displayChanges();
+    });
+    await page.waitForSelector('#modal_overlay .modal .uci-change-list strong', {state: 'visible', timeout});
+    return 'changes dialog';
+  },
 };
 /* Markup LuCI writes on pages the lab boxes do not have, added to a page
  * with LuCI's own calls so its classes and nesting are the real ones. Each

@@ -99,5 +99,15 @@ expect uniform 0 "" "Interface editor: Status list on the field's edge" -- "$url
 expect uniform 1 "g.marker offset" "Interface editor Status icon in a leading gutter (audit3 B5)" -- "$url" "$password" --pages "$tmp/lst-edit.txt" --viewports phone \
 	--debug-css 'admin/network/network=html body .ifacebadge.large { display: flex !important; gap: var(--spacing-3) } html body .ifacebadge.large::before { content: ""; flex: none; inline-size: var(--aster-icon-md); block-size: var(--aster-icon-md); background: var(--color-icon-secondary) }'
 
+# The changes dialog on a phone: a quoted value that fits its line moves
+# whole after the "=" (audit4 B5), not "'Allow-" | "Audit'". The dialog is
+# in no page list yet; its legend and buttons are hidden here, and the list's
+# code face and filled lines are its other hits (not judged here).
+chg='admin/network/network=html body .uci-dialog > .cbi-section > :not(.uci-change-list) { display: none !important }'
+printf '%s\n' 'admin/network/network modal=changes require=g.break' >"$tmp/lst-chg.txt"
+expect uniform 1 "font.body fontFamily,frame nested" "Changes dialog: values whole" -- "$url" "$password" --pages "$tmp/lst-chg.txt" --viewports desktop,phone --debug-css "$chg"
+expect uniform 1 "font.body fontFamily,frame nested,g.break value" "Changes dialog value split at its hyphen (audit4 B5)" -- "$url" "$password" --pages "$tmp/lst-chg.txt" --viewports phone \
+	--debug-css "$chg" --debug-css 'admin/network/network=html body .uci-change-list strong { display: inline !important }'
+
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true
