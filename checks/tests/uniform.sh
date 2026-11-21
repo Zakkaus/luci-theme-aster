@@ -44,7 +44,7 @@ expect uniform 1 "missing checkbox" "required class the page lacks" -- "$url" "$
 
 # Phone: a table with data rows whose rows the phone CSS hides is missing
 # its table (table@rows), though an empty table would be exempt.
-expect uniform 1 "missing table,space.heading.content gap,space.card.pad padding" "phone hides a table's data rows" "the page's tables hold" -- "$url" "$password" --pages "$tmp/rules.txt" --viewports phone \
+expect uniform 1 "missing table,space.card.pad padding" "phone hides a table's data rows" "the page's tables hold" -- "$url" "$password" --pages "$tmp/rules.txt" --viewports phone \
 	--debug-css 'admin/network/firewall/rules=#view .table .tr:not(.placeholder):has(> .td) { display: none !important }'
 
 # Dark: a card fill that only dark mode gets wrong. (Not the overview: a

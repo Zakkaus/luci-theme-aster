@@ -33,7 +33,7 @@ expect uniform 1 "g.marker.table offset,table.row.button height" "marker before 
 	--debug-css 'admin/status/processes=#view .tr > .td:first-child::before { content: ""; display: inline-block; inline-size: 8px; block-size: 8px; margin-inline-end: 8px }'
 # C7 when: a table wider than its card left wide (the cell grows only
 # outside theme-aster.js's measuring, which sets an inline width).
-expect uniform 1 "c7.when state,overflow excess" "wide table that does not fit" -- "$url" "$password" --pages "$tmp/tab-when.txt" \
+expect uniform 1 "c7.when state,overflow excess,g.overflow conform" "wide table that does not fit" -- "$url" "$password" --pages "$tmp/tab-when.txt" \
 	--debug-css 'admin/status/routes=#view .table:not([style*="min-content"]) .tr > .td:nth-child(2) { min-inline-size: 1600px }'
 # G9: a media query laying out table rows.
 expect uniform 1 "g.mq blocks" "table layout by a media query" -- "$url" "$password" --pages "$tmp/tab-proc.txt" \
@@ -43,7 +43,7 @@ expect uniform 1 "g.mq blocks" "table layout by a media query" -- "$url" "$passw
 expect uniform 1 "c7.sig blockPad,c7.sig firstPad" "block padding 24 / 12 (defects 4, 6)" -- "$url" "$password" --pages "$tmp/tab-proc-phone.txt" --viewports phone \
 	--debug-css 'admin/status/processes=#view [data-fold="fold"] .tr { padding-block-start: 24px !important }'
 # Defect 6: the Divider drawn to the card edge.
-expect uniform 1 "c7.sig divStart,c7.sig divEnd" "Divider to the card edge (defect 6)" -- "$url" "$password" --pages "$tmp/tab-proc-phone.txt" --viewports phone \
+expect uniform 1 "c7.sig divStart,c7.sig divEnd,g.overflow conform" "Divider to the card edge (defect 6)" -- "$url" "$password" --pages "$tmp/tab-proc-phone.txt" --viewports phone \
 	--debug-css 'admin/status/processes=#view [data-fold="fold"] .tr { margin-inline: -16px; padding-inline: 16px }'
 # Defect 2: labels inline before their values ("目標 127.0.0.1").
 expect uniform 1 "c7.x valueXs,c7.labelw fit" "inline labels, no label column (defect 2)" -- "$url" "$password" --pages "$tmp/tab-routes.txt" --viewports phone \

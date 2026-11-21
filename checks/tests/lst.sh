@@ -32,7 +32,7 @@ expect uniform 1 "c16.icon legacy,icon legacy" "legacy device image shown (defec
 	--debug-css 'admin/network/network=#view .ifacebox-body > .cbi-tooltip-container > img { display: inline !important; inline-size: 16px }'
 
 # G4 (defects 5, 8): the interface's dot before its name again.
-expect uniform 1 "g.marker offset" "Interfaces dot before the name (G4)" -- "$url" "$password" --pages "$tmp/lst-net.txt" \
+expect uniform 1 "g.marker offset,g.marker.table offset" "Interfaces dot before the name (G4)" -- "$url" "$password" --pages "$tmp/lst-net.txt" \
 	--debug-css 'admin/network/network=#view .ifacebox > .ifacebox-head::before { order: -1 !important }'
 
 ov='admin/status/overview require=c8.kv,c8.x,g.colon,g.marker,c15.dot,c16.icon,c13.badge'
