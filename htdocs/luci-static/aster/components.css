@@ -1021,6 +1021,23 @@ html #view :is(#packages .td:first-child, .td[data-name="_device"], .td var) { w
 html #view [data-fold="fold"] :is(#packages .td:first-child, .td[data-name="_device"]) { overflow: hidden; text-overflow: ellipsis; }
 html #view #packages .td.col-10 { overflow-wrap: anywhere; }
 html #view .td > span[style*="word-break"] { word-break: normal !important; }
+/* An identifier LuCI leaves bare in a cell (AUDIT3 A1, A2): a lease's
+   host, address and interface, a rule's name, an nftables value or set
+   member (port-unreachable broke after "port-"). It is one line too, so a
+   table is measured with it whole and folds where it does not fit;
+   folded, a value wider than its line ends in an ellipsis.
+   Beside actions not yet collapsed a title overflows, so theme-aster.js
+   collapses them before it is cut (C10). Wide, a lease's second column
+   (25.12's host, after the interface; 24.10's address, one word) wraps at
+   its spaces: a host whole with its "(name.lan)" folded 25.12's leases at
+   1440. */
+html #view :is(:is(.table, table)[id*="lease"] .td:not(:nth-child(2)), .nft-set-item, .nft-rules .td strong:not(:has(.nft-set))) { white-space: nowrap; }
+html #view [data-fold="fold"] :is([id*="lease"] .td, .td.cbi-section-table-titles) > .aster-v { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html #view [data-fold="fold"] .tr:has(> * > div:not([data-collapsed]) > .aster-more) > [data-head] > .aster-v { overflow: visible; }
+/* A URL in a cell's prose (a package's description) is theme-aster.js's
+   .aster-id: it does not widen its table, breaks anywhere and shows its
+   first line, its full text the title (B4). */
+html .aster-id { display: -webkit-inline-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden; overflow-wrap: anywhere; vertical-align: top; }
 /* Wide, a table keeps its words whole (G5), and theme-aster.js measures
    its narrowest so: CJK breaks where words do, not after any character,
    and a name (Allow-DHCP-Renew) not at its hyphens. Where whole words do
