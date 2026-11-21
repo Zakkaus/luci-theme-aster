@@ -33,9 +33,13 @@ expect shell 1 keep "open groups forgotten" -- "$url" "$password" \
 expect shell 1 vt "side nav not named" -- "$url" "$password" \
 	--debug-css 'admin/status/overview=.shell-aside { view-transition-name: none !important }'
 
-# appearance: the menu never shows.
-expect shell 1 appearance "menu hidden" -- "$url" "$password" \
-	--debug-css 'admin/status/overview=.palette-menu > [role="menu"] { display: none !important }'
+# appearance: the menus open but their rows cannot take the focus.
+expect shell 1 appearance "menu rows unfocusable" -- "$url" "$password" \
+	--debug-css 'admin/status/overview=.palette-menu > [role="menu"] > li { visibility: hidden !important }'
+
+# stack: on the second page a point on a menu row hits the page under it.
+expect shell 1 stack "page drawn over the menu" -- "$url" "$password" \
+	--debug-css 'admin/system/system=.palette-menu > [role="menu"] { pointer-events: none !important }'
 
 # rail-tip: no tooltip is drawn.
 expect shell 1 rail-tip "rail tooltip hidden" -- "$url" "$password" \
