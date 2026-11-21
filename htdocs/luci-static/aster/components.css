@@ -712,6 +712,14 @@ html :where(.cbi-value > .cbi-value-field) {
   min-block-size: var(--size-element-md);
 }
 html :where(.cbi-value > .cbi-value-field > *) { min-inline-size: 0; }
+/* A select is 256 wide, wider when its chosen option needs it, up to the
+   row: an option is never cut (audit #13). Text fields keep 256 (they
+   scroll as typed; a read-only value already sizes to itself). */
+html :where(.cbi-value > .cbi-value-field) :where(select):not(.cbi-dynlist *, .td *) {
+  field-sizing: content;
+  inline-size: auto;
+  min-inline-size: var(--field-w);
+}
 /* A Button option whose label repeats the button's words (theme-aster.js
    marks the row): the label is read, not drawn, and the button keeps the
    field column. */
