@@ -44,6 +44,11 @@ expect uniform 1 "c7.when state,overflow excess,g.overflow conform" "wide table 
 # chain's 1px ::after resizes it, so theme-aster.js measures again.
 expect uniform 1 "c7.when state,overflow excess,table.row.text height" "table measured with words broken (CJK)" -- "$url" "$password" --pages "$tmp/tab-nft.txt" --viewports phone \
 	--debug-css 'admin/status/nftables=html #view .table[style*="min-content"] :is(.td, .th) { word-break: break-all !important } html #view .nft-chain::after { content: ""; display: block; block-size: 1px }'
+# C7 when (audit 2, C7 A): Overview's leases kept on one line, so a host
+# name that wraps at its spaces on DHCP's page folds the table here.
+printf '%s\n' 'admin/status/overview require=c7.when' >"$tmp/tab-ov.txt"
+expect uniform 1 "c7.when state" "lease host names measured unbroken (audit 2)" -- "$url" "$password" --pages "$tmp/tab-ov.txt" --viewports desktop \
+	--debug-css 'admin/status/overview=html #view .table.leases .td:first-child { white-space: nowrap !important } html #view .table.leases .td:first-child::after { content: " wraps at every space of this long host name like a lease with its DNS name in parentheses, which DHCP shows wide and Overview should too (example.lan)" }'
 # Zones: "lan => wan REJECT all others" as LuCI's column of boxes, three
 # lines in a 360 column (c).
 expect uniform 1 "c6.table run" "zone forwards stacked (c)" -- "$url" "$password" --pages "$tmp/tab-zones.txt" \

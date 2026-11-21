@@ -128,8 +128,11 @@ export async function collect(cfg) {
         // CJK breaks only where words do, a rule's name not at a hyphen.
         const cells = [...t.querySelectorAll('.td, .th, td, th')].filter((c) => c.closest('.table, table') === t);
         // A list (", ": a station's addresses and rates) breaks after its
-        // commas, whatever nowrap the theme puts on it (C7, f).
-        const lists = cells.flatMap((c) => [c, ...c.querySelectorAll('*')]).filter((e) => !e.closest('.cbi-section-actions') && [...e.childNodes].some((n) => n.nodeType === 3 && n.data.includes(', ')));
+        // commas, whatever nowrap the theme puts on it (C7, f). The title
+        // (a lease's host) wraps at its spaces (C7): the same leases fit on
+        // Overview as on DHCP's page (audit 2, C7 A).
+        const titles = rowsOf(t).map((r) => r.children[head(r)]).filter((c) => c && !c.matches('.cbi-section-table .td:is(.cbi-section-table-titles, [data-name="name"])'));
+        const lists = [...titles, ...cells.flatMap((c) => [c, ...c.querySelectorAll('*')]).filter((e) => !e.closest('.cbi-section-actions') && [...e.childNodes].some((n) => n.nodeType === 3 && n.data.includes(', ')))];
         const set = (on) => cells.forEach((c) => {
           on ? c.style.setProperty('word-break', 'keep-all', 'important') : c.style.removeProperty('word-break');
           c.matches('.cbi-section-table .td:is(.cbi-section-table-titles, [data-name="name"])') && (on ? c.style.setProperty('white-space', 'nowrap', 'important') : c.style.removeProperty('white-space'));

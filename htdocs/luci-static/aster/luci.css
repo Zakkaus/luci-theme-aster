@@ -471,8 +471,10 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
    measures it unbroken (data-fold "wide") and folds it where it is wider
    than its card. A station's addresses and its two rates are lists, not
    ids: they break after a comma, so a station table that fits (1440, the
-   Disconnect column too) stays a wide Table instead of folding (C6/C7). */
-#view :is(.leases, .lases, .leases6, .assoclist)[data-fold="wide"] .td { white-space: nowrap; }
+   Disconnect column too) stays a wide Table instead of folding (C6/C7).
+   A lease's host name wraps at its spaces (below), as on DHCP's page: the
+   same leases fit there, so they fit here (C7). */
+#view .assoclist[data-fold="wide"] .td { white-space: nowrap; }
 #view .assoclist[data-fold="wide"] .td :is(.hide-xs, .td > span:not(.ifacebadge) > span) { white-space: normal; }
 #view .assoclist .td :is(.hide-xs, .ifacebadge small) { display: block; }
 /* An interface row: cells to the top, the box column as narrow as the box,
