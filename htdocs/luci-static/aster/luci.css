@@ -428,9 +428,13 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
    longest line and every row of one kind is one height. A station's host
    puts its addresses on the line under its name, its network the
    interface under the SSID. Where the lines do not fit the card the table
-   folds (components.css, Table) instead of breaking them. */
+   folds (components.css, Table) instead of breaking them. A station's
+   address list and its two rates are lists, not ids: where the table
+   would outgrow its card (the Disconnect column, 69 over at 1440) they
+   break after a comma instead of running past the card's edge. */
 @container aster-page (min-width: 72rem) {
   #view :is(.leases, .leases6, .assoclist) .td { white-space: nowrap; }
+  #view .assoclist .td :is(.hide-xs, .td > span:not(.ifacebadge) > span) { white-space: normal; }
 }
 #view .assoclist .td :is(.hide-xs, .ifacebadge small) { display: block; }
 /* An interface row: cells to the top, the box column as narrow as the box,
