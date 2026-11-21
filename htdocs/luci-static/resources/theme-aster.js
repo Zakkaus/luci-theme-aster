@@ -15,6 +15,42 @@ return baseclass.extend({
 		this.tooltip();
 		this.marks();
 		this.actions();
+		this.fold();
+	},
+
+	/* Tables whose lines never break (leases, stations, Wireless' radios)
+	 * fold where they do not fit their card (components.css, luci.css):
+	 * each is measured unfolded (data-fold "wide") at its narrowest
+	 * (min-content) and folds when that is wider than its room; folded, it
+	 * opens again only with 16 to spare, so the scroll bar a taller fold
+	 * brings does not flip it back. Resizes are read on the next frame, as a
+	 * fold resizes the card being observed. */
+	fold() {
+		const view = document.getElementById('view'), seen = new WeakSet(),
+			sel = '.table:is(.leases, .lases, .leases6, .assoclist, :has(.tr > [data-name="_badge"]))';
+		let frame;
+
+		if (!view)
+			return;
+
+		const fit = (t) => {
+			const p = t.parentNode, ps = getComputedStyle(p), ts = getComputedStyle(t), was = t.dataset.fold == 'fold';
+
+			if (!p.clientWidth)
+				return;
+
+			const w = t.style.width;
+			t.dataset.fold = 'wide';
+			t.style.width = 'min-content';
+			const need = t.scrollWidth, room = p.clientWidth - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight) - parseFloat(ts.marginLeft) - parseFloat(ts.marginRight);
+			t.style.width = w;
+			t.dataset.fold = need > room + 0.5 - (was ? 16 : 0) ? 'fold' : 'wide';
+		};
+		const ro = new ResizeObserver(() => frame ||= requestAnimationFrame(() => (frame = 0, view.querySelectorAll(sel).forEach(fit))));
+		const run = () => view.querySelectorAll(sel).forEach((t) => (seen.has(t.parentNode) || (seen.add(t.parentNode), ro.observe(t.parentNode)), fit(t)));
+
+		run();
+		new MutationObserver(run).observe(view, { childList: true, subtree: true });
 	},
 
 	/* Row actions (doona ActionGroup): one line, else a "more" Menu. */

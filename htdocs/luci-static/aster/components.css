@@ -901,9 +901,10 @@ html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -
    the first cell primary, the rest supporting text under it with their
    column names (data-title), the actions last. Rows in thead/tbody
    (form.js), straight in the table (ui.Table) or in a Lua table's <tbody>
-   are all reached. */
+   are all reached. A table theme-aster.js measures (data-fold) folds by
+   its fit alone. */
 @container aster-page (max-width: 48rem) {
-  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th)) {
+  html :where(:is(#view, form > .cbi-map) .table:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th):not([data-fold="wide"])) {
     display: block;
     overflow: visible;
     /* Nested rules keep the parent's one element of weight (& is :is()). */
@@ -962,17 +963,57 @@ html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -
     padding-block: var(--spacing-1);
   }
 }
-/* Leases and stations never break a line (luci.css): a page too narrow
-   for their lines (under the 1440 desktop's) folds them as above, as the
-   reference's compact columns: the first cell the title, its one action
-   (Disconnect, Reserve IP) at the end of the title line, not a line of
-   its own; under it every value in one column after a key column of
-   --aster-label-w (MetadataList on a phone: keys wrap, 16 to the value),
+/* Leases and stations never break a line (luci.css): a table whose lines
+   do not fit its card folds as above, as the reference's compact
+   columns: the first cell the title, its one action (Disconnect, Reserve
+   IP; Wireless' Disconnect cell has no class or title) at the end of the
+   title line, not a line of its own; under it every value in one column
+   after a key column of --aster-label-w (MetadataList on a phone: keys
+   wrap, 16 to the value),
    so a value's second line (the addresses, the TX rate) starts under its
    first. A cell with nothing in it (no action, LuCI's "-") takes no
-   line. */
+   line. theme-aster.js measures the unbroken table (data-fold); without
+   it the page decides (under the 1440 desktop's). */
+html :where(#view .table:is(.leases, .lases, .leases6, .assoclist)[data-fold="fold"]) {
+  display: block;
+  & > :where(.thead, .tbody, thead, tbody) { display: contents; }
+  & :where(.tr.table-titles) { display: none; }
+  & :where(.tr:not(.table-titles, .placeholder)) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-block: var(--spacing-1);
+    border-block-end: var(--border-width) solid var(--color-border);
+  }
+  & :where(.tr:last-child) { border-block-end: 0; }
+  & :where(.tr > .td) {
+    display: block;
+    grid-column: 1 / -1;
+    padding: 0 var(--spacing-2) 0 var(--spacing-4);
+    border: 0;
+    color: var(--color-text-secondary);
+    font-size: var(--text-supporting-size);
+    line-height: var(--text-supporting-leading);
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  & :where(.tr > .td:first-child) { grid-column: 1; color: var(--color-text-primary); font-size: var(--text-body-size); line-height: var(--text-body-leading); }
+  & :where(.tr > .td[data-title]:not(:first-child, .cbi-section-actions)) {
+    display: flow-root;
+    margin-inline-start: calc(var(--aster-label-w) + var(--spacing-4));
+  }
+  & :where(.tr > .td[data-title]:not(:first-child, .cbi-section-actions))::before {
+    content: attr(data-title);
+    float: inline-start;
+    inline-size: var(--aster-label-w);
+    margin-inline: calc((var(--aster-label-w) + var(--spacing-4)) * -1) 0;
+    font-weight: var(--font-weight-medium);
+    word-break: keep-all; /* "接收速率 /" over "發送速率", not "發送速" over "率" */
+  }
+  & :where(.tr > .td:is(.cbi-section-actions, :not([data-title]):has(> .cbi-button:only-child))) { grid-column: 2; grid-row: 1; align-self: center; padding: 0 var(--spacing-4); }
+  & :where(.tr > .td:is(:empty, .cbi-section-actions:not(:has(button, .btn, .cbi-button)), :not(:first-child, [data-title]):not(:has(*)))) { display: none; }
+}
 @container aster-page (max-width: 71.9375rem) {
-  html :where(#view .table:is(.leases, .lases, .leases6, .assoclist)) {
+  html :where(#view .table:is(.leases, .lases, .leases6, .assoclist):not([data-fold])) {
     display: block;
     & > :where(.thead, .tbody, thead, tbody) { display: contents; }
     & :where(.tr.table-titles) { display: none; }
@@ -1007,7 +1048,7 @@ html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -
       font-weight: var(--font-weight-medium);
       word-break: keep-all; /* "接收速率 /" over "發送速率", not "發送速" over "率" */
     }
-    & :where(.tr > .td.cbi-section-actions) { grid-column: 2; grid-row: 1; align-self: center; padding: 0 var(--spacing-4); }
+    & :where(.tr > .td:is(.cbi-section-actions, :not([data-title]):has(> .cbi-button:only-child))) { grid-column: 2; grid-row: 1; align-self: center; padding: 0 var(--spacing-4); }
     & :where(.tr > .td:is(:empty, .cbi-section-actions:not(:has(button, .btn, .cbi-button)), :not(:first-child, [data-title]):not(:has(*)))) { display: none; }
   }
 }
@@ -1016,7 +1057,7 @@ html :where(.drag-over-below) { box-shadow: inset 0 calc(var(--border-width) * -
    (as a folded field's label), the pairs 4 apart. From 480 the column
    leaves the value 330 or more. */
 @container aster-page (max-width: 30rem) {
-  html :where(#view .table:is(.leases, .lases, .leases6, .assoclist)) {
+  html :where(#view .table:is(.leases, .lases, .leases6, .assoclist):not([data-fold="wide"])) {
     & :where(.tr > .td[data-title]:not(:first-child, .cbi-section-actions)) { margin-block-start: var(--spacing-1); margin-inline-start: 0; }
     & :where(.tr > .td[data-title]:not(:first-child, .cbi-section-actions))::before { display: block; float: none; inline-size: auto; margin-inline: 0; }
   }

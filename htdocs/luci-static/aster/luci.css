@@ -428,15 +428,41 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
    longest line and every row of one kind is one height. A station's host
    puts its addresses on the line under its name, its network the
    interface under the SSID. Where the lines do not fit the card the table
-   folds (components.css, Table) instead of breaking them. A station's
-   address list and its two rates are lists, not ids: where the table
-   would outgrow its card (the Disconnect column, 69 over at 1440) they
-   break after a comma instead of running past the card's edge. */
+   folds (components.css, Table) instead of breaking them: theme-aster.js
+   measures it unbroken (data-fold "wide") and folds it where it is wider
+   than its card. Without the script the page decides: the 1440 desktop
+   keeps the rows, a station's address list and rates breaking after a
+   comma where they would run past the card's edge. */
+#view :is(.leases, .lases, .leases6, .assoclist)[data-fold="wide"] .td { white-space: nowrap; }
 @container aster-page (min-width: 72rem) {
-  #view :is(.leases, .lases, .leases6, .assoclist) .td { white-space: nowrap; }
-  #view .assoclist .td :is(.hide-xs, .td > span:not(.ifacebadge) > span) { white-space: normal; }
+  #view :is(.leases, .lases, .leases6, .assoclist):not([data-fold]) .td { white-space: nowrap; }
+  #view .assoclist:not([data-fold]) .td :is(.hide-xs, .td > span:not(.ifacebadge) > span) { white-space: normal; }
 }
 #view .assoclist .td :is(.hide-xs, .ifacebadge small) { display: block; }
+/* Wireless: a radio's or a network's row (badge, status, actions) folds
+   where it is wider than its card (theme-aster.js, data-fold): the badge
+   is the title, the actions at the end of its line, the status under both
+   in supporting text. */
+#view .table:has(.tr > [data-name="_badge"])[data-fold="fold"] {
+  display: block;
+  & > tbody { display: contents; }
+  & .tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    padding-block: var(--spacing-1);
+    border-block-end: var(--border-width) solid var(--color-border);
+    &:last-child { border-block-end: 0; }
+  }
+  & .tr > .td { display: block; inline-size: auto; padding: 0 var(--spacing-4); border: 0; }
+  & .tr > [data-name="_stat"] {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    color: var(--color-text-secondary);
+    font-size: var(--text-supporting-size);
+    line-height: var(--text-supporting-leading);
+  }
+}
 /* An interface row: cells to the top, the box column as narrow as the box,
    the status column the rest. */
 .tr:has(> .td > .ifacebox) > .td {
