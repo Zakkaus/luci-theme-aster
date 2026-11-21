@@ -414,9 +414,8 @@ html :where(.cbi-dropdown > ul > li img) { block-size: var(--aster-icon-sm); inl
 /* LuCI's device images (resources/icons/*.svg, a bitmap look, grey
    squares in dark) in a list row, a device chip (Devices), WireGuard's
    instance chip and the editor's Status: the Heroicons ServerStack, Wifi
-   for a radio (luci.css --icon-*), 16 in the secondary icon colour; 20
-   beside the Status. */
-html :where(.cbi-dropdown > ul > li, .cbi-dropdown > ul > li > label, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip), #view > p > .ifacebadge):has(> img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"]))::before {
+   for a radio (luci.css --icon-*), 16 in the secondary icon colour. */
+html :where(.cbi-dropdown > ul > li, .cbi-dropdown > ul > li > label, .ifacebadge > .cbi-tooltip-container, #view > p > .ifacebadge):has(> img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"]))::before {
   content: "";
   display: block;
   flex: none;
@@ -425,7 +424,20 @@ html :where(.cbi-dropdown > ul > li, .cbi-dropdown > ul > li > label, .ifacebadg
   background-color: var(--color-icon-secondary);
   mask: var(--aster-glyph, var(--icon-server)) center / contain no-repeat;
 }
-html :where(.ifacebadge.large:not(.cbi-tooltip))::before { inline-size: var(--aster-icon-md); block-size: var(--aster-icon-md); }
+/* The editor's Status draws it after the Device value, as Interfaces draws
+   it after the device name: the list keeps the field's left edge (G4). The
+   value is a box (.aster-v is display contents) so the icon stays in it. */
+html :where(.ifacebadge.large:not(.cbi-tooltip)) > span > .nowrap:first-child > .aster-v { display: block; }
+html :where(.ifacebadge.large:not(.cbi-tooltip):has(> img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"])) > span > .nowrap:first-child > .aster-v)::after {
+  content: "";
+  display: inline-block;
+  inline-size: var(--aster-icon-sm);
+  block-size: var(--aster-icon-sm);
+  margin-inline-start: var(--spacing-2);
+  vertical-align: middle;
+  background-color: var(--color-icon-secondary);
+  mask: var(--aster-glyph, var(--icon-server)) center / contain no-repeat;
+}
 html :where(.cbi-dropdown > ul > li, .cbi-dropdown > ul > li > label, .ifacebadge > .cbi-tooltip-container, .ifacebadge.large:not(.cbi-tooltip), #view > p > .ifacebadge) > img[src*="/icons/"]:not([src*="/signal-"], [src*="/port_"]) { display: none; }
 /* Which Heroicon each LuCI image is (C16), named once for every place
    that draws one in its stead (--aster-glyph): a signal's in the

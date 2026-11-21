@@ -791,8 +791,9 @@ html { --icon-tunnel: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
      error ink. */
   & > .aster-error > :is(strong, .aster-v) { color: var(--color-text-error); }
 }
-/* The editor's Status: icon, then the list. */
-.ifacebadge.large:not(.cbi-tooltip) { --badge-bg: transparent; display: flex; align-items: flex-start; justify-content: start; gap: var(--spacing-3); padding: 0; white-space: normal; }
+/* The editor's Status: the list alone (its device icon trails the Device
+   value, components.css). */
+.ifacebadge.large:not(.cbi-tooltip) { --badge-bg: transparent; display: block; padding: 0; white-space: normal; }
 /* A zone's colour (firewall.js writes it inline, the administrator's
    data) as palette tokens: LuCI's lan green and wan red are the muted
    success and error fills, "no zone" the neutral, any other colour mixed
@@ -1219,6 +1220,10 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
         word-break: keep-all;
         text-overflow: ellipsis;
       }
+      /* No colour emoji (C16): LuCI's chart glyph before the DHCPv6
+         counters takes no room (theme-aster.js made it the value's first
+         letter). */
+      & > .aster-v[title^="\1F4CA"]::first-letter { font-size: 0; }
     }
   }
   /* --aster-kv-w is the narrowest the label column may be, not its width:
@@ -1317,6 +1322,19 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
   fill: var(--color-text-secondary) !important; /* inline fill:#eee */
   text-shadow: none !important; /* inline dark shadow */
   font-family: var(--font-family-body) !important; /* inline font-family:sans-serif */
+}
+/* Channel Analysis lays out every band's channel scale once, at load, from
+   its graph's offsetWidth; a pane hidden with display none measures 0 and
+   its numbers pile up at the left. Its hidden panes keep the shown pane's
+   width and take no room (bootstrap hides every pane this way). */
+#view [data-tab-title]:not([data-tab-active="true"]):has(#channel_graph) {
+  display: block;
+  block-size: 0;
+  margin-block: 0;
+  padding-block: 0;
+  border-block-width: 0;
+  overflow: hidden;
+  visibility: hidden;
 }
 
 
