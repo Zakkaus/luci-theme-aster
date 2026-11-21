@@ -476,8 +476,9 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
 #view .assoclist[data-fold="wide"] .td :is(.hide-xs, .td > span:not(.ifacebadge) > span) { white-space: normal; }
 #view .assoclist .td :is(.hide-xs, .ifacebadge small) { display: block; }
 /* An interface row: cells to the top, the box column as narrow as the box,
-   the status column the rest. */
-.tr:has(> .td > .ifacebox) > .td {
+   the status column the rest. Folded, the box is the title line and takes
+   the line (Table): a 1 % cell clipped its zone Badge and port icons. */
+.table:not([data-fold="fold"]) .tr:has(> .td > .ifacebox) > .td {
   vertical-align: top;
   &:first-child { inline-size: 1%; white-space: nowrap; }
   &:nth-child(2) { inline-size: 100%; }
@@ -537,6 +538,13 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
       font-size: var(--text-supporting-size);
       font-weight: var(--font-weight-medium);
       line-height: var(--text-supporting-leading);
+      /* Too long for its line, it ends in an ellipsis inside its round
+         ends (the head's title holds the words). */
+      flex-shrink: 1;
+      min-inline-size: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
   /* The dot is the interface's own device (render_ifacebox_status draws
@@ -546,20 +554,29 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   &:not(:has(> .ifacebox-body > .cbi-tooltip-container:first-child > img:not([src$="_disabled.svg"]))) > .ifacebox-head::before { background: var(--color-icon-secondary); }
   & > .ifacebox-body {
     display: flex;
-    align-items: center;
+    align-items: start;
     gap: var(--spacing-2);
     padding: 0;
     color: var(--color-text-secondary);
     & > br { display: none; }
-    & > small { order: -1; font-size: inherit; }
+    & > small { order: -1; flex: none; font-size: inherit; }
     /* A bridge's ports after its own icon, 8 apart, without LuCI's
        " (" … ")" (font-size 0 hides those words, the tooltips keep theirs). */
-    & > span:has(> .cbi-tooltip-container) { display: inline-flex; align-items: center; font-size: 0; }
+    & > span:has(> .cbi-tooltip-container) {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0;
+      /* Folded, more ports than the line holds wrap under the first port,
+         every one shown (lan's nine). */
+      [data-fold="fold"] & { flex-wrap: wrap; row-gap: var(--spacing-1); min-inline-size: 0; }
+    }
     & > span > .cbi-tooltip-container { font-size: var(--text-supporting-size); }
-    & > span > .cbi-tooltip-container + .cbi-tooltip-container { margin-inline-start: var(--spacing-2); }
+    & > span > .cbi-tooltip-container:not(:last-child) { margin-inline-end: var(--spacing-2); }
   }
   & :is(.ifacebox-body, .ifacebox-body > span) > .cbi-tooltip-container:has(> img) {
     display: inline-flex;
+    align-items: center;
+    min-block-size: calc(var(--text-supporting-leading) * 1em); /* the device name's line */
     color: var(--color-icon-secondary);
     &::before {
       content: "";
