@@ -257,6 +257,12 @@ html :is(.shell-content, .modal) :where(.shell-inner, #view, #view > div:not([cl
 .alert-message.fade-in > div:last-child { align-self: flex-start; margin-inline-start: var(--spacing-2); }
 .alert-message.fade-in > div:last-child > * { --button-h: var(--size-element-sm); }
 .alert-message.fade-in:has(> div:last-child > *)::before { inset-block-start: calc(var(--banner-pad-block) + (var(--size-element-sm) - var(--aster-icon-md)) / 2); }
+/* A message without a title (no h4) is Astryx Banner's title-only line:
+   icon and Dismiss centre on the text, also where it wraps (audit3 B8). */
+.alert-message.fade-in:not(:has(> div:first-child > h4)) {
+  & > div:last-child { align-self: center; }
+  &::before { inset-block-start: calc(50% - var(--aster-icon-md) / 2); }
+}
 /* The 404 page (luci-base's error404.ut: title, two lines, the path) is
    Astryx's EmptyState: centred, 32 above and below, its words 360 wide,
    the title in the large size, the rest secondary; an empty message
