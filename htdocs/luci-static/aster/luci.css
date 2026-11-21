@@ -597,7 +597,10 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
    label column as wide as the longest label, capped at half the list.
    Values wrap at spaces only (identifiers stay whole; theme-aster.js joins
    "(432089 封包)" with a no-break space and keep-all holds the words), a
-   value wider than its column ends in an ellipsis with its text in title. */
+   value wider than its column ends in an ellipsis with its text in title.
+   Interfaces' lists keep one label column down the table: at least the
+   reference's label column (MetadataList dt 112), so wan6 or an absent
+   device with shorter labels starts its values on lan's x. */
 :is([id$="-ifc-description"], .ifacebadge.large:not(.cbi-tooltip) > span) {
   display: grid;
   grid-template-columns: fit-content(50%) minmax(0, 1fr);
@@ -610,6 +613,7 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   & > br { display: none; }
   & > .nowrap { display: contents; }
   & > .nowrap > strong {
+    min-inline-size: var(--aster-label-w);
     margin: 0;
     color: var(--color-text-secondary);
     font-size: var(--text-label-size);
