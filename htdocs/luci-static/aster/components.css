@@ -1657,10 +1657,10 @@ html :where(.cbi-tooltip) :is(.ifacebadge, .zonebadge, .ifacebox, .ifacebox-head
   --card-border: color-mix(in srgb, currentColor 24%, transparent);
   color: inherit;
 }
-/* A cell's "#" with a data-tooltip (more detail behind a row) is an
-   InfoTip: the 16 info icon (the Banner's) in a 20 box; the character
+/* A cell's "#" with a data-tooltip (more detail behind a row) or the
+   "#" of an nftables rule's comment is an InfoTip: the 16 info icon (the Banner's) in a 20 box; the character
    stays for screen readers. */
-html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button)) {
+html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button), .nft-comment > var) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1670,7 +1670,7 @@ html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button
   font-size: 0;
   cursor: help;
 }
-html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button))::after {
+html :where(.td > [data-tooltip]:not(button, a, input, select, .btn, .cbi-button), .nft-comment > var)::after {
   content: "";
   inline-size: var(--aster-icon-sm);
   block-size: var(--aster-icon-sm);

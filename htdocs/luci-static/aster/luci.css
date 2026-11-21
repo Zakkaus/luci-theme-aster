@@ -715,6 +715,7 @@ html { --icon-tunnel: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   & .td:first-child { inline-size: auto; } /* a list key's 1 %: a grid track on a phone */
 }
 .nft-comment { --badge-bg: transparent; cursor: help; }
+.nft-comment > var { margin-block: var(--spacing-0-5); } /* its InfoTip box 20 centred on the 24 line */
 /* nftables.js's own style pads a badge's tooltip .5em on every side; it
    keeps the Tooltip's 4 / 8. */
 .nft-rules .ifacebadge.cbi-tooltip-container .cbi-tooltip { padding: var(--spacing-1) var(--spacing-2); }
