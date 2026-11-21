@@ -18,7 +18,7 @@ export const canonical = {
   'c7.sig': {
     _source: 'COMPONENTS.md C7: one folded signature: subgrid, gap 16 / 8, blocks 12 / 12, flush at the ends, label 15/500 secondary, value 15/400 primary, title 15/500 primary, Divider 1 on the content box',
     grid: 'subgrid', columnGap: 16, rowGap: 8, blockPad: [12, 12], firstPad: 0, lastPad: 0,
-    label: '15/500 secondary', value: '15/400 primary', title: '15/500 primary', divider: '1 border', divStart: 0, divEnd: 0,
+    label: '15/500 secondary', value: '15/400 primary', title: '15/500 primary', divider: '1 border', divStart: 0, divEnd: 0, titleMargin: 0,
   },
   'c7.x': {_source: 'COMPONENTS.md C7: per folded table one label x (= title x) and one value x (counts are strings: a count read as px would pass 2 within the 1px tolerance)', labelXs: 'one', valueXs: 'one', labelToTitle: 0},
   'c7.labelw': {_source: 'COMPONENTS.md C7: the label column is the longest label, at most half the content width', fit: 0},
@@ -222,6 +222,11 @@ export async function collect(cfg) {
       const tf = tc && firstText(tc);
       if (tc && tf) {
         add('c7.sig', 'title', font(cs(tc)), tc);
+        // The block's padding is its only space: no box in the title
+        // (WireGuard's <p>, 1em) adds margins above or below its line.
+        // (A Badge's 2 in a sentence is its own; plain inline boxes have none.)
+        const mb = [...tc.querySelectorAll('*')].filter((e) => shown(e) && cs(e).display !== 'inline').reduce((m, e) => Math.max(m, Math.abs(parseFloat(cs(e).marginTop)), Math.abs(parseFloat(cs(e).marginBottom))), 0);
+        add('c7.sig', 'titleMargin', mb > 2 ? px(mb) : 0, tc);
         titleX ??= tf.left;
         add('g.marker.table', 'offset', px(Math.max(0, tf.left - contentL)), tc);
       }

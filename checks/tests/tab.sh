@@ -46,6 +46,11 @@ expect uniform 1 "c7.when state,overflow excess,table.row.text height" "table me
 # lines in a 360 column (c).
 expect uniform 1 "c6.table run" "zone forwards stacked (c)" -- "$url" "$password" --pages "$tmp/tab-zones.txt" \
 	--debug-css 'admin/network/firewall/zones=html #view .zone-forwards, html #view .zone-forwards > * { display: block !important }'
+# WireGuard peers (e): a title's box with 1em margins, the first block 35
+# above its title and 14 below (Interfaces' box here: a core page).
+printf '%s\n' 'admin/network/network require=c7.sig' >"$tmp/tab-net.txt"
+expect uniform 1 "c7.actions centre,c7.sig titleMargin" "title box with margins (e)" -- "$url" "$password" --pages "$tmp/tab-net.txt" --viewports phone \
+	--debug-css 'admin/network/network=html #view [data-fold="fold"] .td > .ifacebox { margin-block: 15px !important }'
 # G9: a media query laying out table rows.
 expect uniform 1 "g.mq blocks" "table layout by a media query" -- "$url" "$password" --pages "$tmp/tab-proc.txt" \
 	--debug-css 'admin/status/processes=@media (min-width: 1px) { #view .table .tr { color: inherit } }'

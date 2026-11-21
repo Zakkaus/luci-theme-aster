@@ -865,6 +865,9 @@ html :where(:is(th, td, .th, .td):last-child) { padding-inline-end: var(--spacin
    TableCell drops the last body row's divider). */
 html :where(:is(tr, .tr):last-child > :is(td, .td)) { border-block-end: 0; }
 html :where(td, .td) { line-height: var(--text-body-leading); font-variant-numeric: tabular-nums; }
+/* A cell's paragraph (a WireGuard peer's name) is a line of the cell: no
+   1em margins above and below it (C7 blocks 12 / 12). */
+html :where(:is(td, .td) p) { margin-block: 0; }
 /* luci-mod-status's nftables view sets its cells to .25em with !important
    in a <style> it adds after the theme; only !important, one id heavier,
    gives the cell padding back. */
