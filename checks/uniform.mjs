@@ -487,10 +487,11 @@ function collect(cfg) {
   for (const el of all('h1, h2, h3, .cbi-section > legend')) {
     const s = getComputedStyle(el);
     const inCard = el.closest(CARD);
-    // A heading inside a card's content under its title (Heading 3: the
+    // A heading inside a card's content under its title (Heading 4: the
     // overview's leases and stations) is not the card's title: not its
-    // first heading.
-    const inner = el.matches('.cbi-section > div:not(.cbi-title) > h3') && el.closest('.cbi-section').querySelector('h1, h2, h3, h4, h5, h6, legend') !== el || el.matches('.cbi-value > .cbi-section > h3, .cbi-section > h3 ~ h3');
+    // first heading. In a card without a title a table's own heading is
+    // a title too (components.css; audit3 B1).
+    const inner = !el.matches(':is(.cbi-section > div:not(.cbi-title), .cbi-section) > h3 ~ h3:has(+ :is(table, .table)):not(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div > h3)') && (el.matches('.cbi-section > div:not(.cbi-title) > h3') && el.closest('.cbi-section').querySelector('h1, h2, h3, h4, h5, h6, legend') !== el || el.matches('.cbi-value > .cbi-section > h3, .cbi-section > h3 ~ h3'));
     const cls = cfg.modal ? 'heading.modal' : !inCard && el.matches('h1, h2') ? 'heading.page' : inner ? 'heading.inner' : inCard ? 'heading.card' : 'heading.sub';
     add(cls, 'fontSize', px(s.fontSize), el);
     add(cls, 'fontWeight', s.fontWeight, el);

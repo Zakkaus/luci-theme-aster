@@ -134,10 +134,12 @@ html :where(.cbi-section :is(h2, h3), .cbi-section > legend) {
 }
 /* Heading 4: a heading inside a card's content, under the card's title
    (the overview's Active DHCPv4 Leases, Associated Stations). Where the
-   card has no title of its own (24.10's leases), its first heading is the
-   title and only the ones after it are Heading 3. A heading a field writes
-   (.cbi-value > h4: DHCP's Active DHCPv4 Leases) is one too. */
-html :where(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div:not(.cbi-title) > h3, .cbi-section > div:not(.cbi-title) > h3 ~ h3, .cbi-value > h4, .cbi-value > .cbi-section > h3, .cbi-section > h3 ~ h3) {
+   card has no title of its own, a table's own heading (h3 + table: the
+   routing tables, 24.10's leases) names a part of the page as a card's
+   title does, so the tables' headings stay Heading 3, one size (audit3
+   B1). A heading a field writes (.cbi-value > h4: DHCP's Active DHCPv4
+   Leases) is Heading 4 too. */
+html :where(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div:not(.cbi-title) > h3, :is(.cbi-section > div:not(.cbi-title), .cbi-section) > h3 ~ h3:not(:has(+ :is(table, .table))), .cbi-value > h4, .cbi-value > .cbi-section > h3) {
   font-size: var(--text-heading-4-size);
   font-weight: var(--text-heading-4-weight);
   line-height: var(--text-heading-4-leading);

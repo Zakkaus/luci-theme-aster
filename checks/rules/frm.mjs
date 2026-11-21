@@ -249,7 +249,9 @@ export function collect(cfg) {
       // The card's title: its first heading, unless that names a flat section
       // inside it (24.10's leases card has no title but its first heading).
       // nftables' table title sits in a section of its own (25.12).
-      const top = h === hs[0] && h.matches('h3') && (h.parentElement.matches('.nft-table > .cbi-section') ? c : h.parentElement.closest(CARD_SEL)) === c;
+      // Without a title, a table's own heading is one (the routing tables,
+      // 24.10's leases: audit3 B1), as in components.css.
+      const top = (h === hs[0] || h.matches(':is(.cbi-section > div:not(.cbi-title), .cbi-section) > h3 ~ h3:has(+ :is(table, .table)):not(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div > h3)')) && h.matches('h3') && (h.parentElement.matches('.nft-table > .cbi-section') ? c : h.parentElement.closest(CARD_SEL)) === c;
       const want = top ? H3 : H4;
       check('c3.heading', top ? 'card size' : 'inner size', f(s.fontSize), want, h);
       check('c3.heading', 'weight', s.fontWeight, '600', h);
