@@ -1596,14 +1596,17 @@ html :where(#modal_overlay > * > :is(.right, .button-row, div:has(> .left + .rig
   padding: var(--spacing-4) var(--spacing-4) 0;
   border-block-start: var(--border-width) solid var(--color-border);
 }
-/* A Banner inside a dialog drops its fill: the dialog is the surface. The
-   body rule above gives every body child the dialog's 16 inline padding and
-   comes later than the Banner's, so the Banner's own start padding (room
-   for its icon) is set again here: text starts 8 after the icon. */
+/* A Banner inside a dialog keeps its fill, as Astryx's Banner does in a
+   Dialog (audit3 B9), inside the dialog's padding. The body rule above
+   gives every body child the dialog's 16 inline padding and comes later
+   than the Banner's, so the Banner's own start padding (room for its
+   icon) is set again here: text starts 8 after the icon. */
 html :where(#modal_overlay > * > .alert-message) {
-  --banner-bg: transparent;
+  margin-inline: 0;
   padding-inline: calc(var(--banner-pad-inline) + var(--aster-icon-md) + var(--spacing-2)) var(--banner-pad-inline);
 }
+/* Over the footer the footer's 16 is the gap (C18). */
+html :where(#modal_overlay > * > .alert-message:has(+ :is(.right, .button-row):last-child)) { margin-block-end: 0; }
 /* A dialog that is itself a status (ui.js displayStatus: the apply
    countdown) is the sm dialog, its progress full width under the text. */
 html :where(#modal_overlay > .alert-message) {
