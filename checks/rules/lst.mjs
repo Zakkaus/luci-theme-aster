@@ -291,6 +291,15 @@ export function collect(cfg) {
     });
   }
 
+  /* G4: the interface editor's Status list starts on its field's content
+     edge (the device icon trails the Device value). */
+  scope.querySelectorAll('.ifacebadge.large:not(.cbi-tooltip) > span').forEach((l) => {
+    const k = l.querySelector('strong');
+    if (!shown(l) || !k || !textNodes(k).length) return;
+    const b = l.parentNode;
+    add('g.marker', 'offset', px(range(textNodes(k))[0].left - b.getBoundingClientRect().left - parseFloat(cs(b).paddingLeft) - parseFloat(cs(b).borderLeftWidth)), k);
+  });
+
   /* C13 / C16 Interfaces: a head (name, dot, zone Badge) and a device
      line (name, icons) show all they hold: nothing cut at the box. */
   if (document.querySelector('[data-page="admin-network-network"]')) {

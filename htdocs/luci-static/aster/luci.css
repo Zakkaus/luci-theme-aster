@@ -791,8 +791,9 @@ html { --icon-tunnel: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
      error ink. */
   & > .aster-error > :is(strong, .aster-v) { color: var(--color-text-error); }
 }
-/* The editor's Status: icon, then the list. */
-.ifacebadge.large:not(.cbi-tooltip) { --badge-bg: transparent; display: flex; align-items: flex-start; justify-content: start; gap: var(--spacing-3); padding: 0; white-space: normal; }
+/* The editor's Status: the list alone (its device icon trails the Device
+   value, components.css). */
+.ifacebadge.large:not(.cbi-tooltip) { --badge-bg: transparent; display: block; padding: 0; white-space: normal; }
 /* A zone's colour (firewall.js writes it inline, the administrator's
    data) as palette tokens: LuCI's lan green and wan red are the muted
    success and error fills, "no zone" the neutral, any other colour mixed

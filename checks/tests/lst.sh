@@ -91,5 +91,13 @@ expect uniform 1 "c13.badge stray" "Firewall zone verdicts as pills (audit2 B)" 
 expect uniform 1 "c13.badge stray" "Firewall rules' this device as a pill (audit2 B)" -- "$url" "$password" --pages "$tmp/lst-fwr.txt" \
 	--debug-css 'admin/network/firewall/rules=html body .zonebadge.zonebadge:has(> em:only-child) { background: var(--color-neutral) !important; padding-inline: 8px !important }'
 
+edit='admin/network/network modal=interface-edit require=g.marker,c16.icon'
+printf '%s\n' "$edit" >"$tmp/lst-edit.txt"
+expect uniform 0 "" "Interface editor: Status list on the field's edge" -- "$url" "$password" --pages "$tmp/lst-edit.txt" --viewports desktop,phone
+# Audit3 B5: the device icon before the Status list again, a 28 px gutter
+# the other fields do not have.
+expect uniform 1 "g.marker offset" "Interface editor Status icon in a leading gutter (audit3 B5)" -- "$url" "$password" --pages "$tmp/lst-edit.txt" --viewports phone \
+	--debug-css 'admin/network/network=html body .ifacebadge.large { display: flex !important; gap: var(--spacing-3) } html body .ifacebadge.large::before { content: ""; flex: none; inline-size: var(--aster-icon-md); block-size: var(--aster-icon-md); background: var(--color-icon-secondary) }'
+
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true
