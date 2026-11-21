@@ -646,6 +646,10 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
 .ifacebox-body > div > .ifacebadge + .ifacebadge { margin-block-start: var(--spacing-2); }
 .network-status-table { display: flex; flex-wrap: wrap; gap: var(--spacing-3); }
 .network-status-table + .table { margin-block-start: var(--spacing-4); }
+/* A chain is a flat section of its table's card: it does not scroll, so
+   its rules' bleed to the card border is not clipped (its rules fold
+   instead). */
+.nft-table > .nft-chains > .nft-chain { overflow: visible; }
 /* Firewall rules: a two-line action aligns its row to the top. */
 .nft-rules .td { vertical-align: top; }
 /* A rule's clauses are text (C13): one body line each, 8 apart on a line;
