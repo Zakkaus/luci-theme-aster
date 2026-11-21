@@ -606,6 +606,7 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   grid-template-columns: fit-content(50%) minmax(0, 1fr);
   gap: var(--spacing-2) var(--spacing-4);
   align-items: baseline;
+  justify-self: stretch; /* folded: the row's width, not its words' */
   color: var(--color-text-primary);
   font-size: var(--text-body-size);
   font-weight: var(--text-body-weight);
@@ -718,13 +719,14 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   & > .tr {
     display: grid;
     grid-template-columns: fit-content(50%) minmax(0, 1fr);
-    gap: var(--spacing-2) var(--spacing-4);
+    column-gap: var(--spacing-4);
     align-items: baseline;
   }
+  /* Rows 8 apart: a table cell's 4 above and below. */
   & > .tr > .td {
     display: block;
     inline-size: auto;
-    padding: 0;
+    padding: var(--spacing-1) 0;
     border: 0;
     color: var(--color-text-primary);
     text-align: start;
@@ -810,9 +812,11 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   & > .tr > .td:first-child {
     color: var(--color-text-secondary);
     font-weight: var(--text-label-weight);
+    white-space: normal;
     overflow-wrap: normal;
     word-break: keep-all;
   }
+  & .cbi-progressbar { min-inline-size: 0; }
   & .cbi-progressbar::before {
     color: var(--color-text-primary);
     font-size: var(--text-body-size);
