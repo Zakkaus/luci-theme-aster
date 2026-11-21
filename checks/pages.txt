@@ -17,17 +17,17 @@
 
 # Status
 admin/status/overview                require=font.body,heading.page,heading.card,card,table.kv
-admin/status/routes                  require=font.body,heading.page,card,table
+admin/status/routes                  require=font.body,heading.page,card,table,c7.when,g.marker.table
 # Banners, WireGuard's faded instance line and inline code, which the lab
 # boxes never draw (checks/lib/gate.mjs FIXTURES).
 admin/status/routes fixture=notices  require=font.body,banner.icon
-admin/status/nftables                require=font.body,card,table
+admin/status/nftables                require=font.body,card,table,c7.when
 admin/status/logs/syslog             require=font.body,heading.page,card,button,field.input,tab
 admin/status/logs/dmesg              require=font.body,heading.page,card,button,field.input,tab
-admin/status/processes               require=font.body,heading.page,card,table,button
+admin/status/processes               require=font.body,heading.page,card,table,button,c6.table@desktop,c7.when,c10.actions,g.marker.table,g.mq
 admin/status/realtime/load           require=font.body,heading.page,card,tab
 admin/status/realtime/bandwidth      require=font.body,heading.page,card,tab
-admin/status/realtime/connections    require=font.body,heading.page,card,table,tab
+admin/status/realtime/connections    require=font.body,heading.page,card,table,tab,c7.when
 
 # System
 admin/system/system                  require=font.body,heading.page,card,button,field,form.label,tab
@@ -37,11 +37,11 @@ admin/system/admin/dropbear          require=font.body,heading.page,card,button,
 admin/system/admin/sshkeys           require=font.body,heading.page,card,button,field.input,tab
 admin/system/admin/uhttpd            require=font.body,heading.page,card,button,checkbox,form.label,tab
 admin/system/admin/repokeys          require=font.body,heading.page,card,button,table,tab
-admin/system/package-manager         require=font.body,heading.page,card,button,field.input,table,tab
-admin/system/startup                 require=font.body,heading.page,card,button,table,tab
+admin/system/package-manager         require=font.body,heading.page,card,button,field.input,table,tab,c7.when
+admin/system/startup                 require=font.body,heading.page,card,button,table,tab,c7.when,c10.actions
 admin/system/startup tab=rc          require=font.body,card,button,tab
 admin/system/crontab                 require=font.body,heading.page,button
-admin/system/leds                    require=font.body,heading.page,card,button,table@rows
+admin/system/leds                    require=font.body,heading.page,card,button,table@rows,c20.empty
 admin/system/flash                   require=font.body,heading.page,card,button,form.label,tab
 admin/system/flash tab=config        require=font.body,card,button,tab
 admin/system/reboot                  require=font.body,heading.page,button
@@ -51,16 +51,16 @@ admin/system/reboot modal=status-notice    require=banner.icon
 admin/system/reboot modal=status-warning   require=banner.icon
 
 # Network
-admin/network/network                require=font.body,card,button,table
+admin/network/network                require=font.body,card,button,table,c7.when,c10.actions
 admin/network/network modal=interface-edit  require=font.body,button,field,checkbox,form.label,tab
 admin/network/routes                 require=font.body,heading.page,card,button,table@rows,tab
 # DHCP: on 25.12 the page opens on its Active Leases tab, with the
 # form one tab over (pages-25.12.txt requires the fields there).
 admin/network/dhcp                   require=font.body,heading.page,card,button,tab
 admin/network/diagnostics            require=font.body,heading.page,card,button,field.input
-admin/network/firewall/zones         require=font.body,heading.page,card,button,field,checkbox,form.label,table,tab
+admin/network/firewall/zones         require=font.body,heading.page,card,button,field,checkbox,form.label,table,tab,c7.when,c10.actions
 admin/network/firewall/forwards      require=font.body,heading.page,card,button,table@rows,tab
-admin/network/firewall/rules         require=font.body,heading.page,card,button,table,tab
+admin/network/firewall/rules         require=font.body,heading.page,card,button,table,tab,c7.when,c10.actions
 admin/network/firewall/snats         require=font.body,heading.page,card,button,table@rows,tab
-admin/network/firewall/ipsets        require=font.body,heading.page,card,button,table@rows,tab
+admin/network/firewall/ipsets        require=font.body,heading.page,card,button,table@rows,tab,c20.empty
 admin/network/firewall/custom        require=font.body,heading.page,card,button,tab
