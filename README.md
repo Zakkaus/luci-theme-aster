@@ -1,46 +1,73 @@
 # Aster
 
-`luci-theme-aster` is a LuCI theme for OpenWrt 24.10 and 25.12. This
-repository is at its first milestone: the package skeleton is a copy of
-`luci-theme-graphite` with every identifier renamed, so the theme still looks
-like Graphite's default palette. The Astryx look, the new icons and the full
-README come in later milestones.
+English · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
-## Building
+Aster (`luci-theme-aster`) is a LuCI theme for OpenWrt in the Astryx design language.
 
-`Makefile` reaches `luci.mk` through `../../luci.mk`, so the package must be
-copied into the LuCI feed of an OpenWrt SDK. A symlink does not work.
+## Requirements
+
+OpenWrt 24.10 or 25.12 with `luci-base`.
+
+## Install
+
+Build the package with the SDK for your OpenWrt release as described below. Copy the package to the router and run the matching command from the directory containing the file.
+
+| OpenWrt | Install command |
+|---|---|
+| 24.10 | `opkg install ./luci-theme-aster_*.ipk` |
+| 25.12 | `apk add --allow-untrusted ./luci-theme-aster-*.apk` |
+
+Use `--allow-untrusted` only for a package you trust. Select **Aster** in LuCI under **System → System → Language and Style**. Installation preserves an existing theme selection.
+
+### Building it yourself
+
+Start in the theme source directory. Set `SDK` to the absolute path of an unpacked SDK with the LuCI feed already present. Copy the source rather than symlinking it: the Makefile includes `../../luci.mk`.
 
 ```sh
-cp -r luci-theme-aster <sdk>/feeds/luci/themes/
-cd <sdk>
+cp -R . "$SDK/feeds/luci/themes/luci-theme-aster"
+cd "$SDK"
 ./scripts/feeds update -i
 ./scripts/feeds install -p luci luci-theme-aster
 make defconfig
 make package/luci-theme-aster/compile V=s
 ```
 
-The packages land in `bin/packages/<arch>/luci/`: an `.ipk` from the 24.10 SDK
-and an `.apk` from the 25.12 SDK.
+Look in `bin/packages/<arch>/luci/` for the `.ipk` (24.10) or `.apk` (25.12).
 
 ## Palettes
 
-Five colour palettes, chosen per browser from the palette menu in the top
-bar (in the drawer on a phone): Rosé Pine (the default; Dawn in light
-mode, Main in dark), Aster, Relay Blue, Sounding Teal and Herbarium Plum. Each
-works in light, dark and auto mode. The choice is kept in the browser's
-`localStorage` (`aster-palette`), not on the router. Only colours change
-between palettes; components and spacing stay the same.
+Open the palette menu in the top bar. Rosé Pine, the default, uses Dawn in light mode and Main in dark mode. The other choices are Aster, Relay Blue, Sounding Teal and Herbarium Plum. Switching palettes changes colours, not spacing or components. The browser saves the choice in `aster-palette`, not on the router.
 
-## Credits
+## Settings
 
-The logo (Ray Floret) and the Relay, Teal and Plum palettes were designed
-for this project. The Rosé Pine palette is Rosé Pine's
-(https://rosepinetheme.com), MIT, see `LICENSES/rose-pine-MIT.txt`; the few
-colours moved for contrast are listed in `design/palettes.mjs`.
+LuCI offers three device defaults: `Aster` follows the system colour scheme, `AsterLight` selects light and `AsterDark` selects dark. Use the top bar to override the default for this browser. Light and Dark take precedence; Auto returns to the router’s selection.
+
+## Phone
+
+At 48rem or narrower, the menu button opens navigation in a drawer. Tables respond to their own width rather than the phone breakpoint: when the columns no longer fit their container, each row folds into labelled values.
+
+## Layout
+
+LuCI loads five stylesheets from `htdocs/luci-static/aster/`, in this order:
+
+| File | Role |
+|---|---|
+| `tokens.css` | Shared design values and palette colours |
+| `components.css` | Astryx components for LuCI markup |
+| `shell.css` | Top bar, side navigation, page frame and phone drawer |
+| `theme.css` | Login screen, links and status colours |
+| `luci.css` | LuCI class names and page layouts |
+
+A page’s own stylesheet loads after the theme.
+
+## Login
+
+The login page has its own scheme and palette controls. The password field has a reveal button; the form still submits without JavaScript.
+
+## Translations
+
+English is the source language. The optional theme translations are `luci-i18n-aster-zh-cn` (Simplified Chinese) and `luci-i18n-aster-zh-tw` (Traditional Chinese). Aster only styles LuCI. Text that LuCI or an app leaves untranslated stays untranslated.
 
 ## Licence
 
-Apache-2.0, see `LICENSE`. The icons are Heroicons 2.2.0 outline
-(https://github.com/tailwindlabs/heroicons, taken from the `@heroicons/react`
-2.2.0 package), MIT, see `LICENSES/heroicons-MIT.txt`.
+Aster uses the [Apache License 2.0](LICENSE). The Ray Floret logo and the Relay Blue, Sounding Teal and Herbarium Plum palettes were designed for this project. The [Heroicons 2.2.0 outline icons](LICENSES/heroicons-MIT.txt) and the [Rosé Pine palette](LICENSES/rose-pine-MIT.txt) use the MIT licence. [The palette definitions](design/palettes.mjs) list the Rosé Pine colours adjusted for contrast.
