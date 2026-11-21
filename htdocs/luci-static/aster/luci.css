@@ -1318,6 +1318,19 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
   text-shadow: none !important; /* inline dark shadow */
   font-family: var(--font-family-body) !important; /* inline font-family:sans-serif */
 }
+/* Channel Analysis lays out every band's channel scale once, at load, from
+   its graph's offsetWidth; a pane hidden with display none measures 0 and
+   its numbers pile up at the left. Its hidden panes keep the shown pane's
+   width and take no room (bootstrap hides every pane this way). */
+#view [data-tab-title]:not([data-tab-active="true"]):has(#channel_graph) {
+  display: block;
+  block-size: 0;
+  margin-block: 0;
+  padding-block: 0;
+  border-block-width: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
 
 
 /* ── Third-party apps [ported] ──────────────────────────────── */
