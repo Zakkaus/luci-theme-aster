@@ -1208,7 +1208,8 @@ html :where([data-page="admin-status-overview"] #view :is(.ifacebox-body > div, 
    before the text
    (Heroicons 2.2.0 outline, MIT, path data verbatim: InformationCircle,
    ExclamationTriangle, ExclamationCircle, CheckCircle) as a mask, so it
-   takes the text colour. A notification is a Banner with a Dismiss button;
+   takes the text colour. A notification is a Banner with a Dismiss button
+   (the standard Button, 36);
    ui.js removes it when the .fade-out transition ends, so that transition
    always runs. */
 
@@ -1274,7 +1275,6 @@ html :where(.alert-message h4) {
   line-height: var(--text-body-leading);
 }
 html :where(.alert-message pre) { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--text-supporting-size); }
-html :where(.alert-message :is(.btn, .cbi-button, button)) { --button-h: var(--size-element-sm); }
 html :where(.alert-message.fade-out) { opacity: 0; }
 
 /* ── Dialog ──────────────────────────────────────────────────────
