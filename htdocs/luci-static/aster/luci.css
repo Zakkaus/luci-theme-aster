@@ -462,6 +462,28 @@ form > .cbi-map .cbi-section div:not(.cbi-value, .cbi-value *):has(> .table) { o
    the inset made WireGuard's peer table overflow #view by 2, which drew a
    scrollbar under it. */
 .shell-inner .table:not(.cbi-section *, #view > *, #view > .cbi-map > *, [data-tab] > :has(.th)) { margin-inline: var(--border-width); }
+/* A table that is the Card (WireGuard's peers, 24.10's Processes): wide,
+   its cells own the 16, so the header and the rows start on the card's
+   content edge and the row lines run border to border (C2, C6). */
+#view > :is(table, .table)[data-fold="wide"], #view > .cbi-map > :is(table, .table)[data-fold="wide"] { padding-inline: 0; }
+/* A WireGuard peer's short key is the subline under its name (0.1):
+   supporting 13/20 secondary, the body face. */
+#view .td > div > p + .ifacebadge {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: var(--text-supporting-size);
+  line-height: var(--text-supporting-leading);
+  & > code { font-family: inherit; }
+}
+/* Numbers end-aligned in their column (C6) where LuCI marks none: a
+   process's CPU and memory share, a connection's transfer, a package's
+   size, a mount's free and used space, a WireGuard peer's traffic. Folded, every value starts on the
+   value column (C7). */
+[data-page="admin-status-processes"] #view .table[data-fold="wide"] .tr > :is(.th, .td):is(:nth-child(4), :nth-child(5)),
+[data-page="admin-status-realtime-connections"] #view .table[data-fold="wide"] .tr > :is(.th, .td):last-child,
+#packages[data-fold="wide"] .tr > :is(.th, .td).size,
+[data-page="admin-status-wireguard"] #view .table[data-fold="wide"] .tr > :is(.th, .td):is(:nth-child(3), :nth-child(4)),
+[data-page="admin-system-mounts"] #view .table[data-fold="wide"]:not(.cbi-section-table) .tr > :is(.th, .td).center { text-align: end; }
 /* Leases and associated stations are rows of identifiers (addresses, MACs,
    DUIDs, rates): a line is never broken, so a column is as wide as its
    longest line and every row of one kind is one height. A station's host
