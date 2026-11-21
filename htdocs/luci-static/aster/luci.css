@@ -675,6 +675,11 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
   & .aster-k { grid-column: 1; color: var(--color-text-secondary); font-weight: var(--text-label-weight); }
   & .aster-v { grid-column: 2; display: block !important; color: var(--color-text-primary); & :is(strong, big) { font-size: inherit; font-weight: inherit; } }
 }
+/* nlbw's summary is as wide as its words beside the pies: half of that
+   shrink-wrapped width split "主機數" a glyph a line beside a short "0".
+   Its label column is the longest label first (Astryx: auto), the value
+   the rest. */
+.kpi > ul { grid-template-columns: auto minmax(0, 1fr); }
 /* A set in a clause ("{ eth0, br-lan }") sits on its line's baseline:
    nftables.js centres it (middle), which grew the row 1-2 px. */
 .nft-rules :is(.nft-set, .nft-set-items) { vertical-align: baseline; }
