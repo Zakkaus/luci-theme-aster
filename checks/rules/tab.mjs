@@ -124,7 +124,7 @@ export async function collect(cfg) {
       let state = 'ok';
       if (fold !== 'fold' && fold !== 'wide') state = 'unmeasured';
       else if (p.clientWidth) {
-        const w = t.style.width;
+        const tStyle = t.getAttribute('style');
         t.dataset.fold = 'wide';
         t.style.width = 'min-content';
         // With its words whole (G5), whatever the theme's stylesheet says:
@@ -136,17 +136,19 @@ export async function collect(cfg) {
         // (a lease's host) wraps at its spaces (C7): the same leases fit on
         // Overview as on DHCP's page (audit 2, C7 A).
         const titles = rowsOf(t).map((r) => r.children[head(r)]).filter((c) => c && !c.matches('.cbi-section-table .td:is(.cbi-section-table-titles, [data-name="name"])'));
-        const lists = [...titles, ...cells.flatMap((c) => [c, ...c.querySelectorAll('*')]).filter((e) => !e.closest('.cbi-section-actions, .nft-set, .nft-list') && [...e.childNodes].some((n) => n.nodeType === 3 && n.data.includes(', ')))];
-        const set = (on) => cells.forEach((c) => {
-          on ? c.style.setProperty('word-break', 'keep-all', 'important') : c.style.removeProperty('word-break');
-          c.matches('.cbi-section-table .td:is(.cbi-section-table-titles, [data-name="name"])') && (on ? c.style.setProperty('white-space', 'nowrap', 'important') : c.style.removeProperty('white-space'));
+        // A tooltip is no list: any style attribute shows it (components.css,
+        // Tooltip), 300 wide inside the table.
+        const lists = [...titles, ...cells.flatMap((c) => [c, ...c.querySelectorAll('*')]).filter((e) => !e.closest('.cbi-section-actions, .nft-set, .nft-list, .cbi-tooltip') && [...e.childNodes].some((n) => n.nodeType === 3 && n.data.includes(', ')))];
+        // Put back each style attribute as it was: an empty one left behind
+        // still matches [style].
+        const saved = [[t, tStyle], ...[...cells, ...lists].map((e) => [e, e.getAttribute('style')])];
+        cells.forEach((c) => {
+          c.style.setProperty('word-break', 'keep-all', 'important');
+          c.matches('.cbi-section-table .td:is(.cbi-section-table-titles, [data-name="name"])') && c.style.setProperty('white-space', 'nowrap', 'important');
         });
-        set(true);
         lists.forEach((e) => e.style.setProperty('white-space', 'normal', 'important'));
         const need = t.scrollWidth, room = p.clientWidth - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight) - parseFloat(ts.marginLeft) - parseFloat(ts.marginRight);
-        set(false);
-        lists.forEach((e) => e.style.removeProperty('white-space'));
-        t.style.width = w;
+        saved.forEach(([e, v]) => (v === null ? e.removeAttribute('style') : e.setAttribute('style', v)));
         t.dataset.fold = fold;
         if (fold === 'fold' && need <= room - 16.5) state = `folded, fits (${Math.round(need)} in ${Math.round(room)})`;
         if (fold === 'wide' && need > room + 0.5) state = `wide, words do not fit (${Math.round(need)} in ${Math.round(room)})`;
