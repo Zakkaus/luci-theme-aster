@@ -97,9 +97,24 @@ export async function collect(cfg) {
   }
   add('g.mq', 'blocks', mq ? `${mq} blocks` : 'none', mqAt);
 
+  // C7 title: read from the header as COMPONENTS.md words it: the first
+  // column that is not the row's interface, network, device or (start)
+  // priority, nor hidden on phones, nor a checkbox or a signal (Mounts'
+  // Enabled, a Wireless SSID's signal); with no header row, each row's
+  // first cell that is not a checkbox or a signal.
+  const skip = ['Interface', 'Network', 'Device', 'Priority', 'Start priority'].map((x) => (typeof _ === 'function' ? _(x) : x));
+  const mark = (c) => c?.querySelector('[type=checkbox], [data-signal]');
+  const headOf = (t) => {
+    const ths = [...(t.querySelector('.tr:has(> .th)')?.children || [])];
+    const r0 = [...t.querySelectorAll('.tr:not(:has(> .th))')].find((r) => r.closest('.table, table') === t);
+    const i = ths.findIndex((c, k) => !c.matches('.hide-xs') && !mark(r0?.children[k]) && !skip.includes(c.textContent.trim()));
+    return (r) => (ths.length ? Math.max(0, i) : Math.max(0, [...r.children].findIndex((c) => !mark(c))));
+  };
+
   for (const t of scope.querySelectorAll(TABLES)) {
     if (!shown(t) || t.closest('.cbi-tooltip')) continue;
     const fold = t.dataset.fold;
+    const head = headOf(t);
     // C7 when: re-measure as theme-aster.js does.
     {
       const p = t.parentNode, ps = cs(p), ts = cs(t);
@@ -223,10 +238,6 @@ export async function collect(cfg) {
     const titleOf = (r) => cellsOf(r).find((c) => cs(c).gridRowStart === '1' && !c.matches('.cbi-section-actions') && !(cs(c).gridColumnStart === '-2'));
     const actsOf = (r) => cellsOf(r).find((c) => c.matches('.cbi-section-actions') || cs(c).gridColumnStart === '-2');
     const labelled = (r) => cellsOf(r).filter((c) => c !== titleOf(r) && c !== actsOf(r) && !/^(none|normal)$/.test(cs(c, '::before').content));
-    // C7 title: read from the header as COMPONENTS.md words it.
-    const ths = [...(t.querySelector('.tr:has(> .th)')?.children || [])];
-    const skip = ['Interface', 'Network', 'Device', 'Priority', 'Start priority'].map((x) => (typeof _ === 'function' ? _(x) : x));
-    const head = Math.max(0, ths.findIndex((c) => !c.matches('.hide-xs') && !skip.includes(c.textContent.trim())));
     const contentL = box(t).left + parseFloat(ts.paddingLeft), contentR = box(t).right - parseFloat(ts.paddingRight);
     const lxs = new Set(), vxs = new Set();
     let titleX = null, labelW = 0, longest = 0;
@@ -247,7 +258,7 @@ export async function collect(cfg) {
         add('c7.sig', 'divEnd', px(contentR - box(r).right), r);
       }
       const tc = titleOf(r);
-      add('c7.title', 'column', tc && tc === r.children[head] ? 'names the row' : `column ${[...r.children].indexOf(tc) + 1}, not ${head + 1}`, tc || r);
+      add('c7.title', 'column', tc && tc === r.children[head(r)] ? 'names the row' : `column ${[...r.children].indexOf(tc) + 1}, not ${head(r) + 1}`, tc || r);
       const tf = tc && firstText(tc);
       if (tc && tf) {
         add('c7.sig', 'title', font(cs(tc)), tc);
