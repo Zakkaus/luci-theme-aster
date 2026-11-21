@@ -718,6 +718,12 @@ html :where(.cbi-value > .cbi-value-field) {
   min-block-size: var(--size-element-md);
 }
 html :where(.cbi-value > .cbi-value-field > *) { min-inline-size: 0; }
+/* A field and its own buttons (System's Local Time) wrap 8 apart, as they
+   sit 8 apart on one line (C5); help text stays 4 under them. */
+html :where(.cbi-value > .cbi-value-field:has(> :is(input, select, .cbi-dropdown) ~ .control-group > :is(.btn, .cbi-button, button):first-child)) {
+  row-gap: var(--aster-space-row);
+  & > .cbi-value-description { margin-block-start: calc(var(--aster-space-tight) - var(--aster-space-row)); }
+}
 /* A select is 256 wide, wider when its chosen option needs it, up to the
    row: an option is never cut (audit #13). Text fields keep 256 (they
    scroll as typed; a read-only value already sizes to itself). */

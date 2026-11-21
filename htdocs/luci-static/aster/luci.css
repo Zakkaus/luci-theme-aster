@@ -292,9 +292,13 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
 /* Backup / Flash Firmware: only its Configuration tab has anything to
    save; on the Actions tab the bar would hold a lone Save. */
 [data-page="admin-system-flash"] #view:has([data-tab="actions" i][data-tab-active="true"]) .cbi-page-actions { display: none; }
-/* A read-only value may be as wide as it needs, never narrower than a
-   field. */
-.cbi-value-field input[readonly] { field-sizing: content; min-inline-size: var(--aster-field-w); }
+/* A read-only value (System's Local Time) sizes to itself, never
+   narrower than a field (C5): the field width would cut it. */
+.cbi-value-field input[readonly] { field-sizing: content; inline-size: auto; min-inline-size: var(--field-w); }
+/* A labelled text area (System's Notes; CBI wraps it in a bare div) is a
+   field like the rest, 256 (C5): LuCI's inline 100 % on both goes. An
+   unlabelled one is the page's editor and keeps the row. */
+.cbi-value:has(> .cbi-value-title:not(:empty)) > .cbi-value-field > :is(textarea, div:has(> textarea:only-child)) { flex-basis: auto; inline-size: var(--field-w) !important; }
 /* A field in a table cell fills the cell. */
 .td > :is(input, select, .cbi-dropdown:not(.btn, .cbi-button)) { --field-w: 100%; }
 .td textarea { max-block-size: 8.5rem; }
