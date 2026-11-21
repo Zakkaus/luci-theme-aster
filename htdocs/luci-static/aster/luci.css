@@ -930,7 +930,6 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
     grid-template-columns: fit-content(var(--aster-form-label-w)) minmax(0, 1fr);
     align-items: baseline;
     gap: var(--spacing-2) var(--spacing-4);
-    overflow-wrap: break-word;
     & > :is(span, div), & > div > .ifacebadge, & > div > .ifacebadge > span { display: contents; }
     & > div > .ifacebadge::before { content: none; }
     & br:not(.cbi-tooltip *) { display: none; }
@@ -944,6 +943,16 @@ html { --icon-signal: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
       & > strong {
         color: var(--color-text-secondary);
         font-weight: var(--font-weight-medium);
+      }
+      /* A value wraps at its spaces only; an address wider than the
+         column ends in an ellipsis, its text in title (G5). */
+      & > .aster-v {
+        display: block;
+        min-inline-size: 0;
+        overflow: hidden;
+        overflow-wrap: normal;
+        word-break: keep-all;
+        text-overflow: ellipsis;
       }
     }
   }

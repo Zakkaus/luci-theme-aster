@@ -158,8 +158,8 @@ return baseclass.extend({
 	 *    LuCI's colon: all are
 	 *    drawn as a MetadataList, whose labels carry no colons; the
 	 *    overview's upstreams share one label column, as wide as their
-	 *    longest label (--aster-kv-w; luci.css caps it); an interface's
-	 *    value is .aster-v, "(N 封包)" kept whole by a no-break space;
+	 *    longest label (--aster-kv-w; luci.css caps it); a value is
+	 *    .aster-v, titled, "(N 封包)" kept whole by a no-break space;
 	 *  - "K: <b>v</b>, …" (nft hook, nlbw kpi) and WireGuard's " · Port N
 	 *    · key" become rows. */
 	marks() {
@@ -217,7 +217,7 @@ return baseclass.extend({
 
 				const p = s.parentNode, v = p.textContent.slice(t.length).replace(/\((\S+) /g, '($1\xa0');
 
-				if (p.matches('[id$="-ifc-description"] > *') && !p.querySelector('.aster-v'))
+				if (p.matches('.nowrap:not(.cbi-tooltip *)') && !p.querySelector('.aster-v'))
 					p.replaceChildren(s, E('span', { class: 'aster-v', title: v }, [v]));
 			});
 
