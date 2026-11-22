@@ -44,13 +44,19 @@ expect uniform 1 "c8.x *" "Interfaces lists with their own label columns (audit2
 expect uniform 1 "c13.badge clipped" "Interfaces zone Badge cut (audit2 C13)" -- "$url" "$password" --pages "$tmp/lst-net.txt" --viewports phone \
 	--debug-css 'admin/network/network=html #view .table .tr:has(> .td > .ifacebox) > .td:first-child { inline-size: 1% !important } html #view .ifacebox > .ifacebox-head::after { flex: none !important }'
 
-ov='admin/status/overview require=c8.kv,c8.x,c8.bar,g.colon,g.marker,c16.icon,c13.badge'
+ov='admin/status/overview require=c8.kv,c8.x,c8.bar,g.colon,g.marker,c16.icon,c13.badge,c25.tile'
 printf '%s\n' "$ov" >"$tmp/lst-ov.txt"
 expect uniform 0 "" "Overview: port tiles, upstream and radio lists" -- "$url" "$password" --pages "$tmp/lst-ov.txt"
 # C25 / G4 (defect 10): a dot before a port's or a radio's name (the
 # port's state is its start icon, in its own column; no dot follows).
 expect uniform 1 "g.marker offset" "Overview dot before a port or radio name (G4)" -- "$url" "$password" --pages "$tmp/lst-ov.txt" \
 	--debug-css 'admin/status/overview=#view .ifacebox > .ifacebox-head:first-child::before { content: "" !important; display: inline-block !important; inline-size: 8px !important; margin-inline-end: 8px !important }'
+# C25 (owner 2026-11-23): a port's name 3 px below its row's (lan1 under
+# wan); a tile padded off the small Card's 12 16 (a bare one: any).
+expect uniform 1 "c25.tile lines" "Overview port name off its tile's top (C25)" -- "$url" "$password" --pages "$tmp/lst-ov.txt" \
+	--debug-css 'admin/status/overview=#view .ifacebox:has(img[src*="/port_"]) > .ifacebox-head:first-child { margin-block-start: 3px !important }'
+expect uniform 1 "c25.tile surface" "Overview port tile padded 6 (C25)" -- "$url" "$password" --pages "$tmp/lst-ov.txt" \
+	--debug-css 'admin/status/overview=#view .ifacebox:has(img[src*="/port_"]) { padding-block-start: 6px !important }'
 
 nft='admin/status/nftables require=c8.kv,c8.x,g.colon,c13.badge,c16.icon'
 printf '%s\n' "$nft" >"$tmp/lst-nft.txt"

@@ -203,8 +203,9 @@ export function collect(cfg) {
   }
 
   /* G8: inside a card nothing draws a box (four borders) or a fill but the
-     controls, Badges, Tokens, Banners, code blocks, bars and charts. */
-  const OK = `${CTRL}, input, .cbi-dropdown *, .zonebadge, .label, .alert-message, .alert-message *, ${CODE}, code, kbd, .cbi-progressbar, .cbi-progressbar *, svg, svg *, canvas, .cbi-tooltip, .cbi-tooltip *, .cbi-checkbox, .cbi-checkbox *, label:has(> input), .ifacebadge, .ifacebadge *, img, .aster-glyph, [class*="spinning"]`;
+     controls, Badges, Tokens, Banners, code blocks, bars and charts, and
+     the C25 port tiles (a row of 2 or 3 is small Cards; lst c25.tile). */
+  const OK = `.ifacebox:has(> .ifacebox-body > img[src*="/port_"]), ${CTRL}, input, .cbi-dropdown *, .zonebadge, .label, .alert-message, .alert-message *, ${CODE}, code, kbd, .cbi-progressbar, .cbi-progressbar *, svg, svg *, canvas, .cbi-tooltip, .cbi-tooltip *, .cbi-checkbox, .cbi-checkbox *, label:has(> input), .ifacebadge, .ifacebadge *, img, .aster-glyph, [class*="spinning"]`;
   for (const c of cards) {
     if (cfg.modal) break;
     for (const el of c.querySelectorAll('*')) {

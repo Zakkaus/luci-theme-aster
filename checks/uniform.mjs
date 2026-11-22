@@ -834,8 +834,10 @@ function collect(cfg) {
   // (a phone) that keeps its divider or its fill is a band: inside a card
   // it is a second frame (Startup, Backup); fixed under the column it is
   // the layout's footer, not in the card. A dialog is a frame over the page.
+  // A port tile in a row of 2 or 3 is a small Card (C25, owner 2026-11-23;
+  // lst c25.tile holds every port tile to its surface).
   const FRAME_OK = [
-    'input', 'select', 'textarea', 'button', '.btn', '.cbi-button', '.cbi-dropdown', '.cbi-dropdown *',
+    '.ifacebox:has(> .ifacebox-body > img[src*="/port_"])', 'input', 'select', 'textarea', 'button', '.btn', '.cbi-button', '.cbi-dropdown', '.cbi-dropdown *',
     '.label', '.zonebadge', '.ifacebadge', '.cbi-progressbar', '.cbi-progressbar *', 'code', 'kbd', 'pre', 'samp',
     '.alert-message', '.cbi-tooltip', '.cbi-tooltip *', '.cbi-tabmenu > li > a', 'img', 'svg', 'canvas',
   ].join(', ');

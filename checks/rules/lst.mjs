@@ -25,6 +25,7 @@ export const canonical = {
   'g.break': {_source: 'COMPONENTS.md G5: an identifier or value token never breaks across lines (or is truncated with a title); a changes dialog value that fits its line is on one line (AUDIT4 B5)', broken: 0, value: 'whole'},
   'g.colon': {_source: 'COMPONENTS.md G10: labels carry no trailing colon', trailing: 'none'},
   'g.marker': {_source: 'COMPONENTS.md G4 / 0.1: a box title (name) starts at its list labels\' x; markers trail the text', offset: 0},
+  'c25.tile': {_source: 'COMPONENTS.md C25, owner 2026-11-23 (「還是很不平衡」, lan1 3 px below wan): name, description and traffic stacked from the tile\'s content top, one name-line top per row of tiles; a row of 2 or 3 is equal small Cards (muted, radius 12, padding 12 16) filling the row, every other tile bare', lines: 'stacked', rowTop: 'shared', surface: 'ok', width: 'fill'},
   'c13.badge': {_source: 'COMPONENTS.md C13: filled pills only for zones (a verdict, "this device" or "any zone" is text), action-needed status, Tokens, buttons; .ifacebadge is text (no fill, no border); an interface\'s zone Badge is never cut (ellipsis inside it)', stray: 0, ifacebadge: 'plain', clipped: 0},
   'c14.token': {_source: 'COMPONENTS.md C14: Astryx Token md, dynamic lists only', height: 28, radius: 8, stray: 0},
   'c7.keys': {_source: 'COMPONENTS.md section 3 system/admin/sshkeys: C7 title-line-only blocks (name the title, type + key its subline, the key cut with an ellipsis before the remove mark), not Tokens', lines: 'name/sub', key: 'cut', fill: 'none', width: 'full'},
@@ -449,5 +450,29 @@ export function collect(cfg) {
     const split = new Set(rs.map((x) => Math.round(x.top))).size > 1 && rs.reduce((a, x) => a + x.width, 0) <= room;
     add('g.break', 'value', split ? `split: ${t.data}` : 'whole', el);
   });
+  /* C25 port tiles. */
+  for (const g of scope.querySelectorAll('#view div[style*="grid-template-columns"]:has(> .ifacebox > .ifacebox-body > img[src*="/port_"])')) {
+    const tiles = [...g.children].filter(shown);
+    const top = (e) => px(e.getBoundingClientRect().top);
+    const rows = Object.values(Object.groupBy(tiles, top));
+    const card = tiles.length >= 2 && tiles.length <= 3 && rows.length === 1;
+    for (const t of tiles) {
+      const s = cs(t), name = t.querySelector(':scope > .ifacebox-head:first-child'), desc = t.querySelector(':scope > .ifacebox-body:nth-child(2)');
+      if (!name || !desc) continue;
+      const c = top(t) + px(s.borderTopWidth) + px(s.paddingTop), nr = name.getBoundingClientRect();
+      const off = [px(nr.top) - c, top(desc) - px(nr.bottom)];
+      add('c25.tile', 'lines', off.every((v) => !v) ? 'stacked' : `name +${off[0]}, description +${off[1]}`, name);
+      const ok = card ? s.backgroundColor === fills.muted && s.borderTopLeftRadius === '12px' && s.padding === '12px 16px' : clear(s.backgroundColor) && s.padding === '0px';
+      add('c25.tile', 'surface', ok ? 'ok' : `${card ? 'card' : 'bare'} drawn ${s.backgroundColor} r${s.borderTopLeftRadius} p${s.padding}`, t);
+    }
+    for (const r of rows) if (r.length > 1) {
+      const tops = new Set(r.map((t) => top(t.querySelector(':scope > .ifacebox-head:first-child'))));
+      add('c25.tile', 'rowTop', tops.size === 1 ? 'shared' : `name tops ${[...tops].join('/')}`, r[0]);
+    }
+    if (card) {
+      const ws = tiles.map((t) => t.getBoundingClientRect().width), sum = ws.reduce((a, b) => a + b) + 16 * (ws.length - 1);
+      add('c25.tile', 'width', Math.max(...ws) - Math.min(...ws) <= 1 && Math.abs(sum - g.getBoundingClientRect().width) <= 1 ? 'fill' : `${ws.map(px).join('/')} of ${px(g.getBoundingClientRect().width)}`, g);
+    }
+  }
   return out;
 }
