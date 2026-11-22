@@ -1298,10 +1298,40 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
         word-break: keep-all;
         text-overflow: ellipsis;
       }
-      /* No colour emoji (C16): LuCI's chart glyph before the DHCPv6
-         counters takes no room (theme-aster.js made it the value's first
-         letter). */
-      & > .aster-v[title^="\1F4CA"]::first-letter { font-size: 0; }
+    }
+    /* LuCI's DHCPv6 statistics: a chart glyph whose hover tooltip holds a
+       "<strong>DHCPv6 solicit:</strong> 2 封包" line per counter (ui.itemlist,
+       theme-aster.js drops the colons). No colour emoji (C16) and nothing
+       behind a hover: the counters are the row's value, a multi-line value
+       (C8), one counter a row, its name secondary 500, its count 16 after
+       the longest name. Too wide for the value column (a phone), the list
+       goes under the label, the box's full width; the label column stays.
+       The glyph's line is moved after the list and takes no room. */
+    & .nowrap:has(> .cbi-tooltip-container) {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-2) var(--spacing-4);
+      & > strong { flex: 0 0 min(var(--aster-kv-w), var(--aster-form-label-w)); }
+    }
+    & .nowrap > .cbi-tooltip-container { display: grid; font-size: 0; line-height: 0; cursor: auto; }
+    & .nowrap > .cbi-tooltip-container > .cbi-tooltip {
+      position: static;
+      grid-area: 1 / 1;
+      display: grid;
+      grid-template-columns: minmax(0, max-content) auto;
+      gap: var(--spacing-2) var(--spacing-4);
+      inline-size: auto;
+      min-inline-size: 0;
+      max-inline-size: none;
+      padding: 0;
+      background: none;
+      color: inherit;
+      font-size: var(--ifacebox-body-size);
+      line-height: var(--ifacebox-body-leading);
+      opacity: 1;
+      & > span, & .nowrap { display: contents; }
+      & br { display: none; }
+      & strong { padding: 0; color: var(--color-text-secondary); white-space: normal; }
     }
   }
   /* --aster-kv-w is the narrowest the label column may be, not its width:
