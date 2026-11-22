@@ -764,13 +764,16 @@ function collect(cfg) {
     add('tooltip', 'gap', px(t.bottom <= r.top + 0.5 ? r.top - t.bottom : t.top - r.bottom), el);
     el.dispatchEvent(new MouseEvent('mouseout', {bubbles: true}));
   }
-  // A key/value list in a tooltip, as 30_network.js puts the DHCPv6
-  // statistics in an upstream box (ui.itemlist inside a .cbi-tooltip), is
-  // built in the overview's first upstream box when the device has none
-  // (the lab has no DHCPv6 upstream) and taken out after the read.
-  const host = cfg.modal ? null : scope.querySelector('.network-status-table .ifacebox-body');
+  // A key/value list in a tooltip (ui.itemlist inside a .cbi-tooltip, as
+  // 30_network.js builds the DHCPv6 statistics) is built on the overview,
+  // under its upstream boxes, and taken out after the read. Not in an
+  // upstream box: there the theme lays LuCI's DHCPv6 tooltip out as the
+  // row's multi-line value (C8), in flow, so it is no tooltip and not read
+  // as one.
+  const INFLOW = '.network-status-table .nowrap > .cbi-tooltip-container > .cbi-tooltip';
+  const host = cfg.modal ? null : scope.querySelector('.network-status-table');
   let probe = null;
-  if (host && !host.querySelector('.cbi-tooltip-container .cbi-tooltip .nowrap')) {
+  if (host) {
     const list = (pairs) => {
       const sp = document.createElement('span');
       pairs.forEach(([k, v], i) => {
@@ -787,11 +790,12 @@ function collect(cfg) {
     tip.append(list(['solicit', 'advertise', 'request', 'renew', 'reply', 'information_request', 'discarded_packets'].map((k, i) => [`DHCPv6 ${k}`, `${i * 7} pkts`])));
     const c = Object.assign(document.createElement('span'), {className: 'cbi-tooltip-container'});
     c.append('📊', tip);
-    probe = list([['DHCPv6 Statistics', c]]);
-    host.append(probe);
+    probe = document.createElement('div');
+    probe.append(list([['DHCPv6 Statistics', c]]));
+    host.after(probe);
   }
   for (const tip of scope.querySelectorAll('.cbi-tooltip-container > .cbi-tooltip:not(:empty, [style])')) {
-    if ((!cfg.modal && tip.closest('#modal_overlay')) || tip.closest(APP_OWN) || !visible(tip.parentElement)) continue;
+    if ((!cfg.modal && tip.closest('#modal_overlay')) || tip.closest(APP_OWN) || tip.matches(INFLOW) || !visible(tip.parentElement)) continue;
     tip.setAttribute('style', 'transition: none'); // shown at once, not fading in from opacity 0
     if (visible(tip)) tipRead(tip, tip.parentElement);
     tip.removeAttribute('style');
