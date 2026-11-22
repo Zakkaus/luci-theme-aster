@@ -1139,9 +1139,8 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
   & :is(.ifacebox-body > div, .td) > .ifacebadge > img { display: none; }
   /* Port tiles (C25, Astryx Item stacked in a Grid): no border, no fill
      (G8), in the Port status Card like any card's content. The label is
-     the port name 15/500 and its trailing StatusDot (success with a
-     carrier, neutral without: LuCI says so only in port_up/port_down);
-     the description LuCI's words ("2.5 GbE", "no link") in supporting
+     the port name 15/500 after the port icon (its link state: LuCI says
+     so only in port_up/port_down); the description LuCI's words ("2.5 GbE", "no link") in supporting
      text; then the traffic. 29_ports.js writes a 70 px grid and box sizes
      inline (!important to override). LuCI lists lan ports before wan; the
      uplink comes first (firewall.js getColorForName's wan colour). */
@@ -1155,23 +1154,32 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
     --card-border-width: 0;
     --card-radius: 0;
     --card-bg: transparent;
-    gap: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0 var(--spacing-2);
     min-inline-size: 0 !important;
     max-inline-size: none !important;
     margin: 0 !important;
     &:has(.zonebadge[style*="240, 144, 144"]) { order: -1; }
+    /* Astryx Item's start icon: ServerStack 20 (C16, LuCI's port_up /
+       port_down), centred on the name's line and coloured by the link
+       (success with a carrier, secondary without), so it is the port's
+       state too and no StatusDot follows the name. Name, description
+       and traffic share the column after it. */
+    &::before {
+      content: "";
+      align-self: center;
+      inline-size: var(--aster-icon-md);
+      block-size: var(--aster-icon-md);
+      background-color: var(--color-icon-success);
+      mask: var(--icon-server) center / contain no-repeat;
+    }
+    & > * { grid-column: 2; }
     & > .ifacebox-head:first-child {
+      grid-row: 1;
       font-size: var(--text-label-size);
       font-weight: var(--text-label-weight) !important;
       line-height: var(--text-label-leading);
-      &::after {
-        content: "";
-        flex: none;
-        inline-size: var(--spacing-2);
-        block-size: var(--spacing-2);
-        border-radius: var(--radius-full);
-        background-color: var(--color-icon-success);
-      }
     }
     & > .ifacebox-body:nth-child(2) {
       overflow: hidden;
@@ -1179,10 +1187,10 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
       white-space: nowrap;
       & > br { display: none; }
     }
-    /* No carrier: neutral dot and the traffic in secondary text, as LuCI
-       fades a down port's zone bar; the name keeps primary. */
+    /* No carrier: secondary icon and traffic, as LuCI fades a down
+       port's zone bar; the name keeps primary. */
     &:has(> .ifacebox-body > img[src*="_down."]) {
-      & > .ifacebox-head:first-child::after { background-color: var(--color-icon-secondary); }
+      &::before { background-color: var(--color-icon-secondary); }
       & > .ifacebox-body > .cbi-tooltip-container { color: var(--color-text-secondary); }
     }
     /* LuCI's zone bars are colour only. */
