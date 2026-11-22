@@ -148,7 +148,8 @@ return baseclass.extend({
 	/* Marks for what LuCI says only in its words, kept as views re-render:
 	 *  - ▲ / ▼ before a traffic count become an .aster-glyph span, drawn
 	 *    as the ArrowUp / ArrowDown icon (components.css);
-	 *  - a URL in a cell is an .aster-id (G5);
+	 *  - a URL in a cell is an .aster-id (G5); a station rate's or a
+	 *    command's word does not break after its hyphen (a word joiner);
 	 *  - a view with no title (Interfaces, nftables) gets an h2 with its
 	 *    menu entry's name;
 	 *  - a card title repeating the page title or a tab is .aster-said, not
@@ -169,8 +170,10 @@ return baseclass.extend({
 		const run = () => roots.forEach((root) => {
 			const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), hits = [];
 
-			for (let n; n = walk.nextNode();)
+			for (let n; n = walk.nextNode();) {
+				/-\b/.test(n.data) && n.parentNode.matches('.assoclist .td > :not(.ifacebadge) > span, .td > [style*=word-break]') && (n.data = n.data.replace(/-\b/g, '-\u2060'));
 				(/[▲▼]/.test(n.data) || id.test(n.data) && n.parentNode.closest('.td, td')) && !n.parentNode.closest('.aster-glyph, .aster-id, .cbi-tooltip, textarea, option') && hits.push(n);
+			}
 
 			hits.forEach((n) => n.replaceWith(...(/[▲▼]/.test(n.data) ? n.data.split(/([▲▼])/).filter(Boolean).map((s) => /^[▲▼]$/.test(s) ? glyph(s) : s.trim()) : n.data.split(id).map((s, i) => i % 2 ? E('span', { class: 'aster-id', title: s }, [s]) : s))));
 

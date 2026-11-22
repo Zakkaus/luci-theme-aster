@@ -15,6 +15,7 @@ if [[ ${BASH_SOURCE[0]} == "$0" ]]; then
 fi
 printf '%s\n' 'admin/status/processes require=c6.table,c7.when,c10.actions,g.marker.table,g.mq' >"$tmp/tab-proc.txt"
 printf '%s\n' 'admin/status/processes require=c7.sig,c7.x,c7.labelw,c7.actions,c7.when,g.marker.table' >"$tmp/tab-proc-phone.txt"
+printf '%s\n' 'admin/status/processes require=g.break.table' >"$tmp/tab-proc-word.txt"
 printf '%s\n' 'admin/status/routes require=c7.sig,c7.x,c7.labelw,c7.when' >"$tmp/tab-routes.txt"
 printf '%s\n' 'admin/network/firewall/ipsets require=c20.empty' >"$tmp/tab-empty.txt"
 printf '%s\n' 'admin/status/routes require=c7.when' >"$tmp/tab-when.txt"
@@ -170,6 +171,14 @@ if has_page admin/network/wireless; then
 else
 	echo "skip Wireless network titles (AUDIT4 B3): no Wireless page on this box"
 fi
+
+# AUDIT5 known (AUDIT4 B2): a process' command keeps a hyphenated word
+# (an option, pppoe-wan, /lib/netifd/ppp6-up) whole on a phone; squeezed
+# to 1ch and broken anywhere, its words (uhttpd's "-f") break. A station's
+# rate (HE-MCS) is the same rule; the lab's radios have no stations.
+expect uniform 0 "" "Processes: hyphenated words whole on a phone" -- "$url" "$password" --pages "$tmp/tab-proc-word.txt" --viewports phone
+expect uniform 1 "g.break.table word" "a command broken inside its hyphenated words (AUDIT4 B2)" -- "$url" "$password" --pages "$tmp/tab-proc-word.txt" --viewports phone \
+	--debug-css 'admin/status/processes=#view .td > [style*=word-break] { display: inline-block; max-width: 1ch; overflow-wrap: anywhere }'
 
 # AUDIT5 B1: a static lease with no hostname is titled by its IPv4 address
 # (else its MAC), not by LuCI's "none" placeholder. 25.12 lists static
