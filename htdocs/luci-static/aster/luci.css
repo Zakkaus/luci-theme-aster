@@ -1148,9 +1148,11 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
      port a row (never a part-filled row). One row: each tile as wide as
      its content, the row spread with space-between, so the first tile
      starts at the card's content start and the last one's content ends
-     at its end, the tiles at least 16 apart. List: n tiles do not fit
-     when the container is narrower than n * (min + 16) - 16 (128 + 16
-     per port, the tokens' values: a container query takes no var()),
+     28 (icon 20 + gap 8, its end margin) before the content end, so its
+     text is as far from the card's edge as the first tile's text, the
+     tiles at least 16 apart. List: n tiles do not fit when the container
+     is narrower than n * (min + 16) - 16 + 28 (128 + 16 per port and the
+     inset, the tokens' values: a container query takes no var()),
      one query for each port count n (:has, 2-9) sets --aster-port-list
      (a space toggle) on the tiles: a full-width basis and an inline-size
      container, the one the row-end traffic below asks. Rows 16 apart, no
@@ -1162,14 +1164,14 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
     justify-content: space-between;
     gap: var(--spacing-4) !important;
     margin: 0 !important;
-    @container (width<272px){&:has(>:nth-child(2))>*{--aster-port-list: }}
-    @container (width<416px){&:has(>:nth-child(3))>*{--aster-port-list: }}
-    @container (width<560px){&:has(>:nth-child(4))>*{--aster-port-list: }}
-    @container (width<704px){&:has(>:nth-child(5))>*{--aster-port-list: }}
-    @container (width<848px){&:has(>:nth-child(6))>*{--aster-port-list: }}
-    @container (width<992px){&:has(>:nth-child(7))>*{--aster-port-list: }}
-    @container (width<1136px){&:has(>:nth-child(8))>*{--aster-port-list: }}
-    @container (width<1280px){&:has(>:nth-child(9))>*{--aster-port-list: }}
+    @container (width<300px){&:has(>:nth-child(2))>*{--aster-port-list: }}
+    @container (width<444px){&:has(>:nth-child(3))>*{--aster-port-list: }}
+    @container (width<588px){&:has(>:nth-child(4))>*{--aster-port-list: }}
+    @container (width<732px){&:has(>:nth-child(5))>*{--aster-port-list: }}
+    @container (width<876px){&:has(>:nth-child(6))>*{--aster-port-list: }}
+    @container (width<1020px){&:has(>:nth-child(7))>*{--aster-port-list: }}
+    @container (width<1164px){&:has(>:nth-child(8))>*{--aster-port-list: }}
+    @container (width<1308px){&:has(>:nth-child(9))>*{--aster-port-list: }}
   }
   & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) {
     --card-pad: 0;
@@ -1190,6 +1192,11 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
     max-inline-size: none !important;
     margin: 0 !important;
     &:has(.zonebadge[style*="240, 144, 144"]) { order: -1; }
+    /* One row: the last tile on screen (the uplink moved first) ends 28
+       before the row's end (the inset above); a list row keeps the edge. */
+    &:not(:has(.zonebadge[style*="240, 144, 144"])):is(:last-child, :has(+ :last-child .zonebadge[style*="240, 144, 144"])) {
+      margin-inline-end: var(--aster-port-list, calc(var(--aster-icon-md) + var(--spacing-2))) !important;
+    }
     /* Astryx Item's start icon: ServerStack 20 (C16, LuCI's port_up /
        port_down), centred on the name's line and coloured by the link
        (success with a carrier, secondary without), so it is the port's
