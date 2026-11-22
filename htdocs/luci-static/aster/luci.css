@@ -1179,7 +1179,12 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
       white-space: nowrap;
       & > br { display: none; }
     }
-    &:has(> .ifacebox-body > img[src*="_down."]) > .ifacebox-head:first-child::after { background-color: var(--color-icon-secondary); }
+    /* No carrier: neutral dot and the traffic in secondary text, as LuCI
+       fades a down port's zone bar; the name keeps primary. */
+    &:has(> .ifacebox-body > img[src*="_down."]) {
+      & > .ifacebox-head:first-child::after { background-color: var(--color-icon-secondary); }
+      & > .ifacebox-body > .cbi-tooltip-container { color: var(--color-text-secondary); }
+    }
     /* LuCI's zone bars are colour only. */
     & > .ifacebox-head.cbi-tooltip-container { display: none !important; }
     /* Traffic, 4 under the description, as doona's WidgetSpeed: a line
