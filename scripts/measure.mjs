@@ -112,13 +112,13 @@ const FIELDS = [
   // Port tiles (Port status): the first tile with a link.
   {name: 'port grid gap', from: ['frame', 'Grid: port tiles', 'gap'], sel: '#view div[style*="grid-template-columns"]:has(> .ifacebox)', prop: 'gap'},
   // A tile is COMPONENTS.md C25 (it wins over the reference's Card tile):
-  // no border, fill or device icon; the name in body size with its
-  // StatusDot trailing it (success with a link), the link state in
-  // supporting text, the traffic the value in body size.
+  // no border or fill; the ServerStack start icon carries the link state
+  // (success with a link; the lab has no port without one), the name in
+  // body size, the link state and the traffic in supporting text.
   {name: 'port name size', from: ['components', 'Port tile: speed text', 'fontSize'], sel: `${PORT_UP} > .ifacebox-head:first-child`, prop: 'fontSize'},
-  {name: 'port state dot', from: ['components', 'Port tile: port icon', 'color'], want: {light: 'rgb(9, 68, 31)', dark: 'rgb(165, 246, 144)'}, sel: `${PORT_UP} > .ifacebox-head:first-child`, pseudo: '::after', prop: 'background', exact: true},
+  {name: 'port state icon', from: ['components', 'Port tile: port icon', 'color'], want: {light: 'rgb(9, 68, 31)', dark: 'rgb(165, 246, 144)'}, sel: PORT_UP, pseudo: '::before', prop: 'background', exact: true},
   {name: 'port speed size', from: ['components', 'Port tile: TX/RX text', 'fontSize'], sel: `${PORT_UP} > .ifacebox-body:nth-child(2)`, prop: 'fontSize'},
-  {name: 'port traffic size', from: ['components', 'Port tile: speed text', 'fontSize'], sel: `${PORT_UP} > .ifacebox-body > .cbi-tooltip-container`, prop: 'fontSize'},
+  {name: 'port traffic size', from: ['components', 'Port tile: TX/RX text', 'fontSize'], sel: `${PORT_UP} > .ifacebox-body > .cbi-tooltip-container`, prop: 'fontSize'},
   // Main colours.
   {name: 'shell background', from: ['frame', 'AppShell root', 'background'], sel: '.shell', prop: 'background', exact: true},
   {name: 'text', from: ['frame', 'AppShell root', 'color'], sel: '.shell', prop: 'color', exact: true},
