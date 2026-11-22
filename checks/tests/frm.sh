@@ -112,15 +112,32 @@ expect uniform 1 "c5.form conform" "labelled text area full row (C5, audit2)" "t
 expect uniform 1 "c9.button conform" "drag handle filled (C9, audit2)" "drag handle fill" -- "$url" "$password" --pages "$tmp/frm-zones.txt" \
 	--debug-css 'admin/network/firewall/zones=#view .drag-handle { --button-bg: var(--color-neutral) }'
 # C3, audit3 B1: Routing's tables, one card without a title, headed at
-# two sizes (Neighbours 18, Routes and Rules 15).
+# two sizes (Neighbours 18, Routes and Rules Heading 4).
 expect uniform 1 "c3.heading conform,heading.card *" "routing table headings at two sizes (C3, audit3 B1)" "card size" -- "$url" "$password" --pages "$tmp/frm-routes.txt" \
-	--debug-css 'admin/status/routes=#view .cbi-section > h3 ~ h3 { font-size: 15px !important }'
+	--debug-css 'admin/status/routes=#view .cbi-section > h3 ~ h3 { font-size: var(--text-heading-4-size) !important }'
 # G5, audit3 B2: a dialog title broken inside a word.
 expect uniform 1 "c18.dialog conform" "dialog title broken in a word (G5, audit3 B2)" "title word" -- "$url" "$password" --pages "$tmp/frm-dialog.txt" --viewports phone \
 	--debug-css 'admin/network/network=#modal_overlay > .modal > h4 { inline-size: 24px; word-break: break-all !important }'
 # C1, audit3 B3: Connections' filter against its DNS switch (phone).
 expect uniform 1 "c1.header conform" "toolbar controls touching (C1, audit3 B3)" "toolbar gap" -- "$url" "$password" --pages "$tmp/frm-conn.txt" --viewports phone \
 	--debug-css 'admin/status/realtime/connections=#settings-row { gap: 0 !important }'
+
+# C1, audit4 C2: a range as wide as the pager less one arrow (zh-TW on a
+# phone) takes its own line and the arrows wrap as a pair; without Prev's
+# reserve, Next wraps alone.
+printf '%s\n' 'admin/system/package-manager require=c1.header' >"$tmp/frm-pager.txt"
+pager='admin/system/package-manager=#view .pager > .text { min-inline-size: calc(100% - 60px) }'
+expect uniform 0 "" "pager arrows wrap as a pair" -- "$url" "$password" --pages "$tmp/frm-pager.txt" --viewports phone --debug-css "$pager"
+expect uniform 1 "c1.header conform" "Next page alone under Previous (audit4 C2)" "pager arrows" -- "$url" "$password" --pages "$tmp/frm-pager.txt" --viewports phone \
+	--debug-css "$pager" --debug-css 'admin/system/package-manager=#view .pager > :is(.prev, .next) { margin-inline: 0 !important }'
+
+# C3, audit4 C1: an inner heading (Flash's Backup, Restore, Flash image;
+# the overview's leases on 25.12) is 16, not the body's 15 (Heading 4 as
+# the scale's base size).
+printf 'admin/system/flash require=c3.heading\n' >"$tmp/frm-inner.txt"
+expect uniform 0 "" "inner headings 16 (C3)" -- "$url" "$password" --pages "$tmp/frm-inner.txt" --viewports desktop,phone
+expect uniform 1 "c3.heading conform" "inner headings at the body's 15 (audit4 C1)" "inner size" -- "$url" "$password" --pages "$tmp/frm-inner.txt" \
+	--debug-css 'admin/system/flash=:root { --text-heading-4-size: var(--font-size-base) !important }'
 
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true

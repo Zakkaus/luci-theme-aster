@@ -15,14 +15,14 @@ export const canonical = {
     _source: 'COMPONENTS.md C8: Astryx MetadataList columns=single, label start (grid auto minmax(0,1fr), gap 8 16); label 15/500 secondary, value 15/400 primary, baseline; no underline on a label or value that is not a link',
     layout: 'rows', columnGap: 16, rowGap: 8, labelSize: 15, labelWeight: '500', labelInk: 'secondary', valueSize: 15, valueInk: 'primary', align: 'baseline', underline: 'none',
   },
-  'c8.x': {_source: 'COMPONENTS.md C8: one value x per list (Interfaces: per table, the label column at least --aster-label-w); label column = longest label, capped at 50% (nlbw\'s shrink-wrapped summary: uncapped)', valueXs: 1, tableXs: 1, labelFit: 0},
+  'c8.x': {_source: 'COMPONENTS.md C8: one value x per list (Interfaces: per table, the label column at least --aster-label-w); label column = longest label, capped at 50% (nlbw\'s shrink-wrapped summary: uncapped); nlbw\'s summary on a line of its own starts at the card content edge (AUDIT4 B4)', valueXs: 1, tableXs: 1, labelFit: 0, edge: 0},
   'c8.bar': {_source: 'COMPONENTS.md C19 in C8: label | value text at the value column\'s start, the bar under it as wide as the value column; one value x per list; label 500 secondary', layout: 'value column', valueXs: 1, labelWeight: '500', labelInk: 'secondary'},
   'c8.tracks': {_source: 'COMPONENTS.md C8: no value column narrower than its longest token (unless truncated with a title)', narrow: 0},
   'c8.ifstatus': {
     _source: 'COMPONENTS.md C8 Interfaces status cell: one single-column list (2 tracks); values wrap at spaces only (keep-all holds CJK words: "(432089 封包)" stays whole); dot neutral iff the own device image is _disabled or missing',
     tracks: 2, valueWrap: 'normal/keep-all', dot: 'ok',
   },
-  'g.break': {_source: 'COMPONENTS.md G5: an identifier or value token never breaks across lines (or is truncated with a title)', broken: 0},
+  'g.break': {_source: 'COMPONENTS.md G5: an identifier or value token never breaks across lines (or is truncated with a title); a changes dialog value that fits its line is on one line (AUDIT4 B5)', broken: 0, value: 'whole'},
   'g.colon': {_source: 'COMPONENTS.md G10: labels carry no trailing colon', trailing: 'none'},
   'g.marker': {_source: 'COMPONENTS.md G4 / 0.1: a box title (name) starts at its list labels\' x; markers trail the text', offset: 0},
   'c13.badge': {_source: 'COMPONENTS.md C13: filled pills only for zones (a verdict, "this device" or "any zone" is text), action-needed status, Tokens, buttons; .ifacebadge is text (no fill, no border); an interface\'s zone Badge is never cut (ellipsis inside it)', stray: 0, ifacebadge: 'plain', clipped: 0},
@@ -139,6 +139,10 @@ export function collect(cfg) {
     const texts = (nodes) => nodes.flatMap((n) => (n.nodeType === 3 ? [n] : textNodes(n)));
     const lr = pairs.map(([k]) => range(texts([k])));
     const vr = pairs.map(([, v]) => (texts(v).length ? range(texts(v)) : []));
+    // nlbw's summary wrapped below its pies starts at their row's edge.
+    const pies = kind === 'nlbw' && el.closest('.head'), kb = el.parentNode.getBoundingClientRect();
+    if (pies && ![...pies.children].some((p) => { const b = p.getBoundingClientRect(); return p !== el.parentNode && b.bottom > kb.top + 1 && b.top < kb.bottom - 1; }))
+      add('c8.x', 'edge', px(Math.min(...lr.map((r) => r[0]?.left ?? Infinity)) - pies.getBoundingClientRect().left), el);
     if (vr.some((r) => !r.length)) { add('c8.kv', 'layout', 'inline', el); continue; }
     const lx = lr.map((r) => r[0].left), vx = vr.map((r) => r[0].left);
     const rows = pairs.every((p, i) => Math.abs(lr[i][0].bottom - vr[i][0].bottom) <= 1 && vx[i] > Math.max(...lr[i].map((r) => r.right)));
@@ -435,5 +439,15 @@ export function collect(cfg) {
     }
   });
   if (scope.querySelector('.ifacebox')) add('c16.icon', 'emoji', emoji, named('emoji', scope));
+  /* G5 in the changes dialog: a value that fits its line is on one line. */
+  scope.querySelectorAll('.uci-change-list strong').forEach((el) => {
+    const t = textNodes(el)[0], room = el.closest('ins, del, var')?.clientWidth ?? 0;
+    if (!t || !shown(el)) return;
+    const r = document.createRange();
+    r.selectNodeContents(t);
+    const rs = [...r.getClientRects()].filter((x) => x.width > 0.5);
+    const split = new Set(rs.map((x) => Math.round(x.top))).size > 1 && rs.reduce((a, x) => a + x.width, 0) <= room;
+    add('g.break', 'value', split ? `split: ${t.data}` : 'whole', el);
+  });
   return out;
 }

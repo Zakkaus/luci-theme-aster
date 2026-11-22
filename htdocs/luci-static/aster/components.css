@@ -1802,3 +1802,6 @@ html :where(.uci-change-legend-label) :is(ins, del) {
 /* luci-base's <br> after the legend would add a line to its 16. */
 html :where(.uci-change-legend + br) { display: none; }
 html :where(.uci-change-list var) { font-style: normal; color: var(--color-text-secondary); }
+/* The value moves whole to the next line; it breaks inside only when wider
+   than the line. */
+html :where(.uci-change-list strong) { display: inline-block; }
