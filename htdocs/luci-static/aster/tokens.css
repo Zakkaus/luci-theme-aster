@@ -372,8 +372,8 @@ html[data-theme="dark"] { color-scheme: dark; }
   --aster-icon-sm: 16px;
   --aster-icon-md: 20px;
 
-  /* Port tiles: Grid minmax(160px, 1fr). */
-  --aster-port-min: 160px;
+  /* Port tiles: Grid minmax(128px, 1fr), two a row in a 390 card. */
+  --aster-port-min: 128px;
 
   /* Grid tracks: cards wrap below 320 wide, as Grid minmax(320px, 1fr). */
   --aster-card-min: 320px;
