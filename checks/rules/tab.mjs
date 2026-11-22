@@ -16,7 +16,7 @@ export const canonical = {
   },
   'card.table': {_source: 'COMPONENTS.md C2/C6: a wide table that is the Card (WireGuard peers, 24.10 Processes) pads 15 + border above and below; its cells own the inline 16, so rows run border to border', padding: [15, 0, 15, 0]},
   'table.td.field': {_source: 'COMPONENTS.md G7, C6: a cell holding a field (a zone\'s policy select) pads 8, so the field keeps 8 from the row lines (row 53)', paddingBlock: 8, paddingInlineStart: 16, fontSize: 15},
-  'g.break.table': {_source: 'COMPONENTS.md G5: an identifier in a cell (a one-word cell while wide, a package name, a mount device, a <var>, a station rate) is one line, or ends in an ellipsis; never broken at a hyphen; so is a lease\'s host, address and interface (25.12\'s host wide too, AUDIT4 A1), a station\'s host in its folded title (AUDIT4 A1), a rule\'s name, an nftables value or set member (AUDIT3 A1, A2), clipped only with an ellipsis, and a URL in a cell, clipped with its title (B4)', token: 'whole', word: 'whole'},
+  'g.break.table': {_source: 'COMPONENTS.md G5: an identifier in a cell (a one-word cell while wide, a package name, a mount device, a <var>, a station rate) is one line, or ends in an ellipsis; never broken at a hyphen; so is a lease\'s host, address and interface (25.12\'s host wide too, AUDIT4 A1), a station\'s host in its folded title (AUDIT4 A1), a rule\'s name, an nftables value or set member (AUDIT3 A1, A2), clipped only with an ellipsis, and a URL in a cell, clipped with its title (B4); a station rate\'s or a command\'s hyphenated word (HE-MCS, -t120) breaks only when wider than its cell, inside it (AUDIT4 B2)', token: 'whole', word: 'whole'},
   'c7.clause': {_source: 'COMPONENTS.md C7, C13 (AUDIT3 A2): a folded nftables match is a sentence of clauses 8 apart on a line', gap: 8},
   'c7.when': {_source: 'COMPONENTS.md C7: a table is folded iff its min-content is wider than its room (unfolds with 16 to spare); every data table is measured', state: 'ok'},
   'c7.sig': {
@@ -235,21 +235,27 @@ export async function collect(cfg) {
       // set member), and a URL in any cell (B4): one line; where it is
       // clipped, with an ellipsis, a URL also with its full text as title.
       const idc = '[id*="lease"] .td, .assoclist [data-head], .td.cbi-section-table-titles, .nft-set-item, .nft-rules .td strong';
+      // A station's rate and a process' command: no hyphenated word (HE-MCS,
+      // -t120, pppoe-wan) broken at its hyphen, unless wider than its cell
+      // (then inside the cell) (AUDIT4 A1, B2).
+      const hy = '.assoclist .td > :not(.ifacebadge) > span, .td > [style*=word-break]';
       for (const r of rows) for (const c of cellsOf(r)) {
         let bad = '', n = 0;
         const w = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
         while (!bad && w.nextNode()) {
           const tn = w.currentNode, p = tn.parentNode;
           if (p.closest('.cbi-tooltip') || !shown(p)) continue;
-          for (const m of tn.data.matchAll(p.closest(idc) ? /[^ \t\n]+[-/][^ \t\n]+/g : /\S+:\/\/\S+/g)) {
+          for (const m of tn.data.matchAll(p.closest(idc) ? /[^ \t\n]+[-/][^ \t\n]+/g : p.closest(hy) ? /[^ \t\n]*-[^ \t\n]+/g : /\S+:\/\/\S+/g)) {
             n++;
             const rg = document.createRange();
             rg.setStart(tn, m.index);
             rg.setEnd(tn, m.index + m[0].length);
-            const word = `"${m[0].slice(0, 24)}"`;
+            const word = `"${m[0].replace(/\u2060/g, '').slice(0, 24)}"`;
             // A one-line clamp (a URL in prose) shows its first line only.
-            const lines = new Set([...rg.getClientRects()].filter((x) => x.width > 0.5).map((x) => Math.round(x.top))).size, clamp = cs(p).webkitLineClamp === '1';
-            if (lines > 1 && !clamp) { bad = `broken ${word}`; break; }
+            const rs = [...rg.getClientRects()].filter((x) => x.width > 0.5), lines = new Set(rs.map((x) => Math.round(x.top))).size, clamp = cs(p).webkitLineClamp === '1';
+            const wider = p.closest(hy) && rs.reduce((a, x) => a + x.width, 0) > c.clientWidth - parseFloat(cs(c).paddingLeft) - parseFloat(cs(c).paddingRight);
+            if (wider && (c.scrollWidth > c.clientWidth + 1 || rs.some((x) => x.right > box(c).right + 0.5))) { bad = `outside ${word}`; break; }
+            if (lines > 1 && !clamp && !wider) { bad = `broken ${word}`; break; }
             if (clamp ? lines > 1 : p.scrollWidth > p.clientWidth + 1 && cs(p).overflowX !== 'visible') {
               if (!clamp && cs(p).textOverflow !== 'ellipsis') { bad = `clipped ${word}`; break; }
               if (/:\/\//.test(m[0]) && p.title !== tn.data.trim()) { bad = `untitled ${word}`; break; }

@@ -458,7 +458,7 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
    text sits a line above the track) where the line holds both: the value
    is about 400 wide, so from 64rem; under that it keeps its own line. The
    pager's arrows 8 off its text. */
-@media (min-width: 64rem) { #disk-space-label + .cbi-progressbar { margin-block-start: 0; } }
+@media (min-width: 64rem) { .controls .cbi-progressbar { margin-block-start: 0; } }
 /* On a phone the value (about 340 wide in English) wraps onto a second
    line over the track instead of losing its end to an ellipsis. */
 @media (max-width: 30rem) {
@@ -476,7 +476,7 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
      its four dBm labels) labels every other channel, so three-digit numbers
      keep apart (audit4 B1). */
   #channel_graph svg:has(> text:nth-of-type(20)) > text:nth-of-type(2n+6) { display: none; }
-  #disk-space-label + .cbi-progressbar {
+  .controls .cbi-progressbar {
     margin-block-start: calc(2 * var(--text-supporting-size) * var(--text-supporting-leading) + var(--spacing-1));
     &::before { line-height: var(--text-supporting-leading); text-align: start; white-space: normal; }
   }
@@ -1054,7 +1054,10 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
 
 /* A bar row is a MetadataList row (C8 with C19): the name in the label
    column (the table's longest name, at most half), the value text at the
-   value column's start, its track 4 under it as wide as the column. */
+   value column's start, its track 4 under it as wide as the column. The
+   text is in flow, the track (::after) under it: text too long for the
+   column breaks at a space, balanced (a number keeps its unit, the
+   percentage stays), and moves the track down (AUDIT5 B2). */
 [data-page="admin-status-overview"] .table:has(> .tr > .td > .cbi-progressbar) {
   display: grid;
   grid-template-columns: fit-content(50%) minmax(0, 1fr);
@@ -1074,12 +1077,18 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
     overflow-wrap: normal;
     word-break: keep-all;
   }
-  & .cbi-progressbar { min-inline-size: 0; }
+  & .cbi-progressbar { min-inline-size: 0; block-size: auto; margin: 0; background: none; }
   & .cbi-progressbar::before {
+    position: static;
+    display: block;
     color: var(--color-text-primary);
     font-size: var(--text-body-size);
     text-align: start;
+    white-space: normal;
+    text-wrap: balance;
   }
+  & .cbi-progressbar::after { content: ""; display: block; block-size: var(--aster-progress-h); margin-block-start: var(--spacing-1); border-radius: inherit; background: var(--color-background-muted); }
+  & .cbi-progressbar > div { position: absolute; inset-block-end: 0; block-size: var(--aster-progress-h); }
 }
 [data-page="admin-status-overview"] #view {
   /* Interface boxes: ports (29_ports.js), upstreams (30_network.js) and

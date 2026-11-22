@@ -64,9 +64,13 @@ expect uniform 1 "c5.form conform,space.formrow.pad padding" "form row padding 4
 # C18: a dialog 24 inside.
 expect uniform 1 "c18.dialog conform,space.dialog gap" "dialog padding 24 (C18)" -- "$url" "$password" --pages "$tmp/frm-dialog.txt" \
 	--debug-css 'admin/network/network=#modal_overlay > .modal { padding: 24px !important }'
-# C19: a 12 bar.
+# C19: a 12 track (Overview's is the ::after under its text).
 expect uniform 1 "c19.progress conform" "progress bar 12 high (C19)" -- "$url" "$password" --pages "$tmp/frm-ov.txt" \
-	--debug-css 'admin/status/overview=#view .cbi-progressbar { block-size: 12px !important }'
+	--debug-css 'admin/status/overview=#view .cbi-progressbar::after { block-size: 12px !important }'
+# AUDIT5 B2: a phone's value text cut with an ellipsis ("247.23 MiB /
+# 6.98 GiB (…"; spaced out so every value is too long for its column).
+expect uniform 1 "c19.progress conform" "bar value text ellipsized (AUDIT5 B2)" "cut" -- "$url" "$password" --pages "$tmp/frm-ov.txt" --viewports phone \
+	--debug-css 'admin/status/overview=#view .cbi-progressbar::before { white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; letter-spacing: 4px }'
 # C22: a Divider drawn 2 thick.
 expect uniform 1 "c22.divider conform" "Divider 2 thick (C22)" -- "$url" "$password" --pages "$tmp/frm-flash.txt" \
 	--debug-css 'admin/system/flash=#view .cbi-value + .cbi-value > .cbi-section { border-block-start-width: 2px }'
