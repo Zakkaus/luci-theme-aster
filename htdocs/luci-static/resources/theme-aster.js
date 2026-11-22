@@ -69,9 +69,9 @@ return baseclass.extend({
 			}));
 		};
 		const ro = new ResizeObserver(() => frame ||= requestAnimationFrame(() => (frame = 0, view.querySelectorAll(sel).forEach(fit))));
-		/* Only the tables a change is in, or under (a view re-rendered); a
+		/* Only the tables a change is in, or adds (a view re-rendered); a
 		 * table's own size too (its text grows when the web font lands). */
-		const run = (rs) => new Set((rs || [{ target: view }]).flatMap((r) => r.target.closest(sel) || [...r.target.querySelectorAll(sel)]))
+		const run = (rs) => new Set((rs || [{ target: view }]).flatMap((r) => r.target.closest(sel) || [...r.target.querySelectorAll(sel)].filter((t) => [...r.addedNodes || [view]].some((n) => n.contains(t)))))
 			.forEach((t) => (seen.has(t.parentNode) || (seen.add(t.parentNode), ro.observe(t.parentNode)), ro.observe(t), fit(t)));
 
 		run();
@@ -134,12 +134,11 @@ return baseclass.extend({
 		 * next frame. */
 		const q = new Set();
 		const ro = new ResizeObserver((es) => (q.size || requestAnimationFrame(() => (q.forEach(fit), q.clear())), es.forEach((e) => (e.target.matches('.table, table') ? [e.target] : e.target.querySelectorAll(':scope > :is(.table, table)')).forEach((t) => q.add(t)))));
-		const run = () => new Set(groups(view).map((g) => {
-			g.querySelector('.aster-more') || g.appendChild(E('button', { type: 'button', class: 'btn cbi-button aster-more',
+		const run = () => new Set(groups(view).flatMap((g) => g.querySelector('.aster-more') ? [] : (
+			g.appendChild(E('button', { type: 'button', class: 'btn cbi-button aster-more',
 				'aria-haspopup': 'menu', 'aria-expanded': false, 'aria-label': _('Actions'), popovertarget: 'aster-more-menu',
-				click: (ev) => owner = ev.currentTarget }));
-			return g.closest('.table, table');
-		})).forEach((t) => (ro.observe(t.parentNode), ro.observe(t), fit(t)));
+				click: (ev) => owner = ev.currentTarget })),
+			g.closest('.table, table')))).forEach((t) => (ro.observe(t.parentNode), ro.observe(t), fit(t)));
 
 		run();
 		new MutationObserver(run).observe(view, { childList: true, subtree: true });
