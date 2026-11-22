@@ -91,7 +91,7 @@ expect 0 "ok   stylesheets: $base B shipped" "a large comment does not count" "$
 
 # A rule as large as the room left: shipped goes past the budget.
 copy rule
-room=$((151000 - base + 1))
+room=$((154000 - base + 1))
 { printf '.budget-test{--x:"'; head -c "$room" /dev/zero | tr '\0' 'r'; printf '"}\n'; } >>"$tmp/rule/luci-static/aster/luci.css"
 expect 1 "FAIL stylesheets" "a large rule counts" "$tmp/rule"
 

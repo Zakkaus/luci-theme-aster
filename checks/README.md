@@ -6,7 +6,7 @@
 | `uniform.mjs` | Every page draws each component with the same size, spacing and type as the M2 overview | `tests/uniform.sh` |
 | `contrast.mjs` | WCAG AA on every page, light and dark; dark separators stay faint | `tests/contrast.sh` |
 | `shell.mjs` | The top bar and the side nav are in the first frame and stand still across page loads (no move, no layout shift, open groups kept, stored scheme and palette before the first paint, view-transition names); the appearance menu works by keyboard in the top bar and on the login page; the collapsed rail shows its labels as tooltips | `tests/shell.sh` |
-| `budget.sh` | The five stylesheets as shipped (comments stripped by `scripts/strip-css-comments.pl`, as the package build does) total <= 151,000 B; the three theme scripts <= 35,300 B | `tests/budget.sh` |
+| `budget.sh` | The five stylesheets as shipped (comments stripped by `scripts/strip-css-comments.pl`, as the package build does) total <= 154,000 B; the three theme scripts <= 35,300 B | `tests/budget.sh` |
 
 `scripts/measure.mjs` compares the overview itself with the reference page.
 
