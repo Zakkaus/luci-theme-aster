@@ -942,7 +942,8 @@ function collect(cfg) {
   const neutral = getComputedStyle(nb).backgroundColor;
   nb.remove();
   for (const z of scope.querySelectorAll('.zonebadge[style*="--zone-color-rgb"], .ifacebox-head[style*="--zone-color-rgb"][title]')) {
-    if (!visible(z) || z.closest('.cbi-tooltip') || (!cfg.modal && z.closest('#modal_overlay'))) continue;
+    // A verdict or "this device" in a zone chip is text (C13).
+    if (!visible(z) || z.matches('.zonebadge-empty, :has(> em:only-child)') || z.closest('.cbi-tooltip') || (!cfg.modal && z.closest('#modal_overlay'))) continue;
     const bg = getComputedStyle(z, z.matches('.zonebadge') ? null : '::after');
     if (bg.content === 'none' || bg.display === 'none') continue;
     add('zone', 'fill', bg.backgroundColor === neutral ? 'neutral' : bg.backgroundColor, z);
