@@ -424,11 +424,22 @@ export function collect(cfg) {
     }
   }
 
-  /* C19: the bar 8 high, 4 under its text. */
+  /* C19: the bar 8 high, 4 under its text. Where the text is in flow
+     (Overview) the track is the ::after under it, measured instead of the
+     box; the text is never cut to fit (AUDIT5 B2: "6.98 GiB (…"). */
   for (const p of all('.cbi-progressbar')) {
-    check('c19.progress', 'height', box(p).height, 8, p);
-    const t = css(p, '::before');
-    if (t.content !== 'none' && t.content !== '""' && f(t.height)) { check('c19.progress', 'text gap', f(t.bottom) - box(p).height, 4, p); continue; }
+    const t = css(p, '::before'), a = css(p, '::after'), tk = a.content !== 'none' && a.display !== 'none' && f(a.height);
+    check('c19.progress', 'height', tk || box(p).height, 8, p);
+    if (t.content !== 'none' && t.content !== '""' && f(t.height)) {
+      const s = document.body.appendChild(document.createElement('span'));
+      s.style.cssText = `position: absolute; white-space: pre; font: ${t.font}; font-variant-numeric: ${t.fontVariantNumeric}; letter-spacing: ${t.letterSpacing}`;
+      s.textContent = p.title;
+      const w = s.getBoundingClientRect().width;
+      s.remove();
+      check('c19.progress', 'text', /nowrap|pre$/.test(t.whiteSpace) && w > f(t.width) + 0.5 ? `cut (${Math.round(w)} in ${Math.round(f(t.width))})` : 'whole', 'whole', p);
+      check('c19.progress', 'text gap', tk ? box(p).height - f(t.height) - tk : f(t.bottom) - box(p).height, 4, p);
+      continue;
+    }
     let tx = p.previousSibling;
     while (tx && tx.nodeType === 3 && !tx.data.trim()) tx = tx.previousSibling;
     if (tx && tx.nodeType === 1 && !visible(tx)) tx = null;
