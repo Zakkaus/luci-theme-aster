@@ -38,6 +38,8 @@ bash checks/tests/uniform.sh http://127.0.0.1:18025 <password>
 bash checks/tests/contrast.sh http://127.0.0.1:18025 <password>
 # on a box with OpenClash installed, add the Lua CBI fold cases:
 APPS=1 bash checks/tests/uniform.sh http://127.0.0.1:18025 <password>
+# on a box with a static lease that has no hostname (ip and mac only):
+LEASES=1 bash checks/tests/uniform.sh http://127.0.0.1:18025 <password>
 ```
 
 Every rule is a command-line parameter; a bad option prints the usage and exits 1.

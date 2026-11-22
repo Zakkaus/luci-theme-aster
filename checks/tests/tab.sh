@@ -166,5 +166,17 @@ expect uniform 1 "g.break.table token,g.break.table word" "a wide lease's host b
 expect uniform 1 "c7.title lead" "a network's title led by its SSID label (AUDIT4 B3)" -- "$url" "$password" --pages "$tmp/tab-wifi.txt" --viewports phone \
 	--debug-css "admin/network/wireless=$fold #view .td[data-name=\"_stat\"] .nowrap > strong { display: inline !important }"
 
+# AUDIT5 B1: a static lease with no hostname is titled by its IPv4 address
+# (else its MAC), not by LuCI's "none" placeholder. 25.12 lists static
+# leases on the first tab, 24.10 on its "leases" tab. LEASES=1: the box has
+# such a lease (one host section with ip and mac but no name).
+if curl -fsI "$url/luci-static/resources/uqr.js" >/dev/null 2>&1; then lt=''; else lt=' tab=leases'; fi
+printf 'admin/network/dhcp%s require=c7.title\n' "$lt" >"$tmp/tab-static.txt"
+expect uniform 0 "" "static leases: each title names its lease" -- "$url" "$password" --pages "$tmp/tab-static.txt" --viewports phone
+if [[ ${LEASES:-0} = 1 ]]; then
+	expect uniform 1 "c7.title column" "an unnamed lease titled by its placeholder (AUDIT5 B1)" -- "$url" "$password" --pages "$tmp/tab-static.txt" --viewports phone \
+		--debug-css 'admin/network/dhcp=#view [data-fold="fold"] .tr > [data-name=name] { display: block !important } #view [data-fold="fold"] .tr > [data-name=ip] { grid-row: auto !important }'
+fi
+
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true
