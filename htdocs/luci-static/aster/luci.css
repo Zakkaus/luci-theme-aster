@@ -1203,11 +1203,15 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
     min-inline-size: max-content !important;
     max-inline-size: none !important;
     margin: 0 !important;
-    &:has(.zonebadge[style*="240, 144, 144"]) { order: -1; }
+    /* The uplink is the tile whose networks tooltip has a badge titled
+       "Part of zone wan" (LuCI's "%q" adds no quotes; the patterns cover
+       every translation that names the zone). Not its bar's inline
+       colour: a :has() on style made every poll restyle the page. */
+    &:has(.zonebadge:is([title$=" wan"], [title*=" wan "], [title^="wan "], [title*="ンwanの"])) { order: -1; }
     /* A row of 4 or more: the last tile on screen (the uplink moved
        first) ends 28 before the row's end (the inset above); a list row
        keeps the edge. */
-    &:not(:has(.zonebadge[style*="240, 144, 144"])):is(:last-child:nth-child(n+4), :nth-child(n+3):has(+ :last-child .zonebadge[style*="240, 144, 144"])) {
+    &:not(:has(.zonebadge:is([title$=" wan"], [title*=" wan "], [title^="wan "], [title*="ンwanの"]))):is(:last-child:nth-child(n+4), :nth-child(n+3):has(+ :last-child .zonebadge:is([title$=" wan"], [title*=" wan "], [title^="wan "], [title*="ンwanの"]))) {
       margin-inline-end: var(--aster-port-list, calc(var(--aster-icon-md) + var(--spacing-2))) !important;
     }
     /* Astryx Item's start icon: ServerStack 20 (C16, LuCI's port_up /
