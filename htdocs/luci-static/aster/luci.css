@@ -25,11 +25,7 @@
 /* In a table row every action is the secondary Button, small (doona's
    row actions; Astryx ActionGroup: one primary at most, on the page, not
    repeated down the rows). Diagnostics' tools: below, with the form rows. */
-:is(.td, td) :is(.cbi-button-positive, .cbi-button-apply, .cbi-button-save, .cbi-button-action, .cbi-button-primary, .btn.primary, .btn.important):not(.diag-action *) {
-  --button-bg: var(--color-neutral);
-  --button-fg: var(--color-text-primary);
-  --button-divider: var(--color-border);
-}
+:is(.td, td) :is(.cbi-button-positive, .cbi-button-apply, .cbi-button-save, .cbi-button-action, .cbi-button-primary, .btn.primary, .btn.important):not(.diag-action *),
 /* One primary per group (Astryx ButtonGroup), by meaning, not by LuCI's
    class: a form row's own action (Sync with browser, Generate archive,
    Flash image), a toolbar's (Software's OK, Update lists, Upload
@@ -109,16 +105,16 @@
 :is(td, th, .td, .th).right { text-align: end; }
 /* An actions cell stays a table cell; its buttons sit 8 apart. */
 :is(.td, .th).cbi-section-actions { text-align: end; white-space: nowrap; }
-.cbi-section-actions > * + * { margin-inline-start: var(--spacing-2); }
+.cbi-section-actions > * + *,
 /* In a table cell a control and its button have only whitespace between. */
-.td :is(input, select, .cbi-dropdown, .btn, .cbi-button) + :is(.btn, .cbi-button, button) { margin-inline-start: var(--spacing-2); }
+.td :is(input, select, .cbi-dropdown, .btn, .cbi-button) + :is(.btn, .cbi-button, button),
+/* A field's button written straight after it in a plain block (the
+   interface editor's CIDR switch) sits 8 after it, as in a control group. */
+.cbi-value-field div:not(.control-group, .cbi-value-field, .cbi-dropdown) > :is(input, select) + :is(.btn, .cbi-button, button) { margin-inline-start: var(--spacing-2); }
 /* The package manager's <style> grows every control in its toolbar
    (.controls > * > *); its pager arrows are IconButtons and keep their
    square (layout). */
 #view .pager > :is(.btn, button) { flex: none; }
-/* A field's button written straight after it in a plain block (the
-   interface editor's CIDR switch) sits 8 after it, as in a control group. */
-.cbi-value-field div:not(.control-group, .cbi-value-field, .cbi-dropdown) > :is(input, select) + :is(.btn, .cbi-button, button) { margin-inline-start: var(--spacing-2); }
 /* luci-mod-statistics pairs a select with its button in a span. */
 .shell-content .nowrap:not(.td, .th, .cbi-tooltip *) { display: inline-flex; align-items: center; gap: var(--spacing-2); }
 
@@ -495,7 +491,7 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
 /* The log views' Scroll buttons: LuCI pads their line 20 inline; the card
    owns the gap. */
 #content_syslog > div[style*="padding"] { padding: 0 !important; } /* inline padding-bottom: 20px */
-#view .pager { gap: var(--spacing-2); }
+#view .pager,
 /* Realtime Connections' filter and DNS switch (inline display:flex): a
    toolbar, 8 apart where the field shrinks too (C1, G7; audit3 B3). */
 #settings-row { gap: var(--spacing-2); }
@@ -1483,7 +1479,8 @@ html body[data-page^="admin-services-passwall"] {
   & .pw-actions > .node-wrapper { flex-wrap: wrap; gap: var(--spacing-2); }
   /* A node group tab's count (node_list.htm, inline red) is supporting
      text beside the group's name. */
-  & #maincontent .cbi-tabmenu > li > a > font[style*="color"] { color: var(--color-text-secondary) !important; } /* inline color:red */  /* Running Status tiles: the label and the state words in the theme's
+  & #maincontent .cbi-tabmenu > li > a > font[style*="color"], /* inline color:red */
+  /* Running Status tiles: the label and the state words in the theme's
      inks (status.htm's own greys and oranges are under 3:1 on the card). */
   & #_passwall_status_fieldset .block h4 { color: var(--color-text-secondary) !important; } /* status.htm color:#8898aa!important */  /* App Update: each version under its name at the label's ink, not
      app_version.htm's 70% opacity (under 4.5:1). */

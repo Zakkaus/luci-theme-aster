@@ -110,24 +110,14 @@ html :where(h1, h2, h3, h4, h5, h6) {
   font-family: var(--font-family-heading);
   color: var(--color-text-primary);
 }
-html :where(h3) {
-  font-size: var(--text-heading-3-size);
-  font-weight: var(--text-heading-3-weight);
-  line-height: var(--text-heading-3-leading);
-}
-html :where(h4, h5, h6) {
-  font-size: var(--text-heading-4-size);
-  font-weight: var(--text-heading-4-weight);
-  line-height: var(--text-heading-4-leading);
-}
 html :where(h2) {
   font-size: var(--text-heading-2-size);
   font-weight: var(--text-heading-2-weight);
   line-height: var(--text-heading-2-leading);
 }
-/* Heading 3: a card's or section's title, as Astryx's settings and
-   dashboard templates title their sections (layout/SPEC.md). */
-html :where(.cbi-section :is(h2, h3), .cbi-section > legend) {
+/* Heading 3: any h3, and a card's or section's title, as Astryx's
+   settings and dashboard templates title their sections (layout/SPEC.md). */
+html :where(h3, .cbi-section h2, .cbi-section > legend) {
   font-size: var(--text-heading-3-size);
   font-weight: var(--text-heading-3-weight);
   line-height: var(--text-heading-3-leading);
@@ -138,8 +128,8 @@ html :where(.cbi-section :is(h2, h3), .cbi-section > legend) {
    routing tables, 24.10's leases) names a part of the page as a card's
    title does, so the tables' headings stay Heading 3, one size (audit3
    B1). A heading a field writes (.cbi-value > h4: DHCP's Active DHCPv4
-   Leases) is Heading 4 too. */
-html :where(.cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div:not(.cbi-title) > h3, :is(.cbi-section > div:not(.cbi-title), .cbi-section) > h3 ~ h3:not(:has(+ :is(table, .table))), .cbi-value > h4, .cbi-value > .cbi-section > h3) {
+   Leases) is Heading 4 too, as are h4 to h6 anywhere. */
+html :where(h4, h5, h6, .cbi-section:has(> :is(h2, h3, legend, .cbi-title)) > div:not(.cbi-title) > h3, :is(.cbi-section > div:not(.cbi-title), .cbi-section) > h3 ~ h3:not(:has(+ :is(table, .table))), .cbi-value > .cbi-section > h3) {
   font-size: var(--text-heading-4-size);
   font-weight: var(--text-heading-4-weight);
   line-height: var(--text-heading-4-leading);
@@ -862,10 +852,7 @@ html :where(.cbi-map > .cbi-section:has(> .cbi-section-descr):not(:has(> :not(.c
    family's neighbours, routes and rules) is titled by the first; each
    later one is a flat section under a Divider. */
 html :where(.cbi-section > h3 ~ h3),
-html :where(.cbi-value:has(> .cbi-section) + .cbi-value > .cbi-section) {
-  padding-block-start: var(--aster-space-region);
-  border-block-start: var(--border-width) solid var(--color-border);
-}
+html :where(.cbi-value:has(> .cbi-section) + .cbi-value > .cbi-section),
 html :where(.cbi-section, .cbi-section-node, .nft-table) :where(.cbi-section + .cbi-section, .cbi-section-node + .cbi-section-node, .nft-chain + .nft-chain) {
   padding-block-start: var(--aster-space-region);
   border-block-start: var(--border-width) solid var(--color-border);
