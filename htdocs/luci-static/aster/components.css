@@ -797,8 +797,10 @@ html :where(.cbi-value:has([data-changed="true"]) > .cbi-value-title)::after {
   border-radius: var(--radius-full);
   background: var(--color-accent);
 }
-/* A field with its own affordance (password reveal, add button). */
-html :where(.control-group:not(.cbi-dynlist > .add-item)) { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); }
+/* A field with its own affordance (password reveal, add button). A field
+   and its reveal share the line: on a phone the field gives up the
+   button's 8 + 36, never the button its line (AUDIT5 C1). */
+html :where(.control-group:not(.cbi-dynlist > .add-item)) { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); &:has(> input) { flex-wrap: nowrap; } }
 
 /* ── Card ────────────────────────────────────────────────────────
    The surface, a 1 border, the container radius and 16 from the outer

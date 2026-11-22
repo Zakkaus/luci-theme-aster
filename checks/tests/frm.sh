@@ -139,5 +139,12 @@ expect uniform 0 "" "inner headings 16 (C3)" -- "$url" "$password" --pages "$tmp
 expect uniform 1 "c3.heading conform" "inner headings at the body's 15 (audit4 C1)" "inner size" -- "$url" "$password" --pages "$tmp/frm-inner.txt" \
 	--debug-css 'admin/system/flash=:root { --text-heading-4-size: var(--font-size-base) !important }'
 
+# C5, audit5 C1: Router Password's reveal buttons wrapped alone under their
+# fields (phone).
+printf 'admin/system/admin require=c5.form\n' >"$tmp/frm-pw.txt"
+expect uniform 0 "" "reveal beside its password field (C5)" -- "$url" "$password" --pages "$tmp/frm-pw.txt" --viewports desktop,phone
+expect uniform 1 "c5.form conform" "reveal wrapped under its field (audit5 C1)" "reveal line" -- "$url" "$password" --pages "$tmp/frm-pw.txt" --viewports phone \
+	--debug-css 'admin/system/admin=#view .control-group { flex-wrap: wrap !important }'
+
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true

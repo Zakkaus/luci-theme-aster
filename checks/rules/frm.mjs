@@ -30,7 +30,7 @@ const RULES = {
   'c2.card': 'C2: radius 16, border 1, card fill, padding 16',
   'c3.heading': 'C3: page 26/600, card 18/600, inner 16/600; heading box -> content 16; actions (a section\'s Remove, C10) on the heading\'s row, ending on the content end',
   'c4.tabs': 'C4: tabs 36 (second level 32), 2 apart, one line, 2 accent bar, list -> pane 16',
-  'c5.form': 'C5: label 200 + 16 (stacked 4), row padding 8, fields 36, a labelled text area 256, a read-only value whole, buttons wrapped 8 under their field, help 4',
+  'c5.form': 'C5: label 200 + 16 (stacked 4), row padding 8, fields 36, a labelled text area 256, a read-only value whole, buttons wrapped 8 under their field, a reveal button beside its field, help 4',
   'c9.button': 'C9: md 36 in toolbars/forms/save bar/dialogs, sm 32 in tables/cards/heading rows; one primary; red only in a dialog; the drag handle ghost; C11: the save bar reads Reset, Save, Save & Apply',
   'c17.banner': 'C17: padding 12, radius 12, icon gap 8',
   'c18.dialog': 'C18: padding 16, title/footer gaps 16, button gap 8, the confirm last, width 400/560/800 or window - 32, fits; G5: the title breaks between words',
@@ -331,6 +331,8 @@ export function collect(cfg) {
       const ctl = [...fld.querySelectorAll(':scope > :is(input, select, .cbi-dropdown)')].find(visible);
       if (ctl && visible(g) && g.firstElementChild?.matches(BTN) && box(g).top >= box(ctl).bottom - 0.5) check('c5.form', 'button wrap gap', box(g).top - box(ctl).bottom, 8, g);
     }
+    // A field's reveal button (a password) on the field's line (AUDIT5 C1).
+    for (const b of fld.querySelectorAll('.control-group > input + button:last-child')) if (visible(b)) check('c5.form', 'reveal line', box(b).top < box(b.previousElementSibling).bottom - 0.5 ? 'beside' : 'wrapped', 'beside', b);
     // Beside its label a text area is a field, 256.
     if (fb.top < lb.bottom - 0.5 && lab.textContent.trim()) {
       const ta = fld.querySelector(':scope > textarea, :scope > div > textarea:only-child');
