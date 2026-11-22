@@ -91,12 +91,12 @@ expect 0 "ok   stylesheets: $base B shipped" "a large comment does not count" "$
 
 # A rule as large as the room left: shipped goes past the budget.
 copy rule
-room=$((150000 - base + 1))
+room=$((151000 - base + 1))
 { printf '.budget-test{--x:"'; head -c "$room" /dev/zero | tr '\0' 'r'; printf '"}\n'; } >>"$tmp/rule/luci-static/aster/luci.css"
 expect 1 "FAIL stylesheets" "a large rule counts" "$tmp/rule"
 
 copy js
-head -c 35000 /dev/zero | tr '\0' ' ' >>"$tmp/js/luci-static/resources/theme-aster.js"
+head -c 35300 /dev/zero | tr '\0' ' ' >>"$tmp/js/luci-static/resources/theme-aster.js"
 expect 1 "FAIL scripts" "a script over the budget" "$tmp/js"
 
 if [[ $failures -ne 0 ]]; then
