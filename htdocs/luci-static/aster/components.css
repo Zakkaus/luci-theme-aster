@@ -1592,13 +1592,17 @@ html :where(#modal_overlay > :not(.alert-message)) {
   padding: var(--spacing-4);
 }
 html :where(#modal_overlay > :not(.alert-message) > *) { flex: none; }
-html :where(#modal_overlay > :not(.alert-message) > :not(h4:first-child, :is(.right, .button-row, div:has(> .left + .right)):last-child)) {
+html :where(#modal_overlay > :not(.alert-message) > :not(h4:first-child, textarea, :is(.right, .button-row, div:has(> .left + .right)):last-child)) {
   flex: 0 1 auto;
   min-block-size: 0;
   margin-inline: calc(var(--spacing-4) * -1);
   padding-inline: var(--spacing-4);
   overflow-y: auto;
 }
+/* A text area straight in the body (Software's Configure apk/opkg: h5 +
+   textarea per file) is a field: it keeps the content column and its own
+   padding, scrolls in itself and gives way when the body is too tall. */
+html :where(#modal_overlay > :not(.alert-message) > textarea) { flex-shrink: 1; min-block-size: 0; }
 /* Tabs in a scrolling body stay at its top, over the rows that pass. */
 html :where(#modal_overlay .cbi-tabmenu) {
   position: sticky;

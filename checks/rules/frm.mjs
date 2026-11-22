@@ -411,6 +411,13 @@ export function collect(cfg) {
       }
       check('c18.dialog', 'title word', cut, 'none', title);
     }
+    // A text area straight in the body (Software's Configure apk) is a
+    // field in the content column, its edges on the title's (pkg modal).
+    const cx = box(scope).left + f(s.paddingLeft) + f(s.borderLeftWidth), cr = box(scope).right - f(s.paddingRight) - f(s.borderRightWidth);
+    for (const t of kids.filter((k) => k.matches('textarea'))) {
+      check('c18.dialog', 'field start', box(t).left - cx, 0, t);
+      check('c18.dialog', 'field end', cr - box(t).right, 0, t);
+    }
     const foot = kids.find((k) => k.matches('.button-row, .right:last-child'));
     if (foot && kids[kids.indexOf(foot) - 1]) {
       check('c18.dialog', 'footer gap', box(foot).top - box(kids[kids.indexOf(foot) - 1]).bottom, 16, foot);

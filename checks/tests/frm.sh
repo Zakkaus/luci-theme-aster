@@ -19,6 +19,7 @@ printf 'admin/status/realtime/bandwidth require=c4.tabs\n' >"$tmp/frm-bw.txt"
 printf 'admin/status/overview require=c19.progress\n' >"$tmp/frm-ov.txt"
 printf 'admin/system/flash require=c22.divider\n' >"$tmp/frm-flash.txt"
 printf 'admin/network/network modal=interface-edit require=c18.dialog\n' >"$tmp/frm-dialog.txt"
+printf 'admin/system/package-manager modal=pkg-config require=c18.dialog\n' >"$tmp/frm-pkg.txt"
 printf 'admin/status/nftables require=c2.card,g.nested\n' >"$tmp/frm-nft.txt"
 printf 'admin/system/crontab require=c1.descr\n' >"$tmp/frm-cron.txt"
 printf 'admin/system/admin/dropbear require=c3.heading\n' >"$tmp/frm-drop.txt"
@@ -64,6 +65,10 @@ expect uniform 1 "c5.form conform,space.formrow.pad padding" "form row padding 4
 # C18: a dialog 24 inside.
 expect uniform 1 "c18.dialog conform,space.dialog gap" "dialog padding 24 (C18)" -- "$url" "$password" --pages "$tmp/frm-dialog.txt" \
 	--debug-css 'admin/network/network=#modal_overlay > .modal { padding: 24px !important }'
+# C18, beta user (Configure apk): the dialog body's bleed on its text
+# areas, their border on the dialog's edge, 16 short of its content end.
+expect uniform 1 "c18.dialog conform" "dialog text area on the dialog edge (C18, beta)" "field start" -- "$url" "$password" --pages "$tmp/frm-pkg.txt" \
+	--debug-css 'admin/system/package-manager=#modal_overlay > .modal > textarea { margin-inline: -16px 16px !important }'
 # C19: a 12 track (Overview's is the ::after under its text).
 expect uniform 1 "c19.progress conform" "progress bar 12 high (C19)" -- "$url" "$password" --pages "$tmp/frm-ov.txt" \
 	--debug-css 'admin/status/overview=#view .cbi-progressbar::after { block-size: 12px !important }'

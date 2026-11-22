@@ -131,6 +131,15 @@ export const MODALS = {
     await page.waitForSelector('#modal_overlay .modal :is(.cbi-section, .cbi-map, .cbi-value)', {state: 'visible', timeout});
     return `edit dialog of interface ${row}`;
   },
+  // Software's Configure apk/opkg button: a heading and a text area per
+  // file straight in the dialog; nothing is saved.
+  'pkg-config': async (page, timeout) => {
+    const btn = page.locator('button, .btn').filter({hasText: /^Configure /}).first();
+    await btn.waitFor({state: 'visible', timeout});
+    await btn.click();
+    await page.waitForSelector('#modal_overlay .modal > textarea', {state: 'visible', timeout});
+    return 'package manager configuration dialog';
+  },
   // ui.js's status dialogs (ui.changes.displayStatus), as applying, a revert
   // and a failed revert draw them; opened directly, so nothing is sent.
   'status-spinning': (page, timeout) => status(page, timeout, 'notice spinning', 'Applying configuration changes… 9s'),
