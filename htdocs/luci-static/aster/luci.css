@@ -1145,29 +1145,48 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
      inline (!important to override). LuCI lists lan ports before wan; the
      uplink comes first (firewall.js getColorForName's wan colour). */
   /* One row while every tile gets --aster-port-min, else a list, one
-     port a row (never a part-filled row): the tiles' flex basis is
-     (n * (min + 16) - 16 - container) * 999, negative (0, all on one
-     row) when n tiles fit and huge (a line each) when they do not; n is
-     the port count (:has, 2-9). Rows 16 apart, no Divider: Astryx
-     List without dividers (Item padding-block 8 + 8; G8). */
+     port a row (never a part-filled row). One row: each tile as wide as
+     its content, the row spread with space-between, so the first tile
+     starts at the card's content start and the last one's content ends
+     at its end, the tiles at least 16 apart. List: n tiles do not fit
+     when the container is narrower than n * (min + 16) - 16 (128 + 16
+     per port, the tokens' values: a container query takes no var()),
+     one query for each port count n (:has, 2-9) sets --aster-port-list
+     (a space toggle) on the tiles: a full-width basis and an inline-size
+     container, the one the row-end traffic below asks. Rows 16 apart, no
+     Divider: Astryx List without dividers (Item padding-block 8 + 8; G8). */
   & div[style*="grid-template-columns"]:has(> .ifacebox) {
+    container-type: inline-size;
     display: flex !important;
     flex-wrap: wrap;
+    justify-content: space-between;
     gap: var(--spacing-4) !important;
     margin: 0 !important;
-    &:has(>:nth-child(2)){--n:2} &:has(>:nth-child(3)){--n:3} &:has(>:nth-child(4)){--n:4} &:has(>:nth-child(5)){--n:5} &:has(>:nth-child(6)){--n:6} &:has(>:nth-child(7)){--n:7} &:has(>:nth-child(8)){--n:8} &:has(>:nth-child(9)){--n:9}
+    @container (width<272px){&:has(>:nth-child(2))>*{--aster-port-list: }}
+    @container (width<416px){&:has(>:nth-child(3))>*{--aster-port-list: }}
+    @container (width<560px){&:has(>:nth-child(4))>*{--aster-port-list: }}
+    @container (width<704px){&:has(>:nth-child(5))>*{--aster-port-list: }}
+    @container (width<848px){&:has(>:nth-child(6))>*{--aster-port-list: }}
+    @container (width<992px){&:has(>:nth-child(7))>*{--aster-port-list: }}
+    @container (width<1136px){&:has(>:nth-child(8))>*{--aster-port-list: }}
+    @container (width<1280px){&:has(>:nth-child(9))>*{--aster-port-list: }}
   }
   & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) {
     --card-pad: 0;
     --card-border-width: 0;
     --card-radius: 0;
     --card-bg: transparent;
-    flex: 1 1 calc((var(--n, 1) * (var(--aster-port-min) + var(--spacing-4)) - var(--spacing-4) - 100%) * 999);
-    container-type: inline-size;
+    /* --aster-port-list off (one row): flex 0 1 auto and no container (a
+       size container would lose its content width); on (list): basis
+       100 % and an inline-size container. Two columns, so a content-wide
+       tile ends at its content; a list row's traffic takes a third. */
+    flex: 0 1 var(--aster-port-list) 100%;
+    container-type: var(--aster-port-list) inline-size;
+    container-name: port;
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr);
     gap: 0 var(--spacing-2);
-    min-inline-size: 0 !important;
+    min-inline-size: max-content !important;
     max-inline-size: none !important;
     margin: 0 !important;
     &:has(.zonebadge[style*="240, 144, 144"]) { order: -1; }
@@ -1228,7 +1247,7 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
        16) is Astryx Item with end content: the traffic trails at the
        row's end, upload on the name's line, download on the description's,
        counts right-aligned on the row's end. */
-    @container (width >= 272px) {
+    @container port (width >= 272px) {
       & > .ifacebox-body:last-child { grid-area: 1 / 3 / 3; display: grid; }
       & > .ifacebox-body > .cbi-tooltip-container { grid-template-rows: 1fr auto; justify-items: end; margin: 0; }
     }
