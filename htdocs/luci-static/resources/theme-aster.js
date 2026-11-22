@@ -127,7 +127,7 @@ return baseclass.extend({
 				on(true);
 				const h = t.offsetHeight;
 				on(false);
-				on(wide(t.parentNode) || wide(t) || [...t.querySelectorAll('.tr > *')].some(wide) || gs.some((g, r, b) => (r = g.getBoundingClientRect(), b = t.getBoundingClientRect(), wide(g) || g.offsetWidth > g.parentNode.clientWidth || r.left < b.left - 1 || r.right > b.right + 1)) || t.dataset.fold == 'fold' && h < t.offsetHeight);
+				on(wide(t.parentNode) || wide(t) || [...t.querySelectorAll('.tr > *, [data-head] > .aster-v')].some(wide) || gs.some((g, r, b) => (r = g.getBoundingClientRect(), b = t.getBoundingClientRect(), wide(g) || g.offsetWidth > g.parentNode.clientWidth || r.left < b.left - 1 || r.right > b.right + 1)) || t.dataset.fold == 'fold' && h < t.offsetHeight);
 			}
 		};
 		/* The parent's room, or the table's own size (it folds), read on the
