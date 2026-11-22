@@ -1,8 +1,18 @@
+<div align="center">
+
+<img src="htdocs/luci-static/aster/logo.svg" width="96" alt="Aster">
+
 # Aster
 
 English · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md)
 
 Aster (`luci-theme-aster`) is a LuCI theme for OpenWrt in the Astryx design language.
+
+[Requirements](#requirements) • [Install](#install) • [Palettes](#palettes) • [Settings](#settings) • [Phone](#phone) • [Layout](#layout) • [Login](#login)
+
+</div>
+
+![Overview](docs/screenshots/en/rose-pine-overview-light.png)
 
 ## Requirements
 
@@ -38,13 +48,29 @@ Look in `bin/packages/<arch>/luci/` for the `.ipk` (24.10) or `.apk` (25.12).
 
 Open the palette menu in the top bar. Rosé Pine, the default, uses Dawn in light mode and Main in dark mode. The other choices are Aster, Relay Blue, Sounding Teal and Herbarium Plum. Switching palettes changes colours, not spacing or components. The browser saves the choice in `aster-palette`, not on the router.
 
+| Palette | Light | Dark |
+|---|---|---|
+| **Rosé Pine (default)** | <img src="docs/screenshots/en/rose-pine-overview-light.png" width="380"> | <img src="docs/screenshots/en/rose-pine-overview-dark.png" width="380"> |
+| **Aster** | <img src="docs/screenshots/en/aster-overview-light.png" width="380"> | <img src="docs/screenshots/en/aster-overview-dark.png" width="380"> |
+| **Relay Blue** | <img src="docs/screenshots/en/relay-overview-light.png" width="380"> | <img src="docs/screenshots/en/relay-overview-dark.png" width="380"> |
+| **Sounding Teal** | <img src="docs/screenshots/en/teal-overview-light.png" width="380"> | <img src="docs/screenshots/en/teal-overview-dark.png" width="380"> |
+| **Herbarium Plum** | <img src="docs/screenshots/en/plum-overview-light.png" width="380"> | <img src="docs/screenshots/en/plum-overview-dark.png" width="380"> |
+
+<img src="docs/screenshots/en/realtime-light.png" width="420"> <img src="docs/screenshots/en/realtime-dark.png" width="420">
+
 ## Settings
 
 LuCI offers three device defaults: `Aster` follows the system colour scheme, `AsterLight` selects light and `AsterDark` selects dark. Use the top bar to override the default for this browser. Light and Dark take precedence; Auto returns to the router’s selection.
 
+<img src="docs/screenshots/en/system-light.png" width="420"> <img src="docs/screenshots/en/system-dark.png" width="420">
+
 ## Phone
 
 At 48rem or narrower, the menu button opens navigation in a drawer. Tables respond to their own width rather than the phone breakpoint: when the columns no longer fit their container, each row folds into labelled values.
+
+| Light | Dark |
+|---|---|
+| <img src="docs/screenshots/en/phone-light.png" width="280"> | <img src="docs/screenshots/en/phone-dark.png" width="280"> |
 
 ## Layout
 
@@ -60,9 +86,13 @@ LuCI loads five stylesheets from `htdocs/luci-static/aster/`, in this order:
 
 A page’s own stylesheet loads after the theme.
 
+<img src="docs/screenshots/en/nav-dark.png" width="420"> <img src="docs/screenshots/en/firewall-dark.png" width="420">
+
 ## Login
 
 The login page has its own scheme and palette controls. The password field has a reveal button; the form still submits without JavaScript.
+
+<img src="docs/screenshots/en/login-light.png" width="420"> <img src="docs/screenshots/en/login-dark.png" width="420">
 
 ## Translations
 

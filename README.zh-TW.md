@@ -1,8 +1,18 @@
+<div align="center">
+
+<img src="htdocs/luci-static/aster/logo.svg" width="96" alt="Aster">
+
 # Aster
 
 [English](README.md) · [简体中文](README.zh-CN.md) · 繁體中文
 
 Aster（`luci-theme-aster`）是 OpenWrt 的 LuCI 主題，採用 Astryx 設計語言。
+
+[系統需求](#系統需求) • [安裝](#安裝) • [配色](#配色) • [設定](#設定) • [手機](#手機) • [樣式分層](#樣式分層) • [登入頁](#登入頁)
+
+</div>
+
+![概覽](docs/screenshots/zh-TW/rose-pine-overview-light.png)
 
 ## 系統需求
 
@@ -38,13 +48,29 @@ make package/luci-theme-aster/compile V=s
 
 頂端列的配色選單提供五種選擇。預設的 Rosé Pine 在淺色模式下使用 Dawn，深色模式下使用 Main。其他四種是 Aster、Relay Blue、Sounding Teal 與 Herbarium Plum。切換配色不會改變元件或間距。配色記錄在瀏覽器的 `aster-palette`，不會寫入路由器。
 
+| 配色 | 淺色 | 深色 |
+|---|---|---|
+| **Rosé Pine（預設）** | <img src="docs/screenshots/zh-TW/rose-pine-overview-light.png" width="380"> | <img src="docs/screenshots/zh-TW/rose-pine-overview-dark.png" width="380"> |
+| **Aster** | <img src="docs/screenshots/zh-TW/aster-overview-light.png" width="380"> | <img src="docs/screenshots/zh-TW/aster-overview-dark.png" width="380"> |
+| **Relay Blue** | <img src="docs/screenshots/zh-TW/relay-overview-light.png" width="380"> | <img src="docs/screenshots/zh-TW/relay-overview-dark.png" width="380"> |
+| **Sounding Teal** | <img src="docs/screenshots/zh-TW/teal-overview-light.png" width="380"> | <img src="docs/screenshots/zh-TW/teal-overview-dark.png" width="380"> |
+| **Herbarium Plum** | <img src="docs/screenshots/zh-TW/plum-overview-light.png" width="380"> | <img src="docs/screenshots/zh-TW/plum-overview-dark.png" width="380"> |
+
+<img src="docs/screenshots/zh-TW/realtime-light.png" width="420"> <img src="docs/screenshots/zh-TW/realtime-dark.png" width="420">
+
 ## 設定
 
 在 LuCI 選用 `Aster` 時，明暗模式跟隨系統；選用 `AsterLight` 或 `AsterDark` 則分別固定為淺色或深色。若只想更改目前瀏覽器的外觀，可在頂端列指定淺色或深色。切回自動模式即恢復路由器的設定。
 
+<img src="docs/screenshots/zh-TW/system-light.png" width="420"> <img src="docs/screenshots/zh-TW/system-dark.png" width="420">
+
 ## 手機
 
 畫面寬度在 48rem 以下（含）時，可從選單按鈕開啟側邊導覽抽屜。表格依可用空間決定是否摺疊，不以手機版面的寬度為準。欄位排不下時，每筆資料會分行顯示，欄名標在對應的值旁。
+
+| 淺色 | 深色 |
+|---|---|
+| <img src="docs/screenshots/zh-TW/phone-light.png" width="280"> | <img src="docs/screenshots/zh-TW/phone-dark.png" width="280"> |
 
 ## 樣式分層
 
@@ -60,9 +86,13 @@ make package/luci-theme-aster/compile V=s
 
 頁面若有自己的樣式表，會在主題之後載入。
 
+<img src="docs/screenshots/zh-TW/nav-dark.png" width="420"> <img src="docs/screenshots/zh-TW/firewall-dark.png" width="420">
+
 ## 登入頁
 
 登入前就能切換配色與明暗模式。密碼欄位旁有顯示或隱藏密碼的按鈕。停用 JavaScript 時，仍可送出登入表單。
+
+<img src="docs/screenshots/zh-TW/login-light.png" width="420"> <img src="docs/screenshots/zh-TW/login-dark.png" width="420">
 
 ## 翻譯
 
