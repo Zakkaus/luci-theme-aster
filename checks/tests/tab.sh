@@ -152,19 +152,36 @@ expect uniform 0 "" "Packages: URLs one line on a phone" -- "$url" "$password" -
 # R7 (AUDIT4): a wide lease's identifiers whole (A1: 25.12's host broke
 # in "(switchbot-hubminimatter-" over "6847c8.lan)"), a folded network's
 # title its name, not its "SSID" label (B3).
-# The lab's radios are absent, so their short rows fit a phone: a wide
-# status 400 wide folds the table.
-printf '%s\n' 'admin/network/wireless require=c7.title' >"$tmp/tab-wifi.txt"
-fold='#view [data-fold="wide"] .td[data-name="_stat"] > div { min-width: 400px }'
-expect uniform 0 "" "Wireless: a network's title is its name on a phone" -- "$url" "$password" --pages "$tmp/tab-wifi.txt" --viewports phone \
-	--debug-css "admin/network/wireless=$fold"
 # A1: the host column 64 wide, so its name breaks at its hyphens while the
 # table stays wide.
 expect uniform 1 "g.break.table token,g.break.table word" "a wide lease's host broken at its hyphens (AUDIT4 A1)" -- "$url" "$password" --pages "$tmp/tab-leases.txt" --viewports desktop \
 	--debug-css 'admin/status/overview=#view #status_leases .td:first-child { white-space: normal !important; max-width: 64px }'
-# B3: the "SSID" label back before the name.
-expect uniform 1 "c7.title lead" "a network's title led by its SSID label (AUDIT4 B3)" -- "$url" "$password" --pages "$tmp/tab-wifi.txt" --viewports phone \
-	--debug-css "admin/network/wireless=$fold #view .td[data-name=\"_stat\"] .nowrap > strong { display: inline !important }"
+# B3, only on a box with a wireless config (LuCI has no Wireless page
+# without one: 404): the "SSID" label back before the name.
+if has_page admin/network/wireless; then
+	# The lab's radios are absent, so their short rows fit a phone: a wide
+	# status 400 wide folds the table.
+	printf '%s\n' 'admin/network/wireless require=c7.title' >"$tmp/tab-wifi.txt"
+	fold='#view [data-fold="wide"] .td[data-name="_stat"] > div { min-width: 400px }'
+	expect uniform 0 "" "Wireless: a network's title is its name on a phone" -- "$url" "$password" --pages "$tmp/tab-wifi.txt" --viewports phone \
+		--debug-css "admin/network/wireless=$fold"
+	expect uniform 1 "c7.title lead" "a network's title led by its SSID label (AUDIT4 B3)" -- "$url" "$password" --pages "$tmp/tab-wifi.txt" --viewports phone \
+		--debug-css "admin/network/wireless=$fold #view .td[data-name=\"_stat\"] .nowrap > strong { display: inline !important }"
+else
+	echo "skip Wireless network titles (AUDIT4 B3): no Wireless page on this box"
+fi
+
+# AUDIT5 B1: a static lease with no hostname is titled by its IPv4 address
+# (else its MAC), not by LuCI's "none" placeholder. 25.12 lists static
+# leases on the first tab, 24.10 on its "leases" tab. LEASES=1: the box has
+# such a lease (one host section with ip and mac but no name).
+if curl -fsI "$url/luci-static/resources/uqr.js" >/dev/null 2>&1; then lt=''; else lt=' tab=leases'; fi
+printf 'admin/network/dhcp%s require=c7.title\n' "$lt" >"$tmp/tab-static.txt"
+expect uniform 0 "" "static leases: each title names its lease" -- "$url" "$password" --pages "$tmp/tab-static.txt" --viewports phone
+if [[ ${LEASES:-0} = 1 ]]; then
+	expect uniform 1 "c7.title column" "an unnamed lease titled by its placeholder (AUDIT5 B1)" -- "$url" "$password" --pages "$tmp/tab-static.txt" --viewports phone \
+		--debug-css 'admin/network/dhcp=#view [data-fold="fold"] .tr > [data-name=name] { display: block !important } #view [data-fold="fold"] .tr > [data-name=ip] { grid-row: auto !important }'
+fi
 
 [[ ${BASH_SOURCE[0]} == "$0" ]] && finish
 true

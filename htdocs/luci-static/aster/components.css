@@ -797,8 +797,10 @@ html :where(.cbi-value:has([data-changed="true"]) > .cbi-value-title)::after {
   border-radius: var(--radius-full);
   background: var(--color-accent);
 }
-/* A field with its own affordance (password reveal, add button). */
-html :where(.control-group:not(.cbi-dynlist > .add-item)) { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); }
+/* A field with its own affordance (password reveal, add button). A field
+   and its reveal share the line: on a phone the field gives up the
+   button's 8 + 36, never the button its line (AUDIT5 C1). */
+html :where(.control-group:not(.cbi-dynlist > .add-item)) { display: flex; flex-wrap: wrap; align-items: center; gap: var(--spacing-2); &:has(> input) { flex-wrap: nowrap; } }
 
 /* ── Card ────────────────────────────────────────────────────────
    The surface, a 1 border, the container radius and 16 from the outer
@@ -1159,8 +1161,10 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
      the end. The identifier is the column that names the row (data-head,
      theme-aster.js: the first column that is not the row's interface,
      network, device or priority, nor one LuCI hides on phones; a station's
-     host, a lease's host, a script, a route's target), else the first. */
-  & :where(.tr > :is(.td, td):is([data-head], :first-child:not(:has(~ [data-head])))) {
+     host, a lease's host, a script, a route's target), else the first.
+     A static lease with no hostname (LuCI's <em> placeholder) is named by
+     its IPv4 address, else its MAC (AUDIT5 B1); the placeholder goes. */
+  & :where(.tr > :is(.td, td):is([data-head], :first-child:not(:has(~ [data-head]))), .tr:has(> [data-name=name] > em:only-child) > [data-name=ip]:not(:has(> em)), .tr:has(> [data-name=name] > em:only-child):has(> [data-name=ip] > em) > [data-name=mac]) {
     display: block;
     grid-row: 1;
     grid-column: 1 / -2;
@@ -1201,7 +1205,7 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
   }
   /* A cell with nothing in it (LuCI's "-" too, theme-aster.js) takes no
      row; nor do actions with no button. */
-  & :where(.tr > :is(.td, td):not([data-head], :first-child:not(:has(~ [data-head]))):is(:empty, [data-empty]), .tr > .cbi-section-actions:not(:has(button, .btn, .cbi-button))) { display: none; }
+  & :where(.tr > :is(.td, td):not([data-head], :first-child:not(:has(~ [data-head]))):is(:empty, [data-empty]), .tr > .cbi-section-actions:not(:has(button, .btn, .cbi-button)), .tr > [data-name=name]:has(> em:only-child)) { display: none; }
 }
 /* nftables' <style> pads its cells .25em with !important (one id heavier). */
 html #view .nft-rules[data-fold="fold"] tr > td { padding: 0 !important; }

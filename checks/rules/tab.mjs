@@ -25,7 +25,7 @@ export const canonical = {
     label: '15/500 secondary', value: '15/400 primary', title: '15/500 primary', divider: '1 border', divStart: 0, divEnd: 0, titleMargin: 0,
   },
   'c7.x': {_source: 'COMPONENTS.md C7: per folded table one label x (= title x) and one value x (counts are strings: a count read as px would pass 2 within the 1px tolerance)', labelXs: 'one', valueXs: 'one', labelToTitle: 0},
-  'c7.title': {_source: 'COMPONENTS.md C7: the title is the column that names the row: the first that is not the row\'s interface, network, device or (start) priority, nor one LuCI hides on phones (hide-xs); the same table folds by the same column on every page; it leads with the name, not a field label (AUDIT4 B3: a network\'s "SSID")', column: 'names the row', lead: 'name'},
+  'c7.title': {_source: 'COMPONENTS.md C7: the title is the column that names the row: the first that is not the row\'s interface, network, device or (start) priority, nor one LuCI hides on phones (hide-xs); the same table folds by the same column on every page; it leads with the name, not a field label (AUDIT4 B3: a network\'s "SSID"); an unnamed static lease by its IPv4, else its MAC, not the "none" placeholder (AUDIT5 B1)', column: 'names the row', lead: 'name'},
   'c7.labelw': {_source: 'COMPONENTS.md C7: the label column is the longest label, at most half the content width', fit: 0},
   'c7.actions': {_source: 'COMPONENTS.md C7/C10: a folded row\'s actions are on its title line, one line, ending on the content edge, centred on the title line', lines: 'one', end: 0, centre: 0},
   'c10.actions': {_source: 'COMPONENTS.md C10 (doona ActionGroup, Astryx MoreMenu): buttons 8 apart, at most one More menu per row', gap: 8, menus: 'ok'},
@@ -112,7 +112,11 @@ export async function collect(cfg) {
     const ths = [...(t.querySelector('.tr:has(> .th)')?.children || [])];
     const r0 = [...t.querySelectorAll('.tr:not(:has(> .th))')].find((r) => r.closest('.table, table') === t);
     const i = ths.findIndex((c, k) => !c.matches('.hide-xs') && !mark(r0?.children[k]) && !skip.includes(c.textContent.trim()));
-    return (r) => (ths.length ? Math.max(0, i) : Math.max(0, [...r.children].findIndex((c) => !mark(c))));
+    const k = (r) => (ths.length ? Math.max(0, i) : Math.max(0, [...r.children].findIndex((c) => !mark(c))));
+    // AUDIT5 B1: a static lease with no hostname (LuCI's <em> placeholder)
+    // is named by its IPv4 address, else its MAC.
+    const at = (r, n) => [...r.children].findIndex((c) => c.dataset.name === n);
+    return (r) => (r.children[k(r)]?.matches('[data-name=name]:has(> em:only-child)') ? at(r, r.querySelector(':scope > [data-name=ip] > em') ? 'mac' : 'ip') : k(r));
   };
 
   for (const t of scope.querySelectorAll(TABLES)) {
