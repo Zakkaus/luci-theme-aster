@@ -1182,23 +1182,24 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
     &:has(> .ifacebox-body > img[src*="_down."]) > .ifacebox-head:first-child::after { background-color: var(--color-icon-secondary); }
     /* LuCI's zone bars are colour only. */
     & > .ifacebox-head.cbi-tooltip-container { display: none !important; }
-    /* Traffic, 4 under the description: the count, then its arrow
-       (.aster-glyph, ArrowUp / ArrowDown 16) trailing it 8 apart (G4), a
-       line each; the 80 % size is inline. */
+    /* Traffic, 4 under the description, as doona's WidgetSpeed: a line
+       each, upload over download, the arrow (.aster-glyph, ArrowUp /
+       ArrowDown 16) leading its count 8 apart, so every count of every
+       tile starts on one x; supporting 13/20, tabular figures (the 80 %
+       size is inline). PoE's line spans both columns. */
     & > .ifacebox-body > .cbi-tooltip-container {
       display: grid;
-      grid-template-columns: auto auto;
-      grid-auto-flow: dense;
-      justify-content: start;
+      grid-template-columns: auto 1fr;
       align-items: center;
       column-gap: var(--spacing-2);
       margin-block-start: var(--spacing-1);
       color: var(--color-text-primary);
-      font-size: var(--text-body-size) !important;
-      line-height: var(--text-body-leading);
+      font-size: var(--text-supporting-size) !important;
+      line-height: var(--text-supporting-leading);
       font-variant-numeric: tabular-nums;
       & > br { display: none; }
-      & > .aster-glyph { grid-column: 2; color: var(--color-icon-secondary); }
+      & > span[style] { grid-column: 1 / -1; }
+      & > .aster-glyph { color: var(--color-icon-secondary); }
       & > .aster-glyph::before { inline-size: var(--aster-icon-sm); block-size: var(--aster-icon-sm); }
     }
   }
