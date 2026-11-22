@@ -60,6 +60,13 @@ expect() {
 	fi
 }
 
+# has_page <path>: the page answers 200 when logged in (LuCI drops a page
+# whose package or config the box lacks, e.g. Wireless with no wireless
+# config: 404). Box-dependent cases run only where it exists.
+has_page() {
+	[[ $(curl -s -o /dev/null -w '%{http_code}' -c "$tmp/jar" -b "$tmp/jar" -L -d luci_username=root --data-urlencode "luci_password=$password" "$url/cgi-bin/luci/$1") = 200 ]]
+}
+
 finish() {
 	if [[ $failures -ne 0 ]]; then
 		echo "$failures test(s) failed"
