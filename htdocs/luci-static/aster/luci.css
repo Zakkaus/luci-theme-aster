@@ -1154,12 +1154,14 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
      inline (!important to override). LuCI lists lan ports before wan; the
      uplink comes first (firewall.js getColorForName's wan colour). */
   /* One row while every tile gets --aster-port-min, else a list, one
-     port a row (never a part-filled row). One row: each tile as wide as
-     its content, the row spread with space-between, so the first tile
-     starts at the card's content start and the last one's content ends
-     28 (icon 20 + gap 8, its end margin) before the content end, so its
-     text is as far from the card's edge as the first tile's text, the
-     tiles at least 16 apart. List: n tiles do not fit when the container
+     port a row (never a part-filled row). One row of 4 or more: each
+     tile as wide as its content, the row spread with space-between, so
+     the first tile starts at the card's content start and the last one's
+     content ends 28 (icon 20 + gap 8, its end margin) before the content
+     end, so its text is as far from the card's edge as the first tile's
+     text, the tiles at least 16 apart. One row of 2 or 3: equal columns,
+     tile k starting at k / n of the row (2: the second at its middle),
+     each tile 1 / n less the 16 gap. List: n tiles do not fit when the container
      is narrower than n * (min + 16) - 16 + 28 (128 + 16 per port and the
      inset, the tokens' values: a container query takes no var()),
      one query for each port count n (:has, 2-9) sets --aster-port-list
@@ -1181,6 +1183,11 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
     @container (width<1020px){&:has(>:nth-child(7))>*{--aster-port-list: }}
     @container (width<1164px){&:has(>:nth-child(8))>*{--aster-port-list: }}
     @container (width<1308px){&:has(>:nth-child(9))>*{--aster-port-list: }}
+    &:has(> :nth-child(2)):not(:has(> :nth-child(4))) {
+      justify-content: flex-start;
+      & > * { inline-size: calc(50% - var(--spacing-4)); }
+      &:has(> :nth-child(3)) > * { inline-size: calc(100% / 3 - var(--spacing-4)); }
+    }
   }
   & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) {
     --card-pad: 0;
@@ -1201,9 +1208,10 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
     max-inline-size: none !important;
     margin: 0 !important;
     &:has(.zonebadge[style*="240, 144, 144"]) { order: -1; }
-    /* One row: the last tile on screen (the uplink moved first) ends 28
-       before the row's end (the inset above); a list row keeps the edge. */
-    &:not(:has(.zonebadge[style*="240, 144, 144"])):is(:last-child, :has(+ :last-child .zonebadge[style*="240, 144, 144"])) {
+    /* A row of 4 or more: the last tile on screen (the uplink moved
+       first) ends 28 before the row's end (the inset above); a list row
+       keeps the edge. */
+    &:not(:has(.zonebadge[style*="240, 144, 144"])):is(:last-child:nth-child(n+4), :nth-child(n+3):has(+ :last-child .zonebadge[style*="240, 144, 144"])) {
       margin-inline-end: var(--aster-port-list, calc(var(--aster-icon-md) + var(--spacing-2))) !important;
     }
     /* Astryx Item's start icon: ServerStack 20 (C16, LuCI's port_up /
