@@ -1603,6 +1603,12 @@ html :where(#modal_overlay > :not(.alert-message) > :not(h4:first-child, textare
    textarea per file) is a field: it keeps the content column and its own
    padding, scrolls in itself and gives way when the body is too tall. */
 html :where(#modal_overlay > :not(.alert-message) > textarea) { flex-shrink: 1; min-block-size: 0; }
+/* Text under the title starts 16 under it, the title's own margin (C18).
+   A file's heading sits 4 over its text area, a stacked label over its
+   field (C5), and 16 under the text or field before it. */
+html :where(#modal_overlay > * > h4:first-child + p) { margin-block-start: 0; }
+html :where(#modal_overlay > * > p:has(+ h5)) { margin-block-end: 0; }
+html :where(#modal_overlay > * > h5:has(+ textarea)) { margin-block: var(--spacing-4) var(--spacing-1); }
 /* Tabs in a scrolling body stay at its top, over the rows that pass. */
 html :where(#modal_overlay .cbi-tabmenu) {
   position: sticky;

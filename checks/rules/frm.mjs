@@ -417,6 +417,12 @@ export function collect(cfg) {
     for (const t of kids.filter((k) => k.matches('textarea'))) {
       check('c18.dialog', 'field start', box(t).left - cx, 0, t);
       check('c18.dialog', 'field end', cr - box(t).right, 0, t);
+      // Its heading 4 over it, as a stacked label (C5), 16 under what is
+      // before it.
+      const h = t.previousElementSibling, p = h?.previousElementSibling;
+      if (!h?.matches('h5, h6')) continue;
+      check('c18.dialog', 'label gap', box(t).top - box(h).bottom, 4, h);
+      if (p && p !== title) check('c18.dialog', 'heading gap', box(h).top - box(p).bottom, 16, h);
     }
     const foot = kids.find((k) => k.matches('.button-row, .right:last-child'));
     if (foot && kids[kids.indexOf(foot) - 1]) {

@@ -67,8 +67,13 @@ expect uniform 1 "c18.dialog conform,space.dialog gap" "dialog padding 24 (C18)"
 	--debug-css 'admin/network/network=#modal_overlay > .modal { padding: 24px !important }'
 # C18, beta user (Configure apk): the dialog body's bleed on its text
 # areas, their border on the dialog's edge, 16 short of its content end.
+expect uniform 0 "" "Configure apk: text areas in the content column, headings on them" -- "$url" "$password" --pages "$tmp/frm-pkg.txt" --viewports desktop,phone
 expect uniform 1 "c18.dialog conform" "dialog text area on the dialog edge (C18, beta)" "field start" -- "$url" "$password" --pages "$tmp/frm-pkg.txt" \
 	--debug-css 'admin/system/package-manager=#modal_overlay > .modal > textarea { margin-inline: -16px 16px !important }'
+# C18/C5, beta user: each file's heading flush on its text area and on the
+# one before it.
+expect uniform 1 "c18.dialog conform" "dialog field heading off its text area (C18, beta)" "label gap" -- "$url" "$password" --pages "$tmp/frm-pkg.txt" \
+	--debug-css 'admin/system/package-manager=#modal_overlay > .modal > h5 { margin-block: 0 !important }'
 # C19: a 12 track (Overview's is the ::after under its text).
 expect uniform 1 "c19.progress conform" "progress bar 12 high (C19)" -- "$url" "$password" --pages "$tmp/frm-ov.txt" \
 	--debug-css 'admin/status/overview=#view .cbi-progressbar::after { block-size: 12px !important }'
