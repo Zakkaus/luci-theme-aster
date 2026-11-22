@@ -710,8 +710,7 @@ html { --icon-tunnel: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
       block-size: auto;
       padding: 0 var(--spacing-2);
       border-radius: var(--radius-full);
-      background: var(--zone-bg);
-      color: var(--zone-fg);
+      background: var(--color-neutral);
       font-size: var(--text-supporting-size);
       font-weight: var(--font-weight-medium);
       line-height: var(--text-supporting-leading);
@@ -816,16 +815,9 @@ html { --icon-tunnel: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000
 /* The editor's Status: the list alone (its device icon trails the Device
    value, components.css). */
 .ifacebadge.large:not(.cbi-tooltip) { --badge-bg: transparent; display: block; padding: 0; white-space: normal; }
-/* A zone's colour (firewall.js writes it inline, the administrator's
-   data) as palette tokens: LuCI's lan green and wan red are the muted
-   success and error fills, "no zone" the neutral, any other colour mixed
-   30 % into the card; each with its own ink, light and dark. */
-[style*="--zone-color-rgb"] { --zone-bg: color-mix(in oklab, rgb(var(--zone-color-rgb)) 30%, var(--color-background-card)); --zone-fg: var(--color-text-primary); }
-[style*="144, 240, 144"] { --zone-bg: var(--color-success-muted); --zone-fg: var(--color-on-success-muted); }
-[style*="240, 144, 144"] { --zone-bg: var(--color-error-muted); --zone-fg: var(--color-on-error-muted); }
-[style*="238, 238, 238"] { --zone-bg: var(--color-neutral); }
-.zonebadge[style*="--zone-color-rgb"]:not(.cbi-tooltip *) { --badge-bg: var(--zone-bg); --badge-fg: var(--zone-fg); }
-.zonebadge[style*="--zone-color-rgb"] { background-color: var(--badge-bg) !important; /* inline zone fill */ }
+/* A zone is a neutral Badge (C13; owner 2026-11-23, wan in red: the
+   zone's colour, firewall.js's inline fill, is not shown). */
+.zonebadge[style*="--zone-color-rgb"] { background-color: var(--badge-bg, var(--color-neutral)) !important; }
 /* A verdict ("REJECT", "REJECT all others": .zonebadge-empty) and a place
    that is no zone ("this device", "any zone", "unspecified": an em alone)
    are text in LuCI's zone chip (C13: verdicts are text, Badges are zones). */

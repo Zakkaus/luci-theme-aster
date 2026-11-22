@@ -70,7 +70,7 @@
     "banner.icon": {"_source": "Astryx 0.7.16 Banner: gap icon -> text 8; a status dialog (ui.js displayStatus) keeps it", "gap": 8},
 
     "icon": {"_source": "qa2 #10: LuCI's device images (resources/icons/*.svg, bitmap look) are drawn as Heroicons; a showing one is listed", "legacy": "none"},
-    "zone": {"_source": "qa2 #10: a firewall zone's inline colour as palette tokens (success, error, neutral, or mixed into the card), light and dark", "fill": "token"},
+    "zone": {"_source": "COMPONENTS.md C13, owner 2026-11-23 (wan in red): a firewall zone's Badge, and an interface head's zone Badge, is the neutral Badge (--color-neutral); the zone's inline colour never shows", "fill": "neutral"},
     "glyph": {"_source": "Astryx draws icons (Heroicons), not characters: LuCI's ▾ ⇒ ∗ + × ··· are hidden and drawn as the icon; a showing one is listed", "raw": "none"},
     "footer": {"_source": "Astryx LayoutFooter: the save bar is a region under the main column on a wide screen, so it covers no content (px of the main column under the bar)", "overlap": 0},
     "space.page.inset": {"_source": "lab spacing audit 2026-11-20, contract approved by the owner; Astryx Stack/Card/Dialog: the container owns the gap: page inset 24 (LayoutContent) on top and both sides; bottom to the save bar where the page outgrows the column; the last block to an in-flow save bar (phone)", "padding": 24},

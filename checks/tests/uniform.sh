@@ -207,6 +207,13 @@ expect uniform 1 "icon legacy" "the editor's Status image" -- "$url" "$password"
 printf 'admin/network/firewall/zones\n' >"$tmp/zones.txt"
 expect uniform 1 "zone fill" "zone chips in LuCI's inline colours" -- "$url" "$password" --pages "$tmp/zones.txt" \
 	--debug-css 'admin/network/firewall/zones=html .zonebadge[style] { background-color: rgb(var(--zone-color-rgb)) !important }'
+# Owner 2026-11-23 ("wan 標紅色好難看"): wan in the error token, lan in the
+# success one, as before; an interface head's zone Badge in its colour.
+expect uniform 1 "zone fill" "zone Badges in status tokens" -- "$url" "$password" --pages "$tmp/zones.txt" \
+	--debug-css 'admin/network/firewall/zones=html .zonebadge[style*="240, 144, 144"] { --badge-bg: var(--color-error-muted) } html .zonebadge[style*="144, 240, 144"] { --badge-bg: var(--color-success-muted) }'
+printf 'admin/network/network\n' >"$tmp/ifaces.txt"
+expect uniform 1 "zone fill" "an interface's zone Badge in its colour" -- "$url" "$password" --pages "$tmp/ifaces.txt" --viewports desktop \
+	--debug-css 'admin/network/network=html #view .ifacebox > .ifacebox-head::after { background: rgb(var(--zone-color-rgb)) !important }'
 
 # Frames: a form row framed inside its card.
 expect uniform 1 "frame nested" "a form row framed inside its card" -- "$url" "$password" --pages "$tmp/system.txt" \

@@ -930,14 +930,20 @@ function collect(cfg) {
   }
   // LuCI's device images (resources/icons/*.svg) are drawn as Heroicons,
   // the image hidden (tooltips keep theirs); a showing one is listed. A
-  // zone's inline colour is mapped to palette tokens, never shown as is.
+  // zone's Badge (and an interface head's zone Badge) is the neutral
+  // Badge: its inline colour never shows (owner 2026-11-23).
   for (const im of scope.querySelectorAll('img[src*="/icons/"]')) {
     if (visible(im) && !im.closest('.cbi-tooltip, ' + APP_OWN) && (cfg.modal || !im.closest('#modal_overlay'))) add('icon', 'legacy', im.getAttribute('src').replace(/.*\//, ''), im);
   }
-  for (const z of scope.querySelectorAll('.zonebadge[style*="--zone-color-rgb"]')) {
+  const nb = scope.appendChild(document.createElement('span'));
+  nb.style.background = 'var(--color-neutral)';
+  const neutral = getComputedStyle(nb).backgroundColor;
+  nb.remove();
+  for (const z of scope.querySelectorAll('.zonebadge[style*="--zone-color-rgb"], .ifacebox-head[style*="--zone-color-rgb"][title]')) {
     if (!visible(z) || z.closest('.cbi-tooltip') || (!cfg.modal && z.closest('#modal_overlay'))) continue;
-    const inline = `rgb(${z.style.getPropertyValue('--zone-color-rgb').trim().split(/\s*,\s*/).join(', ')})`;
-    add('zone', 'fill', getComputedStyle(z).backgroundColor === inline ? `inline ${inline}` : 'token', z);
+    const bg = getComputedStyle(z, z.matches('.zonebadge') ? null : '::after');
+    if (bg.content === 'none' || bg.display === 'none') continue;
+    add('zone', 'fill', bg.backgroundColor === neutral ? 'neutral' : bg.backgroundColor, z);
   }
 
   // The save bar is the layout's footer: on a wide screen it sits under
