@@ -1707,6 +1707,20 @@ html :where(.cbi-tooltip[style]) { display: block; opacity: 1; }
 @starting-style {
   html :where(.cbi-tooltip[style], .cbi-tooltip-container:hover > .cbi-tooltip) { opacity: 0; }
 }
+/* A markup tooltip stays inside the window: anchored to its container
+   (fixed, so it is not clipped and never widens the page), it opens over
+   the container from its start edge; with no room for that it ends at
+   the container's end, then opens upwards (the last port tile's details
+   ran past the window's right edge and scrolled the page sideways). */
+@supports (anchor-scope: all) {
+  html :where(.cbi-tooltip-container) { anchor-scope: --aster-tip; anchor-name: --aster-tip; }
+  html :where(.cbi-tooltip-container > .cbi-tooltip) {
+    position: fixed;
+    position-anchor: --aster-tip;
+    position-area: span-block-end span-inline-end;
+    position-try-fallbacks: flip-inline, flip-block, flip-block flip-inline;
+  }
+}
 /* A key/value list inside (ui.itemlist: "<strong>Key:</strong> value"
    lines between <br>s, as the overview's DHCPv6 statistics) is a tight
    two-column table: keys on one line at medium weight, values beside

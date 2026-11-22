@@ -198,7 +198,7 @@ return baseclass.extend({
 
 				/\|/.test(p.previousSibling?.data) && p.previousSibling.remove();
 
-				if (p.matches('.nowrap:not(.cbi-tooltip *)') && !p.querySelector('.aster-v'))
+				if (p.matches('.nowrap:not(.cbi-tooltip *)') && !p.querySelector('.aster-v, .cbi-tooltip'))
 					p.replaceChildren(s, E('span', { class: 'aster-v', title: v }, [v]));
 			});
 
@@ -218,7 +218,7 @@ return baseclass.extend({
 
 			root.querySelectorAll('.network-status-table').forEach((n) => {
 				n.style.removeProperty('--aster-kv-w');
-				const w = Math.max(...[...n.querySelectorAll('.nowrap > strong:first-child')].map((s) => s.getBoundingClientRect().width));
+				const w = Math.max(...[...n.querySelectorAll('.nowrap:not(.cbi-tooltip *) > strong:first-child')].map((s) => s.getBoundingClientRect().width));
 
 				w > 0 && n.style.setProperty('--aster-kv-w', `${Math.ceil(w)}px`);
 			});
