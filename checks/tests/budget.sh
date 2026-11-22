@@ -96,7 +96,7 @@ room=$((154000 - base + 1))
 expect 1 "FAIL stylesheets" "a large rule counts" "$tmp/rule"
 
 copy js
-head -c 35300 /dev/zero | tr '\0' ' ' >>"$tmp/js/luci-static/resources/theme-aster.js"
+head -c 35600 /dev/zero | tr '\0' ' ' >>"$tmp/js/luci-static/resources/theme-aster.js"
 expect 1 "FAIL scripts" "a script over the budget" "$tmp/js"
 
 if [[ $failures -ne 0 ]]; then

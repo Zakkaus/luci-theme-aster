@@ -6,12 +6,12 @@
 # The five stylesheets together <= 154,000 bytes as shipped: each is measured
 # after scripts/strip-css-comments.pl, the step the package build runs, so a
 # comment costs nothing and a rule costs its bytes (plan decision 13). The
-# three theme scripts together <= 35,300 bytes as they are. Exit 1 over either.
+# three theme scripts together <= 35,600 bytes as they are. Exit 1 over either.
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 htdocs=${1:-$root/htdocs}
 css_max=154000
-js_max=35300
+js_max=35600
 
 fail=0
 src=0

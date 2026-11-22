@@ -167,6 +167,8 @@ return baseclass.extend({
 		const error = _('Error');
 		const row = (k, v) => E('li', { class: 'aster-row' }, [E('span', { class: 'aster-k' }, [k]), E('span', { class: 'aster-v' }, v)]);
 		const glyph = (s) => E('span', { class: 'aster-glyph', 'data-glyph': s == '▲' ? 'up' : 'down' }, s), id = /(\S+:\/\/\S+)/;
+		// A copy drops the word joiners put after hyphens below.
+		document.addEventListener('copy', (ev) => { const s = `${getSelection()}`; /⁠/.test(s) && (ev.clipboardData.setData('text/plain', s.replace(/⁠/g, '')), ev.preventDefault()); });
 		const run = () => roots.forEach((root) => {
 			const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), hits = [];
 
