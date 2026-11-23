@@ -1113,7 +1113,7 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
   padding-inline: var(--aster-bleed, 0);
   /* Nested rules keep the parent's one element of weight (& is :is()). */
   & > :where(.thead, .tbody, .tfoot, thead, tbody, tfoot) { display: contents; }
-  & :where(.tr:has(> :is(.th, th)), .tr.cbi-section-table-descr) { display: none; }
+  & :where(.tr):where(:has(> :is(.th, th)), .cbi-section-table-descr) { display: none; }
   & :where(.tr.placeholder) { display: block; grid-column: 1 / -1; }
   & :where(.tr.placeholder > :is(.td, td)) { display: block; padding-block: var(--spacing-4); text-align: center; color: var(--color-text-secondary); &::before { content: none; } }
   & :where(.tr:not(.placeholder):has(> :is(.td, td))) {
@@ -1146,14 +1146,15 @@ html :where(:is(#view, form > .cbi-map) :is(.table, table)[data-fold="fold"]) {
        breaks (identifiers wrap at spaces only). */
     & > * { grid-column: 2 / -1; justify-self: start; min-inline-size: 0; max-inline-size: 100%; margin: 0; overflow-x: clip; text-overflow: ellipsis; }
     & > .aster-v { justify-self: stretch; }
-    &::before {
-      content: attr(data-title);
-      grid-column: 1;
-      color: var(--color-text-secondary);
-      font-weight: var(--text-label-weight);
-      overflow-wrap: normal;
-      word-break: keep-all;
-    }
+  }
+  & :where(.tr:not(.placeholder)) > :where(.td)::before,
+  & :where(.tr:not(.placeholder)) > :where(td)::before {
+    content: attr(data-title);
+    grid-column: 1;
+    color: var(--color-text-secondary);
+    font-weight: var(--text-label-weight);
+    overflow-wrap: normal;
+    word-break: keep-all;
   }
   & :where(.tr > :is(.td, td):not([data-title]), .tr > :is(.td, td)[data-title=""]) {
     &::before { content: none; }
