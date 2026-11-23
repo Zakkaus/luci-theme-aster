@@ -414,7 +414,7 @@ html .shell-content .shell-inner:has(> h2[name="content"] + p + p + tt) {
       grid-area: 1 / 2;
       block-size: var(--size-element-sm);
       inline-size: var(--size-element-sm);
-      margin-block: calc(0px - var(--spacing-1));
+      margin-block: calc(-1 * var(--spacing-1));
       mask-size: var(--aster-icon-sm);
     }
   }
