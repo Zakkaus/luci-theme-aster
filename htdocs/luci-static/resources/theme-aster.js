@@ -310,11 +310,11 @@ return baseclass.extend({
 		// A copy drops the word joiners put after hyphens below.
 		document.addEventListener('copy', (ev) => { const s = `${getSelection()}`; /⁠/.test(s) && (ev.clipboardData.setData('text/plain', s.replace(/⁠/g, '')), ev.preventDefault()); });
 		const scan = (rs, ns) => {
-			const q = new Set(ns);
+			const q = new Set(ns), matches = new Map();
 			for (const { target: t, addedNodes: a } of rs) {
 				let n = t.nodeType == 1 ? t : t.parentElement, p;
 				for (; n && n !== v && n.id != 'modal_overlay'; n = n.parentElement)
-					if (n.matches(local)) p = n;
+					if (matches.get(n) ?? matches.set(n, n.matches(local)).get(n)) p = n;
 				if (n) p || t.nodeType == 3 ? q.add(p || t) : a.forEach(e => e.parentNode == t && q.add(e));
 			}
 			const defer = t => t?.checkVisibility() === false && (ro.observe(t), pending.add(t));
