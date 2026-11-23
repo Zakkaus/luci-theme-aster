@@ -1229,8 +1229,10 @@ html #view .nft-chain > .nft-rules.cbi-section-table {
 }
 /* Folded, a chain's hook list and its rules are two groups of its card:
    a Divider 16 under the list and 16 over the first rule (C22), as the
-   rules have one between them. */
-html #view .nft-chain-hook:has(+ .nft-rules[data-fold="fold"]) { padding-block-end: var(--aster-space-region); border-block-end: var(--border-width) solid var(--color-border); }
+   rules have one between them. LuCI renders the hook and its table as
+   the last two siblings. Check their order without making a table's
+   live data-fold a :has() input. */
+html #view .nft-chain-hook:where(:nth-last-child(2)):nth-last-child(2 of .nft-chain-hook, .nft-rules:where([data-fold="fold"])) { padding-block-end: var(--aster-space-region); border-block-end: var(--border-width) solid var(--color-border); }
 /* Wide, a clause is one line (its set clipped by LuCI, items in the set's
    tooltip): a chain where a clause and its action do not fit folds, small
    or large (C7), instead of shrinking the clause into a column. (Measured
