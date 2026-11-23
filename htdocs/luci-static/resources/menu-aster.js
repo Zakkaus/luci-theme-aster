@@ -2,7 +2,6 @@
 'require baseclass';
 'require ui';
 'require theme-aster';
-'require progressbar-aster';
 
 /* The side nav and the mode row are in the page already: header.ut renders
  * them from the same menu tree, so they are part of the first paint and stand

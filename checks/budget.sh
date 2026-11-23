@@ -6,7 +6,7 @@
 # The five stylesheets together <= 154,000 bytes as shipped: each is measured
 # after scripts/strip-css-comments.pl, the step the package build runs, so a
 # comment costs nothing and a rule costs its bytes (plan decision 13). The
-# three theme scripts together <= 35,600 bytes as they are. Exit 1 over either.
+# two theme scripts together <= 35,600 bytes as they are. Exit 1 over either.
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 htdocs=${1:-$root/htdocs}
@@ -32,7 +32,7 @@ else
 fi
 
 total=0
-for f in theme menu progressbar; do
+for f in theme menu; do
 	total=$((total + $(wc -c <"$htdocs/luci-static/resources/$f-aster.js")))
 done
 if [ "$total" -gt "$js_max" ]; then

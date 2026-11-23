@@ -1390,7 +1390,6 @@ html :where(.cbi-progressbar)::before {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-html :where(.cbi-progressbar .bar-ink) { display: none; }
 /* Spinner (Astryx): a status line (.spinning) leads with a 16 ring, its
    accent arc (3/8 of the ring) turning on the muted track, 8 before the
    loading words; stopped (reduced motion, a still capture) it rests. */
