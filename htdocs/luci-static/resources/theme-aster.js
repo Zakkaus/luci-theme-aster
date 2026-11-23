@@ -313,8 +313,20 @@ return baseclass.extend({
 		}));
 		let said;
 		const error = _('Error'), id = /(\S+:\/\/\S+)/, arrow = /([▲▼])/, colon = /\s*[:：]\s*$/;
+		// nlbw later sets display on the value's new parent, not the row.
+		const hide = (v) => v.parentNode.toggleAttribute('hidden', v.style.display != 'list-item');
+		const kpi = new MutationObserver((rs) => rs.forEach(({ target }) => hide(target)));
 		const span = (c, v, a) => E('span', { class: `aster-${c}`, ...a }, v);
-		const row = (k, v) => E('li', { class: 'aster-row' }, v ? [span('k', [k]), span('v', v)] : k);
+		const row = (k, v, li) => {
+			const r = E('li', { class: 'aster-row' }, v ? [span('k', [k]), span('v', v)] : k);
+			if (v && li?.closest('.kpi')) {
+				const p = r.lastChild;
+				p.style.display = li.style.display;
+				hide(p);
+				kpi.observe(p, { attributeFilter: ['style'] });
+			}
+			return r;
+		};
 		// A copy drops the word joiners put after hyphens below.
 		document.addEventListener('copy', (ev) => { const s = `${getSelection()}`; /⁠/.test(s) && (ev.clipboardData.setData('text/plain', s.replace(/⁠/g, '')), ev.preventDefault()); });
 		const run = (ns) => {
@@ -363,7 +375,7 @@ return baseclass.extend({
 			each(rows, (li) => li.replaceWith(...li.innerHTML.split(/[，,] *(?=[^<]*[:：] *<)/).map((h) => {
 				const [k, v] = h.split(/[:：] *(.*)/s);
 
-				return row(v ? k : h, v);
+				return row(v ? k : h, v, li);
 			})));
 
 			each('.ifacebadge:has(img,em)', ({ firstChild: t }) => /:\s*$/.test(t.data) && (t.data = t.data.split(':')[0]));

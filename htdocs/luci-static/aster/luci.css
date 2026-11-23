@@ -896,12 +896,13 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
 .nft-rules .td > .ifacebadge { margin: 0 var(--spacing-2) 0 0; vertical-align: top; }
 /* A chain's hook line and nlbw's summary are MetadataLists (C8):
    theme-aster.js splits LuCI's "Hook: input (…), Priority: 0", "Policy:
-   drop (…)" and "主機數: <big>17</big>" into rows; a sentence with no
-   "label:" (English "17 hosts") is one line. A split summary row shows
-   before nlbw fills it, with LuCI's placeholder: nlbw marks the value's
-   parent (now .aster-v) list-item, and only a :has() on that inline
-   style could hide the row, which made every poll restyle the page. */
+   drop (…)" and "主機數: <big>17</big>" into rows. A split summary stays
+   hidden until nlbw shows its value; a sentence with no "label:"
+   (English "17 hosts") stays on one line. */
+.kpi li.aster-row[hidden] { display: none; }
 .kpi li.aster-row:not(:has(> .aster-k)) { grid-column: 1 / -1; margin: 0; }
+/* LuCI appends its unsplit host tooltip outside the marked view. */
+.cbi-tooltip .kpi li { display: none; }
 .head { gap: var(--spacing-6); }
 /* Beats nlbw.css's later ".head .kpi" (centred, 5 padding): on a phone the
    summary below the pies starts at the card's content edge. */
