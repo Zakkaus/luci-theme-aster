@@ -299,79 +299,104 @@ return baseclass.extend({
 	 *  - "K: <b>v</b>, …" (nft hook, nlbw kpi) and WireGuard's " · Port N
 	 *    · key", wireless' "K: v | K: v" become rows. */
 	marks() {
-		const roots = ['view', 'modal_overlay'].map((id) => document.getElementById(id)).filter(Boolean);
-		const error = _('Error');
-		const row = (k, v) => E('li', { class: 'aster-row' }, [E('span', { class: 'aster-k' }, [k]), E('span', { class: 'aster-v' }, v)]);
-		const glyph = (s) => E('span', { class: 'aster-glyph', 'data-glyph': s == '▲' ? 'up' : 'down' }, s), id = /(\S+:\/\/\S+)/;
+		const v = document.getElementById('view'), shell = v?.closest('.shell-inner');
+		const roots = document.querySelectorAll('#view,#modal_overlay');
+		const labels = 'label,.cbi-value-title,.nft-rules .ifacebadge,.modal .cbi-section>strong', rows = ':is(.nft-chain-hook,.kpi) li:not(.aster-row)';
+		const h3 = '.cbi-section>h3', net = '.network-status-table', table = '.table:not(:has(.th))';
+		const local = `${labels},${rows},${h3},${net},${table},.ifacebadge,#view>p,.nowrap,span:has(>strong)`;
+		const kv = '--aster-kv-w';
+		// Read after layout; a lease-table replacement otherwise forces a full layout here.
+		const ro = new ResizeObserver((rs) => rs.forEach(({ target: n }) => {
+			ro.unobserve(n);
+			const w = Math.max(...Array.from(n.querySelectorAll('.nowrap:not(.cbi-tooltip *)>strong:first-child'), (s) => s.getBoundingClientRect().width));
+			if (w > 0) queueMicrotask(() => n.style.setProperty(kv, `${Math.ceil(w)}px`));
+		}));
+		let said;
+		const error = _('Error'), id = /(\S+:\/\/\S+)/, arrow = /([▲▼])/, colon = /\s*[:：]\s*$/;
+		const span = (c, v, a) => E('span', { class: `aster-${c}`, ...a }, v);
+		const row = (k, v) => E('li', { class: 'aster-row' }, v ? [span('k', [k]), span('v', v)] : k);
 		// A copy drops the word joiners put after hyphens below.
 		document.addEventListener('copy', (ev) => { const s = `${getSelection()}`; /⁠/.test(s) && (ev.clipboardData.setData('text/plain', s.replace(/⁠/g, '')), ev.preventDefault()); });
-		const run = () => roots.forEach((root) => {
-			const walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), hits = [];
-
-			for (let n; n = walk.nextNode();) {
-				/-\b/.test(n.data) && n.parentNode.matches('.assoclist .td > :not(.ifacebadge) > span, .td > [style*=word-break]') && (n.data = n.data.replace(/-\b/g, '-\u2060'));
-				(/[▲▼]/.test(n.data) || id.test(n.data) && n.parentNode.closest('.td, td')) && !n.parentNode.closest('.aster-glyph, .aster-id, .cbi-tooltip, textarea, option') && hits.push(n);
+		const run = (ns) => {
+			const each = (s, f, set = ns) => set.forEach((n) => {
+				n.matches?.(s) && f(n);
+				n.querySelectorAll?.(s).forEach(f);
+			});
+			for (const root of ns) {
+				const walk = document.createNodeIterator(root, NodeFilter.SHOW_TEXT);
+				for (let n; n = walk.nextNode();) {
+					const p = n.parentNode;
+					/-\b/.test(n.data) && p.matches('.assoclist .td>:not(.ifacebadge)>span,.td>[style*=word-break]') && (n.data = n.data.replace(/-\b/g, '-\u2060'));
+					const s = n.data, a = arrow.test(s);
+					if ((a || id.test(s) && p.closest('.td,td')) && !p.closest('.aster-glyph,.aster-id,.cbi-tooltip,textarea,option'))
+						n.replaceWith(...s.split(a ? arrow : id).flatMap((t, i) => i % 2
+							? (a ? span('glyph', t, { 'data-glyph': t == '▲' ? 'up' : 'down' }) : span('id', [t], { title: t }))
+							: (!a ? t : t ? t.trim() : [])));
+				}
 			}
 
-			hits.forEach((n) => n.replaceWith(...(/[▲▼]/.test(n.data) ? n.data.split(/([▲▼])/).filter(Boolean).map((s) => /^[▲▼]$/.test(s) ? glyph(s) : s.trim()) : n.data.split(id).map((s, i) => i % 2 ? E('span', { class: 'aster-id', title: s }, [s]) : s))));
+			if (shell?.querySelector('h2:not(.aster-title)'))
+				v.querySelector('.aster-title')?.remove();
+			else if (v?.firstElementChild && !v.querySelector('.aster-title,.spinning')) {
+				const cur = document.querySelector('#mainmenu [aria-current=page]');
+				cur && v.prepend(E('h2', { class: 'aster-title' }, [cur.textContent.trim()]));
+			}
+			// Only duplicate titles depend on the titles and tabs of the whole page.
+			const names = Array.from(document.querySelectorAll('.shell-inner h2,.cbi-tabmenu>li,.tab[data-active]'), (e) => e.textContent.trim());
+			const all = said != (said = names.join('\0'));
+			each(h3, (h) => h.classList.toggle('aster-said', names.includes(h.textContent.trim())), all ? roots : ns);
+			each(labels, (l) => l.childNodes.forEach((n) => colon.test(n.data) && (n.data = n.data.replace(colon, ''))));
+			each('span:not(.aster-error)>strong:first-child', (s) => s.textContent.trim().replace(/[:：]$/, '') == error && s.parentNode.classList.add('aster-error'));
 
-			const v = document.getElementById('view');
-			const cur = [...document.querySelectorAll('#mainmenu [aria-current="page"]')].pop();
-
-			if (root === v && document.querySelector('.shell-inner h2:not(.aster-title)'))
-				v.querySelectorAll(':scope > .aster-title').forEach((h) => h.remove());
-			else if (root === v && cur && v.firstElementChild && !document.querySelector('.aster-title, #view .spinning'))
-				v.prepend(E('h2', { class: 'aster-title' }, [cur.textContent.trim()]));
-
-			const said = [...document.querySelectorAll('.shell-inner h2, .cbi-tabmenu > li, .tab[data-active]')].map((e) => e.textContent.trim());
-
-			root.querySelectorAll('.cbi-section > h3').forEach((h) => h.classList.toggle('aster-said', said.includes(h.textContent.trim())));
-			root.querySelectorAll('label, .cbi-value-title, .nft-rules .ifacebadge, .modal .cbi-section > strong').forEach((l) => l.childNodes.forEach((n) => /[:：]\s*$/.test(n.data) && (n.data = n.data.replace(/\s*[:：]\s*$/, ''))));
-
-			root.querySelectorAll('span:not(.aster-error) > strong:first-child').forEach((s) => s.textContent.trim().replace(/[:：]$/, '') == error && s.parentNode.classList.add('aster-error'));
-
-			root.querySelectorAll('.ifacebox-body .nowrap > strong:first-child, [id$="-ifc-description"] > .nowrap > strong:first-child, .ifacebadge.large > span > .nowrap > strong:first-child, .table:not(:has(.th)) .td > strong:only-child, [data-name="_stat"] .nowrap > strong').forEach((s) => {
-				const t = s.textContent.replace(/\s*[:：]\s*$/, '');
-
+			each(`:is(.ifacebox-body .nowrap,:is([id$="-ifc-description"],.ifacebadge.large>span)>.nowrap)>strong:first-child,${table} .td>strong:only-child,[data-name="_stat"] .nowrap>strong`, (s) => {
+				const t = s.textContent.replace(colon, '');
 				t != s.textContent && (s.textContent = t);
 
 				const p = s.parentNode, v = p.textContent.slice(t.length).replace(/\((\S+) /g, '($1\xa0');
 
 				/\|/.test(p.previousSibling?.data) && p.previousSibling.remove();
 
-				if (p.matches('.nowrap:not(.cbi-tooltip *)') && !p.querySelector('.aster-v, .cbi-tooltip'))
-					p.replaceChildren(s, E('span', { class: 'aster-v', title: v }, [v]));
+				if (p.matches('.nowrap:not(.cbi-tooltip *)') && !p.querySelector('.aster-v,.cbi-tooltip'))
+					p.replaceChildren(s, span('v', [v], { title: v }));
 			});
 
-			root.querySelectorAll('.nft-chain-hook li:not(.aster-row), .kpi li:not(.aster-row)').forEach((li) => li.replaceWith(...li.innerHTML.split(/[，,] *(?=[^<]*[:：] *<)/).map((h) => {
+			each(rows, (li) => li.replaceWith(...li.innerHTML.split(/[，,] *(?=[^<]*[:：] *<)/).map((h) => {
 				const [k, v] = h.split(/[:：] *(.*)/s);
 
-				return v ? row(k, v) : E('li', { class: 'aster-row' }, h);
+				return row(v ? k : h, v);
 			})));
 
-			root.querySelectorAll('.ifacebadge:has(img, em)').forEach(({ firstChild: t }) => /:\s*$/.test(t.data) && (t.data = t.data.split(':')[0]));
+			each('.ifacebadge:has(img,em)', ({ firstChild: t }) => /:\s*$/.test(t.data) && (t.data = t.data.split(':')[0]));
 
-			root.querySelectorAll('#view > p > .ifacebadge + span').forEach((s) => {
+			each('#view>p>.ifacebadge+span', (s) => {
 				const [, k, n] = s.textContent.match(/([^\s·\d][^·\d]*?) *(\d+)/) || [], c = s.querySelector('code');
 
 				n && c && (c.title = c.textContent, s.parentNode.replaceChildren(E('ul', { class: 'aster-kv' }, [row(k, n), row(_('Public Key'), c)])));
 			});
-
-			root.querySelectorAll('.network-status-table').forEach((n) => {
-				n.style.removeProperty('--aster-kv-w');
-				const w = Math.max(...[...n.querySelectorAll('.nowrap:not(.cbi-tooltip *) > strong:first-child')].map((s) => s.getBoundingClientRect().width));
-
-				w > 0 && n.style.setProperty('--aster-kv-w', `${Math.ceil(w)}px`);
+			each(net, (n) => {
+				n.style.removeProperty(kv);
+				ro.observe(n);
 			});
+		};
+		const mo = new MutationObserver((rs) => {
+			const q = new Set();
+			for (const { target: t, addedNodes: a } of rs) {
+				let n = t.nodeType == 1 ? t : t.parentElement, p;
+				for (; n && n !== v && n.id != 'modal_overlay'; n = n.parentElement)
+					if (n.matches(local)) p = n;
+				if (!n) continue;
+				if (p || t.nodeType == 3) q.add(p || t);
+				else a.forEach((e) => e.parentNode == t && q.add(e));
+			}
+			for (const n of q)
+				for (let p = n.parentElement; p; p = p.parentElement)
+					if (q.has(p) && q.delete(n)) break;
+			run(q);
+			// All records since run() are from our writes.
+			mo.takeRecords();
 		});
-		let queued = false;
-		const observer = new MutationObserver(() => {
-			if (!queued)
-				queued = requestAnimationFrame(() => { queued = false; run(); });
-		});
-
-		run();
-		roots.forEach((root) => observer.observe(root, { childList: true, subtree: true, characterData: true }));
+		run(roots);
+		roots.forEach((r) => mo.observe(r === v && shell || r, { childList: true, subtree: true, characterData: true, attributeFilter: ['data-active'] }));
 	},
 
 	/* ui.js's tooltip (one node it fills and moves on hover) is the Tooltip
