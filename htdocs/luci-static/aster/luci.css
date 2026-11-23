@@ -1178,21 +1178,21 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
     justify-content: space-between;
     gap: var(--spacing-4) !important;
     margin: 0 !important;
-    @container (width<336px){&:has(>:nth-child(2))>*{--aster-port-list: }}
-    @container (width<512px){&:has(>:nth-child(3))>*{--aster-port-list: }}
-    @container (width<588px){&:has(>:nth-child(4))>*{--aster-port-list: }}
-    @container (width<732px){&:has(>:nth-child(5))>*{--aster-port-list: }}
-    @container (width<876px){&:has(>:nth-child(6))>*{--aster-port-list: }}
-    @container (width<1020px){&:has(>:nth-child(7))>*{--aster-port-list: }}
-    @container (width<1164px){&:has(>:nth-child(8))>*{--aster-port-list: }}
-    @container (width<1308px){&:has(>:nth-child(9))>*{--aster-port-list: }}
-    &:has(> :nth-child(2)):not(:has(> :nth-child(4))) > * {
+    @container (width<336px){&:has(>:nth-child(2))>:where(.ifacebox){--aster-port-list: }}
+    @container (width<512px){&:has(>:nth-child(3))>:where(.ifacebox){--aster-port-list: }}
+    @container (width<588px){&:has(>:nth-child(4))>:where(.ifacebox){--aster-port-list: }}
+    @container (width<732px){&:has(>:nth-child(5))>:where(.ifacebox){--aster-port-list: }}
+    @container (width<876px){&:has(>:nth-child(6))>:where(.ifacebox){--aster-port-list: }}
+    @container (width<1020px){&:has(>:nth-child(7))>:where(.ifacebox){--aster-port-list: }}
+    @container (width<1164px){&:has(>:nth-child(8))>:where(.ifacebox){--aster-port-list: }}
+    @container (width<1308px){&:has(>:nth-child(9))>:where(.ifacebox){--aster-port-list: }}
+    &:has(> :nth-child(2)):not(:has(> :nth-child(4))) > :where(.ifacebox) {
       inline-size: calc(50% - var(--spacing-2));
       padding: var(--aster-port-list, var(--spacing-3) var(--spacing-4));
       border-radius: var(--aster-port-list, var(--radius-element));
       background: var(--aster-port-list, var(--color-background-muted));
     }
-    &:has(> :nth-child(3)):not(:has(> :nth-child(4))) > * { inline-size: calc((100% - 2 * var(--spacing-4)) / 3); }
+    &:has(> :nth-child(3)):not(:has(> :nth-child(4))) > :where(.ifacebox) { inline-size: calc((100% - 2 * var(--spacing-4)) / 3); }
   }
   & .ifacebox:has(> .ifacebox-body > img[src*="/port_"]) {
     --card-pad: 0;
