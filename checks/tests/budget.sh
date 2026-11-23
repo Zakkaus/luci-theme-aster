@@ -95,8 +95,16 @@ room=$((154000 - base + 1))
 { printf '.budget-test{--x:"'; head -c "$room" /dev/zero | tr '\0' 'r'; printf '"}\n'; } >>"$tmp/rule/luci-static/aster/luci.css"
 expect 1 "FAIL stylesheets" "a large rule counts" "$tmp/rule"
 
+expect 0 "ok   scripts" "committed scripts" "$root/htdocs"
+jsbase=$(bash "$root/checks/budget.sh" | sed -n 's/^ok   scripts: \([0-9]*\) B.*/\1/p')
+
+# The same for scripts, through jsmin: a comment is free, code is not.
+copy jscomment
+{ printf '/*'; head -c 100000 /dev/zero | tr '\0' 'c'; printf '*/\n'; } >>"$tmp/jscomment/luci-static/resources/theme-aster.js"
+expect 0 "ok   scripts: $jsbase B shipped" "a large script comment does not count" "$tmp/jscomment"
+
 copy js
-head -c 35600 /dev/zero | tr '\0' ' ' >>"$tmp/js/luci-static/resources/theme-aster.js"
+{ printf 'var budgetTest="'; head -c $((23000 - jsbase + 1)) /dev/zero | tr '\0' 'r'; printf '";\n'; } >>"$tmp/js/luci-static/resources/theme-aster.js"
 expect 1 "FAIL scripts" "a script over the budget" "$tmp/js"
 
 if [[ $failures -ne 0 ]]; then
