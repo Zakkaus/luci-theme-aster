@@ -3,18 +3,11 @@
 
 function tableChanges(rs, view, sel, touch, add) {
 	const targets = new Set(), roots = new Set();
-	for (const r of rs) {
-		if (!r.removedNodes.length && r.addedNodes.length == 1 && r.addedNodes[0].classList?.contains('aster-more'))
-			continue;
-		targets.add(r.target);
-		for (const n of r.addedNodes)
-			if (n.nodeType == 1)
-				roots.add(n);
-	}
-	for (const n of targets) {
-		const el = n.nodeType == 1 ? n : n.parentElement;
-		if (view.contains(el))
-			touch(el, roots);
+	for (const {target: t, addedNodes: a, removedNodes: r} of rs) {
+		if (!r.length && a.length == 1 && a[0].classList?.contains('aster-more')) continue;
+		const n = t.nodeType == 1 ? t : t.parentElement;
+		if (!targets.has(n) && view.contains(n)) targets.add(n), touch(n, roots);
+		for (const c of a) if (c.nodeType == 1) roots.add(c);
 	}
 	for (const n of roots) {
 		if (!view.contains(n))
@@ -66,33 +59,34 @@ return baseclass.extend({
 	 * its card; it reopens only with 16 to spare (the fold's scroll bar).
 	 * Refitted when the card's width or the table's size changes. */
 	fold() {
-		const view = document.getElementById('maincontent'), parents = new Map(), q = new Set(), resized = new Set(),
-			sel = ':is(#view, form > .cbi-map) :is(.table, table):is(:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th), .cbi-section-table):not(:has(.diag-action))';
+		const view = document.getElementById('maincontent'), q = new Set(),
+			sel = ':is(#view,form>.cbi-map) :is(.table,table):is(:has(>.tr>.th,>:is(.thead,thead,tbody)>.tr>.th),.cbi-section-table):not(:has(.diag-action))';
 		if (!view)
 			return;
-		const fitted = [];
+		const memo = new Map();
 
 		const width = (p) => {
 			const s = getComputedStyle(p);
 			return p.clientWidth - parseFloat(s.paddingLeft) - parseFloat(s.paddingRight);
 		};
 		const fit = (t) => {
-			const p = t.parentElement, ts = getComputedStyle(t), was = t.dataset.fold == 'fold';
-
-			if (!p?.clientWidth || !t.matches(sel))
-				return;
-
-			if (t.dataset.fold != 'wide')
-				t.dataset.fold = 'wide';
+			const p = t.parentElement;
+			if (!p?.clientWidth || !t.checkVisibility() || !t.matches(sel)) return sz.delete(t), q.delete(t);
+			const {id, dataset: d} = t;
+			/* LuCI rebinds data-idref. Keep data-fold in the key for hysteresis. */
+			const k = /^(status_leases6?|lease6?_status_table)$/.test(id) &&
+				[innerWidth, width(p), t.outerHTML.replace(/ data-idref="[^"]*"/g, '')].join('\0'), old = memo.get(id);
+			if (old?.p === p && old.k === k) return d.fold = old.fold;
+			const s = getComputedStyle(t), gap = parseFloat(s.marginLeft) + parseFloat(s.marginRight), h = d.fold == 'fold' ? -15.5 : 0.5;
+			d.fold = 'wide';
 			t.classList.add('aster-probe');
 			/* Not an inline style: [style] rules stay put. */
 			const probe = t.animate([{ width: 'min-content' }], { fill: 'forwards' });
-			const need = t.scrollWidth, room = width(p) - parseFloat(ts.marginLeft) - parseFloat(ts.marginRight);
+			const fold = t.scrollWidth > width(p) - gap + h;
 			probe.cancel();
 			t.classList.remove('aster-probe');
-			if (need > room + 0.5 - (was ? 16 : 0))
-				t.dataset.fold = 'fold';
-			fitted.push(t);
+			if (fold) d.fold = 'fold';
+			if (k) memo.set(id, {p, k, fold: d.fold});
 		};
 		const format = (t) => {
 			/* nftables' comment mark follows the rule's words. */
@@ -116,48 +110,32 @@ return baseclass.extend({
 				(n[1] || n[0]?.nodeType == 3) && !c.matches('.cbi-section-actions') && c.replaceChildren(E('div', { class: 'aster-v' }, n));
 			}));
 		};
-		const sz = new WeakMap(), dim = (t) => t.offsetWidth + 'x' + t.offsetHeight;
-		const ro = new ResizeObserver((es) => (es.forEach((e) => resized.add(e.target)), schedule()));
-		const add = (t) => {
-			const p = t.parentElement;
-			if (!parents.has(p)) {
-				parents.set(p, { width: width(p), tables: new Set() });
-				ro.observe(p);
+		const sz = new WeakMap(), dim = t => `${t.offsetWidth}x${t.offsetHeight}`;
+		const ro = new ResizeObserver((es) => {
+			for (const {target: t, contentRect: {width: w}} of es) {
+				if (!view.contains(t)) ro.unobserve(t);
+				else if (t.matches(sel)) {
+					if (sz.get(t) != dim(t)) q.add(t);
+				} else {
+					/* add() already queued the children for the first delivery. */
+					if (w != (sz.get(t) ?? w)) for (const c of t.children) if (c.matches(sel)) q.add(c);
+					sz.set(t, w);
+				}
 			}
-			parents.get(p).tables.add(t);
+			q.size && schedule();
+		});
+		const add = (t) => {
+			if (!t) return;
+			ro.observe(t.parentElement);
 			ro.observe(t);
 			q.add(t);
 		};
-		const collect = (rs) => {
-			if (rs.some((r) => r.removedNodes.length))
-				for (const [p, { tables }] of parents) {
-					for (const t of tables)
-						if (t.parentElement !== p || !view.contains(t))
-							tables.delete(t), q.delete(t), ro.unobserve(t);
-					if (!tables.size)
-						ro.unobserve(p), parents.delete(p);
-				}
-			tableChanges(rs, view, sel, (n) => {
-				const t = n.closest(sel);
-				if (t && view.contains(t))
-					add(t);
-			}, add);
-		};
+		const collect = rs => tableChanges(rs, view, sel, n => add(n.closest(sel)), add);
 		const schedule = tableFrame(() => {
 			collect(mo.takeRecords());
-			for (const p of resized) {
-				const entry = parents.get(p), w = entry && width(p);
-				if (entry && entry.width !== w) {
-					entry.width = w;
-					entry.tables.forEach((t) => q.add(t));
-				} else if (!entry && sz.get(p) != dim(p))
-					q.add(p);
-			}
-			resized.clear();
 			q.forEach(fit);
 			/* Batch row mutations so :has() restyles the view once. */
-			fitted.forEach(format);
-			fitted.length = 0;
+			q.forEach(format);
 			q.forEach((t) => sz.set(t, dim(t)));
 			q.clear();
 			/* Drop this fit's own cell and comment moves. */
@@ -305,10 +283,12 @@ return baseclass.extend({
 		const h3 = '.cbi-section>h3', net = '.network-status-table', table = '.table:not(:has(.th))';
 		const local = `${labels},${rows},${h3},${net},${table},.ifacebadge,#view>p,.nowrap,span:has(>strong)`;
 		const kv = '--aster-kv-w';
+		const pending = new WeakSet(), tables = '.table,table';
 		// Read after layout; a lease-table replacement otherwise forces a full layout here.
-		const ro = new ResizeObserver((rs) => rs.forEach(({ target: n }) => {
+		const ro = new ResizeObserver(es => es.forEach(({target: n, contentRect: r}) => {
+			if (!(r.width || r.height)) return;
+			if (pending.delete(n)) return ro.unobserve(n), scan(mo.takeRecords(), [n]);
 			const w = Math.max(...Array.from(n.querySelectorAll('.nowrap:not(.cbi-tooltip *)>strong:first-child'), (s) => s.getBoundingClientRect().width));
-			/* Hidden (an inactive tab), it is measured when it shows. */
 			if (w > 0) ro.unobserve(n), queueMicrotask(() => n.style.setProperty(kv, `${Math.ceil(w)}px`));
 		}));
 		let said;
@@ -329,18 +309,33 @@ return baseclass.extend({
 		};
 		// A copy drops the word joiners put after hyphens below.
 		document.addEventListener('copy', (ev) => { const s = `${getSelection()}`; /⁠/.test(s) && (ev.clipboardData.setData('text/plain', s.replace(/⁠/g, '')), ev.preventDefault()); });
-		const run = (ns) => {
-			const each = (s, f, set = ns) => set.forEach((n) => {
-				n.matches?.(s) && f(n);
-				n.querySelectorAll?.(s).forEach(f);
+		const scan = (rs, ns) => {
+			const q = new Set(ns);
+			for (const { target: t, addedNodes: a } of rs) {
+				let n = t.nodeType == 1 ? t : t.parentElement, p;
+				for (; n && n !== v && n.id != 'modal_overlay'; n = n.parentElement)
+					if (n.matches(local)) p = n;
+				if (n) p || t.nodeType == 3 ? q.add(p || t) : a.forEach(e => e.parentNode == t && q.add(e));
+			}
+			const defer = t => t?.checkVisibility() === false && (ro.observe(t), pending.add(t));
+			for (const n of q) {
+				let p = n.parentElement;
+				while (p && !q.has(p)) p = p.parentElement;
+				if (p || defer((n.nodeType == 1 ? n : n.parentElement)?.closest(tables))) q.delete(n);
+				else n.querySelectorAll?.(tables).forEach(defer);
+			}
+			const visible = (n) => !pending.has(n.closest(tables));
+			const each = (s, f, set = q) => set.forEach((n) => {
+				n.matches?.(s) && visible(n) && f(n);
+				n.querySelectorAll?.(s).forEach((e) => visible(e) && f(e));
 			});
-			for (const root of ns) {
+			for (const root of q) {
 				const walk = document.createNodeIterator(root, NodeFilter.SHOW_TEXT);
 				for (let n; n = walk.nextNode();) {
 					const p = n.parentNode;
-					/-\b/.test(n.data) && p.matches('.assoclist .td>:not(.ifacebadge)>span,.td>[style*=word-break]') && (n.data = n.data.replace(/-\b/g, '-\u2060'));
+					/-\b/.test(n.data) && p.matches('.assoclist .td>:not(.ifacebadge)>span,.td>[style*=word-break]') && visible(p) && (n.data = n.data.replace(/-\b/g, '-\u2060'));
 					const s = n.data, a = arrow.test(s);
-					if ((a || id.test(s) && p.closest('.td,td')) && !p.closest('.aster-glyph,.aster-id,.cbi-tooltip,textarea,option'))
+					if ((a || id.test(s) && p.closest('.td,td')) && visible(p) && !p.closest('.aster-glyph,.aster-id,.cbi-tooltip,textarea,option'))
 						n.replaceWith(...s.split(a ? arrow : id).flatMap((t, i) => i % 2
 							? (a ? span('glyph', t, { 'data-glyph': t == '▲' ? 'up' : 'down' }) : span('id', [t], { title: t }))
 							: (!a ? t : t ? t.trim() : [])));
@@ -356,7 +351,7 @@ return baseclass.extend({
 			// Only duplicate titles depend on the titles and tabs of the whole page.
 			const names = Array.from(document.querySelectorAll('.shell-inner h2,.cbi-tabmenu>li,.tab[data-active]'), (e) => e.textContent.trim());
 			const all = said != (said = names.join('\0'));
-			each(h3, (h) => h.classList.toggle('aster-said', names.includes(h.textContent.trim())), all ? roots : ns);
+			each(h3, (h) => h.classList.toggle('aster-said', names.includes(h.textContent.trim())), all ? roots : q);
 			each(labels, (l) => l.childNodes.forEach((n) => colon.test(n.data) && (n.data = n.data.replace(colon, ''))));
 			each('span:not(.aster-error)>strong:first-child', (s) => s.textContent.trim().replace(/[:：]$/, '') == error && s.parentNode.classList.add('aster-error'));
 
@@ -389,26 +384,12 @@ return baseclass.extend({
 				n.style.removeProperty(kv);
 				ro.observe(n);
 			});
-		};
-		const mo = new MutationObserver((rs) => {
-			const q = new Set();
-			for (const { target: t, addedNodes: a } of rs) {
-				let n = t.nodeType == 1 ? t : t.parentElement, p;
-				for (; n && n !== v && n.id != 'modal_overlay'; n = n.parentElement)
-					if (n.matches(local)) p = n;
-				if (!n) continue;
-				if (p || t.nodeType == 3) q.add(p || t);
-				else a.forEach((e) => e.parentNode == t && q.add(e));
-			}
-			for (const n of q)
-				for (let p = n.parentElement; p; p = p.parentElement)
-					if (q.has(p) && q.delete(n)) break;
-			run(q);
-			// All records since run() are from our writes.
+			// Only records from this scan's writes remain.
 			mo.takeRecords();
-		});
-		run(roots);
+		};
+		const mo = new MutationObserver(rs => scan(rs));
 		roots.forEach((r) => mo.observe(r === v && shell || r, { childList: true, subtree: true, characterData: true, attributeFilter: ['data-active'] }));
+		scan([], roots);
 	},
 
 	/* ui.js's tooltip (one node it fills and moves on hover) is the Tooltip
