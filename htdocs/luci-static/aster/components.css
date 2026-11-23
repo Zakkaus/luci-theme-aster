@@ -1040,7 +1040,7 @@ html #view [data-fold="fold"] :is([id*="lease"] .td, .td.cbi-section-table-title
    hubminimatter-" over "6847c8.lan)"). theme-aster.js measures the table
    (width: min-content) with the host wrapping, as before, so the leases
    stay wide at 1440. */
-[data-fold="wide"]:not([style*="min-content"]) :is(#status_leases .td:nth-last-child(7), #status_leases6 .td:nth-last-child(6)):nth-child(2) { max-width: 0; width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+[data-fold="wide"]:not(.aster-probe) :is(#status_leases .td:nth-last-child(7), #status_leases6 .td:nth-last-child(6)):nth-child(2) { max-width: 0; width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 /* A URL in a cell's prose (a package's description) is theme-aster.js's
    .aster-id: it does not widen its table, breaks anywhere and shows its
    first line, its full text the title (B4). */

@@ -62,18 +62,15 @@ return baseclass.extend({
 		this.fold();
 	},
 
-	/* Every data table (Table, components.css) folds where it does not fit
-	 * its card, whatever the window: each is measured unfolded (data-fold
-	 * "wide") at its narrowest (min-content) and folds when that is wider
-	 * than its room; folded, it opens again only with 16 to spare, so the
-	 * scroll bar a taller fold brings does not flip it back. A table is
-	 * fitted again on the next frame when its card's width or, since its
-	 * last fit, its own size changes (the web font lands). */
+	/* A data table folds when, unfolded at min-content, it is wider than
+	 * its card; it reopens only with 16 to spare (the fold's scroll bar).
+	 * Refitted when the card's width or the table's size changes. */
 	fold() {
 		const view = document.getElementById('maincontent'), parents = new Map(), q = new Set(), resized = new Set(),
 			sel = ':is(#view, form > .cbi-map) :is(.table, table):is(:has(> .tr > .th, > :is(.thead, thead, tbody) > .tr > .th), .cbi-section-table):not(:has(.diag-action))';
 		if (!view)
 			return;
+		const fitted = [];
 
 		const width = (p) => {
 			const s = getComputedStyle(p);
@@ -85,22 +82,27 @@ return baseclass.extend({
 			if (!p?.clientWidth || !t.matches(sel))
 				return;
 
-			const w = t.style.width;
+			const lease = t.id == 'status_leases' || t.id == 'status_leases6';
 			if (t.dataset.fold != 'wide')
 				t.dataset.fold = 'wide';
-			t.style.width = 'min-content';
+			if (lease)
+				t.classList.add('aster-probe');
+			/* Not an inline style: [style] rules stay put. */
+			const probe = t.animate([{ width: 'min-content' }], { fill: 'forwards' });
 			const need = t.scrollWidth, room = width(p) - parseFloat(ts.marginLeft) - parseFloat(ts.marginRight);
-			t.style.width = w;
+			probe.cancel();
+			if (lease)
+				t.classList.remove('aster-probe');
 			if (need > room + 0.5 - (was ? 16 : 0))
 				t.dataset.fold = 'fold';
-			/* nftables' comment mark follows the rule's words (text first); an
-			 * empty chain's line is the table's placeholder (C20). */
+			fitted.push(t);
+		};
+		const format = (t) => {
+			/* nftables' comment mark follows the rule's words. */
 			t.querySelectorAll('.td > .nft-comment:not(:last-child)').forEach((c) => c.parentNode.append(c));
-			t.querySelectorAll('.tr > .td.center[colspan]:only-child').forEach((c) => c.parentNode.classList.add('placeholder'));
+			t.querySelectorAll('.tr:not(.placeholder) > .td.center[colspan]:only-child').forEach((c) => c.parentNode.classList.add('placeholder'));
 
-			/* Folded, a cell is a label and a value: it takes its column's
-			 * name where LuCI gives none (nftables, Lua maps), an empty one
-			 * ("-") is marked, and mixed content goes into one box. */
+			/* Folded cells need a label, an empty marker and one value. */
 			if (t.dataset.fold == 'wide')
 				return t.querySelectorAll('.tr > * > div.aster-v').forEach((v) => v.replaceWith(...v.childNodes));
 
@@ -155,7 +157,11 @@ return baseclass.extend({
 					q.add(p);
 			}
 			resized.clear();
-			q.forEach((t) => (fit(t), sz.set(t, dim(t))));
+			q.forEach(fit);
+			/* Batch row mutations so :has() restyles the view once. */
+			fitted.forEach(format);
+			fitted.length = 0;
+			q.forEach((t) => sz.set(t, dim(t)));
 			q.clear();
 			/* Drop this fit's own cell and comment moves. */
 			mo.takeRecords();
