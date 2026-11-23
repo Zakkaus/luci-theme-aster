@@ -37,16 +37,16 @@ expect uniform 1 "c10.actions gap,space.control.row gap" "row actions 2 apart" -
 expect uniform 1 "g.marker.table offset,table.row.button height" "marker before the identifier (defect 1, 5)" -- "$url" "$password" --pages "$tmp/tab-proc.txt" \
 	--debug-css 'admin/status/processes=#view .tr > .td:first-child::before { content: ""; display: inline-block; inline-size: 8px; block-size: 8px; margin-inline-end: 8px }'
 # C7 when: a table wider than its card left wide (the cell grows only
-# outside theme-aster.js's measuring, which sets an inline width).
+# outside theme-aster.js's measuring, which marks it .aster-probe).
 expect uniform 1 "c7.when state,overflow excess,g.overflow conform" "wide table that does not fit" -- "$url" "$password" --pages "$tmp/tab-when.txt" \
-	--debug-css 'admin/status/routes=#view .table:not([style*="min-content"]) .tr > .td:nth-child(2) { min-inline-size: 1600px }'
+	--debug-css 'admin/status/routes=#view .table:not(.aster-probe) .tr > .td:nth-child(2) { min-inline-size: 1600px }'
 # C7 when, G5: nftables on a phone measured with CJK breaking after any
 # character, so its tables "fit" and stay wide, one glyph a line (a); its
 # clauses may wrap too (wide, they are one line). The table overflows its
 # card and the broken rows grow past one text line. The chain's 1px ::after
 # resizes it, so theme-aster.js measures again.
 expect uniform 1 "c7.when state,g.overflow conform,overflow excess,table.row.text height" "table measured with words broken (CJK)" -- "$url" "$password" --pages "$tmp/tab-nft.txt" --viewports phone \
-	--debug-css 'admin/status/nftables=html #view .table[style*="min-content"] :is(.td, .th, .td .ifacebadge) { word-break: break-all !important; white-space: normal !important } html #view .nft-chain::after { content: ""; display: block; block-size: 1px }'
+	--debug-css 'admin/status/nftables=html #view .table.aster-probe :is(.td, .th, .td .ifacebadge) { word-break: break-all !important; white-space: normal !important } html #view .nft-chain::after { content: ""; display: block; block-size: 1px }'
 # C7 when (audit 2, C7 A): Overview's leases kept on one line, so a host
 # name that wraps at its spaces on DHCP's page folds the table here.
 printf '%s\n' 'admin/status/overview require=c7.when' >"$tmp/tab-ov.txt"

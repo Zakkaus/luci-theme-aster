@@ -82,17 +82,14 @@ return baseclass.extend({
 			if (!p?.clientWidth || !t.matches(sel))
 				return;
 
-			const lease = t.id == 'status_leases' || t.id == 'status_leases6';
 			if (t.dataset.fold != 'wide')
 				t.dataset.fold = 'wide';
-			if (lease)
-				t.classList.add('aster-probe');
+			t.classList.add('aster-probe');
 			/* Not an inline style: [style] rules stay put. */
 			const probe = t.animate([{ width: 'min-content' }], { fill: 'forwards' });
 			const need = t.scrollWidth, room = width(p) - parseFloat(ts.marginLeft) - parseFloat(ts.marginRight);
 			probe.cancel();
-			if (lease)
-				t.classList.remove('aster-probe');
+			t.classList.remove('aster-probe');
 			if (need > room + 0.5 - (was ? 16 : 0))
 				t.dataset.fold = 'fold';
 			fitted.push(t);

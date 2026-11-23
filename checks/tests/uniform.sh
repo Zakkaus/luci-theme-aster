@@ -55,10 +55,10 @@ expect uniform 1 "card background,c2.card conform" "dark card fill changed" -- "
 # Content wider than its card: the rule 26d0959 dropped, put back. It made
 # the interfaces table 15,200 px wide inside its card; the page itself did
 # not overflow, so only the overflow rule sees it.
-# (theme-aster.js measures a table with an inline min-content width, so
+# (theme-aster.js marks a table .aster-probe while it measures it, so
 # the stretch hides from it and the table stays wide.)
 expect uniform 1 "overflow excess,c7.when state,g.overflow conform" "interfaces table wider than its card" -- "$url" "$password" --pages "$tmp/network.txt" \
-	--debug-css 'admin/network/network=.table:not([style*="min-content"]):has([style*="min-width"]) { min-inline-size: max-content; }'
+	--debug-css 'admin/network/network=.table:not(.aster-probe):has([style*="min-width"]) { min-inline-size: max-content; }'
 
 # A rule under a card's last row: Diagnostics' tool cells (one row in a
 # card-framed table) drawing their row rule again.
