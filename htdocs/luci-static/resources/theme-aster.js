@@ -307,9 +307,9 @@ return baseclass.extend({
 		const kv = '--aster-kv-w';
 		// Read after layout; a lease-table replacement otherwise forces a full layout here.
 		const ro = new ResizeObserver((rs) => rs.forEach(({ target: n }) => {
-			ro.unobserve(n);
 			const w = Math.max(...Array.from(n.querySelectorAll('.nowrap:not(.cbi-tooltip *)>strong:first-child'), (s) => s.getBoundingClientRect().width));
-			if (w > 0) queueMicrotask(() => n.style.setProperty(kv, `${Math.ceil(w)}px`));
+			/* Hidden (an inactive tab), it is measured when it shows. */
+			if (w > 0) ro.unobserve(n), queueMicrotask(() => n.style.setProperty(kv, `${Math.ceil(w)}px`));
 		}));
 		let said;
 		const error = _('Error'), id = /(\S+:\/\/\S+)/, arrow = /([▲▼])/, colon = /\s*[:：]\s*$/;
