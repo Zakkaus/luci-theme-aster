@@ -1059,7 +1059,7 @@ html .zonebadge:is(.zonebadge-empty, :has(> em:only-child)) {
    text is in flow, the track (::after) under it: text too long for the
    column breaks at a space, balanced (a number keeps its unit, the
    percentage stays), and moves the track down (AUDIT5 B2). */
-[data-page="admin-status-overview"] .table:not(:where(#status_leases, #status_leases6)):has(> .tr > .td > .cbi-progressbar) {
+[data-page="admin-status-overview"] .table:not(:where(#status_leases, #status_leases6)):has(.cbi-progressbar:is(.tr > .td > *)) {
   display: grid;
   grid-template-columns: fit-content(50%) minmax(0, 1fr);
   gap: var(--spacing-2) var(--spacing-4);
