@@ -93,7 +93,7 @@ html :where(:focus-visible) {
    on every scroller, apps' included. */
 html, html :where(*) { scrollbar-width: thin; scrollbar-color: var(--color-border-emphasized) transparent; }
 
-html ::selection { background: var(--color-accent-muted); }
+::selection { background: var(--color-accent-muted); }
 
 html input[type="range"], html progress { accent-color: var(--color-accent); }
 
